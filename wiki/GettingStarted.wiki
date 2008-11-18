@@ -1,0 +1,45 @@
+#labels starter
+Getting started
+
+
+= Introduction =
+
+import flash.display.Sprite;
+import com.atticmedia.console.*;
+//
+// SET UP
+c.start(this, ""); // "" - change for password. this will start hidden
+c.command = true; // enable command line
+c.fpsMode = 2; // enable FPS monitor with setting 2
+c.width = 500;
+c.height =300;
+//c.tracing = true; // trace on flash's normal trace
+
+// LOGGING
+c.add("Hello world");
+c.add("This is important!", 10);
+c.add("This is not really important", 7);
+c.add("This is totally a dummy", 0);
+
+//
+c.ch("myChannel","Hello my Channel");
+c.ch("myChannel","Hello importnat message at my channel", 10);
+
+// press @ at the top for console menu.
+// press H on second right for console menu help
+
+// if you want to use command line, please type /help 
+// in command line at the bottom for examples
+
+// garbage collection monitor
+var aSprite = new Sprite();
+c.watch(aSprite, "aSprite");
+aSprite = null;
+// it will probably never get collected in this example
+// but if you have debugger version of flash player installed,
+// you can press G in console menu (press @ at top) to force garbage collect
+
+
+
+
+MORE TO COME...
