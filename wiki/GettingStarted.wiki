@@ -3,7 +3,8 @@ Getting started
 
 
 = Introduction =
-`
+{{{
+
 import flash.display.Sprite;
 import com.atticmedia.console.*;
 //
@@ -38,7 +39,7 @@ aSprite = null;
 // it will probably never get collected in this example
 // but if you have debugger version of flash player installed,
 // you can press G in console menu (press @ at top) to force garbage collect
-`
+}}}
 
 
 
