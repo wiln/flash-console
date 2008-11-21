@@ -3,10 +3,10 @@
 
 ==Introduction==
 
-The main class you will need to use for console is `c`, (`com.atticmedia.console.c`). `c` is a static class wrapper of `console` (`com.atticmedia.console.console`). 
-If you want to use multiple instances of console, you can start a new console instance by calling `new console()` but for your convinence, use `c.start(..)`, which make sure console reference is a singleton.
+The main class you will need to use for console is `C`, (`com.atticmedia.console.C`). `C` is a static class wrapper of `Console` (`com.atticmedia.console.Console`). 
+If you want to use multiple instances of console, you can start a new console instance by calling `new Console()` but for your convenience, use `C.start(..)`, which make sure console reference is a singleton.
 
-In a later date when you don't need logging in your flash project, you can just remove `c.start(..)` from your code and the rest of other console related codes will stop executing.
+In a later date when you don't need logging in your flash project, you can just remove `C.start(..)` from your code and the rest of other console related codes will stop executing.
 
 
 ==Basics==
@@ -14,27 +14,27 @@ In a later date when you don't need logging in your flash project, you can just 
 import com.atticmedia.console.*;
 
 // SET UP
-c.start(this, ""); 
+C.start(this, ""); 
 // If you want to set a keyword for console to start, assign at second parameter. 
 // Use letters and numbers only. Console will start hidden if you set a password.
 // You will need to type the keyword in correct sequence to show the console.
 // 
-c.command = true; // (optional) enable command line
-c.fpsMode = 2; // (optional) enable FPS monitor with setting 2
-c.memoryMonitor = 1; // (optional) enable memory usage monitor with setting 1
-c.width = 500; // (optional)
-c.height =300; // (optional)
-//c.tracing = true; // (optional) trace on flash's normal 'trace'
+C.command = true; // (optional) enable command line
+C.fpsMode = 2; // (optional) enable FPS monitor with setting 2
+C.memoryMonitor = 1; // (optional) enable memory usage monitor with setting 1
+C.width = 500; // (optional)
+C.height =300; // (optional)
+//C.tracing = true; // (optional) trace on flash's normal 'trace'
 
 // LOGGING
-c.add("Hello world");
-c.add("This is important!", 10);
-c.add("This is not really important", 7);
-c.add("This is totally a dummy", 0);
+C.add("Hello world");
+C.add("This is important!", 10);
+C.add("This is not really important", 7);
+C.add("This is totally a dummy", 0);
 
 //
-c.ch("myChannel","Hello my Channel");
-c.ch("myChannel","Hello important message at my channel", 10);
+C.ch("myChannel","Hello my Channel");
+C.ch("myChannel","Hello important message at my channel", 10);
 
 // press @ at the top for console menu.
 // press H on second right for console menu help
@@ -70,7 +70,7 @@ __Filter log text
 {{{
 import flash.display.Sprite;
 var aSprite = new Sprite();
-c.watch(aSprite, "aSprite");
+C.watch(aSprite, "aSprite");
 aSprite = null;
 }}}
 Above example creates a Sprite and then remove its reference. This marks the Sprite to be garbage collected, but it will probably never get collected straight away.
@@ -84,32 +84,32 @@ If you start using this in fairly big flash project, you will see that objects t
 // enable remoting broadcast
 // start broadcasting logs. It will also keep logging for it self
 // it can not be a remote while it is remoting...
-c.remoting = true;
+C.remoting = true;
 
 // recieve remoting broadcasts
 // start logging broadcasted logs from another swf.
 // it can not be remoting while it is a remote...
-c.isRemote = true;
+C.isRemote = true;
 
 // Change viewing channel
 // This is the same as pressing the channel on channels tab at the top.
-c.viewingChannel = "myChannel";
+C.viewingChannel = "myChannel";
 
 // pause console
 // This is the same as pressing P button from console menu
 // It will keep logging but will stop all update processes
-c.paused = true;
+C.paused = true;
 
 // hide console
 // This is the same as pressing H button from console menu
 // It will keep logging but will stop all update processes
-c.visible = false;
+C.visible = false;
 
 // disable console
 // It will stop all processes until you enable by code again
-c.enabled = false;
+C.enabled = false;
 
 // disable always on top (default is on)
 // when disabled console will try keep it self at the top of the display list
-c.alwaysOnTop = false;
+C.alwaysOnTop = false;
 }}}
