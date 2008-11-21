@@ -1,0 +1,11 @@
+#labels Phase-Requirements
+This page aims to explain technical aspects of Console.
+
+= Introduction =
+
+
+  * Required : *ActionScript 3.0*
+  * Compatible with : *Flash CS3* or above, *Flex*, *AIR*
+  * File size increase in compressed SWF : *27KB*
+  * File size increase in uncompressed SWF : *54KB*
+  * Minimum memory usage increase : *42KB*
