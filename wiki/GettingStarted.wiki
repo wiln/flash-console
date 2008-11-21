@@ -43,7 +43,7 @@ c.ch("myChannel","Hello important message at my channel", 10);
 ==Advanced==
 
 ====Command line====
-
+TODO: write up proper page for command line
 {{{
 root.oObj => root oObj
 (save obj reference) => /save obj1
@@ -61,6 +61,9 @@ __Other useful examples:
 stage width
 stage scaleMode = noScale
 stage frameRate = 12
+
+__Filter log text
+/filter <some text>
 }}}
 
 ====Garbage collection monitor====
@@ -110,4 +113,3 @@ c.enabled = false;
 // when disabled console will try keep it self at the top of the display list
 c.alwaysOnTop = false;
 }}}
-
