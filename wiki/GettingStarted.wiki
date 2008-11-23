@@ -3,10 +3,9 @@
 
 ==Introduction==
 
-The main class you will need to use for console is `C`, (`com.atticmedia.console.C`). `C` is a static class wrapper of `Console` (`com.atticmedia.console.Console`). 
-If you want to use multiple instances of console, you can start a new console instance by calling `new Console()` but for your convenience, use `C.start(..)`, which make sure console reference is a singleton.
+The main class you will need to use for console is `C`, (`com.atticmedia.console.C`). `C` is a static / singleton adapter for `Console` (`com.atticmedia.console.Console`). 
 
-In a later date when you don't need logging in your flash project, you can just remove `C.start(..)` from your code and the rest of other console related codes will stop executing.
+In a later date when you don't need console in your flash project, you can just remove `C.start(..)` from your code and the rest of console related codes will stop executing to save memory and performance.
 
 
 ==Basics==
@@ -19,10 +18,10 @@ C.start(this, "");
 // Use letters and numbers only. Console will start hidden if you set a password.
 // You will need to type the keyword in correct sequence to show the console.
 // 
-C.command = true; // (optional) enable command line
+C.commandLine = true; // (optional) enable command line
 C.fpsMode = 2; // (optional) enable FPS monitor with setting 2
 C.memoryMonitor = 1; // (optional) enable memory usage monitor with setting 1
-C.width = 500; // (optional)
+C.width = 600; // (optional)
 C.height =300; // (optional)
 //C.tracing = true; // (optional) trace on flash's normal 'trace'
 
@@ -34,7 +33,7 @@ C.add("This is totally a dummy", 0);
 
 //
 C.ch("myChannel","Hello my Channel");
-C.ch("myChannel","Hello important message at my channel", 10);
+C.ch("myChannel","Hello, important message at my channel", 10);
 
 // press @ at the top for console menu.
 // press H on second right for console menu help
