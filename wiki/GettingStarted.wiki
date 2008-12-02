@@ -43,27 +43,7 @@ C.ch("myChannel","Hello, important message at my channel", 10);
 
 ====Command line====
 TODO: write up proper page for command line
-{{{
-root.oObj => root oObj
-(save obj reference) => /save obj1
-(load obj reference) => $obj1
-root.oObj2.myProperty => root oObj2 myProperty
-root.oObj2.myProperty = oObj => root oObj2 myProperty = $obj1
-(view info of last return) => /inspect
-(view all info of last return) => /inspectall
-(see display map of last return) => /map
-__Use * to access static classes
-com.atticmedia.console.C => *com.atticmedia.console.C
-(save reference) => /save c
-com.atticmedia.console.C.add('test',10) => $c add(test,10)
-__Other useful examples:
-stage width
-stage scaleMode = noScale
-stage frameRate = 12
-
-__Filter log text
-/filter <some text>
-}}}
+write `/help` in command line area for help.
 
 ====Garbage collection monitor====
 {{{
