@@ -42,8 +42,9 @@ C.ch("myChannel","Hello, important message at my channel", 10);
 ==Advanced==
 
 ====Command line====
-TODO: write up proper page for command line
-write `/help` in command line area for help.
+TODO: write up proper page for command line.
+
+Write `/help` in command line area for help.
 
 ====Garbage collection monitor====
 {{{
