@@ -1,0 +1,34 @@
+#labels Featured,Phase-Implementation
+Command Line usage
+
+= Introduction =
+
+Command line uses the same syntax as normal AS3. Except that you can only do 1 simple line of code at a time. 
+Command line starts with root as the first scope.
+So if you write `this` and hit enter first thing, it will reply:
+
+`[C] Returned com.atticmedia.console.samples::Sample: [object Sample]`
+
+Where in this example, document class is `Sample`
+
+To call a method `getChildAt(0)`from this root, you can write:
+`getChildAt(0)` OR `this.getChildAt(0)` OR `root.getChildAt(0)`
+
+Console should return the first display object from your root.
+which in this Sample example:
+`[C] Returned flash.display::Shape: [object Shape]`
+
+As soon as there is an object return (anything thats not a String or null), your current scope becomes the last return.
+
+So now if you type `this`, it should return the first display object in the root, rather than the root it self.
+
+Using this anolgy, you can basically access almost every 'public' object in your flash... read on...
+
+
+If you want to make a direct reference to an object / class, you can use C.store("myObj", myObject); in code.
+in CommandLine, you can access to this object by typing `$myObj`
+
+Sometimes when you go into objects that are not in the display list and you need to go back to `root`, you can no longer type root to get to the top level display. You will need to force return to base scope by typing `/base`. You can change your base target in code using this example: `C.commandBase = stage`
+
+Use commands `/inspect` AND  `/inspectfull`  to get detailed info of your current scope.
+Use command `/map` to get the display list map starting from your current scope
