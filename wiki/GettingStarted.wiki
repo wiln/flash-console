@@ -17,6 +17,7 @@ C.start(this, "");
 // If you want to set a keyword for console to start, assign at second parameter. 
 // Use letters and numbers only. Console will start hidden if you set a password.
 // You will need to type the keyword in correct sequence to show the console.
+// Recommended keyword: ` or # or ~
 // 
 C.commandLine = true; // (optional) enable command line
 C.fpsMode = 2; // (optional) enable FPS monitor with setting 2
@@ -42,7 +43,6 @@ C.ch("myChannel","Hello, important message at my channel", 10);
 ==Advanced==
 
 ====Command line====
-TODO: write up proper page for command line.
 
 Write `/help` in command line area for help.
 
@@ -71,6 +71,8 @@ C.remoting = true;
 // it can not be remoting while it is a remote...
 C.isRemote = true;
 
+
+
 // Change viewing channel
 // This is the same as pressing the channel on channels tab at the top.
 C.viewingChannel = "myChannel";
@@ -90,6 +92,7 @@ C.visible = false;
 C.enabled = false;
 
 // disable always on top (default is on)
-// when disabled console will try keep it self at the top of the display list
+// when disabled console will stop from keeping it self at the top of the display list
+// this can sometimes fix some problems if you need to manage the display list
 C.alwaysOnTop = false;
 }}}
