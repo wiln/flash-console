@@ -36,7 +36,36 @@ root.getChildAt(0)
 this
 }}}
   * it should return the first display object (Shape) from the root, rather than the root it self.
-  * Using this anolgy, you can basically access almost every 'public' object in your flash... Read on !...
+  * If you want to go back to root, you could use these commands:
+{{{
+parent
+ (OR)
+root
+ (OR)
+/base
+}}}
+  * Where `/base` is a build it command to force re-scope to the command line base scope (by default, it is root)
+  * Now you should be back in root. To see a map of displays inside root, you can type
+{{{
+/map
+}}}
+  * Again this is another built in command that tells command line to generate map of displays from your prevous return. You should now see a fairly long list of display objects.
+  * From this list you can eitehr click on the object you are interseted in to get the scope or simply try an adventurious way by typing away. For now we are going to get a scope on the yellow circle inside the nested circles. by code it would be:
+{{{
+mc.nest2.nest3.yellow
+ (OR)
+root.mc.nest2.nest3.yellow
+}}}
+  * This will return you with a reference to the yellow circle. You can already start playing the properties of this clip by typing this like:
+{{{
+alpha = 0.5
+x = 0
+y = 0
+}}}
+  * Note that changing X and Y may be inverted for you because rotation of `mc` is -90...SO you could go ahead and change the rotation back to zero... try it!
+
+
+TODO: finish writing this section
 
 == Storing objects ==
   * If you want to make a direct reference to an object / class, you can write this in your source code (not in command line)
