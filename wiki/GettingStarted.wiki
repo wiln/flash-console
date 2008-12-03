@@ -44,8 +44,8 @@ C.ch("myChannel","Hello, important message at my channel", 10);
 
 ====Command line====
 
-Write `/help` in command line area for help.
-Read CommandLineHelp for detailed info on how to take advantage of Command Line.
+  * Write `/help` in command line area for help.
+  * Read CommandLineHelp for detailed info on how to take advantage of Command Line.
 
 ====Garbage collection monitor====
 {{{
