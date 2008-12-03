@@ -8,7 +8,8 @@
 
 == Introduction ==
 
-  * Command line uses the same syntax as normal AS3. Except that you can only do 1 simple line of code at a time. 
+  * Command line sits at the bottom of the console window.
+  * It uses the same syntax as normal AS3. Except that you can only do 1 simple line of code at a time. 
   * Command line starts with root as the first scope (by default). So if you write:
 {{{
 this
