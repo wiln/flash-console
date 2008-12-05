@@ -9,12 +9,25 @@
 == Introduction ==
 
   * Command line sits at the bottom of the console window.
-  * It uses the same syntax as normal AS3. Except that you can only do 1 simple line of code at a time. 
-  * Command line starts with root as the first scope (by default). So if you write:
+  * It uses the same syntax as normal AS3. Except that you can only do 1 simple line of code at a time.
+
+
+=== Uses===
+  * We have developed a game that users are able to go to to different parts of an island collecting items, keys and unlocking each part of the island. Testing and fixing different parts of the island for bugs would be a pain if you have to go through all stage from start every time you re-launch the game (or recompile to change the start place). With Console, we are able to just type which section we want to go to in command line like: `$goto(red31)` We can even give our selves items without picking them up by calling a command like: `$give(bluekey1)` with these simple commands we are able to let betatesters go to different parts of the island with different item combinations without needing to start the game all over again.
+  * We are developing another game that can save game progress to server. While server side is being developed we are able to use text files to save the game data. We can call from commandline: `$load(save30.txt)` to load the text data
+
+
+=== Limitations ===
+  * At the moment command line can not accept nested function calls. Such as `myobj.myfunction(myobj2.myfun2().name).property`. But a function call like this will work: `myobj.myfunction($name).property`
+  * String declarations such as `"thisIsMyString"`, can not have spaces in them. - This will be fixed sometime soon.
+
+== Tutorial==
+
+  * Command line starts with root/(document class) as the first scope (by default). So if you write:
 {{{
 this
 }}} 
-  * and hit enter first thing, it will reply:
+  * and hit enter,it will reply:
 {{{
 [C] Returned com.atticmedia.console.samples::Sample: [object Sample]
 }}}
