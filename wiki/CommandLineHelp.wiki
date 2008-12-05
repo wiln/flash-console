@@ -42,9 +42,9 @@ root.getChildAt(0)
 }}}
   * Console should return the first display object from your root. which in this example:
 {{{
-[C] Returned flash.display::Shape: [object Shape]
+[C] + Returned flash.display::Shape: [object Shape]
 }}}
-  * As soon as there is an object return (anything thats not a String or null or undefined), your current scope becomes that last return.
+  * As soon as there is an object return (anything thats not a String or null or undefined), your current scope becomes that last return. You can tell by ' + ' sign on the return statement that it have moved to a new scope.
   * So now if you type again:
 {{{
 this
