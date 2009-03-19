@@ -3,7 +3,7 @@ This page is to list advanced list of how to...
 
 
 ==FPS display==
-  * To turn on FPS display by code: `C.fpsMode = 1` (1 - 3)
+  * To turn on FPS display by code: `C.fpsMode = 1` (0 - 5)
   * To turn on at run time: click on *@* at the top (to show the menu), then press F.
 
 *fpsMode list:*
