@@ -1,0 +1,9 @@
+This page is to list advanced list of how to...
+
+
+Text searching/filtering:
+- turn on command line.
+- type '/filter <text to filter>'
+- this will create a new channel called 'filtered' and it will only print logs that only have the text term you have passed.
+- When finished don't forget to go back to other channels to see other logs.
+
