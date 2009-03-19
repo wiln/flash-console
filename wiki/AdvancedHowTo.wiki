@@ -1,9 +1,23 @@
 This page is to list advanced list of how to...
 
 
-Text searching/filtering:
-- turn on command line.
-- type '/filter <text to filter>'
-- this will create a new channel called 'filtered' and it will only print logs that only have the text term you have passed.
-- When finished don't forget to go back to other channels to see other logs.
 
+==FPS display==
+  * To turn on FPS display by code: `C.fpsMode = 1` (1 - 3)
+  * To turn on at run time: click on *@* at the top (to show the menu), then press F.
+
+*fpsMode list:*
+  * 0 = off
+  * 1 = current fps
+  * 2 = mininum - current - max
+  * 3 = min - current - max: average
+  * 4 = min - current - max: average, average msPerFrame - msPerFrame
+  * 5 = average msPerFrame - mcPerFrame
+
+
+
+==Text searching/filtering==
+  * turn on command line.
+  * type '/filter <text to filter>'
+  * this will create a new channel called 'filtered' and it will only print logs that only have the text term you have passed.
+  * When finished don't forget to go back to other channels to see other logs.
