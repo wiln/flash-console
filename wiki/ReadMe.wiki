@@ -1,4 +1,5 @@
-#summary Read me an changes log.
+#summary Read me and changes log.
+#labels Featured
 
 
 = READ ME =
