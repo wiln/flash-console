@@ -1,5 +1,5 @@
-#summary Read me and changes log.
-#labels Featured
+#summary Read me and Changes log.
+#labels Featured,Phase-Requirements
 
 
 = READ ME =
@@ -10,7 +10,16 @@
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo
 
+  * Required: `ActionScript 3.0`, Flash player 9 or above
+  * Authoring: Flash, Flex or AIR
+
+
+NOTE: To use in flex or AIR, you need to pass in a UIView (which is somewhere on stage) as console's base display. Passing in document class or stage does not work in Flex, for some reason. - will be looked at very soon.
 ---- 
+
+==Short description==
+Console is an as3 logger, debugger which runs inside the flash app.
+Features include: priorities, channels, FPS display, memory/garbage collection monitor, remote logging, non-repeative tracing, ruler tool, display mapping, and many more!
 
 
 == Change Log ==
