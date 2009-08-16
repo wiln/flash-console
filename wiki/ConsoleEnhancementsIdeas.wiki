@@ -1,0 +1,13 @@
+==Console Enhancements Ideas==
+
+NOT in order of importance.
+
+ * Data graphing - such as showing FPS in graph and add multiple graphs of your own data
+ * Display Roller to capture current display map on key/mouse click, for better examination of the map - click on display name to get instance of the clip for command line use.
+ * Better Command Line syntax reading - currently can't handle nested calls and strings with spaces
+ * FPS to show in a more visual way for easier comparison.
+ * Ruler mode should have a horizontal and vertical line following the mouse to be useful in alignment testing
+ * Support Flex debugging like logging method. (like making channel instances with package path)
+ * Improve menu system. - currently a LOT of people don't know what the menu button keys stand for.
+
+ * Do a video or so to demonstrate the use of Console
