@@ -1,11 +1,7 @@
 ﻿package com.atticmedia.console.panels {
-	import com.atticmedia.console.panels.prop.Grapher;	
-	
-	import flash.events.Event;
-	import flash.geom.Rectangle;	
-	import flash.display.Shape;	
 	import flash.display.Sprite;
-	
+	import flash.events.Event;	
+
 	/**
 	 * @author LuAye
 	 */
@@ -13,8 +9,10 @@
 
 		private var _interests:Array = [];
 		private var _history:Array = [];
-		protected var lowGraph:Number;
-		protected var highGraph:Number;
+		public var lowGraph:Number;
+		public var highGraph:Number;
+		private var _fixedGraph:Boolean;
+		
 		protected var graph:Sprite;
 		
 		public function GraphingPanel() {
@@ -22,7 +20,6 @@
 			registerDragger(bg);
 			graph = new Sprite();
 			addChild(graph);
-			add(this,"rand",0);
 		}
 		
 		public function get rand():Number{
@@ -38,7 +35,15 @@
 			// Note that if has already started, it wont add another listener on top.
 			addEventListener(Event.ENTER_FRAME, onFrame, false, 0, true);
 		}
-		
+		public function fixGraph(low:Number,high:Number):void{
+			if(isNaN(low) || isNaN(low)) {
+				_fixedGraph = false;
+				return;
+			}
+			_fixedGraph = true;
+			lowGraph = low;
+			highGraph = high;
+		}
 		private function onFrame(e:Event):void{
 			
 			var values:Array = [];
@@ -46,8 +51,10 @@
 				var v:Number = interest[0][interest[1]];
 				v = isNaN(v)?0:v;
 				values.push(v);
-				if(v > highGraph) highGraph = v;
-				if(v < lowGraph) lowGraph = v;
+				if(!_fixedGraph){
+					if(v > highGraph) highGraph = v;
+					if(v < lowGraph) lowGraph = v;
+				}
 			}
 			_history.push(values);
 			drawGraph();
@@ -70,7 +77,7 @@
 					}
 					var v:Number = values[j];
 					var p:Number = (v-lowGraph)/diffGraph;
-					graph.graphics[(first?"moveTo":"lineTo")]((W-i), p*H);
+					graph.graphics[(first?"moveTo":"lineTo")]((W-i), H-(p*H));
 				}
 				first = false;
 			}
