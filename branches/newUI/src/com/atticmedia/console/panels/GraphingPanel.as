@@ -13,6 +13,11 @@
 		public var highGraph:Number;
 		private var _fixedGraph:Boolean;
 		
+		private var _updatedFrame:uint = 0;
+		private var _drawnFrame:uint = 0;
+		public var updateEvery:uint = 25;
+		public var drawEvery:uint = 25;
+		
 		protected var graph:Sprite;
 		
 		public function GraphingPanel() {
@@ -36,7 +41,7 @@
 			addEventListener(Event.ENTER_FRAME, onFrame, false, 0, true);
 		}
 		public function fixGraph(low:Number,high:Number):void{
-			if(isNaN(low) || isNaN(low)) {
+			if(isNaN(low) || isNaN(high)) {
 				_fixedGraph = false;
 				return;
 			}
@@ -45,22 +50,40 @@
 			highGraph = high;
 		}
 		private function onFrame(e:Event):void{
-			
-			var values:Array = [];
-			for each(var interest in _interests){
-				var v:Number = interest[0][interest[1]];
-				v = isNaN(v)?0:v;
-				values.push(v);
-				if(!_fixedGraph){
-					if(v > highGraph) highGraph = v;
-					if(v < lowGraph) lowGraph = v;
+			var doupdate:Boolean = true;
+			if(updateEvery > 1){
+				_updatedFrame++;
+				if(_updatedFrame >= updateEvery){
+					_updatedFrame= 0;
+				}else{
+					doupdate = false;
 				}
 			}
-			_history.push(values);
+			if(doupdate){
+				var values:Array = [];
+				for each(var interest in _interests){
+					var v:Number = interest[0][interest[1]];
+					v = isNaN(v)?0:v;
+					values.push(v);
+					if(!_fixedGraph){
+						if(v > highGraph) highGraph = v;
+						if(v < lowGraph) lowGraph = v;
+					}
+				}
+				_history.push(values);
+			}
 			drawGraph();
 		}
 		
 		private function drawGraph():void{
+			if(drawEvery > 1){
+				_drawnFrame++;
+				if(_drawnFrame >= drawEvery){
+					_drawnFrame= 0;
+				}else{
+					return;
+				}
+			}
 			var W:Number = width;
 			var H:Number = height;
 			graph.graphics.clear();
