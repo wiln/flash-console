@@ -38,7 +38,7 @@
 			var format:TextFormat = new TextFormat();
             format.font = "Arial";
             format.size = 10;
-            format.color = 0xAAAAAA;
+            format.color = 0x999999;
 			lowTxt = new TextField();
 			lowTxt.mouseEnabled = false;
 			lowTxt.defaultTextFormat = format;
@@ -52,6 +52,7 @@
 			addChild(highTxt);
 			//
 			format.align = TextFormatAlign.RIGHT;
+            format.color = 0xCCCCCC;
 			keyTxt = new TextField();
 			keyTxt.mouseEnabled = false;
 			keyTxt.defaultTextFormat = format;

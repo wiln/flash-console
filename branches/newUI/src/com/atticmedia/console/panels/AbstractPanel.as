@@ -42,8 +42,6 @@ package com.atticmedia.console.panels {
 			var grid:Rectangle = new Rectangle(rounding, rounding, roundSize, roundSize);
 			bg.scale9Grid = grid;
 		}
-		
-		
 		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = 0, a:Number = 0.6, rounding:int = 10):void{
 			drawBG(col, a, rounding);
 			if(resizable){
@@ -62,6 +60,7 @@ package com.atticmedia.console.panels {
 			height = h;
 		}
 		//
+		// SIZE
 		//
 		override public function set width(n:Number):void{
 			if(n < minimumWidth) n = minimumWidth;
@@ -80,7 +79,7 @@ package com.atticmedia.console.panels {
 			return bg.height;
 		}
 		//
-		// DRAGGING
+		// MOVING
 		//
 		public function registerSnaps(X:Array, Y:Array):void{
 			_snaps = [X,Y];

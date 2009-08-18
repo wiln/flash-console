@@ -42,7 +42,6 @@ package com.atticmedia.console.panels {
 			_traceField.multiline = true;
 			_traceField.defaultTextFormat = format;
 			_traceField.y = 12;
-			_traceField.text = "JEU!";
 			addChild(_traceField);
 			//
 			_txtFormat = new TextFormat();
@@ -82,6 +81,10 @@ package com.atticmedia.console.panels {
 			updateMenu();
 			//
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
+			//
+			//
+			
+			_traceField.htmlText = "Happy bug fixing!<br/>Hows the new Console so far?";
 		}
 		override public function set width(n:Number):void{
 			super.width = n;
