@@ -21,6 +21,8 @@
 * 
 */
 package com.atticmedia.console {
+	import flash.system.System;	
+	
 	import com.atticmedia.console.panels.*;
 	
 	import flash.utils.getTimer;	
@@ -66,14 +68,19 @@ package com.atticmedia.console {
 			addChild(panel);
 			
 			// test
-			var grapher:GraphingPanel = new GraphingPanel();
-			grapher.fixGraph(-1,2);
-			grapher.add(grapher,"rand", 0xFF0000);
-			grapher.add(grapher,"rand", 0x00FF00);
-			grapher.add(grapher,"rand", 0x3333FF);
-			addChild(grapher);
-			grapher.x = 100;
-			grapher.y = 120;
+			var fps:FPSPanel = new FPSPanel();
+			fps.x = panel.x+panel.width-80;
+			fps.y = panel.y+15;
+			//grapher.add(grapher,"rand", 0x00FF00, "green");
+			//grapher.add(grapher,"rand", 0x3333FF, "blue");
+			addChild(fps);
+			
+			// test
+			var mem:MemoryPanel = new MemoryPanel();
+			mem.x = panel.x+panel.width-160;
+			mem.y = panel.y+15;
+			addChild(mem);
+			
 		}
 		
 		

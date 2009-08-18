@@ -32,8 +32,8 @@ package com.atticmedia.console.panels {
 		}
 		
 		
-		public function init(w:Number,h:Number,resizable:Boolean = false):void{
-			drawBG();
+		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = 0, a:Number = 0.6, rounding:int = 10):void{
+			drawBG(col, a, rounding);
 			if(resizable){
 				scaler = new Sprite();
 				scaler.name = "scaler";

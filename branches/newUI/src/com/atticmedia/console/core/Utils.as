@@ -71,5 +71,11 @@ package com.atticmedia.console.core {
 		public static function getPointOnCircle(radius:Number, rad:Number):Point {
 			return new Point(radius * Math.cos(rad),radius * Math.sin(rad));
 		}
+		//
+		
+		public static function averageOut(current:Number, addition:Number, over:Number):Number {
+			var diff:Number = addition-current;
+			return current+(diff/over);
+		}
 	}
 }
