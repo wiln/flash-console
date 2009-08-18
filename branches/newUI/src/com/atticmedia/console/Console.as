@@ -21,8 +21,7 @@
 * 
 */
 package com.atticmedia.console {
-	import com.atticmedia.console.panels.MainPanel;	
-	import com.atticmedia.console.panels.AbstractPanel;	
+	import com.atticmedia.console.panels.*;
 	
 	import flash.utils.getTimer;	
 	import flash.system.Security;	
@@ -66,9 +65,15 @@ package com.atticmedia.console {
 			var panel:MainPanel = new MainPanel(this);
 			addChild(panel);
 			
-			//var abs:AbstractPanel = new AbstractPanel();
-			//abs.init(100, 20, true);
-			//addChild(abs);
+			// test
+			var grapher:GraphingPanel = new GraphingPanel();
+			grapher.fixGraph(-1,2);
+			grapher.add(grapher,"rand", 0xFF0000);
+			grapher.add(grapher,"rand", 0x00FF00);
+			grapher.add(grapher,"rand", 0x3333FF);
+			addChild(grapher);
+			grapher.x = 100;
+			grapher.y = 120;
 		}
 		
 		
