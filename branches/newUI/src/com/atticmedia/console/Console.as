@@ -58,6 +58,7 @@ package com.atticmedia.console {
 		public static const MINIMUM_HEIGHT:int = 16;
 		public static const MINIMUM_WIDTH:int = 20;
 		
+		private var _panels:Array = [];
 		
 		
 		public function Console(pass:String = "") {
@@ -65,25 +66,43 @@ package com.atticmedia.console {
 			
 			
 			var panel:MainPanel = new MainPanel(this);
-			addChild(panel);
+			addPanel(panel);
 			
-			// test
 			var fps:FPSPanel = new FPSPanel();
 			fps.x = panel.x+panel.width-80;
 			fps.y = panel.y+15;
-			//grapher.add(grapher,"rand", 0x00FF00, "green");
-			//grapher.add(grapher,"rand", 0x3333FF, "blue");
-			addChild(fps);
+			addPanel(fps);
 			
-			// test
 			var mem:MemoryPanel = new MemoryPanel();
 			mem.x = panel.x+panel.width-160;
 			mem.y = panel.y+15;
-			addChild(mem);
-			
+			addPanel(mem);
 		}
-		
-		
+		private function addPanel(panel:AbstractPanel):void{
+			_panels.push(panel);
+			panel.addEventListener(AbstractPanel.STARTED_DRAGGING, onPanelStartDragScale, false,0, true);
+			panel.addEventListener(AbstractPanel.STARTED_SCALING, onPanelStartDragScale, false,0, true);
+			addChild(panel);
+		}
+		private function onPanelStartDragScale(e:Event):void{
+			var target:AbstractPanel = e.currentTarget as AbstractPanel;
+			if(target.snapping){
+				var X:Array = [0];
+				var Y:Array = [0];
+				if(stage){
+					// this will only work for default stage.align atm...
+					X.push(stage.stageWidth);
+					Y.push(stage.stageHeight);
+				}
+				for each(var panel:AbstractPanel in _panels){
+					X.push(panel.x);
+					X.push(panel.x+panel.width);
+					Y.push(panel.y);
+					Y.push(panel.y+panel.height);
+				}
+				target.registerSnaps(X, Y);
+			}
+		}
 		
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();

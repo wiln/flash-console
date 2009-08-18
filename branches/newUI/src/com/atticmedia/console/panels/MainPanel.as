@@ -87,7 +87,7 @@ package com.atticmedia.console.panels {
 			super.width = n;
 			_traceField.width = n;
 			_menuField.width = n;
-			_commandField.width = n;
+			_commandField.width = n-10;
 			_commandBackground.width = n;
 			
 			_bottomLine.graphics.clear();

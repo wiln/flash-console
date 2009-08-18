@@ -1,4 +1,6 @@
 ﻿package com.atticmedia.console.panels {
+	import flash.text.TextFormatAlign;	
+	
 	import com.atticmedia.console.core.Utils;	
 	
 	import flash.display.Shape;
@@ -49,7 +51,7 @@
 			highTxt.y = 6;
 			addChild(highTxt);
 			//
-			format.align = "right";
+			format.align = TextFormatAlign.RIGHT;
 			keyTxt = new TextField();
 			keyTxt.mouseEnabled = false;
 			keyTxt.defaultTextFormat = format;
@@ -161,7 +163,7 @@
 					if(isNaN(avg)) {
 						interest[4] = v;
 					}else{
-						interest[4] = Utils.averageOut(avg, v, 50);
+						interest[4] = Utils.averageOut(avg, v, 20);
 					}
 				}
 				if(!fixed){

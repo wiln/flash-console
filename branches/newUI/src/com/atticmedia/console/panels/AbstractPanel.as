@@ -1,9 +1,13 @@
 package com.atticmedia.console.panels {
+	import flash.text.TextFieldAutoSize;	
+	import flash.text.TextFormatAlign;	
+	import flash.text.TextFormat;	
+	import flash.text.TextField;	
+	import flash.geom.Point;	
 	import flash.display.DisplayObject;	
 	import flash.events.Event;	
 	import flash.events.MouseEvent;	
-	import flash.geom.Rectangle;	
-	import flash.display.Shape;	
+	import flash.geom.Rectangle;
 	import flash.display.Sprite;
 	
 	/**
@@ -11,10 +15,18 @@ package com.atticmedia.console.panels {
 	 */
 	public class AbstractPanel extends Sprite {
 		
+		public static const STARTED_DRAGGING:String = "startedDragging";
+		public static const STARTED_SCALING:String = "startedScaling";
+		
+		private var _snaps:Array;
+		private var _dragOffset:Point;
+		private var _resizeTxt:TextField;
+		
 		protected var bg:Sprite;
 		protected var scaler:Sprite;
 		protected var minimumWidth:int = 18;
 		protected var minimumHeight:int = 18;
+		public var snapping:uint = 3;
 		
 		public function AbstractPanel() {
 			bg = new Sprite();
@@ -70,6 +82,9 @@ package com.atticmedia.console.panels {
 		//
 		// DRAGGING
 		//
+		public function registerSnaps(X:Array, Y:Array):void{
+			_snaps = [X,Y];
+		}
 		protected function registerDragger(mc:DisplayObject, dereg:Boolean = false):void{
 			if(dereg){
 				mc.removeEventListener(MouseEvent.MOUSE_DOWN, onDraggerMouseDown);
@@ -79,33 +94,108 @@ package com.atticmedia.console.panels {
 		}
 		private function onDraggerMouseDown(e:MouseEvent):void{
 			if(!stage) return;
+			//
+			_resizeTxt = new TextField();
+			_resizeTxt.y = -3;
+			_resizeTxt.autoSize = TextFieldAutoSize.LEFT;
+           	formatText(_resizeTxt, TextFormatAlign.LEFT);
+			addChild(_resizeTxt);
+			//
+			_dragOffset = new Point(mouseX,mouseY); // using this way instead of startDrag, so that it can control snapping.
+			_snaps = [[],[]];
+			dispatchEvent(new Event(STARTED_DRAGGING));
 			stage.addEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp, false, 0, true);
-			startDrag();
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove, false, 0, true);
+		}
+		private function onDraggerMouseMove(e:MouseEvent):void{
+			if(snapping==0) return;
+			// YEE HA, SNAPPING!
+			var p:Point = returnSnappedFor(parent.mouseX-_dragOffset.x, parent.mouseY-_dragOffset.y);
+			x = p.x;
+			y = p.y;
+			_resizeTxt.text = p.x+","+p.y;
 		}
 		private function onDraggerMouseUp(e:MouseEvent):void{
+			_snaps = null;
 			stage.removeEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp);
-			stopDrag();
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove);
+			if(_resizeTxt && _resizeTxt.parent){
+				_resizeTxt.parent.removeChild(_resizeTxt);
+			}
+			_resizeTxt = null;
 		}
 		//
 		// SCALING
 		//
 		private function onScalerMouseDown(e:Event):void{
-			scaler.startDrag(false, new Rectangle(minimumWidth, minimumHeight, 1280, 1280));
+			_resizeTxt = new TextField();
+			_resizeTxt.autoSize = TextFieldAutoSize.RIGHT;
+			_resizeTxt.x = -8;
+			_resizeTxt.y = -18;
+           	formatText(_resizeTxt, TextFormatAlign.RIGHT);
+			scaler.addChild(_resizeTxt);
+			_dragOffset = new Point(scaler.mouseX,scaler.mouseY); // using this way instead of startDrag, so that it can control snapping.
+			_snaps = [[],[]];
+			dispatchEvent(new Event(STARTED_SCALING));
 			scaler.stage.addEventListener(MouseEvent.MOUSE_UP,onScalerMouseUp, false, 0, true);
 			scaler.stage.addEventListener(MouseEvent.MOUSE_MOVE,updateScale, false, 0, true);
 		}
 		private function updateScale(e:Event = null):void{
-			width = scaler.x;
-			height = scaler.y;
+			var p:Point = returnSnappedFor(x+mouseX-_dragOffset.x, y+mouseY-_dragOffset.x);
+			p.x-=x;
+			p.y-=y;
+			width = p.x<minimumWidth?minimumWidth:p.x;
+			height = p.y<minimumHeight?minimumHeight:p.y;
+			_resizeTxt.text = p.x+","+p.y;
 		}
 		private function onScalerMouseUp(e:Event):void{
 			scaler.stage.removeEventListener(MouseEvent.MOUSE_UP,onScalerMouseUp);
 			scaler.stage.removeEventListener(MouseEvent.MOUSE_MOVE,updateScale);
-			stopDrag();
 			updateScale();
+			_snaps = null;
+			if(_resizeTxt && _resizeTxt.parent){
+				_resizeTxt.parent.removeChild(_resizeTxt);
+			}
+			_resizeTxt = null;
 		}
 		//
 		//
 		//
+		private function formatText(txt:TextField, align:String):void{
+			var format:TextFormat = new TextFormat();
+            format.font = "Arial";
+            format.size = 10;
+            format.color = 0xFFFFFF;
+            format.align = align;
+			txt.defaultTextFormat = format;
+			txt.mouseEnabled = false;
+		}
+		private function returnSnappedFor(X:Number,Y:Number):Point{
+			var ex:Number = X+width;
+			var Xs:Array = _snaps[0];
+			for each(var Xi:Number in Xs){
+				if(Math.abs(Xi-X)<snapping){
+					X = Xi;
+					break;
+				}
+				if(Math.abs(Xi-ex)<snapping){
+					X = Xi-width;
+					break;
+				}
+			}
+			var ey:Number = Y+height;
+			var Ys:Array = _snaps[1];
+			for each(var Yi:Number in Ys){
+				if(Math.abs(Yi-Y)<snapping){
+					Y = Yi;
+					break;
+				}
+				if(Math.abs(Yi-ey)<snapping){
+					Y = Yi-height;
+					break;
+				}
+			}
+			return new Point(X,Y);
+		}
 	}
 }
