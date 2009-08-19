@@ -1,6 +1,7 @@
 package com.atticmedia.console.panels {
 	import flash.events.Event;
-	import flash.utils.getTimer;		
+	import flash.utils.getTimer;
+	import flash.events.TextEvent;		
 
 	/**
 	 * @author LuAye
@@ -12,14 +13,21 @@ package com.atticmedia.console.panels {
 		private var _mspf:Number;
 		//
 		public function FPSPanel() {
+			name = "FPSPanel";
 			super(80,40);
 			lowest = 0;
 			drawAverage = true;
+			minimumWidth = 32;
+			keyTxt.selectable = false;
+			keyTxt.mouseEnabled = true;
+			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
+			registerDragger(keyTxt);
 			add(this, "current", 0xFF3333, "FPS");
 		}
-		public function reset():void {
+		public override function reset():void {
 			_fps = NaN;
 			_previousTime = NaN;
+			super.reset();
 		}
 		public function get current():Number {
 			return _fps;
@@ -36,7 +44,7 @@ package com.atticmedia.console.panels {
 				var time:int = getTimer();
 				_mspf = time-_previousTime;
 				_fps = 1000/_mspf;
-				keyTxt.text = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1);
+				keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#C04444'><a href=\"event:reset\">R</a></font>";
 				if(stage){
 					fixed = true;
 					highest = stage.frameRate;
@@ -44,6 +52,12 @@ package com.atticmedia.console.panels {
 				super.onFrame(e);
 			}
 			_previousTime = getTimer();
+		}
+		private function linkHandler(e:TextEvent):void{
+			if(e.text == "reset"){
+				reset();
+			}
+			e.stopPropagation();
 		}
 		
 		/*public function getInFormat(preset:Number = 0):String{

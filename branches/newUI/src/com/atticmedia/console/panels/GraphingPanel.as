@@ -89,6 +89,14 @@
 			_isRunning = false;
 			removeEventListener(Event.ENTER_FRAME, onFrame);
 		}
+		public function reset():void{
+			if(!fixed){
+				lowest = NaN;
+				highest = NaN;
+			}
+			_history = [];
+			graph.graphics.clear();
+		}
 		public function get running():Boolean {
 			return _isRunning;
 		}
@@ -215,8 +223,8 @@
 					graph.graphics.lineTo(W, Y);
 				}
 			}
-			lowTxt.text = String(lowest);
-			highTxt.text = String(highest);
+			lowTxt.text = isNaN(lowest)?"":String(lowest);
+			highTxt.text = isNaN(highest)?"":String(highest);
 		}
 		private function updateKeyText():void{
 			var str:String = "";

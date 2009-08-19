@@ -95,7 +95,6 @@ package com.atticmedia.console.panels {
 			if(!stage) return;
 			//
 			_resizeTxt = new TextField();
-			_resizeTxt.y = -3;
 			_resizeTxt.autoSize = TextFieldAutoSize.LEFT;
            	formatText(_resizeTxt, TextFormatAlign.LEFT);
 			addChild(_resizeTxt);
@@ -129,8 +128,8 @@ package com.atticmedia.console.panels {
 		private function onScalerMouseDown(e:Event):void{
 			_resizeTxt = new TextField();
 			_resizeTxt.autoSize = TextFieldAutoSize.RIGHT;
-			_resizeTxt.x = -8;
-			_resizeTxt.y = -18;
+			_resizeTxt.x = -4;
+			_resizeTxt.y = -17;
            	formatText(_resizeTxt, TextFormatAlign.RIGHT);
 			scaler.addChild(_resizeTxt);
 			_dragOffset = new Point(scaler.mouseX,scaler.mouseY); // using this way instead of startDrag, so that it can control snapping.
@@ -145,7 +144,7 @@ package com.atticmedia.console.panels {
 			p.y-=y;
 			width = p.x<minimumWidth?minimumWidth:p.x;
 			height = p.y<minimumHeight?minimumHeight:p.y;
-			_resizeTxt.text = p.x+","+p.y;
+			_resizeTxt.text = width+","+height;
 		}
 		private function onScalerMouseUp(e:Event):void{
 			scaler.stage.removeEventListener(MouseEvent.MOUSE_UP,onScalerMouseUp);
@@ -166,6 +165,8 @@ package com.atticmedia.console.panels {
             format.size = 10;
             format.color = 0xFFFFFF;
             format.align = align;
+            txt.background = true;
+            txt.backgroundColor = 0;
 			txt.defaultTextFormat = format;
 			txt.mouseEnabled = false;
 		}

@@ -1,7 +1,8 @@
 package com.atticmedia.console.panels {
 	import flash.system.System;	
 	import flash.events.Event;
-	import flash.utils.getTimer;		
+	import flash.utils.getTimer;
+	import flash.events.TextEvent;	
 
 	/**
 	 * @author LuAye
@@ -10,9 +11,15 @@ package com.atticmedia.console.panels {
 		
 		//
 		public function MemoryPanel() {
+			name = "MemoryPanel";
 			super(80,40);
 			updateEvery = 5;
 			drawEvery = 5;
+			minimumWidth = 32;
+			keyTxt.selectable = false;
+			keyTxt.mouseEnabled = true;
+			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
+			registerDragger(keyTxt);
 			add(this, "current", 0x3333FF, "Memory");
 		}
 		public function get current():Number{
@@ -20,7 +27,13 @@ package com.atticmedia.console.panels {
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
-			keyTxt.text = getCurrentOf(0)+"mb";
+			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:reset\">R</a></font>";
+		}
+		private function linkHandler(e:TextEvent):void{
+			if(e.text == "reset"){
+				reset();
+			}
+			e.stopPropagation();
 		}
 	}
 }
