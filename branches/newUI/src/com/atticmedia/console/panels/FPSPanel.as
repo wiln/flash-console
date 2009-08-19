@@ -44,10 +44,17 @@ package com.atticmedia.console.panels {
 				var time:int = getTimer();
 				_mspf = time-_previousTime;
 				_fps = 1000/_mspf;
-				keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#C04444'><a href=\"event:reset\">R</a></font>";
+				keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
 				if(stage){
 					fixed = true;
 					highest = stage.frameRate;
+					var frames:int = Math.floor(_mspf/(1000/highest));
+					if(frames>30) frames = 30; // Don't add too many
+					while(frames>1){
+						// this is to try add the frames that have been lagged due to script run time/lag.
+						updateData();
+						frames--;
+					}
 				}
 				super.onFrame(e);
 			}
@@ -56,30 +63,10 @@ package com.atticmedia.console.panels {
 		private function linkHandler(e:TextEvent):void{
 			if(e.text == "reset"){
 				reset();
+			}else if(e.text == "close"){
+				close();
 			}
 			e.stopPropagation();
 		}
-		
-		/*public function getInFormat(preset:Number = 0):String{
-			switch(preset){
-				case 2:
-					return Math.round(min)+"-<b>"+current.toFixed(1) +"</b>-"+ Math.round(max);
-				break;
-				case 3:
-					return Math.round(min)+"-<b>"+current.toFixed(1)+"</b>-"+ Math.round(max) + ": <b>" + Math.round(averageFPS)+ "</b>";
-				break;
-				case 4:
-					var stageFrameRate:String = "";
-					return Math.round(min)+"-<b>"+current.toFixed(1)+stageFrameRate+"</b>-"+ Math.round(max) + ": <b>" + Math.round(averageFPS) + "</b> " + Math.round(averageMsPF)+"ms-"+Math.round(mspf)+"ms";
-				break;
-				case 5:
-					var stageMS:String = "";
-					return Math.round(averageMsPF)+"ms-"+Math.round(mspf)+"ms "+stageMS;
-				break;
-				default:
-					return current.toFixed(1);
-				break;
-			}
-		}*/
 	}
 }

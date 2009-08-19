@@ -89,6 +89,13 @@
 			_isRunning = false;
 			removeEventListener(Event.ENTER_FRAME, onFrame);
 		}
+		public function close():void {
+			stop();
+			stopDragging();
+			if(parent){
+				parent.removeChild(this);
+			}
+		}
 		public function reset():void{
 			if(!fixed){
 				lowest = NaN;
@@ -133,7 +140,7 @@
 			highTxt.width = n;
 			keyTxt.width = n;
 			graphics.clear();
-			graphics.lineStyle(1,0xFFFFFF, 1);
+			graphics.lineStyle(1,0xAAAAAA, 1);
 			graphics.moveTo(0, graph.y);
 			graphics.lineTo(n, graph.y);
 			_needRedraw = true;
@@ -153,7 +160,7 @@
 			updateData();
 			drawGraph();
 		}
-		private function updateData():void{
+		protected function updateData():void{
 			_updatedFrame++;
 			if(_updatedFrame < updateEvery) return;
 			_updatedFrame= 0;

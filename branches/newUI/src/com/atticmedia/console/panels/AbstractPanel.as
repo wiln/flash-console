@@ -98,6 +98,7 @@ package com.atticmedia.console.panels {
 			_resizeTxt.autoSize = TextFieldAutoSize.LEFT;
            	formatText(_resizeTxt, TextFormatAlign.LEFT);
 			addChild(_resizeTxt);
+			updateDragText();
 			//
 			_dragOffset = new Point(mouseX,mouseY); // using this way instead of startDrag, so that it can control snapping.
 			_snaps = [[],[]];
@@ -105,15 +106,21 @@ package com.atticmedia.console.panels {
 			stage.addEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp, false, 0, true);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove, false, 0, true);
 		}
-		private function onDraggerMouseMove(e:MouseEvent):void{
+		private function onDraggerMouseMove(e:MouseEvent = null):void{
 			if(snapping==0) return;
 			// YEE HA, SNAPPING!
 			var p:Point = returnSnappedFor(parent.mouseX-_dragOffset.x, parent.mouseY-_dragOffset.y);
 			x = p.x;
 			y = p.y;
-			_resizeTxt.text = p.x+","+p.y;
+			updateDragText();
+		}
+		private function updateDragText():void{
+			_resizeTxt.text = x+","+y;
 		}
 		private function onDraggerMouseUp(e:MouseEvent):void{
+			stopDragging();
+		}
+		protected function stopDragging():void{
 			_snaps = null;
 			stage.removeEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove);
@@ -132,6 +139,7 @@ package com.atticmedia.console.panels {
 			_resizeTxt.y = -17;
            	formatText(_resizeTxt, TextFormatAlign.RIGHT);
 			scaler.addChild(_resizeTxt);
+			updateScaleText();
 			_dragOffset = new Point(scaler.mouseX,scaler.mouseY); // using this way instead of startDrag, so that it can control snapping.
 			_snaps = [[],[]];
 			dispatchEvent(new Event(STARTED_SCALING));
@@ -144,6 +152,9 @@ package com.atticmedia.console.panels {
 			p.y-=y;
 			width = p.x<minimumWidth?minimumWidth:p.x;
 			height = p.y<minimumHeight?minimumHeight:p.y;
+			updateScaleText();
+		}
+		private function updateScaleText():void{
 			_resizeTxt.text = width+","+height;
 		}
 		private function onScalerMouseUp(e:Event):void{

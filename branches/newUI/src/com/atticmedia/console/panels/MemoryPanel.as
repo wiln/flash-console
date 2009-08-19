@@ -1,4 +1,4 @@
-package com.atticmedia.console.panels {
+﻿package com.atticmedia.console.panels {
 	import flash.system.System;	
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -20,14 +20,14 @@ package com.atticmedia.console.panels {
 			keyTxt.mouseEnabled = true;
 			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			registerDragger(keyTxt);
-			add(this, "current", 0x3333FF, "Memory");
+			add(this, "current", 0x5060FF, "Memory");
 		}
 		public function get current():Number{
 			return Math.round(System.totalMemory/1048.576)/1000;
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
-			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:gc\">GC</a></font>";
+			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:gc\">G</a> <a href=\"event:close\">X</a></font>";
 		}
 		private function linkHandler(e:TextEvent):void{
 			if(e.text == "reset"){
@@ -37,6 +37,8 @@ package com.atticmedia.console.panels {
 				if(System["gc"] != null){
 					System["gc"]();
 				}
+			}else if(e.text == "close"){
+				close();
 			}
 			e.stopPropagation();
 		}
