@@ -77,6 +77,15 @@ package com.atticmedia.console {
 			mem.x = panel.x+panel.width-160;
 			mem.y = panel.y+15;
 			addPanel(mem);
+			
+			// TEST...
+			var graph:GraphingPanel = new GraphingPanel(100,100);
+			graph.x = 50;
+			graph.y = 150;
+			graph.inverse = true;
+			graph.add(this,"mouseX",0x00DD00, "x");
+			graph.add(this,"mouseY",0xDD0000, "y");
+			addPanel(graph);
 		}
 		private function addPanel(panel:AbstractPanel):void{
 			_panels.push(panel);

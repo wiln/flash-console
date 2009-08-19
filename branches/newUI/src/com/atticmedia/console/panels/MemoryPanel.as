@@ -2,7 +2,7 @@
 	import flash.system.System;	
 	import flash.events.Event;
 	import flash.utils.getTimer;
-	import flash.events.TextEvent;	
+	import flash.events.TextEvent;
 
 	/**
 	 * @author LuAye
@@ -16,10 +16,6 @@
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;
-			keyTxt.selectable = false;
-			keyTxt.mouseEnabled = true;
-			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
-			registerDragger(keyTxt);
 			add(this, "current", 0x5060FF, "Memory");
 		}
 		public function get current():Number{
@@ -27,20 +23,19 @@
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
-			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:gc\">G</a> <a href=\"event:close\">X</a></font>";
+			updateKeyText();
 		}
-		private function linkHandler(e:TextEvent):void{
-			if(e.text == "reset"){
-				reset();
-			}else if(e.text == "gc"){
+		protected override function updateKeyText():void{
+			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+		}
+		protected override function linkHandler(e:TextEvent):void{
+			if(e.text == "gc"){
 				// TODO: Should notify main Console if Garbage Collection is possible or not.
 				if(System["gc"] != null){
 					System["gc"]();
 				}
-			}else if(e.text == "close"){
-				close();
 			}
-			e.stopPropagation();
+			super.linkHandler(e);
 		}
 	}
 }

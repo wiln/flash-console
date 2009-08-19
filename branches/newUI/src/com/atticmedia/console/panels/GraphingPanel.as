@@ -1,12 +1,12 @@
 ﻿package com.atticmedia.console.panels {
-	import flash.text.TextFormatAlign;	
+	import com.atticmedia.console.core.Utils;
 	
-	import com.atticmedia.console.core.Utils;	
-	
+	import flash.text.TextFormatAlign;
 	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.text.TextField;
-	import flash.text.TextFormat;	
+	import flash.text.TextFormat;
+	import flash.events.TextEvent;
 
 	/**
 	 * @author LuAye
@@ -29,7 +29,8 @@
 		public var drawEvery:uint = 1;
 		public var lowest:Number;
 		public var highest:Number;
-		public var drawAverage:Boolean;
+		public var averaging:uint;
+		public var inverse:Boolean;
 		//
 		public function GraphingPanel(W:int = 0, H:int = 0, resizable:Boolean = true) {
 			registerDragger(bg);
@@ -54,10 +55,12 @@
 			format.align = TextFormatAlign.RIGHT;
             format.color = 0xCCCCCC;
 			keyTxt = new TextField();
-			keyTxt.mouseEnabled = false;
 			keyTxt.defaultTextFormat = format;
 			keyTxt.height = 16;
 			keyTxt.y = -4;
+			keyTxt.selectable = false;
+			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
+			registerDragger(keyTxt); // so that we can still drag from textfield
 			addChild(keyTxt);
 			//
 			graph = new Shape();
@@ -71,6 +74,7 @@
 			return Math.random();
 		}
 		public function add(obj:Object, prop:String, col:Number = -1, key:String=null):void{
+			// TODO: Check if property exists before adding
 			var cur:Number = obj[prop];
 			if(isNaN(lowest) && !isNaN(cur)) lowest = cur;
 			if(isNaN(highest) && !isNaN(cur)) highest = cur;
@@ -174,12 +178,12 @@
 					if(isNaN(highest)) highest = v;
 				}
 				values.push(v);
-				if(drawAverage){
+				if(averaging>0){
 					var avg:Number = interest[4];
 					if(isNaN(avg)) {
 						interest[4] = v;
 					}else{
-						interest[4] = Utils.averageOut(avg, v, 20);
+						interest[4] = Utils.averageOut(avg, v, averaging);
 					}
 				}
 				if(!fixed){
@@ -215,14 +219,16 @@
 					if(first){
 						graph.graphics.lineStyle(1,interest[2]);
 					}
-					var Y:Number = H-((diffGraph?((values[j]-lowest)/diffGraph):0.5)*H);
+					var Y:Number = (diffGraph?((values[j]-lowest)/diffGraph):0.5)*H;
+					if(!inverse) Y = H-Y;
 					if(Y<0)Y=0;
 					if(Y>H)Y=H;
 					graph.graphics[(first?"moveTo":"lineTo")]((W-i), Y);
 					first = false;
 				}
-				if(drawAverage && diffGraph){
-					Y = H-(((interest[4]-lowest)/diffGraph)*H);
+				if(averaging>0 && diffGraph){
+					Y = ((interest[4]-lowest)/diffGraph)*H;
+					if(!inverse) Y = H-Y;
 					if(Y<-1)Y=-1;
 					if(Y>H)Y=H+1;
 					graph.graphics.lineStyle(1,interest[2], 0.3);
@@ -233,7 +239,7 @@
 			lowTxt.text = isNaN(lowest)?"":String(lowest);
 			highTxt.text = isNaN(highest)?"":String(highest);
 		}
-		private function updateKeyText():void{
+		protected function updateKeyText():void{
 			var str:String = "";
 			for each(var interest:Array in _interests){
 				var n:String = interest[3];
@@ -241,7 +247,16 @@
 				var col:Number = interest[2];
 				str += " <font color='#"+col.toString(16)+"'>"+n+"</font>";
 			}
+			str +=  " | <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
 			keyTxt.htmlText = str;
+		}
+		protected function linkHandler(e:TextEvent):void{
+			if(e.text == "reset"){
+				reset();
+			}else if(e.text == "close"){
+				close();
+			}
+			e.stopPropagation();
 		}
 	}
 }

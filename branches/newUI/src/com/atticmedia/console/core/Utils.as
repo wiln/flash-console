@@ -74,8 +74,9 @@ package com.atticmedia.console.core {
 		//
 		
 		public static function averageOut(current:Number, addition:Number, over:Number):Number {
-			var diff:Number = addition-current;
-			return current+(diff/over);
+			// this does not output an absolute average - you would need a history of values for this
+			// This way is more light weight but not as accurate.
+			return current+((addition-current)/over);
 		}
 	}
 }

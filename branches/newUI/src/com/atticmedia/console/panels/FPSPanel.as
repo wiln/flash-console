@@ -1,7 +1,7 @@
 package com.atticmedia.console.panels {
 	import flash.events.Event;
 	import flash.utils.getTimer;
-	import flash.events.TextEvent;		
+	import flash.events.TextEvent;
 
 	/**
 	 * @author LuAye
@@ -16,12 +16,8 @@ package com.atticmedia.console.panels {
 			name = "FPSPanel";
 			super(80,40);
 			lowest = 0;
-			drawAverage = true;
+			averaging = 10;
 			minimumWidth = 32;
-			keyTxt.selectable = false;
-			keyTxt.mouseEnabled = true;
-			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
-			registerDragger(keyTxt);
 			add(this, "current", 0xFF3333, "FPS");
 		}
 		public override function reset():void {
@@ -39,12 +35,15 @@ package com.atticmedia.console.panels {
 			stop();
 			reset();
 		}
+		protected override function updateKeyText():void{
+			keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+		}
 		protected override function onFrame(e:Event):void{
 			if (_previousTime) {
 				var time:int = getTimer();
 				_mspf = time-_previousTime;
 				_fps = 1000/_mspf;
-				keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+				updateKeyText();
 				if(stage){
 					fixed = true;
 					highest = stage.frameRate;
@@ -59,14 +58,6 @@ package com.atticmedia.console.panels {
 				super.onFrame(e);
 			}
 			_previousTime = getTimer();
-		}
-		private function linkHandler(e:TextEvent):void{
-			if(e.text == "reset"){
-				reset();
-			}else if(e.text == "close"){
-				close();
-			}
-			e.stopPropagation();
 		}
 	}
 }
