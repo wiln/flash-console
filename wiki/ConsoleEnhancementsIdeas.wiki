@@ -3,7 +3,7 @@
 NOT in order of importance.
 
  * Data graphing - such as showing FPS in graph and add multiple graphs of your own data
- * Display Roller to capture current display map on key/mouse click, for better examination of the map - click on display name to get instance of the clip for command line use.
+ * Display Roller to capture current display map on key/mouse click, for better examination of the map - click on display name to get instance of the clip for command line use. - and also print mouseX and mouseY in the list.
  * Better Command Line syntax reading - currently can't handle nested calls and strings with spaces
  * Memory monitor should have option to show in MB, and also have rest button.
  * FPS to show in a more visual way for easier comparison.
