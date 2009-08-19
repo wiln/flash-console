@@ -90,7 +90,7 @@ package com.atticmedia.console {
 				var X:Array = [0];
 				var Y:Array = [0];
 				if(stage){
-					// this will only work for default stage.align atm...
+					// this will only work if stage size is not changed or top left aligned
 					X.push(stage.stageWidth);
 					Y.push(stage.stageHeight);
 				}

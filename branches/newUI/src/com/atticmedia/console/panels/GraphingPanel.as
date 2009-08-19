@@ -82,7 +82,7 @@
 		}
 		public function start():void{
 			_isRunning = true;
-			// Note that if has already started, it wont add another listener on top.
+			// Note that if it has already started, it won't add another listener on top.
 			addEventListener(Event.ENTER_FRAME, onFrame, false, 0, true);
 		}
 		public function stop():void {

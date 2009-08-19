@@ -27,11 +27,16 @@ package com.atticmedia.console.panels {
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
-			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:reset\">R</a></font>";
+			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:gc\">GC</a></font>";
 		}
 		private function linkHandler(e:TextEvent):void{
 			if(e.text == "reset"){
 				reset();
+			}else if(e.text == "gc"){
+				// TODO: Should notify main Console if Garbage Collection is possible or not.
+				if(System["gc"] != null){
+					System["gc"]();
+				}
 			}
 			e.stopPropagation();
 		}
