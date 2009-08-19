@@ -57,7 +57,7 @@
 			keyTxt = new TextField();
 			keyTxt.defaultTextFormat = format;
 			keyTxt.height = 16;
-			keyTxt.y = -4;
+			keyTxt.y = -3;
 			keyTxt.selectable = false;
 			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			registerDragger(keyTxt); // so that we can still drag from textfield
@@ -93,12 +93,9 @@
 			_isRunning = false;
 			removeEventListener(Event.ENTER_FRAME, onFrame);
 		}
-		public function close():void {
+		public override function close():void {
 			stop();
-			stopDragging();
-			if(parent){
-				parent.removeChild(this);
-			}
+			super.close();
 		}
 		public function reset():void{
 			if(!fixed){
@@ -247,7 +244,7 @@
 				var col:Number = interest[2];
 				str += " <font color='#"+col.toString(16)+"'>"+n+"</font>";
 			}
-			str +=  " | <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+			str +=  " | <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
 			keyTxt.htmlText = str;
 		}
 		protected function linkHandler(e:TextEvent):void{

@@ -14,6 +14,8 @@ package com.atticmedia.console.panels {
 	 */
 	public class MainPanel extends AbstractPanel {
 		
+		public static const NAME:String = "MainPanel";
+		
 		private var _traceField:TextField;
 		private var _menuField:TextField;
 		private var _commandField:TextField;
@@ -28,7 +30,7 @@ package com.atticmedia.console.panels {
 		
 		public function MainPanel(master:Console) {
 			_master = master;
-			name = "mainPanel";
+			name = NAME;
 			minimumWidth = 50;
 			minimumHeight = 18;
 			

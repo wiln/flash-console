@@ -8,12 +8,14 @@ package com.atticmedia.console.panels {
 	 */
 	public class FPSPanel extends GraphingPanel {
 		
+		public static const NAME:String = "FPSPanel";
+		
 		private var _previousTime:Number;
 		private var _fps:Number;
 		private var _mspf:Number;
 		//
 		public function FPSPanel() {
-			name = "FPSPanel";
+			name = NAME;
 			super(80,40);
 			lowest = 0;
 			averaging = 10;
@@ -36,7 +38,7 @@ package com.atticmedia.console.panels {
 			reset();
 		}
 		protected override function updateKeyText():void{
-			keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#C04444'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+			keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
 		}
 		protected override function onFrame(e:Event):void{
 			if (_previousTime) {
@@ -50,7 +52,7 @@ package com.atticmedia.console.panels {
 					var frames:int = Math.floor(_mspf/(1000/highest));
 					if(frames>30) frames = 30; // Don't add too many
 					while(frames>1){
-						// this is to try add the frames that have been lagged due to script run time/lag.
+						// this is to try add the frames that have been lagged
 						updateData();
 						frames--;
 					}

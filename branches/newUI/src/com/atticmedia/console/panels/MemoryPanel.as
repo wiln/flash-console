@@ -9,9 +9,10 @@
 	 */
 	public class MemoryPanel extends GraphingPanel {
 		
+		public static const NAME:String = "MemoryPanel";
 		//
 		public function MemoryPanel() {
-			name = "MemoryPanel";
+			name = NAME;
 			super(80,40);
 			updateEvery = 5;
 			drawEvery = 5;
@@ -19,14 +20,14 @@
 			add(this, "current", 0x5060FF, "Memory");
 		}
 		public function get current():Number{
-			return Math.round(System.totalMemory/1048.576)/1000;
+			return Math.round(System.totalMemory/10485.76)/100;
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
 			updateKeyText();
 		}
 		protected override function updateKeyText():void{
-			keyTxt.htmlText = getCurrentOf(0)+"mb <font color='#C04444'><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+			keyTxt.htmlText = getCurrentOf(0).toFixed(2)+"mb <font color='#FF8800'><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
 		}
 		protected override function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){

@@ -55,28 +55,36 @@ package com.atticmedia.console {
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "Filtered";
 		public static const GLOBAL_CHANNEL:String = "global";
-		public static const MINIMUM_HEIGHT:int = 16;
-		public static const MINIMUM_WIDTH:int = 20;
 		
-		private var _panels:Array = [];
+		private var _panels:PanelsManager;
 		
 		
 		public function Console(pass:String = "") {
+			
 			name = NAME;
 			
+			_panels = new PanelsManager(this);
 			
 			var panel:MainPanel = new MainPanel(this);
-			addPanel(panel);
+			_panels.addPanel(panel);
 			
 			var fps:FPSPanel = new FPSPanel();
 			fps.x = panel.x+panel.width-80;
 			fps.y = panel.y+15;
-			addPanel(fps);
+			_panels.addPanel(fps);
 			
 			var mem:MemoryPanel = new MemoryPanel();
 			mem.x = panel.x+panel.width-160;
 			mem.y = panel.y+15;
-			addPanel(mem);
+			_panels.addPanel(mem);
+			
+			
+			
+			var roller:RollerPanel = new RollerPanel();
+			roller.x = 0;
+			roller.y = 100;
+			_panels.addPanel(roller);
+			roller.start(this);
 			
 			// TEST...
 			var graph:GraphingPanel = new GraphingPanel(100,100);
@@ -85,34 +93,8 @@ package com.atticmedia.console {
 			graph.inverse = true;
 			graph.add(this,"mouseX",0x00DD00, "x");
 			graph.add(this,"mouseY",0xDD0000, "y");
-			addPanel(graph);
+			_panels.addPanel(graph);
 		}
-		private function addPanel(panel:AbstractPanel):void{
-			_panels.push(panel);
-			panel.addEventListener(AbstractPanel.STARTED_DRAGGING, onPanelStartDragScale, false,0, true);
-			panel.addEventListener(AbstractPanel.STARTED_SCALING, onPanelStartDragScale, false,0, true);
-			addChild(panel);
-		}
-		private function onPanelStartDragScale(e:Event):void{
-			var target:AbstractPanel = e.currentTarget as AbstractPanel;
-			if(target.snapping){
-				var X:Array = [0];
-				var Y:Array = [0];
-				if(stage){
-					// this will only work if stage size is not changed or top left aligned
-					X.push(stage.stageWidth);
-					Y.push(stage.stageHeight);
-				}
-				for each(var panel:AbstractPanel in _panels){
-					X.push(panel.x);
-					X.push(panel.x+panel.width);
-					Y.push(panel.y);
-					Y.push(panel.y+panel.height);
-				}
-				target.registerSnaps(X, Y);
-			}
-		}
-		
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();
 			try{

@@ -59,6 +59,12 @@ package com.atticmedia.console.panels {
 			width = w;
 			height = h;
 		}
+		public function close():void {
+			stopDragging();
+			if(parent){
+				parent.removeChild(this);
+			}
+		}
 		//
 		// SIZE
 		//
@@ -120,7 +126,7 @@ package com.atticmedia.console.panels {
 		private function onDraggerMouseUp(e:MouseEvent):void{
 			stopDragging();
 		}
-		protected function stopDragging():void{
+		private function stopDragging():void{
 			_snaps = null;
 			stage.removeEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp);
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove);
