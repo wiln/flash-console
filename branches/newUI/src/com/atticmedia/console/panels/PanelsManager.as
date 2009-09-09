@@ -1,4 +1,5 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Styles;	
 	import com.atticmedia.console.Console;
 	
 	import flash.events.Event;		

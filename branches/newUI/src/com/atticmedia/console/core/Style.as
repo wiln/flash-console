@@ -1,4 +1,4 @@
-﻿/*
+/*
 * 
 * Copyright (c) 2008 Atticmedia
 * 
@@ -26,7 +26,7 @@ package com.atticmedia.console.core {
 	import flash.display.Shape;	
 	import flash.text.TextFormat;
 	import flash.geom.ColorTransform;
-	public class UserInterface {
+	public class Style {
 
 		private var _preset:int;
 		
@@ -34,8 +34,13 @@ package com.atticmedia.console.core {
 		
 		public var panelBackgroundColor:int = 0;
 		public var panelBackgroundAlpha:Number = 0.6;
+		public var panelScalerColor:Number = 0;
+		public var panelScalerAlpha:Number = 0.6;
+		public var bottomLineColor:Number = 0xFF0000;
+		public var textFormat:TextFormat;
 				
-		public function UserInterface() {
+		public function Style() {
+			_style = new StyleSheet();
 			preset = 1;
 		}
 		
@@ -48,16 +53,26 @@ package com.atticmedia.console.core {
 		public function get preset():int{
 			return _preset;
 		}
+		public function get textFormatCopy():TextFormat{
+			var format:TextFormat = new TextFormat();
+			for(var X:String in textFormat){
+				format[X] = textFormat[X];
+			}
+			return format;
+		}
 		public function preset1():void{
+			panelBackgroundColor = 0;
+			panelBackgroundAlpha = 0.6;
+			
+			textFormat = new TextFormat();
+            textFormat.font = "Arial";
+            textFormat.size = 11;
+			textFormat.color = 0xFFFFFF;
 			
 			_style.setStyle(".menu",{color:'#FF8800'});
 			
 			
-			var format:TextFormat = new TextFormat();
-			format.font = "Arial";
-			format.size = 12;
-			format.color = 0xFFFFFF;
-			
+			/*
 			_priorities[0] = "#000000";
 			_priorities[1] = "#33AA33";
 			_priorities[2] = "#77D077";
@@ -70,7 +85,7 @@ package com.atticmedia.console.core {
 			_priorities[9] = "#FF3333";
 			_priorities[10] = "#FF0000";
 			_priorities[-1] = "#0099CC";
-			_priorities[-2] = "#FF8800";
+			_priorities[-2] = "#FF8800";*/
 		}
 		
 		public function preset2():void{

@@ -1,4 +1,6 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Style;	
+	
 	import flash.events.Event;
 	import flash.utils.getTimer;
 	import flash.events.TextEvent;
@@ -14,9 +16,9 @@ package com.atticmedia.console.panels {
 		private var _fps:Number;
 		private var _mspf:Number;
 		//
-		public function FPSPanel() {
+		public function FPSPanel(s:Style) {
 			name = NAME;
-			super(80,40);
+			super(s, 80,40);
 			lowest = 0;
 			averaging = 10;
 			minimumWidth = 32;

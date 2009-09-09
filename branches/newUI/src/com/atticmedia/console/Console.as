@@ -57,37 +57,38 @@ package com.atticmedia.console {
 		public static const GLOBAL_CHANNEL:String = "global";
 		
 		private var _panels:PanelsManager;
+		private var _styles:Style;
 		
 		
 		public function Console(pass:String = "") {
-			
 			name = NAME;
 			
+			_styles = new Style();
 			_panels = new PanelsManager(this);
 			
-			var panel:MainPanel = new MainPanel(this);
+			var panel:MainPanel = new MainPanel(this, _styles);
 			_panels.addPanel(panel);
 			
-			var fps:FPSPanel = new FPSPanel();
+			var fps:FPSPanel = new FPSPanel(_styles);
 			fps.x = panel.x+panel.width-80;
 			fps.y = panel.y+15;
 			_panels.addPanel(fps);
 			
-			var mem:MemoryPanel = new MemoryPanel();
+			var mem:MemoryPanel = new MemoryPanel(_styles);
 			mem.x = panel.x+panel.width-160;
 			mem.y = panel.y+15;
 			_panels.addPanel(mem);
 			
 			
 			
-			var roller:RollerPanel = new RollerPanel();
+			var roller:RollerPanel = new RollerPanel(_styles);
 			roller.x = 0;
 			roller.y = 100;
 			_panels.addPanel(roller);
 			roller.start(this);
 			
 			// TEST...
-			var graph:GraphingPanel = new GraphingPanel(100,100);
+			var graph:GraphingPanel = new GraphingPanel(_styles, 100,100);
 			graph.x = 50;
 			graph.y = 150;
 			graph.inverse = true;

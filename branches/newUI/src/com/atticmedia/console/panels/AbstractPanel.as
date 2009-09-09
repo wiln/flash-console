@@ -1,4 +1,6 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Style;	
+	
 	import flash.text.TextFieldAutoSize;	
 	import flash.text.TextFormatAlign;	
 	import flash.text.TextFormat;	
@@ -22,13 +24,15 @@ package com.atticmedia.console.panels {
 		private var _dragOffset:Point;
 		private var _resizeTxt:TextField;
 		
+		protected var style:Style;
 		protected var bg:Sprite;
 		protected var scaler:Sprite;
 		protected var minimumWidth:int = 18;
 		protected var minimumHeight:int = 18;
 		public var snapping:uint = 3;
 		
-		public function AbstractPanel() {
+		public function AbstractPanel(s:Style) {
+			style = s;
 			bg = new Sprite();
 			bg.name = "background";
 			addChild(bg);
@@ -42,12 +46,12 @@ package com.atticmedia.console.panels {
 			var grid:Rectangle = new Rectangle(rounding, rounding, roundSize, roundSize);
 			bg.scale9Grid = grid;
 		}
-		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = 0, a:Number = 0.6, rounding:int = 10):void{
-			drawBG(col, a, rounding);
+		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = -1, a:Number = -1, rounding:int = 10):void{
+			drawBG(col>=0?col:style.panelBackgroundColor, a>=0?a:style.panelBackgroundAlpha, rounding);
 			if(resizable){
 				scaler = new Sprite();
 				scaler.name = "scaler";
-				scaler.graphics.beginFill(0x000000, 0.6);
+				scaler.graphics.beginFill(style.panelScalerColor, style.panelScalerAlpha);
 	            scaler.graphics.lineTo(-10, 0);
 	            scaler.graphics.lineTo(0, -10);
 	            scaler.graphics.endFill();
@@ -177,10 +181,7 @@ package com.atticmedia.console.panels {
 		//
 		//
 		private function formatText(txt:TextField, align:String):void{
-			var format:TextFormat = new TextFormat();
-            format.font = "Arial";
-            format.size = 10;
-            format.color = 0xFFFFFF;
+			var format:TextFormat = style.textFormatCopy;
             format.align = align;
             txt.background = true;
             txt.backgroundColor = 0;

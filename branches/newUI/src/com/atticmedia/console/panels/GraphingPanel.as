@@ -1,4 +1,5 @@
 ﻿package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.core.Utils;
 	
 	import flash.text.TextFormatAlign;
@@ -32,7 +33,8 @@
 		public var averaging:uint;
 		public var inverse:Boolean;
 		//
-		public function GraphingPanel(W:int = 0, H:int = 0, resizable:Boolean = true) {
+		public function GraphingPanel(s:Style, W:int = 0, H:int = 0, resizable:Boolean = true) {
+			super(s);
 			registerDragger(bg);
 			minimumHeight = 26;
 			//

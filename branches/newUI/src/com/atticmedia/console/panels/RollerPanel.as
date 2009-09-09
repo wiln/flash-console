@@ -21,6 +21,8 @@
 * 
 */
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Style;	
+	
 	import flash.events.TextEvent;	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
@@ -41,7 +43,8 @@ package com.atticmedia.console.panels {
 		private var _base:DisplayObjectContainer;
 		
 		
-		public function RollerPanel() {
+		public function RollerPanel(s:Style) {
+			super(s);
 			name = NAME;
 			init(60,100,false);
 			_txtField = new TextField();

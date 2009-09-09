@@ -1,4 +1,6 @@
 ﻿package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Style;	
+	
 	import flash.system.System;	
 	import flash.events.Event;
 	import flash.utils.getTimer;
@@ -11,9 +13,9 @@
 		
 		public static const NAME:String = "MemoryPanel";
 		//
-		public function MemoryPanel() {
+		public function MemoryPanel(s:Style) {
 			name = NAME;
-			super(80,40);
+			super(s, 80,40);
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;

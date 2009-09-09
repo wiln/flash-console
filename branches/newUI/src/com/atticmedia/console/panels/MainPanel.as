@@ -1,4 +1,5 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.Console;	
 	
 	import flash.events.TextEvent;	
@@ -20,7 +21,6 @@ package com.atticmedia.console.panels {
 		private var _menuField:TextField;
 		private var _commandField:TextField;
 		private var _commandBackground:Shape;
-		private var _txtFormat:TextFormat;
 		private var _bottomLine:Shape;
 		
 		
@@ -28,37 +28,32 @@ package com.atticmedia.console.panels {
 		private var _master:Console;
 		
 		
-		public function MainPanel(master:Console) {
+		public function MainPanel(master:Console, s:Style) {
+			super(s);
 			_master = master;
 			name = NAME;
 			minimumWidth = 50;
 			minimumHeight = 18;
 			
-			var format:TextFormat = new TextFormat();
-            format.font = "Arial";
-            format.size = 11;
 			_traceField = new TextField();
 			_traceField.name = "traceField";
 			_traceField.wordWrap = true;
 			_traceField.background  = false;
 			_traceField.multiline = true;
-			_traceField.defaultTextFormat = format;
+			_traceField.defaultTextFormat = style.textFormat;
 			_traceField.y = 12;
 			addChild(_traceField);
 			//
-			_txtFormat = new TextFormat();
-            _txtFormat.font = "Arial";
-            _txtFormat.size = 12;
 			_menuField = new TextField();
 			_menuField.name = "menuField";
-			_menuField.defaultTextFormat = _txtFormat;
+			_menuField.defaultTextFormat = style.textFormat;
 			_menuField.height = 18;
 			_menuField.y = -2;
 			addChild(_menuField);
 			//
 			_commandBackground = new Shape();
 			_commandBackground.name = "commandBackground";
-			_commandBackground.graphics.beginFill(0xFFFFFF,0.1);
+			_commandBackground.graphics.beginFill(style.panelBackgroundColor, 0.1);
 			_commandBackground.graphics.drawRoundRect(0, 0, 100, 18,12,12);
 			_commandBackground.scale9Grid = new Rectangle(9, 9, 80, 1);
 			//_commandBackground.visible = false;
@@ -85,7 +80,6 @@ package com.atticmedia.console.panels {
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			//
 			//
-			
 			_traceField.htmlText = "Happy bug fixing!<br/>Hows the new Console so far?";
 		}
 		override public function set width(n:Number):void{
@@ -96,7 +90,7 @@ package com.atticmedia.console.panels {
 			_commandBackground.width = n;
 			
 			_bottomLine.graphics.clear();
-			_bottomLine.graphics.lineStyle(1, 0xFF0000);
+			_bottomLine.graphics.lineStyle(1, style.bottomLineColor);
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
 		}
@@ -148,7 +142,7 @@ package com.atticmedia.console.panels {
 			}
 			str += "</p>";
 			_menuField.htmlText = str;
-			_menuField.setTextFormat(_txtFormat);
+			_menuField.setTextFormat(style.textFormat);
 			_menuField.scrollH = _menuField.maxScrollH;
 		}
 		private function doBold(str:String, b:Boolean):String{
