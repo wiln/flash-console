@@ -1,4 +1,6 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.Console;	
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.text.TextFieldAutoSize;	
@@ -24,6 +26,8 @@ package com.atticmedia.console.panels {
 		private var _dragOffset:Point;
 		private var _resizeTxt:TextField;
 		
+		protected var central:Central;
+		protected var master:Console;
 		protected var style:Style;
 		protected var bg:Sprite;
 		protected var scaler:Sprite;
@@ -31,8 +35,10 @@ package com.atticmedia.console.panels {
 		protected var minimumHeight:int = 18;
 		public var snapping:uint = 3;
 		
-		public function AbstractPanel(s:Style) {
-			style = s;
+		public function AbstractPanel(refs:Central) {
+			central= refs;
+			style = refs.style;
+			master = refs.master;
 			bg = new Sprite();
 			bg.name = "background";
 			addChild(bg);
@@ -106,7 +112,7 @@ package com.atticmedia.console.panels {
 			//
 			_resizeTxt = new TextField();
 			_resizeTxt.autoSize = TextFieldAutoSize.LEFT;
-           	formatText(_resizeTxt, TextFormatAlign.LEFT);
+           	formatText(_resizeTxt);
 			addChild(_resizeTxt);
 			updateDragText();
 			//
@@ -125,7 +131,7 @@ package com.atticmedia.console.panels {
 			updateDragText();
 		}
 		private function updateDragText():void{
-			_resizeTxt.text = x+","+y;
+			_resizeTxt.text = "<s>"+x+","+y+"</s>";
 		}
 		private function onDraggerMouseUp(e:MouseEvent):void{
 			stopDragging();
@@ -147,7 +153,7 @@ package com.atticmedia.console.panels {
 			_resizeTxt.autoSize = TextFieldAutoSize.RIGHT;
 			_resizeTxt.x = -4;
 			_resizeTxt.y = -17;
-           	formatText(_resizeTxt, TextFormatAlign.RIGHT);
+           	formatText(_resizeTxt);
 			scaler.addChild(_resizeTxt);
 			updateScaleText();
 			_dragOffset = new Point(scaler.mouseX,scaler.mouseY); // using this way instead of startDrag, so that it can control snapping.
@@ -165,7 +171,7 @@ package com.atticmedia.console.panels {
 			updateScaleText();
 		}
 		private function updateScaleText():void{
-			_resizeTxt.text = width+","+height;
+			_resizeTxt.text = "<s>"+width+","+height+"</s>";
 		}
 		private function onScalerMouseUp(e:Event):void{
 			scaler.stage.removeEventListener(MouseEvent.MOUSE_UP,onScalerMouseUp);
@@ -180,12 +186,10 @@ package com.atticmedia.console.panels {
 		//
 		//
 		//
-		private function formatText(txt:TextField, align:String):void{
-			var format:TextFormat = style.textFormatCopy;
-            format.align = align;
+		private function formatText(txt:TextField):void{
             txt.background = true;
             txt.backgroundColor = 0;
-			txt.defaultTextFormat = format;
+			txt.styleSheet = style.css;
 			txt.mouseEnabled = false;
 		}
 		private function returnSnappedFor(X:Number,Y:Number):Point{

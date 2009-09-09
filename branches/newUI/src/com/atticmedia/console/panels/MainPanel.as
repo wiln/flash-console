@@ -1,4 +1,5 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.Console;	
 	
@@ -25,12 +26,11 @@ package com.atticmedia.console.panels {
 		
 		
 		private var _isMinimised:Boolean;
-		private var _master:Console;
 		
 		
-		public function MainPanel(master:Console, s:Style) {
-			super(s);
-			_master = master;
+		public function MainPanel(refs:Central) {
+			super(refs);
+			master = refs.master;
 			name = NAME;
 			minimumWidth = 50;
 			minimumHeight = 18;
@@ -40,13 +40,13 @@ package com.atticmedia.console.panels {
 			_traceField.wordWrap = true;
 			_traceField.background  = false;
 			_traceField.multiline = true;
-			_traceField.defaultTextFormat = style.textFormat;
+			_traceField.styleSheet = style.tracecss;
 			_traceField.y = 12;
 			addChild(_traceField);
 			//
 			_menuField = new TextField();
 			_menuField.name = "menuField";
-			_menuField.defaultTextFormat = style.textFormat;
+			_menuField.styleSheet = style.css;
 			_menuField.height = 18;
 			_menuField.y = -2;
 			addChild(_menuField);
@@ -80,7 +80,7 @@ package com.atticmedia.console.panels {
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			//
 			//
-			_traceField.htmlText = "Happy bug fixing!<br/>Hows the new Console so far?";
+			_traceField.htmlText = "<p><l1>Happy bug fixing!</l1></p><p><p0>Hows the new Console so far?</p0></p>";
 		}
 		override public function set width(n:Number):void{
 			super.width = n;
@@ -93,6 +93,7 @@ package com.atticmedia.console.panels {
 			_bottomLine.graphics.lineStyle(1, style.bottomLineColor);
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
+			updateMenu();
 		}
 		override public function set height(n:Number):void{
 			super.height = n;
@@ -113,23 +114,22 @@ package com.atticmedia.console.panels {
 			_commandBackground.y = cmdy;
 			_bottomLine.y = _commandField.visible?cmdy:n;
 			_traceField.scrollV = _traceField.maxScrollV;
+			updateMenu();
 		}
 		//
 		//
 		//
-		private function updateMenu():void{
-			var str:String = "<p align=\"right\"><font color=\"#DDDDDD\">";
-			str += "<font color=\"#FF8800\">[";
-			//if(_fps.running){
-			//	_menuText += "<a href=\"event:resetFPS\">R</a> ";
-			//}
-			str += "<a href=\"event:fps\">F</a> <a href=\"event:memory\">M</a> <a href=\"event:gc\">G</a> ";
+		public function updateMenu():void{
+			var str:String = "<r><w><menu>[";
+			str += doBold("<a href=\"event:fps\">F</a>", central.master.fpsMode>0);
+			str += doBold(" <a href=\"event:memory\">M</a>", central.panels.panelExists(MemoryPanel.NAME));
+			str += " <a href=\"event:gc\">G</a> ";
 			str += doBold("<a href=\"event:command\">CL</a>", commandLine);
 			//_menuText += (_ruler?"<b>":"")+"<a href=\"event:ruler\">RL</a> "+(_ruler?"</b>":"");
 			//_menuText += (_roller?"<b>":"")+"<a href=\"event:roller\">Ro</a> "+(_roller?"</b>":"");
 			//_menuText += "<a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:alpha\">A</a> <a href=\"event:pause\">P</a> <a href=\"event:help\">H</a> <a href=\"event:close\">X</a>] </font>";
-			str += "]</font> ";
-			str += "<font color=\"#77D077\"><b><a href=\"event:menu\">@</a></b></font>";
+			str += "]</menu> ";
+			str += "<menu2><a href=\"event:menu\">@</a></menu2>";
 			if(_traceField.scrollV > 1){
 				str += " <a href=\"event:scrollUp\">^</a>";
 			}else{
@@ -140,9 +140,8 @@ package com.atticmedia.console.panels {
 			}else{
 				str += " -";
 			}
-			str += "</p>";
+			str += "</w></r>";
 			_menuField.htmlText = str;
-			_menuField.setTextFormat(style.textFormat);
 			_menuField.scrollH = _menuField.maxScrollH;
 		}
 		private function doBold(str:String, b:Boolean):String{
@@ -157,6 +156,8 @@ package com.atticmedia.console.panels {
 				_traceField.scrollV += 3;
 			}else if(e.text == "close"){
 				visible = false;
+			}else if(e.text == "fps"){
+				central.master.fpsMode = central.master.fpsMode>0?0:1;
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
 			}

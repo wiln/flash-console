@@ -56,45 +56,41 @@ package com.atticmedia.console {
 		public static const FILTERED_CHANNEL:String = "Filtered";
 		public static const GLOBAL_CHANNEL:String = "global";
 		
-		private var _panels:PanelsManager;
-		private var _styles:Style;
+		private var _central:Central;
 		
 		
 		public function Console(pass:String = "") {
 			name = NAME;
 			
-			_styles = new Style();
-			_panels = new PanelsManager(this);
+			_central = new Central(this);
+			_central.style = new Style();
+			_central.panels = new PanelsManager(_central);
 			
-			var panel:MainPanel = new MainPanel(this, _styles);
-			_panels.addPanel(panel);
+			var panel:MainPanel = new MainPanel(_central);
+			_central.panels.addPanel(panel);
 			
-			var fps:FPSPanel = new FPSPanel(_styles);
-			fps.x = panel.x+panel.width-80;
-			fps.y = panel.y+15;
-			_panels.addPanel(fps);
 			
-			var mem:MemoryPanel = new MemoryPanel(_styles);
+			var mem:MemoryPanel = new MemoryPanel(_central);
 			mem.x = panel.x+panel.width-160;
 			mem.y = panel.y+15;
-			_panels.addPanel(mem);
+			_central.panels.addPanel(mem);
 			
 			
 			
-			var roller:RollerPanel = new RollerPanel(_styles);
+			var roller:RollerPanel = new RollerPanel(_central);
 			roller.x = 0;
 			roller.y = 100;
-			_panels.addPanel(roller);
+			_central.panels.addPanel(roller);
 			roller.start(this);
 			
 			// TEST...
-			var graph:GraphingPanel = new GraphingPanel(_styles, 100,100);
+			var graph:GraphingPanel = new GraphingPanel(_central, 100,100);
 			graph.x = 50;
 			graph.y = 150;
 			graph.inverse = true;
 			graph.add(this,"mouseX",0x00DD00, "x");
 			graph.add(this,"mouseY",0xDD0000, "y");
-			_panels.addPanel(graph);
+			_central.panels.addPanel(graph);
 		}
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();
@@ -106,6 +102,31 @@ package com.atticmedia.console {
 			}
 			sCon.close();
 			return false;
+		}
+		
+		
+		
+		public function get fpsMode():int{
+			var fps:FPSPanel = _central.panels.getPanel(FPSPanel.NAME) as FPSPanel;
+			if(!fps) return 0;
+			return 1;
+		}
+		public function set fpsMode(n:int):void{
+			if(fpsMode != n){
+				var panel:MainPanel = _central.panels.getPanel(MainPanel.NAME) as MainPanel;
+				var fps:FPSPanel;
+				if(n == 0){
+					fps = _central.panels.getPanel(FPSPanel.NAME) as FPSPanel;
+					fps.destory();
+					_central.panels.removePanel(FPSPanel.NAME);
+				}else if(n == 1){
+					fps = new FPSPanel(_central);
+					fps.x = panel.x+panel.width-80;
+					fps.y = panel.y+15;
+					_central.panels.addPanel(fps);
+				}
+				panel.updateMenu();
+			}
 		}
 	}
 }

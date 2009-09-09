@@ -1,4 +1,5 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Styles;	
 	import com.atticmedia.console.Console;
 	
@@ -11,8 +12,8 @@ package com.atticmedia.console.panels {
 		
 		private var _master:Console;
 		
-		public function PanelsManager(master:Console) {
-			_master = master;
+		public function PanelsManager(refs:Central) {
+			_master = refs.master;
 		}
 		public function addPanel(panel:AbstractPanel):void{
 			_master.addChild(panel);
@@ -25,6 +26,12 @@ package com.atticmedia.console.panels {
 				// this removes it self from parent. this way each individual panel can clean up before closing.  
 				panel.close();
 			}
+		}
+		public function getPanel(n:String):AbstractPanel{
+			return _master.getChildByName(n) as AbstractPanel;
+		}
+		public function panelExists(n:String):Boolean{
+			return (_master.getChildByName(n) as AbstractPanel)?true:false;
 		}
 		private function onPanelStartDragScale(e:Event):void{
 			var target:AbstractPanel = e.currentTarget as AbstractPanel;

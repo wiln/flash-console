@@ -21,27 +21,31 @@
 * 
 */
 package com.atticmedia.console.core {
-	import flash.text.StyleSheet;	
-	import flash.text.TextField;	
-	import flash.display.Shape;	
-	import flash.text.TextFormat;
-	import flash.geom.ColorTransform;
+	import flash.text.StyleSheet;		
+
 	public class Style {
 
 		private var _preset:int;
 		
-		private var _style:StyleSheet;
+		private var _css:StyleSheet;
+		private var _tracecss:StyleSheet;
 		
-		public var panelBackgroundColor:int = 0;
-		public var panelBackgroundAlpha:Number = 0.6;
-		public var panelScalerColor:Number = 0;
-		public var panelScalerAlpha:Number = 0.6;
-		public var bottomLineColor:Number = 0xFF0000;
-		public var textFormat:TextFormat;
+		public var panelBackgroundColor:int;
+		public var panelBackgroundAlpha:Number;
+		public var panelScalerColor:Number;
+		public var panelScalerAlpha:Number;
+		public var bottomLineColor:Number;
 				
 		public function Style() {
-			_style = new StyleSheet();
+			_css = new StyleSheet();
+			_tracecss = new StyleSheet();
 			preset = 1;
+		}
+		public function get css():StyleSheet{
+			return _css;
+		}
+		public function get tracecss():StyleSheet{
+			return _tracecss;
 		}
 		
 		public function set preset(num:int):void{
@@ -53,24 +57,28 @@ package com.atticmedia.console.core {
 		public function get preset():int{
 			return _preset;
 		}
-		public function get textFormatCopy():TextFormat{
-			var format:TextFormat = new TextFormat();
-			for(var X:String in textFormat){
-				format[X] = textFormat[X];
-			}
-			return format;
-		}
 		public function preset1():void{
 			panelBackgroundColor = 0;
 			panelBackgroundAlpha = 0.6;
+			panelScalerColor = 0;
+			panelScalerAlpha = 0.6;
+			bottomLineColor = 0xFF0000;
 			
-			textFormat = new TextFormat();
-            textFormat.font = "Arial";
-            textFormat.size = 11;
-			textFormat.color = 0xFFFFFF;
+			_css.setStyle("r",{textAlign:'right', display:'inline'});
+			//_css.setStyle("a",{textDecoration:'underline'});
+			_css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
+			_css.setStyle("y",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
+			_css.setStyle("y2",{color:'#EE6611', fontWeight:'bold'});
+			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
+			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
+			_css.setStyle("menu2",{color:'#77D077', fontWeight:'bold', display:'inline'});
 			
-			_style.setStyle(".menu",{color:'#FF8800'});
 			
+			
+			_tracecss.setStyle("p",{fontFamily:'Arial', fontSize:'11'});
+			_tracecss.setStyle("l1",{color:'#0099CC'});
+			_tracecss.setStyle("l2",{color:'#FF8800'});
+			_tracecss.setStyle("p0",{color:'#000000'});
 			
 			/*
 			_priorities[0] = "#000000";
@@ -89,6 +97,27 @@ package com.atticmedia.console.core {
 		}
 		
 		public function preset2():void{
+			panelBackgroundColor = 0xFFFFFF;
+			panelBackgroundAlpha = 0.6;
+			panelScalerColor = 0xFF0000;
+			panelScalerAlpha = 0.6;
+			bottomLineColor = 0xFFFFFFF;
+			
+			_css.setStyle("r",{textAlign:'right', display:'inline'});
+			//_css.setStyle("a",{textDecoration:'underline'});
+			_css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
+			_css.setStyle("y",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
+			_css.setStyle("y2",{color:'#EE6611', fontWeight:'bold'});
+			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
+			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
+			_css.setStyle("menu2",{color:'#77D077', fontWeight:'bold', display:'inline'});
+			
+			
+			
+			_tracecss.setStyle("p",{fontFamily:'Arial', fontSize:'11'});
+			_tracecss.setStyle("l1",{color:'#0099CC'});
+			_tracecss.setStyle("l2",{color:'#FF8800'});
+			_tracecss.setStyle("p0",{color:'#000000'});
 			/*setbackgroundColour(1,1,1);
 			backgroundAlpha = 0.8;
 			backgroundBlendMode = "normal";

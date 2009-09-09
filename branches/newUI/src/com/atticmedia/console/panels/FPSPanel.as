@@ -1,4 +1,5 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.events.Event;
@@ -16,9 +17,9 @@ package com.atticmedia.console.panels {
 		private var _fps:Number;
 		private var _mspf:Number;
 		//
-		public function FPSPanel(s:Style) {
+		public function FPSPanel(ref:Central) {
 			name = NAME;
-			super(s, 80,40);
+			super(ref, 80,40);
 			lowest = 0;
 			averaging = 10;
 			minimumWidth = 32;
@@ -40,7 +41,7 @@ package com.atticmedia.console.panels {
 			reset();
 		}
 		protected override function updateKeyText():void{
-			keyTxt.htmlText = _fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+			keyTxt.htmlText = "<r><s>"+_fps.toFixed(1)+" | "+getAverageOf(0).toFixed(1)+" <menu><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
 		}
 		protected override function onFrame(e:Event):void{
 			if (_previousTime) {

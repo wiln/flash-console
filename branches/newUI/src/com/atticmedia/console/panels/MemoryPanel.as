@@ -1,4 +1,5 @@
 ﻿package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.system.System;	
@@ -13,9 +14,9 @@
 		
 		public static const NAME:String = "MemoryPanel";
 		//
-		public function MemoryPanel(s:Style) {
+		public function MemoryPanel(refs:Central) {
 			name = NAME;
-			super(s, 80,40);
+			super(refs, 80,40);
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;
@@ -29,7 +30,7 @@
 			updateKeyText();
 		}
 		protected override function updateKeyText():void{
-			keyTxt.htmlText = getCurrentOf(0).toFixed(2)+"mb <font color='#FF8800'><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+			keyTxt.htmlText =  "<r><s>"+getCurrentOf(0).toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
 		}
 		protected override function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){

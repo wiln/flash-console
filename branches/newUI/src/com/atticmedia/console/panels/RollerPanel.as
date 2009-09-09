@@ -21,6 +21,7 @@
 * 
 */
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.events.TextEvent;	
@@ -43,15 +44,15 @@ package com.atticmedia.console.panels {
 		private var _base:DisplayObjectContainer;
 		
 		
-		public function RollerPanel(s:Style) {
-			super(s);
+		public function RollerPanel(refs:Central) {
+			super(refs);
 			name = NAME;
 			init(60,100,false);
 			_txtField = new TextField();
 			_txtField.name = "rollerprints";
 			_txtField.multiline = true;
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
-			_txtField.defaultTextFormat = new TextFormat("Arial", 11, 0xDD5500);
+			_txtField.styleSheet = style.css;
 			_txtField.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			_txtField.selectable = false;
 			registerDragger(_txtField);
@@ -68,7 +69,7 @@ package com.atticmedia.console.panels {
 				return;
 			}
 			var stg:Stage = _base.stage;
-			var str:String = "";
+			var str:String = "<y>";
 			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
 			var stepMap:Dictionary = new Dictionary(true);
 			if(objs.length == 0){
@@ -90,15 +91,16 @@ package com.atticmedia.console.panels {
 							str += j==1?" ∟":" -";
 						}
 						if(obj == stg){
-							str +=  "<font color='#FF8800'><a href=\"event:close\">X</a></font> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
+							str +=  "<menu><a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
 						}else if(i == len-1){
-							str +=  "<b><font color='#EE6611'>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</font></b><br/>";
+							str +=  "<y2>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</y2>";
 						}else {
 							str +=  "<i>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</i><br/>";
 						}
 					}
 				}
 			}
+			str += "</y>";
 			_txtField.htmlText = str;
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
 			width = _txtField.width+4;

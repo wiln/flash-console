@@ -1,4 +1,5 @@
 ﻿package com.atticmedia.console.panels {
+	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.core.Utils;
 	
@@ -33,31 +34,25 @@
 		public var averaging:uint;
 		public var inverse:Boolean;
 		//
-		public function GraphingPanel(s:Style, W:int = 0, H:int = 0, resizable:Boolean = true) {
-			super(s);
+		public function GraphingPanel(refs:Central, W:int = 0, H:int = 0, resizable:Boolean = true) {
+			super(refs);
 			registerDragger(bg);
 			minimumHeight = 26;
 			//
-			var format:TextFormat = new TextFormat();
-            format.font = "Arial";
-            format.size = 10;
-            format.color = 0x999999;
 			lowTxt = new TextField();
 			lowTxt.mouseEnabled = false;
-			lowTxt.defaultTextFormat = format;
+			lowTxt.styleSheet = style.css;
 			lowTxt.height = 14;
 			addChild(lowTxt);
 			highTxt = new TextField();
 			highTxt.mouseEnabled = false;
-			highTxt.defaultTextFormat = format;
+			highTxt.styleSheet = style.css;
 			highTxt.height = 14;
 			highTxt.y = 6;
 			addChild(highTxt);
 			//
-			format.align = TextFormatAlign.RIGHT;
-            format.color = 0xCCCCCC;
 			keyTxt = new TextField();
-			keyTxt.defaultTextFormat = format;
+			keyTxt.styleSheet = style.css;
 			keyTxt.height = 16;
 			keyTxt.y = -3;
 			keyTxt.selectable = false;
@@ -235,18 +230,18 @@
 					graph.graphics.lineTo(W, Y);
 				}
 			}
-			lowTxt.text = isNaN(lowest)?"":String(lowest);
-			highTxt.text = isNaN(highest)?"":String(highest);
+			lowTxt.text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
+			highTxt.text = isNaN(highest)?"":"<s>"+highest+"</s>";;
 		}
 		protected function updateKeyText():void{
-			var str:String = "";
+			var str:String = "<r><s>";
 			for each(var interest:Array in _interests){
 				var n:String = interest[3];
 				if(!n) n =  interest[1];
 				var col:Number = interest[2];
 				str += " <font color='#"+col.toString(16)+"'>"+n+"</font>";
 			}
-			str +=  " | <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font>";
+			str +=  " | <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font></s></r>";
 			keyTxt.htmlText = str;
 		}
 		protected function linkHandler(e:TextEvent):void{
