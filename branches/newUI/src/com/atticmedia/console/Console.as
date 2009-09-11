@@ -56,25 +56,36 @@ package com.atticmedia.console {
 		public static const FILTERED_CHANNEL:String = "Filtered";
 		public static const GLOBAL_CHANNEL:String = "global";
 		
+		private var _isPaused:Boolean;
+		private var _enabled:Boolean = true;
+		private var _isRemoting:Boolean;
+		private var _isRemote:Boolean;
+		private var _remoteMSPF:int;
+		private var _remoteMem:int;
+		
 		private var _central:Central;
 		
+		
+		public var quiet:Boolean;
 		
 		public function Console(pass:String = "") {
 			name = NAME;
 			
 			_central = new Central(this);
+			_central.report = addLogLine;
 			_central.style = new Style();
 			_central.panels = new PanelsManager(_central);
+			_central.mm = new MemoryMonitor();
+			var cl:CommandLine = new CommandLine(_central);
+			cl.store("C",this);
+			cl.reserved.push("C");
+			//cl.addEventListener(CommandLine.SEARCH_REQUEST, onCommandSearch, false, 0, true);
+			_central.cl = cl;
+			
 			
 			var panel:MainPanel = new MainPanel(_central);
 			_central.panels.addPanel(panel);
-			
-			
-			var mem:MemoryPanel = new MemoryPanel(_central);
-			mem.x = panel.x+panel.width-160;
-			mem.y = panel.y+15;
-			_central.panels.addPanel(mem);
-			
+			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			
 			
 			var roller:RollerPanel = new RollerPanel(_central);
@@ -114,19 +125,70 @@ package com.atticmedia.console {
 		public function set fpsMode(n:int):void{
 			if(fpsMode != n){
 				var panel:MainPanel = _central.panels.getPanel(MainPanel.NAME) as MainPanel;
-				var fps:FPSPanel;
 				if(n == 0){
-					fps = _central.panels.getPanel(FPSPanel.NAME) as FPSPanel;
-					fps.destory();
 					_central.panels.removePanel(FPSPanel.NAME);
-				}else if(n == 1){
-					fps = new FPSPanel(_central);
+				}else if(n > 0){
+					var fps:FPSPanel = new FPSPanel(_central);
 					fps.x = panel.x+panel.width-80;
 					fps.y = panel.y+15;
 					_central.panels.addPanel(fps);
 				}
 				panel.updateMenu();
 			}
+		}
+		public function get memoryMonitor():int{
+			var mm:MemoryPanel = _central.panels.getPanel(MemoryPanel.NAME) as MemoryPanel;
+			if(!mm) return 0;
+			return 1;
+		}
+		public function set memoryMonitor(n:int):void{
+			if(memoryMonitor != n){
+				var panel:MainPanel = _central.panels.getPanel(MainPanel.NAME) as MainPanel;
+				if(n == 0){
+					_central.panels.removePanel(MemoryPanel.NAME);
+				}else if(n > 0){
+					var mm:MemoryPanel = new MemoryPanel(_central);
+					mm.x = panel.x+panel.width-160;
+					mm.y = panel.y+15;
+					_central.panels.addPanel(mm);
+				}
+				panel.updateMenu();
+			}
+		}
+		public function watch(o:Object,n:String = null):String{
+			var className:String = getQualifiedClassName(o);
+			if(!n) n = className+"@"+getTimer();
+			var nn:String = _central.mm.watch(o,n);
+			if(!quiet)
+				addLine("Watching <b>"+className+"</b> as <font color=\"#FF0000\"><b>"+ nn +"</b></font>.",-1,CONSOLE_CHANNEL, false, true);
+			return nn;
+		}
+		public function unwatch(n:String):void{
+			_central.mm.unwatch(n);
+		}
+		public function gc():void{
+			var ok:Boolean = _central.mm.gc();
+			var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
+			addLine(str,(ok?-1:10),CONSOLE_CHANNEL);
+		}
+		private function _onEnterFrame(e:Event):void{
+			if(!_enabled){
+				return;
+			}
+			if(!_isPaused && visible){
+				var arr:Array = _central.mm.update();
+				if(arr.length>0){
+					addLine("GARBAGE COLLECTED: "+arr.join(", "),10,CONSOLE_CHANNEL);
+				}
+			}
+		}
+		private function addLogLine(line:LogLineVO, q:Boolean = false):void{
+			if(!(this.quiet && q)){
+				addLine(line.text, line.p, line.c==null?CONSOLE_CHANNEL:line.c, line.r, line.s);
+			}
+		}
+		private function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
+			trace(obj);
 		}
 	}
 }

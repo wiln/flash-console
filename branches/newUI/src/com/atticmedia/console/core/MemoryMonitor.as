@@ -21,17 +21,22 @@
 * 
 */
 package com.atticmedia.console.core {
+	import flash.display.MovieClip;	
+	import flash.events.Event;	
+	import flash.events.EventDispatcher;	
 	import flash.system.System;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;	
 
-	public class MemoryMonitor {
+	public class MemoryMonitor extends EventDispatcher{
+		
+		public static const GARBAGE_COLLECTED:String = "garbageCollected";
+		private static const DUMMY_GARBAGE:String = "_memoryMonitor_dummy_garbage";
 		
 		private var _namesList:Object;
 		private var _objectsList:Dictionary;
-		private var _minMemory:uint;
-		private var _maxMemory:uint;
-		private var _previousMemory:uint;
+		private var _notifyGC:Boolean;
+		//
 		//
 		public function MemoryMonitor() {
 			_namesList = new Object();
@@ -63,43 +68,49 @@ package com.atticmedia.console.core {
 		//
 		//
 		public function update():Array {
-			var m:uint = currentMemory;
-			if(m<_minMemory || _minMemory == 0){
-				_minMemory = m;
-			}
-			if(m>_maxMemory){
-				_maxMemory = m;
-			}
-			//
 			var arr:Array = new Array();
 			var o:Object = new Object();
 			for (var X:Object in _objectsList) {
 				o[_objectsList[X]] = true;
 			}
+			var gced:Boolean = false;
 			for(var Y:String in _namesList){
 				if(!o[Y]){
-					arr.push(Y);
+					gced = true;
+					if(Y != DUMMY_GARBAGE){
+						arr.push(Y);
+					}
 					delete _namesList[Y];
 				}
 			}
-			/*
-			//
-			//this don't seem to be working well..
-			if(m<_previousMemory){
-				dispatchEvent(new garbageCollected(_previousMemory));
+			if(_notifyGC && gced){
+				dispatchEvent(new Event(GARBAGE_COLLECTED));
+				seedGCDummy();
 			}
-			*/
-			_previousMemory = m;
 			return arr;
 		}
-		public function get minMemory():uint {
-			return _minMemory;
-		}
-		public function get maxMemory():uint {
-			return _maxMemory;
+		private function seedGCDummy():void{
+			if(!_namesList[DUMMY_GARBAGE]){
+				// using MovieClip as dummy garbate as it doenst get collected straight away like others
+				watch(new MovieClip(), DUMMY_GARBAGE);
+			}
 		}
 		public function get currentMemory():uint {
 			return System.totalMemory;
+		}
+		
+		public function set notifyGC(b:Boolean):void{
+			if(_notifyGC != b){
+				_notifyGC = b;
+				if(b){
+					seedGCDummy();
+				}else if(!b){
+					unwatch(DUMMY_GARBAGE);
+				}
+			}
+		}
+		public function get notifyGC():Boolean{
+			return _notifyGC;
 		}
 		//
 		// only works in debugger player version

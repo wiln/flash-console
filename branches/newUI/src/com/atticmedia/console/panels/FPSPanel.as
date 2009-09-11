@@ -36,8 +36,8 @@ package com.atticmedia.console.panels {
 		public function get mspf():Number {
 			return _mspf;
 		}
-		public function destory():void{
-			stop();
+		public override function stop():void {
+			super.stop();
 			reset();
 		}
 		protected override function updateKeyText():void{

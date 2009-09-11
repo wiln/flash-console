@@ -1,6 +1,6 @@
 ﻿package com.atticmedia.console.panels {
 	import com.atticmedia.console.core.Central;	
-	import com.atticmedia.console.core.Style;	
+	import com.atticmedia.console.core.MemoryMonitor;	
 	
 	import flash.system.System;	
 	import flash.events.Event;
@@ -20,10 +20,16 @@
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;
+			refs.mm.addEventListener(MemoryMonitor.GARBAGE_COLLECTED, onGC, false, 0, true);
+			refs.mm.notifyGC = true;
 			add(this, "current", 0x5060FF, "Memory");
 		}
+		public override function close():void {
+			central.mm.notifyGC = false;
+			super.close();
+		}
 		public function get current():Number{
-			return Math.round(System.totalMemory/10485.76)/100;
+			return Math.round(central.mm.currentMemory/10485.76)/100;
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
@@ -34,12 +40,14 @@
 		}
 		protected override function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){
-				// TODO: Should notify main Console if Garbage Collection is possible or not.
-				if(System["gc"] != null){
-					System["gc"]();
-				}
+				central.master.gc();
 			}
 			super.linkHandler(e);
+		}
+		//
+		
+		private function onGC(e:Event):void{
+			mark(0xFF000000);
 		}
 	}
 }

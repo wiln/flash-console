@@ -76,10 +76,16 @@
 			if(isNaN(lowest) && !isNaN(cur)) lowest = cur;
 			if(isNaN(highest) && !isNaN(cur)) highest = cur;
 			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
+			// TODO: interst should be a class rather than an array of random properties!
 			_interests.push([obj, prop, col, key, NaN]);
 			updateKeyText();
 			//
 			start();
+		}
+		public function mark(col:Number = -1, v:Number = NaN):void{
+			if(_history.length==0) return;
+			var interests:Array = _history[_history.length-1];
+			interests.push([col, v]);
 		}
 		public function start():void{
 			_isRunning = true;
@@ -204,6 +210,8 @@
 			var diffGraph:Number = highest-lowest;
 			var numInterests:int = _interests.length;
 			var len:int = _history.length;
+			var firstpass:Boolean = true;
+			var marks:Array = [];
 			for(var j:int = 0;j<numInterests;j++){
 				var interest:Array = _interests[j];
 				var first:Boolean = true;
@@ -219,7 +227,13 @@
 					if(Y>H)Y=H;
 					graph.graphics[(first?"moveTo":"lineTo")]((W-i), Y);
 					first = false;
+					if(firstpass){
+						if(values.length>numInterests){
+							marks.push(i);
+						}
+					}
 				}
+				firstpass = false;
 				if(averaging>0 && diffGraph){
 					Y = ((interest[4]-lowest)/diffGraph)*H;
 					if(!inverse) Y = H-Y;
@@ -229,6 +243,12 @@
 					graph.graphics.moveTo(0, Y);
 					graph.graphics.lineTo(W, Y);
 				}
+			}
+			for each(var mark:int in marks){
+				// TODO: Mark should have its own special color and value point
+				graph.graphics.lineStyle(1,0xFFCC00, 0.4);
+				graph.graphics.moveTo(W-mark, 0);
+				graph.graphics.lineTo(W-mark, H);
 			}
 			lowTxt.text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
 			highTxt.text = isNaN(highest)?"":"<s>"+highest+"</s>";;

@@ -122,9 +122,8 @@ package com.atticmedia.console.panels {
 		public function updateMenu():void{
 			var str:String = "<r><w><menu>[";
 			str += doBold("<a href=\"event:fps\">F</a>", central.master.fpsMode>0);
-			str += doBold(" <a href=\"event:memory\">M</a>", central.panels.panelExists(MemoryPanel.NAME));
-			str += " <a href=\"event:gc\">G</a> ";
-			str += doBold("<a href=\"event:command\">CL</a>", commandLine);
+			str += doBold(" <a href=\"event:mm\">M</a>", central.master.memoryMonitor>0);
+			str += doBold(" <a href=\"event:command\">CL</a>", commandLine);
 			//_menuText += (_ruler?"<b>":"")+"<a href=\"event:ruler\">RL</a> "+(_ruler?"</b>":"");
 			//_menuText += (_roller?"<b>":"")+"<a href=\"event:roller\">Ro</a> "+(_roller?"</b>":"");
 			//_menuText += "<a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:alpha\">A</a> <a href=\"event:pause\">P</a> <a href=\"event:help\">H</a> <a href=\"event:close\">X</a>] </font>";
@@ -158,6 +157,8 @@ package com.atticmedia.console.panels {
 				visible = false;
 			}else if(e.text == "fps"){
 				central.master.fpsMode = central.master.fpsMode>0?0:1;
+			}else if(e.text == "mm"){
+				central.master.memoryMonitor = central.master.memoryMonitor>0?0:1;
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
 			}

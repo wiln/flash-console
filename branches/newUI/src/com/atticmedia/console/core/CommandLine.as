@@ -41,11 +41,11 @@ package com.atticmedia.console.core {
 		public var reserved:Array;
 		public var useStrong:Boolean;
 
-		public function CommandLine(base:Object, reportFunction:Function = null) {
-			_reportFunction = reportFunction;
+		public function CommandLine(base:Central) {
+			_reportFunction = base.report;
 			_saved = new Weak();
-			_saved.set("_base",base);
-			_saved.set("_returned",base);
+			_saved.set("_base",null);
+			_saved.set("_returned",null);
 			reserved = new Array("_base", "_returned","_returned2","_lastMapBase");
 		}
 		public function set base(obj:Object):void {
