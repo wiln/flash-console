@@ -21,6 +21,7 @@
 * 
 */
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.events.TextFieldRollOver;	
 	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	
@@ -32,7 +33,6 @@ package com.atticmedia.console.panels {
 	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
-	import flash.text.TextFormat;
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;		
 
@@ -55,6 +55,8 @@ package com.atticmedia.console.panels {
 			_txtField.styleSheet = style.css;
 			_txtField.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			_txtField.selectable = false;
+			registerRollOverTextField(_txtField);
+			_txtField.addEventListener(TextFieldRollOver.ROLLOVER, onMenuRollOver, false, 0, true);
 			registerDragger(_txtField);
 			addChild(_txtField);
 		}
@@ -63,6 +65,9 @@ package com.atticmedia.console.panels {
 			addEventListener(Event.ENTER_FRAME, _onFrame, false, 0, true);
 		}
 		
+		private function onMenuRollOver(e:TextFieldRollOver):void{
+			central.tooltip(e.url?"Close":null, this);
+		}
 		private function _onFrame(e:Event):void{
 			if(!_base.stage){
 				close();

@@ -21,6 +21,7 @@ package com.atticmedia.console.core {
 		public var mm:MemoryMonitor;
 		
 		public var report:Function;
+		public var tooltip:Function;
 		
 		public function Central(m:Console) {
 			master = m;

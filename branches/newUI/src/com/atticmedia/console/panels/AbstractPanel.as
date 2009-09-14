@@ -1,4 +1,5 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.events.TextFieldRollOver;	
 	import com.atticmedia.console.Console;	
 	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
@@ -218,6 +219,25 @@ package com.atticmedia.console.panels {
 				}
 			}
 			return new Point(X,Y);
+		}
+		
+		public static function registerRollOverTextField(field:TextField):void{
+			field.addEventListener(MouseEvent.MOUSE_MOVE, onTextFieldMouseMove, false, 0, true);
+			field.addEventListener(MouseEvent.ROLL_OUT, onTextFieldMouseMove, false, 0, true);
+		}
+		private static function onTextFieldMouseMove(e:MouseEvent):void{
+			var field:TextField = e.currentTarget as TextField;
+			var index:int =field.getCharIndexAtPoint(e.localX, e.localY);
+			var url:String = null;
+			var txt:String = null;
+			if(index>0){
+				var X:XML = new XML(field.getXMLText(index,index+1));
+				if(X.textformat && X.textformat.length()>0){
+					url = X.textformat[0].@url;
+					txt = X.textformat[0].toString();
+				}
+			}
+			field.dispatchEvent(new TextFieldRollOver(url, txt));
 		}
 	}
 }

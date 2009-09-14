@@ -1,4 +1,5 @@
 ﻿package com.atticmedia.console.panels {
+	import com.atticmedia.console.events.TextFieldRollOver;	
 	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.core.Utils;
@@ -57,6 +58,8 @@
 			keyTxt.y = -3;
 			keyTxt.selectable = false;
 			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
+			registerRollOverTextField(keyTxt);
+			keyTxt.addEventListener(TextFieldRollOver.ROLLOVER, onMenuRollOver, false, 0, true);
 			registerDragger(keyTxt); // so that we can still drag from textfield
 			addChild(keyTxt);
 			//
@@ -272,6 +275,9 @@
 				close();
 			}
 			e.stopPropagation();
+		}
+		private function onMenuRollOver(e:TextFieldRollOver):void{
+			central.tooltip(e.url?e.url.replace("event:",""):null, this);
 		}
 	}
 }

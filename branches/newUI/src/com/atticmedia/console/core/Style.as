@@ -36,7 +36,8 @@ package com.atticmedia.console.core {
 		public var panelScalerColor:Number;
 		public var panelScalerAlpha:Number;
 		public var bottomLineColor:Number;
-		public var commandLineFormat:TextFormat;
+		public var textFormat:TextFormat;
+		public var tooltipBackgroundColor:Number;
 				
 		public function Style() {
 			_css = new StyleSheet();
@@ -74,8 +75,9 @@ package com.atticmedia.console.core {
 			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
 			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
 			_css.setStyle("menu2",{color:'#77D077', fontWeight:'bold', display:'inline'});
-			commandLineFormat = new TextFormat('Arial', 11, 0xFFFFFF);
-			
+			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
+			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);
+			tooltipBackgroundColor = 0;
 			
 			
 			_tracecss.setStyle("p",{fontFamily:'Arial', fontSize:'11'});

@@ -1,4 +1,6 @@
 package com.atticmedia.console.panels {
+	import com.atticmedia.console.events.TextFieldRollOver;	
+	
 	import flash.events.KeyboardEvent;	
 	import flash.geom.Point;	
 	import flash.events.MouseEvent;	
@@ -22,21 +24,24 @@ package com.atticmedia.console.panels {
 		
 		public static const NAME:String = "MainPanel";
 		
+		private static const _ToolTips:Object = {
+				fps:"Frames Per Second",
+				mm:"Memory Monitor",
+				roller:"Display Roller",
+				command:"Command Line"
+		};
+		
 		private var _traceField:TextField;
 		private var _menuField:TextField;
 		private var _commandField:TextField;
 		private var _commandBackground:Shape;
 		private var _bottomLine:Shape;
 		
-		private var _commandText:String;
-		private var _menuRolled:int = -1;
-		
 		private var _isMinimised:Boolean;
 		
 		
 		public function MainPanel(refs:Central) {
 			super(refs);
-			master = refs.master;
 			name = NAME;
 			minimumWidth = 50;
 			minimumHeight = 18;
@@ -55,6 +60,8 @@ package com.atticmedia.console.panels {
 			_menuField.styleSheet = style.css;
 			_menuField.height = 18;
 			_menuField.y = -2;
+			registerRollOverTextField(_menuField);
+			_menuField.addEventListener(TextFieldRollOver.ROLLOVER, onMenuRollOver, false, 0, true);
 			addChild(_menuField);
 			//
 			_commandBackground = new Shape();
@@ -62,7 +69,6 @@ package com.atticmedia.console.panels {
 			_commandBackground.graphics.beginFill(style.panelBackgroundColor, 0.1);
 			_commandBackground.graphics.drawRoundRect(0, 0, 100, 18,12,12);
 			_commandBackground.scale9Grid = new Rectangle(9, 9, 80, 1);
-			//_commandBackground.visible = false;
 			addChild(_commandBackground);
 			//
 			_commandField = new TextField();
@@ -71,7 +77,7 @@ package com.atticmedia.console.panels {
 			_commandField.height = 18;
 			_commandField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
 			_commandField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
-			_commandField.defaultTextFormat = style.commandLineFormat;
+			_commandField.defaultTextFormat = style.textFormat;
 			addChild(_commandField);
 			//
 			_bottomLine = new Shape();
@@ -81,8 +87,6 @@ package com.atticmedia.console.panels {
 			//
 			init(420,100,true);
 			registerDragger(_menuField);
-			_menuField.addEventListener(MouseEvent.MOUSE_MOVE, onMenuMouseMove, false, 0, true);
-			_menuField.addEventListener(MouseEvent.ROLL_OUT, onMenuMouseMove, false, 0, true);
 			updateMenu();
 			//
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
@@ -156,27 +160,8 @@ package com.atticmedia.console.panels {
 			if(b) return "<b>"+str+"</b>";
 			return str;
 		}
-		private function onMenuMouseMove(e:MouseEvent):void{
-			var index:int =_menuField.getCharIndexAtPoint(e.localX, e.localY);
-			var roll:int = -1;
-			if(index>=0){
-				if(index == 1){
-					roll = 1;
-				}
-				if(index == 3){
-					roll = 2;
-				}
-			}
-			if(roll>=0){
-				if(roll != _menuRolled){
-					_menuRolled = roll;
-					_commandText = _commandField.text;
-					_commandField.text = "Menu description "+roll+" here...";
-					_commandField.selectable = false;
-				}
-			}else{
-				cancelMenuDesc();
-			}
+		private function onMenuRollOver(e:TextFieldRollOver):void{
+			central.tooltip(e.url?_ToolTips[e.url.replace("event:","")]:null, this);
 		}
 		private function linkHandler(e:TextEvent):void{
 			stopDrag();
@@ -200,15 +185,8 @@ package com.atticmedia.console.panels {
 		//
 		// COMMAND LINE
 		//
-		private function cancelMenuDesc():void{
-			if(_menuRolled>=0){
-				_menuRolled = -1;
-				_commandField.text = _commandText;
-				_commandField.selectable = true;
-			}
-		}
 		private function commandKeyDown(e:KeyboardEvent):void{
-			cancelMenuDesc();
+			
 		}
 		private function commandKeyUp(e:KeyboardEvent):void{
 			

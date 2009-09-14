@@ -21,6 +21,7 @@
 * 
 */
 package com.atticmedia.console {
+	import flash.text.TextFieldAutoSize;	
 	import flash.system.System;	
 	
 	import com.atticmedia.console.panels.*;
@@ -58,6 +59,7 @@ package com.atticmedia.console {
 		
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
+		private var _tooltipField:TextField;
 		private var _isRemoting:Boolean;
 		private var _isRemote:Boolean;
 		private var _remoteMSPF:int;
@@ -73,6 +75,7 @@ package com.atticmedia.console {
 			
 			_central = new Central(this);
 			_central.report = addLogLine;
+			_central.tooltip = tooltip;
 			_central.style = new Style();
 			_central.panels = new PanelsManager(_central);
 			_central.mm = new MemoryMonitor();
@@ -82,6 +85,13 @@ package com.atticmedia.console {
 			//cl.addEventListener(CommandLine.SEARCH_REQUEST, onCommandSearch, false, 0, true);
 			_central.cl = cl;
 			
+			_tooltipField = new TextField();
+			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
+			_tooltipField.multiline = true;
+			_tooltipField.background = true;
+			_tooltipField.backgroundColor = _central.style.tooltipBackgroundColor;
+			_tooltipField.styleSheet = _central.style.css;
+			_tooltipField.mouseEnabled = false;
 			
 			var panel:MainPanel = new MainPanel(_central);
 			_central.panels.addPanel(panel);
@@ -193,6 +203,36 @@ package com.atticmedia.console {
 				if(arr.length>0){
 					addLine("GARBAGE COLLECTED: "+arr.join(", "),10,CONSOLE_CHANNEL);
 				}
+			}
+		}
+		private function tooltip(str:String = null, panel:AbstractPanel = null):void{
+			if(str){
+				addChild(_tooltipField);
+				_tooltipField.wordWrap = false;
+				_tooltipField.htmlText = "<tooltip>"+str+"</tooltip>";
+				_tooltipField.x = mouseX-(_tooltipField.width/2);
+				_tooltipField.y = mouseY+20;
+				if(_tooltipField.width>120){
+					_tooltipField.width = 120;
+					_tooltipField.wordWrap = true;
+				}
+				if(panel){
+					var txtRect:Rectangle = _tooltipField.getBounds(this);
+					var panRect:Rectangle = new Rectangle(panel.x,panel.y,panel.width,panel.height);
+					var doff:Number = txtRect.bottom - panRect.bottom;
+					if(doff>0){
+						_tooltipField.y -= doff;
+					}
+					var loff:Number = txtRect.left - panRect.left;
+					var roff:Number = txtRect.right - panRect.right;
+					if(loff<0){
+						_tooltipField.x -= loff;
+					}else if(roff>0){
+						_tooltipField.x -= roff;
+					}
+				}
+			}else if(contains(_tooltipField)){
+				removeChild(_tooltipField);
 			}
 		}
 		private function addLogLine(line:LogLineVO, q:Boolean = false):void{
