@@ -21,6 +21,7 @@
 * 
 */
 package com.atticmedia.console.core {
+	import flash.text.TextFormat;	
 	import flash.text.StyleSheet;		
 
 	public class Style {
@@ -35,6 +36,7 @@ package com.atticmedia.console.core {
 		public var panelScalerColor:Number;
 		public var panelScalerAlpha:Number;
 		public var bottomLineColor:Number;
+		public var commandLineFormat:TextFormat;
 				
 		public function Style() {
 			_css = new StyleSheet();
@@ -72,6 +74,7 @@ package com.atticmedia.console.core {
 			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
 			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
 			_css.setStyle("menu2",{color:'#77D077', fontWeight:'bold', display:'inline'});
+			commandLineFormat = new TextFormat('Arial', 11, 0xFFFFFF);
 			
 			
 			

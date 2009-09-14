@@ -87,13 +87,6 @@ package com.atticmedia.console {
 			_central.panels.addPanel(panel);
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			
-			
-			var roller:RollerPanel = new RollerPanel(_central);
-			roller.x = 0;
-			roller.y = 100;
-			_central.panels.addPanel(roller);
-			roller.start(this);
-			
 			// TEST...
 			var graph:GraphingPanel = new GraphingPanel(_central, 100,100);
 			graph.x = 50;
@@ -117,6 +110,26 @@ package com.atticmedia.console {
 		
 		
 		
+		public function get displayRoller():Boolean{
+			var roller:RollerPanel = _central.panels.getPanel(RollerPanel.NAME) as RollerPanel;
+			if(!roller) return false;
+			return true;
+		}
+		public function set displayRoller(n:Boolean):void{
+			if(displayRoller != n){
+				var panel:MainPanel = _central.panels.getPanel(MainPanel.NAME) as MainPanel;
+				if(!n){
+					_central.panels.removePanel(RollerPanel.NAME);
+				}else if(n){
+					var roller:RollerPanel = new RollerPanel(_central);
+					roller.x = panel.x+panel.width-160;
+					roller.y = panel.y+55;
+					_central.panels.addPanel(roller);
+					roller.start(this);
+				}
+				panel.updateMenu();
+			}
+		}
 		public function get fpsMode():int{
 			var fps:FPSPanel = _central.panels.getPanel(FPSPanel.NAME) as FPSPanel;
 			if(!fps) return 0;
@@ -129,7 +142,7 @@ package com.atticmedia.console {
 					_central.panels.removePanel(FPSPanel.NAME);
 				}else if(n > 0){
 					var fps:FPSPanel = new FPSPanel(_central);
-					fps.x = panel.x+panel.width-80;
+					fps.x = panel.x+panel.width-160;
 					fps.y = panel.y+15;
 					_central.panels.addPanel(fps);
 				}
@@ -148,7 +161,7 @@ package com.atticmedia.console {
 					_central.panels.removePanel(MemoryPanel.NAME);
 				}else if(n > 0){
 					var mm:MemoryPanel = new MemoryPanel(_central);
-					mm.x = panel.x+panel.width-160;
+					mm.x = panel.x+panel.width-80;
 					mm.y = panel.y+15;
 					_central.panels.addPanel(mm);
 				}

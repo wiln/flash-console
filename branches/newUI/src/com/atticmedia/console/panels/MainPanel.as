@@ -1,4 +1,8 @@
 package com.atticmedia.console.panels {
+	import flash.events.KeyboardEvent;	
+	import flash.geom.Point;	
+	import flash.events.MouseEvent;	
+	
 	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.Console;	
@@ -24,6 +28,8 @@ package com.atticmedia.console.panels {
 		private var _commandBackground:Shape;
 		private var _bottomLine:Shape;
 		
+		private var _commandText:String;
+		private var _menuRolled:int = -1;
 		
 		private var _isMinimised:Boolean;
 		
@@ -63,9 +69,9 @@ package com.atticmedia.console.panels {
 			_commandField.name = "commandField";
 			_commandField.type  = TextFieldType.INPUT;
 			_commandField.height = 18;
-			//_commandField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
-			//_commandField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
-			//_commandField.visible = false;
+			_commandField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
+			_commandField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
+			_commandField.defaultTextFormat = style.commandLineFormat;
 			addChild(_commandField);
 			//
 			_bottomLine = new Shape();
@@ -75,6 +81,8 @@ package com.atticmedia.console.panels {
 			//
 			init(420,100,true);
 			registerDragger(_menuField);
+			_menuField.addEventListener(MouseEvent.MOUSE_MOVE, onMenuMouseMove, false, 0, true);
+			_menuField.addEventListener(MouseEvent.ROLL_OUT, onMenuMouseMove, false, 0, true);
 			updateMenu();
 			//
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
@@ -123,6 +131,7 @@ package com.atticmedia.console.panels {
 			var str:String = "<r><w><menu>[";
 			str += doBold("<a href=\"event:fps\">F</a>", central.master.fpsMode>0);
 			str += doBold(" <a href=\"event:mm\">M</a>", central.master.memoryMonitor>0);
+			str += doBold(" <a href=\"event:roller\">Ro</a>", central.master.displayRoller);
 			str += doBold(" <a href=\"event:command\">CL</a>", commandLine);
 			//_menuText += (_ruler?"<b>":"")+"<a href=\"event:ruler\">RL</a> "+(_ruler?"</b>":"");
 			//_menuText += (_roller?"<b>":"")+"<a href=\"event:roller\">Ro</a> "+(_roller?"</b>":"");
@@ -147,6 +156,28 @@ package com.atticmedia.console.panels {
 			if(b) return "<b>"+str+"</b>";
 			return str;
 		}
+		private function onMenuMouseMove(e:MouseEvent):void{
+			var index:int =_menuField.getCharIndexAtPoint(e.localX, e.localY);
+			var roll:int = -1;
+			if(index>=0){
+				if(index == 1){
+					roll = 1;
+				}
+				if(index == 3){
+					roll = 2;
+				}
+			}
+			if(roll>=0){
+				if(roll != _menuRolled){
+					_menuRolled = roll;
+					_commandText = _commandField.text;
+					_commandField.text = "Menu description "+roll+" here...";
+					_commandField.selectable = false;
+				}
+			}else{
+				cancelMenuDesc();
+			}
+		}
 		private function linkHandler(e:TextEvent):void{
 			stopDrag();
 			if(e.text == "scrollUp"){
@@ -159,6 +190,8 @@ package com.atticmedia.console.panels {
 				central.master.fpsMode = central.master.fpsMode>0?0:1;
 			}else if(e.text == "mm"){
 				central.master.memoryMonitor = central.master.memoryMonitor>0?0:1;
+			}else if(e.text == "roller"){
+				central.master.displayRoller = !central.master.displayRoller;
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
 			}
@@ -167,6 +200,19 @@ package com.atticmedia.console.panels {
 		//
 		// COMMAND LINE
 		//
+		private function cancelMenuDesc():void{
+			if(_menuRolled>=0){
+				_menuRolled = -1;
+				_commandField.text = _commandText;
+				_commandField.selectable = true;
+			}
+		}
+		private function commandKeyDown(e:KeyboardEvent):void{
+			cancelMenuDesc();
+		}
+		private function commandKeyUp(e:KeyboardEvent):void{
+			
+		}
 		public function set commandLine (b:Boolean):void{
 			if(b){
 				_commandField.visible = true;

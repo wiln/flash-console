@@ -71,13 +71,16 @@
 			return Math.random();
 		}
 		public function add(obj:Object, prop:String, col:Number = -1, key:String=null):void{
-			// TODO: Check if property exists before adding
+			if(obj == null) return;
 			var cur:Number = obj[prop];
-			if(isNaN(lowest) && !isNaN(cur)) lowest = cur;
-			if(isNaN(highest) && !isNaN(cur)) highest = cur;
+			if(!isNaN(cur)){
+				if(isNaN(lowest)) lowest = cur;
+				if(isNaN(highest)) highest = cur;
+			}
 			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
-			// TODO: interst should be a class rather than an array of random properties!
-			_interests.push([obj, prop, col, key, NaN]);
+			if(key == null) key = prop;
+			//_interests.push([obj, prop, col, key, NaN]);
+			_interests.push(new Interest(obj, prop, col, key));
 			updateKeyText();
 			//
 			start();
@@ -96,7 +99,7 @@
 			_isRunning = false;
 			removeEventListener(Event.ENTER_FRAME, onFrame);
 		}
-		public override function close():void {
+		override public function close():void {
 			stop();
 			super.close();
 		}
@@ -154,8 +157,8 @@
 			return values?values[i]:0;
 		}
 		protected function getAverageOf(i:int):Number{
-			var interest:Array = _interests[i];
-			return interest?interest[4]:0;
+			var interest:Interest = _interests[i];
+			return interest?interest.avg:0;
 		}
 		//
 		//
@@ -170,7 +173,7 @@
 			_updatedFrame= 0;
 			var values:Array = [];
 			for each(var interest in _interests){
-				var v:Number = interest[0][interest[1]];
+				var v:Number = interest.obj[interest.prop];
 				if(isNaN(v)){
 					v = 0;
 				}else{
@@ -179,11 +182,11 @@
 				}
 				values.push(v);
 				if(averaging>0){
-					var avg:Number = interest[4];
+					var avg:Number = interest.avg;
 					if(isNaN(avg)) {
-						interest[4] = v;
+						interest.avg = v;
 					}else{
-						interest[4] = Utils.averageOut(avg, v, averaging);
+						interest.avg = Utils.averageOut(avg, v, averaging);
 					}
 				}
 				if(!fixed){
@@ -199,6 +202,7 @@
 				_history.splice(0, (len-maxLen));
 			}
 		}
+		// TODO: MAYBE USE BITMAPDATA INSTEAD OF DRAW
 		private function drawGraph():void{
 			_drawnFrame++;
 			if(!_needRedraw && _drawnFrame < drawEvery) return;
@@ -213,13 +217,13 @@
 			var firstpass:Boolean = true;
 			var marks:Array = [];
 			for(var j:int = 0;j<numInterests;j++){
-				var interest:Array = _interests[j];
+				var interest:Interest = _interests[j];
 				var first:Boolean = true;
 				for(var i:int = 1;i<W;i++){
 					if(len < i) break;
 					var values:Array = _history[len-i];
 					if(first){
-						graph.graphics.lineStyle(1,interest[2]);
+						graph.graphics.lineStyle(1,interest.col);
 					}
 					var Y:Number = (diffGraph?((values[j]-lowest)/diffGraph):0.5)*H;
 					if(!inverse) Y = H-Y;
@@ -235,11 +239,11 @@
 				}
 				firstpass = false;
 				if(averaging>0 && diffGraph){
-					Y = ((interest[4]-lowest)/diffGraph)*H;
+					Y = ((interest.avg-lowest)/diffGraph)*H;
 					if(!inverse) Y = H-Y;
 					if(Y<-1)Y=-1;
 					if(Y>H)Y=H+1;
-					graph.graphics.lineStyle(1,interest[2], 0.3);
+					graph.graphics.lineStyle(1,interest.col, 0.3);
 					graph.graphics.moveTo(0, Y);
 					graph.graphics.lineTo(W, Y);
 				}
@@ -255,11 +259,8 @@
 		}
 		protected function updateKeyText():void{
 			var str:String = "<r><s>";
-			for each(var interest:Array in _interests){
-				var n:String = interest[3];
-				if(!n) n =  interest[1];
-				var col:Number = interest[2];
-				str += " <font color='#"+col.toString(16)+"'>"+n+"</font>";
+			for each(var interest:Interest in _interests){
+				str += " <font color='#"+interest.col.toString(16)+"'>"+interest.key+"</font>";
 			}
 			str +=  " | <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font></s></r>";
 			keyTxt.htmlText = str;
@@ -274,3 +275,25 @@
 		}
 	}
 }
+class Interest{
+	public var obj:Object;
+	public var prop:String;
+	public var col:Number;
+	public var key:String;
+	public var avg:Number;
+	public function Interest(object:Object, property:String, color:Number, keystr:String):void{
+		obj = object;
+		prop = property;
+		col = color;
+		key = keystr;
+	}
+}
+/*class Mark{
+	public var position:int;
+	public var col:Number;
+	public var val:Number;
+	public function Mark(color:Number, value:Number):void{
+		col = color;
+		val = value;
+	}
+}*/
