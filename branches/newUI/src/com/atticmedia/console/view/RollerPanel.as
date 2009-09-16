@@ -74,7 +74,7 @@ package com.atticmedia.console.view {
 				return;
 			}
 			var stg:Stage = _base.stage;
-			var str:String = "<y>";
+			var str:String = "<ro>";
 			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
 			var stepMap:Dictionary = new Dictionary(true);
 			if(objs.length == 0){
@@ -98,14 +98,14 @@ package com.atticmedia.console.view {
 						if(obj == stg){
 							str +=  "<menu><a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
 						}else if(i == len-1){
-							str +=  "<y2>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</y2>";
+							str +=  "<roBold>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</roBold>";
 						}else {
 							str +=  "<i>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</i><br/>";
 						}
 					}
 				}
 			}
-			str += "</y>";
+			str += "</ro>";
 			_txtField.htmlText = str;
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
 			width = _txtField.width+4;

@@ -70,9 +70,10 @@ package com.atticmedia.console.core {
 			_css.setStyle("r",{textAlign:'right', display:'inline'});
 			//_css.setStyle("a",{textDecoration:'underline'});
 			_css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
-			_css.setStyle("y",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
-			_css.setStyle("y2",{color:'#EE6611', fontWeight:'bold'});
 			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
+			_css.setStyle("y",{color:'#DD5500', display:'inline'});
+			_css.setStyle("ro",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
+			_css.setStyle("roBold",{color:'#EE6611', fontWeight:'bold'});
 			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
 			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
 			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);

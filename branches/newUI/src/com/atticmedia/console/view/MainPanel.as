@@ -135,13 +135,13 @@ package com.atticmedia.console.view {
 		//
 		public function updateMenu():void{
 			//[global] [C] [traces] [myChannel] [myCh2] [masdf] ...v 
-			var str:String = "<r><w><menu>[";
-			str += doBold("<a href=\"event:fps\">F</a>", master.fpsMode>0);
-			str += doBold(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
-			str += doBold(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
-			str += doBold(" <a href=\"event:ruler\">RL</a>", false);
-			str += doBold(" <a href=\"event:command\">CL</a>", commandLine);
-			str += " <b>|</b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P0</a> <a href=\"event:close\">X</a>";
+			var str:String = "<r><w><menu>[<b>";
+			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMode>0);
+			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
+			str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
+			str += doActive(" <a href=\"event:ruler\">RL</a>", false);
+			str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
+			str += " </b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P0</a> <a href=\"event:close\">X</a>";
 			//_menuText += (_ruler?"<b>":"")+"<a href=\"event:ruler\">RL</a> "+(_ruler?"</b>":"");
 			//_menuText += (_roller?"<b>":"")+"<a href=\"event:roller\">Ro</a> "+(_roller?"</b>":"");
 			//_menuText += "<a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:alpha\">A</a> <a href=\"event:pause\">P</a> <a href=\"event:help\">H</a> <a href=\"event:close\">X</a>] </font>";
@@ -160,8 +160,8 @@ package com.atticmedia.console.view {
 			_menuField.htmlText = str;
 			_menuField.scrollH = _menuField.maxScrollH;
 		}
-		private function doBold(str:String, b:Boolean):String{
-			if(b) return "<b>"+str+"</b>";
+		private function doActive(str:String, b:Boolean):String{
+			if(b) return "<y>"+str+"</y>";
 			return str;
 		}
 		private function onMenuRollOver(e:TextFieldRollOver):void{
