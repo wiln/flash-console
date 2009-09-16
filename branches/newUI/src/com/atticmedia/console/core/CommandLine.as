@@ -21,6 +21,8 @@
 * 
 */
 package com.atticmedia.console.core {
+	import com.atticmedia.console.Console;	
+	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
@@ -41,8 +43,8 @@ package com.atticmedia.console.core {
 		public var reserved:Array;
 		public var useStrong:Boolean;
 
-		public function CommandLine(base:Central) {
-			_reportFunction = base.report;
+		public function CommandLine(m:Console) {
+			_reportFunction = m.addLogLine;
 			_saved = new Weak();
 			_saved.set("_base",null);
 			_saved.set("_returned",null);

@@ -1,6 +1,6 @@
-﻿package com.atticmedia.console.panels {
-	import com.atticmedia.console.events.TextFieldRollOver;	
-	import com.atticmedia.console.core.Central;	
+﻿package com.atticmedia.console.view {
+	import com.atticmedia.console.Console;	
+	import com.atticmedia.console.events.TextFieldRollOver;
 	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.core.Utils;
 	
@@ -35,8 +35,8 @@
 		public var averaging:uint;
 		public var inverse:Boolean;
 		//
-		public function GraphingPanel(refs:Central, W:int = 0, H:int = 0, resizable:Boolean = true) {
-			super(refs);
+		public function GraphingPanel(m:Console, W:int = 0, H:int = 0, resizable:Boolean = true) {
+			super(m);
 			registerDragger(bg);
 			minimumHeight = 26;
 			//
@@ -277,7 +277,7 @@
 			e.stopPropagation();
 		}
 		private function onMenuRollOver(e:TextFieldRollOver):void{
-			central.tooltip(e.url?e.url.replace("event:",""):null, this);
+			master.panels.tooltip(e.url?e.url.replace("event:",""):null, this);
 		}
 	}
 }

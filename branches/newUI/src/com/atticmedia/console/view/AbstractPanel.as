@@ -1,7 +1,6 @@
-package com.atticmedia.console.panels {
+package com.atticmedia.console.view {
 	import com.atticmedia.console.events.TextFieldRollOver;	
-	import com.atticmedia.console.Console;	
-	import com.atticmedia.console.core.Central;	
+	import com.atticmedia.console.Console;
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.text.TextFieldAutoSize;	
@@ -27,7 +26,6 @@ package com.atticmedia.console.panels {
 		private var _dragOffset:Point;
 		private var _resizeTxt:TextField;
 		
-		protected var central:Central;
 		protected var master:Console;
 		protected var style:Style;
 		protected var bg:Sprite;
@@ -36,10 +34,9 @@ package com.atticmedia.console.panels {
 		protected var minimumHeight:int = 18;
 		public var snapping:uint = 3;
 		
-		public function AbstractPanel(refs:Central) {
-			central= refs;
-			style = refs.style;
-			master = refs.master;
+		public function AbstractPanel(m:Console) {
+			master = m;
+			style = master.style;
 			bg = new Sprite();
 			bg.name = "background";
 			addChild(bg);
@@ -72,6 +69,7 @@ package com.atticmedia.console.panels {
 		}
 		public function close():void {
 			stopDragging();
+			master.panels.tooltip();
 			if(parent){
 				parent.removeChild(this);
 			}
@@ -227,6 +225,12 @@ package com.atticmedia.console.panels {
 		}
 		private static function onTextFieldMouseMove(e:MouseEvent):void{
 			var field:TextField = e.currentTarget as TextField;
+			if(!field.stage || !field.visible || (field.parent && !field.parent.visible)) {
+				// this can happen if you removed it while rolled over and roll out calls on next move	
+				field.dispatchEvent(new TextFieldRollOver());
+				return;
+			}
+			
 			var index:int =field.getCharIndexAtPoint(e.localX, e.localY);
 			var url:String = null;
 			var txt:String = null;

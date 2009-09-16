@@ -20,7 +20,10 @@
 * 
 * 
 */
-package com.atticmedia.console.core {
+package com.atticmedia.console.view {
+	import com.atticmedia.console.core.LogLineVO;	
+	import com.atticmedia.console.core.Utils;	
+	
 	import flash.geom.Rectangle;
 	import flash.display.Sprite;
 	import flash.events.Event;

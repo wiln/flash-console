@@ -1,5 +1,6 @@
-package com.atticmedia.console.panels {
-	import com.atticmedia.console.core.Central;	
+package com.atticmedia.console.view {
+	import com.atticmedia.console.view.GraphingPanel;
+	import com.atticmedia.console.Console;	
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.events.Event;
@@ -17,9 +18,9 @@ package com.atticmedia.console.panels {
 		private var _fps:Number;
 		private var _mspf:Number;
 		//
-		public function FPSPanel(ref:Central) {
+		public function FPSPanel(m:Console) {
 			name = NAME;
-			super(ref, 80,40);
+			super(m, 80,40);
 			lowest = 0;
 			averaging = 10;
 			minimumWidth = 32;

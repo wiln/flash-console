@@ -1,5 +1,6 @@
-﻿package com.atticmedia.console.panels {
-	import com.atticmedia.console.core.Central;	
+﻿package com.atticmedia.console.view {
+	import com.atticmedia.console.view.GraphingPanel;
+	import com.atticmedia.console.Console;	
 	import com.atticmedia.console.core.MemoryMonitor;	
 	
 	import flash.system.System;	
@@ -14,22 +15,22 @@
 		
 		public static const NAME:String = "MemoryPanel";
 		//
-		public function MemoryPanel(refs:Central) {
+		public function MemoryPanel(m:Console) {
 			name = NAME;
-			super(refs, 80,40);
+			super(m, 80,40);
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;
-			refs.mm.addEventListener(MemoryMonitor.GARBAGE_COLLECTED, onGC, false, 0, true);
-			refs.mm.notifyGC = true;
+			master.mm.addEventListener(MemoryMonitor.GARBAGE_COLLECTED, onGC, false, 0, true);
+			master.mm.notifyGC = true;
 			add(this, "current", 0x5060FF, "Memory");
 		}
 		public override function close():void {
-			central.mm.notifyGC = false;
+			master.mm.notifyGC = false;
 			super.close();
 		}
 		public function get current():Number{
-			return Math.round(central.mm.currentMemory/10485.76)/100;
+			return Math.round(master.mm.currentMemory/10485.76)/100;
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
@@ -40,7 +41,7 @@
 		}
 		protected override function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){
-				central.master.gc();
+				master.gc();
 			}
 			super.linkHandler(e);
 		}

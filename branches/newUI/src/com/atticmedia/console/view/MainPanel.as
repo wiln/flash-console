@@ -1,11 +1,9 @@
-package com.atticmedia.console.panels {
+package com.atticmedia.console.view {
 	import com.atticmedia.console.events.TextFieldRollOver;	
 	
 	import flash.events.KeyboardEvent;	
 	import flash.geom.Point;	
 	import flash.events.MouseEvent;	
-	
-	import com.atticmedia.console.core.Central;	
 	import com.atticmedia.console.core.Style;	
 	import com.atticmedia.console.Console;	
 	
@@ -28,7 +26,11 @@ package com.atticmedia.console.panels {
 				fps:"Frames Per Second",
 				mm:"Memory Monitor",
 				roller:"Display Roller",
-				command:"Command Line"
+				ruler:"Ruler",
+				command:"Command Line",
+				clear:"Clear log",
+				trace:"Trace",
+				close:"Close"
 		};
 		
 		private var _traceField:TextField;
@@ -40,8 +42,8 @@ package com.atticmedia.console.panels {
 		private var _isMinimised:Boolean;
 		
 		
-		public function MainPanel(refs:Central) {
-			super(refs);
+		public function MainPanel(m:Console) {
+			super(m);
 			name = NAME;
 			minimumWidth = 50;
 			minimumHeight = 18;
@@ -134,9 +136,9 @@ package com.atticmedia.console.panels {
 		public function updateMenu():void{
 			//[global] [C] [traces] [myChannel] [myCh2] [masdf] ...v 
 			var str:String = "<r><w><menu>[";
-			str += doBold("<a href=\"event:fps\">F</a>", central.master.fpsMode>0);
-			str += doBold(" <a href=\"event:mm\">M</a>", central.master.memoryMonitor>0);
-			str += doBold(" <a href=\"event:roller\">Ro</a>", central.master.displayRoller);
+			str += doBold("<a href=\"event:fps\">F</a>", master.fpsMode>0);
+			str += doBold(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
+			str += doBold(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
 			str += doBold(" <a href=\"event:ruler\">RL</a>", false);
 			str += doBold(" <a href=\"event:command\">CL</a>", commandLine);
 			str += " <b>|</b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P0</a> <a href=\"event:close\">X</a>";
@@ -163,7 +165,7 @@ package com.atticmedia.console.panels {
 			return str;
 		}
 		private function onMenuRollOver(e:TextFieldRollOver):void{
-			central.tooltip(e.url?_ToolTips[e.url.replace("event:","")]:null, this);
+			master.panels.tooltip(e.url?_ToolTips[e.url.replace("event:","")]:null, this);
 		}
 		private function linkHandler(e:TextEvent):void{
 			stopDrag();
@@ -172,13 +174,14 @@ package com.atticmedia.console.panels {
 			}else if(e.text == "scrollDown"){
 				_traceField.scrollV += 3;
 			}else if(e.text == "close"){
+				master.panels.tooltip();
 				visible = false;
 			}else if(e.text == "fps"){
-				central.master.fpsMode = central.master.fpsMode>0?0:1;
+				master.fpsMode = master.fpsMode>0?0:1;
 			}else if(e.text == "mm"){
-				central.master.memoryMonitor = central.master.memoryMonitor>0?0:1;
+				master.memoryMonitor = master.memoryMonitor>0?0:1;
 			}else if(e.text == "roller"){
-				central.master.displayRoller = !central.master.displayRoller;
+				master.displayRoller = !master.displayRoller;
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
 			}

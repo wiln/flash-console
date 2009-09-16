@@ -20,9 +20,9 @@
 * 
 * 
 */
-package com.atticmedia.console.panels {
-	import com.atticmedia.console.events.TextFieldRollOver;	
-	import com.atticmedia.console.core.Central;	
+package com.atticmedia.console.view {
+	import com.atticmedia.console.Console;	
+	import com.atticmedia.console.events.TextFieldRollOver;
 	import com.atticmedia.console.core.Style;	
 	
 	import flash.events.TextEvent;	
@@ -44,8 +44,8 @@ package com.atticmedia.console.panels {
 		private var _base:DisplayObjectContainer;
 		
 		
-		public function RollerPanel(refs:Central) {
-			super(refs);
+		public function RollerPanel(m:Console) {
+			super(m);
 			name = NAME;
 			init(60,100,false);
 			_txtField = new TextField();
@@ -66,7 +66,7 @@ package com.atticmedia.console.panels {
 		}
 		
 		private function onMenuRollOver(e:TextFieldRollOver):void{
-			central.tooltip(e.url?"Close":null, this);
+			master.panels.tooltip(e.url?"Close":null, this);
 		}
 		private function _onFrame(e:Event):void{
 			if(!_base.stage){
