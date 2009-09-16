@@ -30,7 +30,7 @@ package com.atticmedia.console.core {
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getQualifiedSuperclassName;	
 	
-	public class CommandLine extends EventDispatcher {
+	public class CommandLine_new extends EventDispatcher {
 
 		public static const SEARCH_REQUEST:String = "SearchRequest";
 		
@@ -48,7 +48,7 @@ package com.atticmedia.console.core {
 		public var reserved:Array;
 		public var useStrong:Boolean;
 
-		public function CommandLine(base:Object, reportFunction:Function = null) {
+		public function CommandLine_new(base:Object, reportFunction:Function = null) {
 			_reportFunction = reportFunction;
 			_internal = new Weak();
 			_internal.set(INTERNAL_BASE,base);

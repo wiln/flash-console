@@ -74,7 +74,6 @@ package com.atticmedia.console.core {
 			_css.setStyle("y2",{color:'#EE6611', fontWeight:'bold'});
 			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
 			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
-			_css.setStyle("menu2",{color:'#77D077', fontWeight:'bold', display:'inline'});
 			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
 			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);
 			tooltipBackgroundColor = 0;

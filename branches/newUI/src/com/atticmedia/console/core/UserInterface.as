@@ -58,7 +58,7 @@ package com.atticmedia.console.core {
 			format.size = 12;
 			format.color = 0xFFFFFF;
 			
-			_priorities[0] = "#000000";
+			/*_priorities[0] = "#000000";
 			_priorities[1] = "#33AA33";
 			_priorities[2] = "#77D077";
 			_priorities[3] = "#AAEEAA";
@@ -70,7 +70,7 @@ package com.atticmedia.console.core {
 			_priorities[9] = "#FF3333";
 			_priorities[10] = "#FF0000";
 			_priorities[-1] = "#0099CC";
-			_priorities[-2] = "#FF8800";
+			_priorities[-2] = "#FF8800";*/
 		}
 		
 		public function preset2():void{

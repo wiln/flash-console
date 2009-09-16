@@ -132,16 +132,18 @@ package com.atticmedia.console.panels {
 		//
 		//
 		public function updateMenu():void{
+			//[global] [C] [traces] [myChannel] [myCh2] [masdf] ...v 
 			var str:String = "<r><w><menu>[";
 			str += doBold("<a href=\"event:fps\">F</a>", central.master.fpsMode>0);
 			str += doBold(" <a href=\"event:mm\">M</a>", central.master.memoryMonitor>0);
 			str += doBold(" <a href=\"event:roller\">Ro</a>", central.master.displayRoller);
+			str += doBold(" <a href=\"event:ruler\">RL</a>", false);
 			str += doBold(" <a href=\"event:command\">CL</a>", commandLine);
+			str += " <b>|</b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P0</a> <a href=\"event:close\">X</a>";
 			//_menuText += (_ruler?"<b>":"")+"<a href=\"event:ruler\">RL</a> "+(_ruler?"</b>":"");
 			//_menuText += (_roller?"<b>":"")+"<a href=\"event:roller\">Ro</a> "+(_roller?"</b>":"");
 			//_menuText += "<a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:alpha\">A</a> <a href=\"event:pause\">P</a> <a href=\"event:help\">H</a> <a href=\"event:close\">X</a>] </font>";
 			str += "]</menu> ";
-			str += "<menu2><a href=\"event:menu\">@</a></menu2>";
 			if(_traceField.scrollV > 1){
 				str += " <a href=\"event:scrollUp\">^</a>";
 			}else{
