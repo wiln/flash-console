@@ -35,88 +35,51 @@ package com.atticmedia.console.view {
 	import flash.utils.Dictionary;
 	import flash.utils.getQualifiedClassName;		
 
-	public class RollerPanel extends AbstractPanel{
+	public class ChannelsPanel extends AbstractPanel{
 		
 		private var _txtField:TextField;
-		private var _base:DisplayObjectContainer;
 		
+		private var _channels:Array;
 		
-		public function RollerPanel(m:Console) {
+		public function ChannelsPanel(m:Console) {
 			super(m);
-			name = Console.PANEL_ROLLER;
-			init(60,100,false);
+			name = Console.PANEL_CHANNELS;
+			init(10,10,false);
 			_txtField = new TextField();
-			_txtField.name = "rollerprints";
+			_txtField.name = "channelsField";
+			_txtField.wordWrap = true;
+			_txtField.width = 160;
 			_txtField.multiline = true;
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
 			_txtField.styleSheet = style.css;
 			_txtField.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
-			_txtField.selectable = false;
 			registerRollOverTextField(_txtField);
 			_txtField.addEventListener(TextFieldRollOver.ROLLOVER, onMenuRollOver, false, 0, true);
 			registerDragger(_txtField);
 			addChild(_txtField);
 		}
-		public function start(base:DisplayObjectContainer):void{
-			_base = base;
-			addEventListener(Event.ENTER_FRAME, _onFrame, false, 0, true);
+		public function start(channels:Array):void{
+			_channels = channels;
+			update();
 		}
-		
-		private function onMenuRollOver(e:TextFieldRollOver):void{
-			master.panels.tooltip(e.url?"Close":null, this);
-		}
-		private function _onFrame(e:Event):void{
-			if(!_base.stage){
-				close();
-				return;
+		public function update():void{
+			var str:String = "<w><menu><b><a href=\"event:close\">X</a></b></menu> <textformat leading=\"2\"><font face=\"Arial\" size=\"11\" color=\"#FFFFFF\" >";
+			for each(var channel:String in _channels){
+				var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<font color=\"#0099CC\"><b>"+channel+"</b></font>" : channel;
+				channelTxt = channel==master.defaultChannel ? "<i>"+channelTxt+"</i>" : channelTxt;
+				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
-			var stg:Stage = _base.stage;
-			var str:String = "<ro>";
-			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
-			var stepMap:Dictionary = new Dictionary(true);
-			if(objs.length == 0){
-				objs.push(stg);// if nothing at least have stage.
-			}
-			for each(var child:DisplayObject in objs){
-				var chain:Array = new Array(child);
-				var par:DisplayObjectContainer = child.parent;
-				while(par){
-					chain.unshift(par);
-					par = par.parent;
-				}
-				var len:uint = chain.length;
-				for (var i:uint=0; i<len; i++){
-					var obj:DisplayObject = chain[i];
-					if(stepMap[obj] == undefined){
-						stepMap[obj] = i;
-						for(var j:uint = i;j>0;j--){
-							str += j==1?" ∟":" -";
-						}
-						if(obj == stg){
-							str +=  "<menu><a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
-						}else if(i == len-1){
-							str +=  "<roBold>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</roBold>";
-						}else {
-							str +=  "<i>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</i><br/>";
-						}
-					}
-				}
-			}
-			str += "</ro>";
-			_txtField.htmlText = str;
-			_txtField.autoSize = TextFieldAutoSize.LEFT;
+			_txtField.htmlText = str+"</font></textformat></w>";
+			
 			width = _txtField.width+4;
 			height = _txtField.height;
 		}
-		
-		public override function close():void {
-			removeEventListener(Event.ENTER_FRAME, _onFrame);
-			_base = null;
-			super.close();
+		private function onMenuRollOver(e:TextFieldRollOver):void{
+			//master.panels.tooltip(e.url?"Close":null, this);
 		}
 		protected function linkHandler(e:TextEvent):void{
 			if(e.text == "close"){
-				close();
+				master.channelsPanel = false;
 			}
 			e.stopPropagation();
 		}

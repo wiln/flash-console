@@ -75,15 +75,28 @@ package com.atticmedia.console.core {
 			_css.setStyle("ro",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
 			_css.setStyle("roBold",{color:'#EE6611', fontWeight:'bold'});
 			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
+			_css.setStyle("ch",{color:'#0099CC', display:'inline'});
 			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
 			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);
 			tooltipBackgroundColor = 0;
 			
 			
-			_tracecss.setStyle("p",{fontFamily:'Arial', fontSize:'11'});
+			_tracecss.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
 			_tracecss.setStyle("l1",{color:'#0099CC'});
 			_tracecss.setStyle("l2",{color:'#FF8800'});
 			_tracecss.setStyle("p0",{color:'#000000'});
+			_tracecss.setStyle("p1",{color:'#33AA33'});
+			_tracecss.setStyle("p2",{color:'#77D077'});
+			_tracecss.setStyle("p3",{color:'#AAEEAA'});
+			_tracecss.setStyle("p4",{color:'#D6FFD6'});
+			_tracecss.setStyle("p5",{color:'#E6E6E6'});
+			_tracecss.setStyle("p6",{color:'#FFD6D6'});
+			_tracecss.setStyle("p7",{color:'#FFAAAA'});
+			_tracecss.setStyle("p8",{color:'#FF7777'});
+			_tracecss.setStyle("p9",{color:'#FF3333'});
+			_tracecss.setStyle("p10",{color:'#FF0000'});
+			_tracecss.setStyle("p-1",{color:'#0099CC'});
+			_tracecss.setStyle("p-2",{color:'#FF8800'});
 			
 			/*
 			_priorities[0] = "#000000";

@@ -1,23 +1,21 @@
 ﻿package com.atticmedia.console.view {
+	import com.atticmedia.console.Console;
+	import com.atticmedia.console.core.MemoryMonitor;
+	import com.atticmedia.console.events.TextFieldRollOver;
 	import com.atticmedia.console.view.GraphingPanel;
-	import com.atticmedia.console.Console;	
-	import com.atticmedia.console.core.MemoryMonitor;	
 	
-	import flash.system.System;	
 	import flash.events.Event;
-	import flash.utils.getTimer;
-	import flash.events.TextEvent;
+	import flash.events.TextEvent;		
 
 	/**
 	 * @author LuAye
 	 */
 	public class MemoryPanel extends GraphingPanel {
 		
-		public static const NAME:String = "MemoryPanel";
 		//
 		public function MemoryPanel(m:Console) {
-			name = NAME;
 			super(m, 80,40);
+			name = Console.PANEL_MEMORY;
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;
@@ -47,6 +45,13 @@
 		}
 		//
 		
+		protected override function onMenuRollOver(e:TextFieldRollOver):void{
+			var txt:String = e.url?e.url.replace("event:",""):null;
+			if(txt == "gc"){
+				txt = "Garbage collect::Requires debugger version of flash player";
+			}
+			master.panels.tooltip(txt, this);
+		}
 		private function onGC(e:Event):void{
 			mark(0xFF000000);
 		}

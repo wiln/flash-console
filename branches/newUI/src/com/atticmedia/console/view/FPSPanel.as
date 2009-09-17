@@ -1,27 +1,23 @@
 package com.atticmedia.console.view {
+	import com.atticmedia.console.Console;
 	import com.atticmedia.console.view.GraphingPanel;
-	import com.atticmedia.console.Console;	
-	import com.atticmedia.console.core.Style;	
 	
 	import flash.events.Event;
-	import flash.utils.getTimer;
-	import flash.events.TextEvent;
+	import flash.utils.getTimer;	
 
 	/**
 	 * @author LuAye
 	 */
 	public class FPSPanel extends GraphingPanel {
 		
-		public static const NAME:String = "FPSPanel";
-		
 		private var _previousTime:Number;
 		private var _fps:Number;
 		private var _mspf:Number;
 		//
 		public function FPSPanel(m:Console) {
-			name = NAME;
 			super(m, 80,40);
-			lowest = 0;
+			name = Console.PANEL_FPS;
+			//lowest = 0;
 			averaging = 10;
 			minimumWidth = 32;
 			add(this, "current", 0xFF3333, "FPS");
@@ -29,6 +25,7 @@ package com.atticmedia.console.view {
 		public override function reset():void {
 			_fps = NaN;
 			_previousTime = NaN;
+			lowest = NaN;
 			super.reset();
 		}
 		public function get current():Number {
@@ -54,6 +51,7 @@ package com.atticmedia.console.view {
 					fixed = true;
 					highest = stage.frameRate;
 					var frames:int = Math.floor(_mspf/(1000/highest));
+					if(_fps < lowest) lowest = _fps;
 					if(frames>30) frames = 30; // Don't add too many
 					while(frames>1){
 						// this is to try add the frames that have been lagged

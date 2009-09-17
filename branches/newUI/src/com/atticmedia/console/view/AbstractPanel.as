@@ -1,19 +1,17 @@
 package com.atticmedia.console.view {
-	import com.atticmedia.console.events.TextFieldRollOver;	
 	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.Style;	
+	import com.atticmedia.console.core.Style;
+	import com.atticmedia.console.events.TextFieldRollOver;
 	
-	import flash.text.TextFieldAutoSize;	
-	import flash.text.TextFormatAlign;	
-	import flash.text.TextFormat;	
-	import flash.text.TextField;	
-	import flash.geom.Point;	
-	import flash.display.DisplayObject;	
-	import flash.events.Event;	
-	import flash.events.MouseEvent;	
-	import flash.geom.Rectangle;
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
-	
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;		
+
 	/**
 	 * @author LuAye
 	 */
@@ -32,6 +30,8 @@ package com.atticmedia.console.view {
 		protected var scaler:Sprite;
 		protected var minimumWidth:int = 18;
 		protected var minimumHeight:int = 18;
+		
+		public var moveable:Boolean = true;
 		public var snapping:uint = 3;
 		
 		public function AbstractPanel(m:Console) {
@@ -107,9 +107,10 @@ package com.atticmedia.console.view {
 			}
 		}
 		private function onDraggerMouseDown(e:MouseEvent):void{
-			if(!stage) return;
+			if(!stage || !moveable) return;
 			//
 			_resizeTxt = new TextField();
+			_resizeTxt.name = "positioningField";
 			_resizeTxt.autoSize = TextFieldAutoSize.LEFT;
            	formatText(_resizeTxt);
 			addChild(_resizeTxt);
@@ -137,8 +138,10 @@ package com.atticmedia.console.view {
 		}
 		private function stopDragging():void{
 			_snaps = null;
-			stage.removeEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp);
-			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove);
+			if(stage){
+				stage.removeEventListener(MouseEvent.MOUSE_UP, onDraggerMouseUp);
+				stage.removeEventListener(MouseEvent.MOUSE_MOVE, onDraggerMouseMove);
+			}
 			if(_resizeTxt && _resizeTxt.parent){
 				_resizeTxt.parent.removeChild(_resizeTxt);
 			}
@@ -149,6 +152,7 @@ package com.atticmedia.console.view {
 		//
 		private function onScalerMouseDown(e:Event):void{
 			_resizeTxt = new TextField();
+			_resizeTxt.name = "resizingField";
 			_resizeTxt.autoSize = TextFieldAutoSize.RIGHT;
 			_resizeTxt.x = -4;
 			_resizeTxt.y = -17;

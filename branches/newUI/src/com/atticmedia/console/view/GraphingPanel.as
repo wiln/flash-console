@@ -1,15 +1,12 @@
 ﻿package com.atticmedia.console.view {
-	import com.atticmedia.console.Console;	
-	import com.atticmedia.console.events.TextFieldRollOver;
-	import com.atticmedia.console.core.Style;	
+	import com.atticmedia.console.Console;
 	import com.atticmedia.console.core.Utils;
+	import com.atticmedia.console.events.TextFieldRollOver;
 	
-	import flash.text.TextFormatAlign;
 	import flash.display.Shape;
 	import flash.events.Event;
-	import flash.text.TextField;
-	import flash.text.TextFormat;
 	import flash.events.TextEvent;
+	import flash.text.TextField;		
 
 	/**
 	 * @author LuAye
@@ -41,11 +38,13 @@
 			minimumHeight = 26;
 			//
 			lowTxt = new TextField();
+			lowTxt.name = "lowestField";
 			lowTxt.mouseEnabled = false;
 			lowTxt.styleSheet = style.css;
 			lowTxt.height = 14;
 			addChild(lowTxt);
 			highTxt = new TextField();
+			highTxt.name = "highestField";
 			highTxt.mouseEnabled = false;
 			highTxt.styleSheet = style.css;
 			highTxt.height = 14;
@@ -53,6 +52,7 @@
 			addChild(highTxt);
 			//
 			keyTxt = new TextField();
+			keyTxt.name = "menuField";
 			keyTxt.styleSheet = style.css;
 			keyTxt.height = 16;
 			keyTxt.y = -3;
@@ -64,6 +64,7 @@
 			addChild(keyTxt);
 			//
 			graph = new Shape();
+			graph.name = "graph";
 			graph.y = 10;
 			addChild(graph);
 			//
@@ -88,6 +89,14 @@
 			//
 			start();
 		}
+		public function remove(obj:Object, prop:String):void{
+			for(var X:String in _interests){
+				var interest:Interest = _interests[X];
+				if(interest && interest.obj == obj && interest.prop == prop){
+					_interests.splice(int(X), 1);
+				}
+			}
+		}
 		public function mark(col:Number = -1, v:Number = NaN):void{
 			if(_history.length==0) return;
 			var interests:Array = _history[_history.length-1];
@@ -101,6 +110,9 @@
 		public function stop():void {
 			_isRunning = false;
 			removeEventListener(Event.ENTER_FRAME, onFrame);
+		}
+		public function get numInterests():int{
+			return _interests.length;
 		}
 		override public function close():void {
 			stop();
@@ -276,7 +288,7 @@
 			}
 			e.stopPropagation();
 		}
-		private function onMenuRollOver(e:TextFieldRollOver):void{
+		protected function onMenuRollOver(e:TextFieldRollOver):void{
 			master.panels.tooltip(e.url?e.url.replace("event:",""):null, this);
 		}
 	}

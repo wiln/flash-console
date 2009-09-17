@@ -117,8 +117,44 @@ package com.atticmedia.console {
 				mc.addChild(_console);
 			}
 		}
+		public static function ch(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+			if(_console){
+				_console.ch(channel,newLine,priority, isRepeating);
+			}
+		}
+		public static function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+			if(_console){
+				_console.add(newLine,priority, isRepeating);
+			}
+		}
+		public static function pk(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+			if(_console){
+				_console.pk(channel,newLine,priority, isRepeating);
+			}
+		}
 		public static function get version():Number{
 			return Console.VERSION;
+		}
+		//
+		public static function set fpsMonitor(v:int):void{
+			setter("fpsMonitor", v);
+		}
+		public static function get fpsMonitor():int{
+			return getter("fpsMonitor");
+		}
+		//
+		public static function set memoryMonitor(v:int):void{
+			setter("memoryMonitor", v);
+		}
+		public static function get memoryMonitor():int{
+			return getter("memoryMonitor");
+		}
+		//
+		public static function set displayRoller(v:Boolean):void{
+			setter("displayRoller", v);
+		}
+		public static function get displayRoller():Boolean{
+			return getter("displayRoller");
 		}
 		//
 		//

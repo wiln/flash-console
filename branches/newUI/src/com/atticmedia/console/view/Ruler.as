@@ -35,8 +35,6 @@ package com.atticmedia.console.view {
 	import flash.text.TextFormatAlign;		
 
 	public class Ruler extends Sprite{
-		
-		public static const NAME:String = "ruler";
 		public static const EXIT:String = "exit";
 		
 		private var _reportFunction:Function;
@@ -45,7 +43,7 @@ package com.atticmedia.console.view {
 		private var _points:Array;
 		
 		public function Ruler() {
-			name = NAME;
+			
 		}
 		public function start(reportFunction:Function = null):void{
 			_reportFunction = reportFunction;
@@ -58,6 +56,8 @@ package com.atticmedia.console.view {
 			graphics.drawRect(_area.x, _area.y, _area.width, _area.height);
 			graphics.endFill();
 			addEventListener(MouseEvent.CLICK, onMouseClick, false, 0, true);
+			//
+			report("<b>Ruler started. Click on two locations to measure.</b>", -1);
 		}
 		private function onMouseClick(e:MouseEvent):void{
 			e.stopPropagation();
@@ -177,7 +177,7 @@ package com.atticmedia.console.view {
         	txt.defaultTextFormat = format;
            	return txt;
 		}
-		private function report(txt:String, prio:Number=5, skipSafe:Boolean = false, quiet:Boolean = false):void {
+		private function report(txt:String, prio:Number=5, skipSafe:Boolean = true, quiet:Boolean = false):void {
 			if (_reportFunction != null) {
 				_reportFunction(new LogLineVO(txt,null,prio,false,skipSafe), quiet);
 			} else {

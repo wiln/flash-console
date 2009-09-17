@@ -1,32 +1,27 @@
 package com.atticmedia.console.view {
-	import com.atticmedia.console.events.TextFieldRollOver;	
+	import com.atticmedia.console.core.LogLineVO;	
+	import com.atticmedia.console.Console;
+	import com.atticmedia.console.events.TextFieldRollOver;
 	
-	import flash.events.KeyboardEvent;	
-	import flash.geom.Point;	
-	import flash.events.MouseEvent;	
-	import com.atticmedia.console.core.Style;	
-	import com.atticmedia.console.Console;	
-	
-	import flash.events.TextEvent;	
-	import flash.text.TextFieldType;	
-	import flash.text.TextField;	
-	import flash.text.TextFormat;	
-	import flash.geom.Rectangle;	
-	import flash.display.Shape;	
-	import flash.display.Sprite;
-	
+	import flash.display.Shape;
+	import flash.events.KeyboardEvent;
+	import flash.events.TextEvent;
+	import flash.geom.Rectangle;
+	import flash.text.TextField;
+	import flash.text.TextFieldType;		
+
 	/**
 	 * @author LuAye
 	 */
 	public class MainPanel extends AbstractPanel {
 		
-		public static const NAME:String = "MainPanel";
+		private static const CHANNELS_IN_MENU:int = 5;
 		
 		private static const _ToolTips:Object = {
 				fps:"Frames Per Second",
 				mm:"Memory Monitor",
-				roller:"Display Roller",
-				ruler:"Ruler",
+				roller:"Display Roller::Map the display list under your mouse",
+				ruler:"Screen Ruler::Measure the distance and angle between two points on screen.",
 				command:"Command Line",
 				clear:"Clear log",
 				trace:"Trace",
@@ -38,13 +33,19 @@ package com.atticmedia.console.view {
 		private var _commandField:TextField;
 		private var _commandBackground:Shape;
 		private var _bottomLine:Shape;
-		
 		private var _isMinimised:Boolean;
+		private var _priority:int;
 		
+		private var _channels:Array;
+		private var _lines:Array;
 		
-		public function MainPanel(m:Console) {
+		private var _needUpdateMenu:Boolean;
+		
+		public function MainPanel(m:Console, lines:Array, channels:Array) {
 			super(m);
-			name = NAME;
+			_channels = channels;
+			_lines = lines;
+			name = Console.PANEL_MAIN;
 			minimumWidth = 50;
 			minimumHeight = 18;
 			
@@ -89,12 +90,50 @@ package com.atticmedia.console.view {
 			//
 			init(420,100,true);
 			registerDragger(_menuField);
-			updateMenu();
 			//
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			//
 			//
 			_traceField.htmlText = "<p><l1>Happy bug fixing!</l1></p><p><p0>Hows the new Console so far?</p0></p>";
+		}
+		public function update(changed:Boolean):void{
+			if(visible){
+				if(_bottomLine.alpha>0){
+					_bottomLine.alpha -= 0.25;
+				}
+				if(changed){
+					_bottomLine.alpha = 1;
+					_needUpdateMenu = true;
+					refreshPage();
+				}
+				if(_needUpdateMenu){
+					_needUpdateMenu = false;
+					_updateMenu();
+				}
+			}
+		}
+		private function refreshPage():void{
+			var str:String = "";
+			for each (var line:LogLineVO in _lines ){
+				if((master.viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 || line.c!=Console.FILTERED_CHANNEL) && ((master.cl.searchTerm && line.c != Console.CONSOLE_CHANNEL && line.c != Console.FILTERED_CHANNEL && line.text.toLowerCase().indexOf(master.cl.searchTerm.toLowerCase())>=0 ) || (master.viewingChannels.indexOf(line.c)>=0 || master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0) && (line.p >= _priority || _priority == 0) )){
+					str += makeLine(line);
+				}
+			}
+			var sd:Boolean = _traceField.scrollV == _traceField.maxScrollV;
+			_traceField.htmlText = str;
+			if(sd){
+				_traceField.scrollV = _traceField.maxScrollV;
+			}
+		}
+		private function makeLine(line:LogLineVO):String{
+			var str:String = "";
+			var txt:String = line.text;
+			if(master.prefixChannelNames && (master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0 || master.viewingChannels.length>1) && line.c != master.defaultChannel){
+				txt = "[<a href=\"event:channel_"+line.c+"\">"+line.c+"</a>] "+txt;
+			}
+			var ptag:String = "p"+line.p;
+			str += "<p><"+ptag+">" + txt + "</"+ptag+"></p>";
+			return str;
 		}
 		override public function set width(n:Number):void{
 			super.width = n;
@@ -133,18 +172,31 @@ package com.atticmedia.console.view {
 		//
 		//
 		//
-		public function updateMenu():void{
-			//[global] [C] [traces] [myChannel] [myCh2] [masdf] ...v 
-			var str:String = "<r><w><menu>[<b>";
-			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMode>0);
+		public function updateMenu(instant:Boolean = false):void{
+			if(instant){
+				_updateMenu();
+			}else{
+				_needUpdateMenu = true;
+			}
+		}
+		private function _updateMenu():void{
+			var str:String = "<r><w>";
+			if(!master.channelsPanel){
+				for(var ci:int = 0; (ci<_channels.length && ci<= CHANNELS_IN_MENU);  ci++){
+					var channel:String = _channels[ci];
+					var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
+					channelTxt = channel==master.defaultChannel? "<i>"+channelTxt+"</i>" : channelTxt;
+					str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
+				}
+				str += "<ch><a href=\"event:channels\"><b>"+(_channels.length>CHANNELS_IN_MENU?"...":"")+"</b>^ </a></ch> ";
+			}
+			str += "<menu>[<b>";
+			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
 			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
 			str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
-			str += doActive(" <a href=\"event:ruler\">RL</a>", false);
 			str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
-			str += " </b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P0</a> <a href=\"event:close\">X</a>";
-			//_menuText += (_ruler?"<b>":"")+"<a href=\"event:ruler\">RL</a> "+(_ruler?"</b>":"");
-			//_menuText += (_roller?"<b>":"")+"<a href=\"event:roller\">Ro</a> "+(_roller?"</b>":"");
-			//_menuText += "<a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:alpha\">A</a> <a href=\"event:pause\">P</a> <a href=\"event:help\">H</a> <a href=\"event:close\">X</a>] </font>";
+			str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
+			str += " ¦</b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:pause\">P</a> <a href=\"event:close\">X</a>";
 			str += "]</menu> ";
 			if(_traceField.scrollV > 1){
 				str += " <a href=\"event:scrollUp\">^</a>";
@@ -165,7 +217,14 @@ package com.atticmedia.console.view {
 			return str;
 		}
 		private function onMenuRollOver(e:TextFieldRollOver):void{
-			master.panels.tooltip(e.url?_ToolTips[e.url.replace("event:","")]:null, this);
+			var txt:String = e.url?e.url.replace("event:",""):"";
+			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
+				txt = "View all channels";
+				// TODO: also have tip on current channel and default channel
+			}else{
+				txt = _ToolTips[txt];
+			}
+			master.panels.tooltip(txt, this);
 		}
 		private function linkHandler(e:TextEvent):void{
 			stopDrag();
@@ -173,15 +232,22 @@ package com.atticmedia.console.view {
 				_traceField.scrollV -= 3;
 			}else if(e.text == "scrollDown"){
 				_traceField.scrollV += 3;
+			}else if(e.text == "pause"){
+				master.paused = !master.paused;
 			}else if(e.text == "close"){
 				master.panels.tooltip();
 				visible = false;
+			}else if(e.text == "channels"){
+				master.channelsPanel = !master.channelsPanel;
 			}else if(e.text == "fps"){
-				master.fpsMode = master.fpsMode>0?0:1;
+				master.fpsMonitor = master.fpsMonitor>0?0:1;
 			}else if(e.text == "mm"){
 				master.memoryMonitor = master.memoryMonitor>0?0:1;
 			}else if(e.text == "roller"){
 				master.displayRoller = !master.displayRoller;
+			}else if(e.text == "ruler"){
+				master.panels.tooltip();
+				master.panels.startRuler();
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
 			}
