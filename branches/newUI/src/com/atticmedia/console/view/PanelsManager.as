@@ -35,7 +35,7 @@ package com.atticmedia.console.view {
 		}
 		public function addPanel(panel:AbstractPanel):void{
 			if(_master.contains(_tooltipField)){
-				_master.addChildAt(panel, _master.getChildIndex(_tooltipField)-1);
+				_master.addChildAt(panel, _master.getChildIndex(_tooltipField));
 			}else{
 				_master.addChild(panel);
 			}
