@@ -218,7 +218,7 @@ package com.atticmedia.console.view {
 			_ruler = new Ruler();
 			_ruler.addEventListener(Ruler.EXIT, onRulerExit, false, 0, true);
 			_master.addChild(_ruler);
-			_ruler.start(_master.addLogLine);
+			_ruler.start(_master);
 			_mainPanel.updateMenu();
 		}
 		public function get rulerActive():Boolean{

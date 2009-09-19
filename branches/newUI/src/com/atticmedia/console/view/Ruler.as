@@ -21,14 +21,14 @@
 * 
 */
 package com.atticmedia.console.view {
-	import com.atticmedia.console.core.LogLineVO;	
-	import com.atticmedia.console.core.Utils;	
+	import com.atticmedia.console.Console;
+	import com.atticmedia.console.core.Utils;
 	
-	import flash.geom.Rectangle;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
@@ -37,7 +37,7 @@ package com.atticmedia.console.view {
 	public class Ruler extends Sprite{
 		public static const EXIT:String = "exit";
 		
-		private var _reportFunction:Function;
+		private var _master:Console;
 		private var _area:Rectangle;
 		
 		private var _points:Array;
@@ -45,8 +45,8 @@ package com.atticmedia.console.view {
 		public function Ruler() {
 			
 		}
-		public function start(reportFunction:Function = null):void{
-			_reportFunction = reportFunction;
+		public function start(console:Console):void{
+			_master = console;
 			buttonMode = true;
 			_points = new Array();
 			var p:Point = new Point();
@@ -166,7 +166,7 @@ package com.atticmedia.console.view {
 		}
 		public function exit():void{
 			_points = null;
-			_reportFunction = null;
+			_master = null;
 			dispatchEvent(new Event(EXIT));
 		}
 		private function makeTxtField(col:Number = 0x00FF00, b:Boolean = true):TextField{
@@ -178,8 +178,8 @@ package com.atticmedia.console.view {
            	return txt;
 		}
 		private function report(txt:String, prio:Number=5, skipSafe:Boolean = true, quiet:Boolean = false):void {
-			if (_reportFunction != null) {
-				_reportFunction(new LogLineVO(txt,null,prio,false,skipSafe), quiet);
+			if (_master != null && !(_master.quiet && quiet)) {
+				_master.addLine(txt,prio,Console.CONSOLE_CHANNEL, false, skipSafe);
 			} else {
 				trace("C: "+ txt);
 			}

@@ -38,13 +38,13 @@ package com.atticmedia.console.core {
 		
 		private var _saved:Weak;
 		private var _lastSearchTerm:String;
-		private var _reportFunction:Function;
+		private var _master:Console;
 		
 		public var reserved:Array;
 		public var useStrong:Boolean;
 
 		public function CommandLine(m:Console) {
-			_reportFunction = m.addLogLine;
+			_master = m;
 			_saved = new Weak();
 			_saved.set("_base",null);
 			_saved.set("_returned",null);
@@ -64,7 +64,7 @@ package com.atticmedia.console.core {
 		}
 		public function destory():void {
 			_saved = null;
-			_reportFunction = null;
+			_master = null;
 			reserved = null;
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):String {
@@ -83,7 +83,7 @@ package com.atticmedia.console.core {
 			return _lastSearchTerm;
 		}
 		public function run(str:String):Object {
-			report("&gt; "+str, -1);
+			report("&gt; "+str, -1, false);
 			var returned:Object;
 			var line:Array = str.split(" ");
 			if(line[0].charAt(0)=="/"){
@@ -489,9 +489,9 @@ package com.atticmedia.console.core {
 			report("<b>stage.frameRate = 12</b>",5);
 			report("__________",10);
 		}
-		private function report(txt:String, prio:Number=5, skipSafe:Boolean = false, quiet:Boolean = false):void {
-			if (_reportFunction != null) {
-				_reportFunction(new LogLineVO(txt,null,prio,false,skipSafe), quiet);
+		private function report(txt:String, prio:Number=5, skipSafe:Boolean = true, quiet:Boolean = false):void {
+			if (_master != null && !(_master.quiet && quiet)) {
+				_master.addLine(txt,prio,Console.CONSOLE_CHANNEL, false, skipSafe);
 			} else {
 				trace("C: "+ txt);
 			}

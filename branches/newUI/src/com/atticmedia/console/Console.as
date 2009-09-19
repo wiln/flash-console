@@ -222,12 +222,12 @@ package com.atticmedia.console {
 			if(newV){
 				this.addLine("Paused",10,CONSOLE_CHANNEL);
 				// refresh page here to show the message before it pauses.
-				//refreshPage();
+				//panels.mainPanel.refresh();
 			}else{
 				this.addLine("Resumed",-1,CONSOLE_CHANNEL);
 			}
 			_isPaused = newV;
-			//refreshPage();
+			panels.mainPanel.refresh();
 		}
 		private function _onEnterFrame(e:Event):void{
 			if(!_enabled){
@@ -274,20 +274,13 @@ package com.atticmedia.console {
 		public function get defaultChannel():String{
 			return _defaultChannel;
 		}
-		public function addLogLine(line:LogLineVO, q:Boolean = false):void{
-			if(!(this.quiet && q)){
-				addLine(line.text, line.p, line.c==null?CONSOLE_CHANNEL:line.c, line.r, line.s);
-			}
-		}
-		private function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
+		public function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			if(!_enabled){
 				return;
 			}
 			var txt:String = String(obj);
 			var tmpText:String = txt;
 			if(!skipSafe){
-				// TODO: any way to tidy / speed this up ?
-				// try <font color="#FFCC00"><b>TEXT</b></font> .
 				txt = txt.replace(/</gim, "&lt;");
  				txt = txt.replace(/>/gim, "&gt;");
 			}
@@ -344,6 +337,21 @@ package com.atticmedia.console {
 		}
 		public function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
 			addLine(newLine,priority, _defaultChannel, isRepeating);
+		}
+		public function clear(channel:String = null):void{
+			if(channel){
+				for(var i:int=(_lines.length-1);i>=0;i--){
+					if(_lines[i] && _lines[i].c == channel){
+						delete _lines[i];
+					}
+				}
+			}else{
+				_lines.splice(0);
+				_channels.splice(0);
+				_channels.push(GLOBAL_CHANNEL);
+			}
+			panels.mainPanel.refresh();
+			panels.mainPanel.updateMenu();
 		}
 	}
 }

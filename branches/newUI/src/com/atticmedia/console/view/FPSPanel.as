@@ -17,7 +17,7 @@ package com.atticmedia.console.view {
 		public function FPSPanel(m:Console) {
 			super(m, 80,40);
 			name = Console.PANEL_FPS;
-			//lowest = 0;
+			lowest = 0;
 			averaging = 10;
 			minimumWidth = 32;
 			add(this, "current", 0xFF3333, "FPS");
@@ -51,7 +51,7 @@ package com.atticmedia.console.view {
 					fixed = true;
 					highest = stage.frameRate;
 					var frames:int = Math.floor(_mspf/(1000/highest));
-					if(_fps < lowest) lowest = _fps;
+					//if(_fps < lowest) lowest = _fps;
 					if(frames>30) frames = 30; // Don't add too many
 					while(frames>1){
 						// this is to try add the frames that have been lagged

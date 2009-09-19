@@ -25,7 +25,10 @@ package com.atticmedia.console.view {
 				command:"Command Line",
 				clear:"Clear log",
 				trace:"Trace",
-				close:"Close"
+				pause:"Pause logging",
+				resume:"Resume logging",
+				close:"Close",
+				viewall:"View all channels"
 		};
 		
 		private var _traceField:TextField;
@@ -104,7 +107,7 @@ package com.atticmedia.console.view {
 				if(changed){
 					_bottomLine.alpha = 1;
 					_needUpdateMenu = true;
-					refreshPage();
+					refresh();
 				}
 				if(_needUpdateMenu){
 					_needUpdateMenu = false;
@@ -112,7 +115,7 @@ package com.atticmedia.console.view {
 				}
 			}
 		}
-		private function refreshPage():void{
+		public function refresh():void{
 			var str:String = "";
 			for each (var line:LogLineVO in _lines ){
 				if((master.viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 || line.c!=Console.FILTERED_CHANNEL) && ((master.cl.searchTerm && line.c != Console.CONSOLE_CHANNEL && line.c != Console.FILTERED_CHANNEL && line.text.toLowerCase().indexOf(master.cl.searchTerm.toLowerCase())>=0 ) || (master.viewingChannels.indexOf(line.c)>=0 || master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0) && (line.p >= _priority || _priority == 0) )){
@@ -219,8 +222,13 @@ package com.atticmedia.console.view {
 		private function onMenuRollOver(e:TextFieldRollOver):void{
 			var txt:String = e.url?e.url.replace("event:",""):"";
 			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
-				txt = "View all channels";
+				txt = _ToolTips["viewall"];
 				// TODO: also have tip on current channel and default channel
+			}if(txt == "pause"){
+				if(master.paused)
+					txt = _ToolTips["resume"];
+				else
+					txt = _ToolTips["pause"];
 			}else{
 				txt = _ToolTips[txt];
 			}
@@ -233,7 +241,20 @@ package com.atticmedia.console.view {
 			}else if(e.text == "scrollDown"){
 				_traceField.scrollV += 3;
 			}else if(e.text == "pause"){
-				master.paused = !master.paused;
+				if(master.paused){
+					master.paused = false;
+					master.panels.tooltip(_ToolTips["pause"], this);
+				}else{
+					master.paused = true;
+					master.panels.tooltip(_ToolTips["resume"], this);
+				}
+			}else if(e.text == "trace"){
+				master.tracing = !master.tracing;
+				if(master.tracing){
+					report("Tracing turned [<b>On</b>]",-1);
+				}else{
+					report("Tracing turned [<b>Off</b>]",-1);
+				}
 			}else if(e.text == "close"){
 				master.panels.tooltip();
 				visible = false;
@@ -241,6 +262,14 @@ package com.atticmedia.console.view {
 				master.channelsPanel = !master.channelsPanel;
 			}else if(e.text == "fps"){
 				master.fpsMonitor = master.fpsMonitor>0?0:1;
+			}else if(e.text == "priority"){
+				if(_priority<10){
+					_priority++;
+				}else{
+					_priority = 0;
+				}
+				refresh();
+				updateMenu();
 			}else if(e.text == "mm"){
 				master.memoryMonitor = master.memoryMonitor>0?0:1;
 			}else if(e.text == "roller"){
@@ -250,6 +279,8 @@ package com.atticmedia.console.view {
 				master.panels.startRuler();
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
+			}else if(e.text == "clear"){
+				master.clear();
 			}
 			e.stopPropagation();
 		}

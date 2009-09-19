@@ -24,16 +24,9 @@ package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.events.TextFieldRollOver;
 	
-	import flash.display.DisplayObject;
-	import flash.display.DisplayObjectContainer;
-	import flash.display.Stage;
-	import flash.events.Event;
 	import flash.events.TextEvent;
-	import flash.geom.Point;
 	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;
-	import flash.utils.Dictionary;
-	import flash.utils.getQualifiedClassName;		
+	import flash.text.TextFieldAutoSize;	
 
 	public class ChannelsPanel extends AbstractPanel{
 		
@@ -63,6 +56,8 @@ package com.atticmedia.console.view {
 			update();
 		}
 		public function update():void{
+			_txtField.wordWrap = false;
+			_txtField.width = 80;
 			var str:String = "<w><menu><b><a href=\"event:close\">X</a></b></menu> <textformat leading=\"2\"><font face=\"Arial\" size=\"11\" color=\"#FFFFFF\" >";
 			for each(var channel:String in _channels){
 				var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<font color=\"#0099CC\"><b>"+channel+"</b></font>" : channel;
@@ -70,7 +65,10 @@ package com.atticmedia.console.view {
 				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
 			_txtField.htmlText = str+"</font></textformat></w>";
-			
+			if(_txtField.width>160){
+				_txtField.wordWrap = true;
+				_txtField.width = 160;
+			}
 			width = _txtField.width+4;
 			height = _txtField.height;
 		}
