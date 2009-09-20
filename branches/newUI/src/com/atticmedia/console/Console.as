@@ -128,6 +128,7 @@ package com.atticmedia.console {
 			//addGraph("mouse", this,"mouseX", 0x00DD00, "x");
 			//addGraph("mouse", this,"mouseY", 0xDD0000, "y", new Rectangle(10,120,200,100), true);
 		}
+		
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();
 			try{
@@ -268,8 +269,20 @@ package com.atticmedia.console {
 				}
 			}*/
 		}
+		public function set viewingChannel(str:String):void{
+			viewingChannels = [str];
+		}
+		public function get viewingChannel():String{
+			return _viewingChannels.join(",");
+		}
 		public function get viewingChannels():Array{
-			return _viewingChannels;
+			return _viewingChannels.concat();
+		}
+		public function set viewingChannels(a:Array):void{
+			_viewingChannels.splice(0);
+			_viewingChannels.push.apply(this, a);
+			panels.mainPanel.refresh();
+			panels.mainPanel.updateMenu();
 		}
 		public function get defaultChannel():String{
 			return _defaultChannel;

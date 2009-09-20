@@ -21,6 +21,8 @@
 * 
 */
 package com.atticmedia.console.view {
+	import flash.display.Shape;	
+	
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.core.Utils;
 	
@@ -39,6 +41,7 @@ package com.atticmedia.console.view {
 		
 		private var _master:Console;
 		private var _area:Rectangle;
+		private var _pointer:Shape;
 		
 		private var _points:Array;
 		
@@ -49,15 +52,27 @@ package com.atticmedia.console.view {
 			_master = console;
 			buttonMode = true;
 			_points = new Array();
+			_pointer = new Shape();
+			addChild(_pointer);
 			var p:Point = new Point();
 			p = globalToLocal(p);
 			_area = new Rectangle(-stage.stageWidth*1.5+p.x, -stage.stageHeight*1.5+p.y, stage.stageWidth*3, stage.stageHeight*3);
 			graphics.beginFill(0x000000, 0.2);
 			graphics.drawRect(_area.x, _area.y, _area.width, _area.height);
 			graphics.endFill();
-			addEventListener(MouseEvent.CLICK, onMouseClick, false, 0, true);
 			//
+			addEventListener(MouseEvent.CLICK, onMouseClick, false, 0, true);
+			addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, false, 0, true);
+			onMouseMove();
 			report("<b>Ruler started. Click on two locations to measure.</b>", -1);
+		}
+		private function onMouseMove(e:MouseEvent = null):void{
+			_pointer.graphics.clear();
+			_pointer.graphics.lineStyle(1, 0xAACC00, 0.5);
+			_pointer.graphics.moveTo(_area.x, mouseY);
+			_pointer.graphics.lineTo(_area.x+_area.width, mouseY);
+			_pointer.graphics.moveTo(mouseX, _area.y);
+			_pointer.graphics.lineTo(mouseX, _area.y+_area.height);
 		}
 		private function onMouseClick(e:MouseEvent):void{
 			e.stopPropagation();
@@ -68,6 +83,7 @@ package com.atticmedia.console.view {
 				graphics.drawCircle(p.x, p.y, 3);
 				_points.push(p);
 			}else if(_points.length==1){
+				removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 				p = _points[0];
 				var p2:Point =  new Point(e.localX, e.localY);
 				_points.push(p2);

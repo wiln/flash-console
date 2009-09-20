@@ -1,4 +1,7 @@
 package com.atticmedia.console.view {
+	import flash.ui.Keyboard;	
+	import flash.events.Event;	
+	
 	import com.atticmedia.console.core.LogLineVO;	
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.events.TextFieldRollOver;
@@ -37,6 +40,7 @@ package com.atticmedia.console.view {
 		private var _commandBackground:Shape;
 		private var _bottomLine:Shape;
 		private var _isMinimised:Boolean;
+		private var _shift:Boolean;
 		private var _priority:int;
 		
 		private var _channels:Array;
@@ -95,9 +99,29 @@ package com.atticmedia.console.view {
 			registerDragger(_menuField);
 			//
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
+			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
+			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
 			//
 			//
 			_traceField.htmlText = "<p><l1>Happy bug fixing!</l1></p><p><p0>Hows the new Console so far?</p0></p>";
+		}
+		private function stageAddedHandle(e:Event=null):void{
+			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
+		}
+		private function stageRemovedHandle(e:Event=null):void{
+			stage.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+		}
+		private function keyDownHandler(e:KeyboardEvent):void{
+			if(e.keyCode == Keyboard.SHIFT){
+				_shift = true;
+			}
+		}
+		private function keyUpHandler(e:KeyboardEvent):void{
+			if(e.keyCode == Keyboard.SHIFT){
+				_shift = false;
+			}
 		}
 		public function update(changed:Boolean):void{
 			if(visible){
@@ -281,8 +305,27 @@ package com.atticmedia.console.view {
 				commandLine = !commandLine;
 			}else if(e.text == "clear"){
 				master.clear();
+			}else if(e.text.substring(0,8) == "channel_"){
+				onChannelPressed(e.text.substring(8));
 			}
 			e.stopPropagation();
+		}				
+		public function onChannelPressed(chn:String):void{
+			var current:Array = master.viewingChannels.concat();
+			if(_shift && master.viewingChannel != Console.GLOBAL_CHANNEL && chn != Console.GLOBAL_CHANNEL){
+				var ind:int = current.indexOf(chn);
+				if(ind>=0){
+					current.splice(ind,1);
+					if(current.length == 0){
+						current.push(Console.GLOBAL_CHANNEL);
+					}
+				}else{
+					current.push(chn);
+				}
+				master.viewingChannels = current;
+			}else{
+				master.viewingChannel = chn;
+			}
 		}
 		//
 		// COMMAND LINE
