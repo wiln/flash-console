@@ -76,6 +76,7 @@ package com.atticmedia.console.view {
 			//master.panels.tooltip(e.url?"Close":null, this);
 		}
 		protected function linkHandler(e:TextEvent):void{
+			_txtField.setSelection(0, 0);
 			if(e.text == "close"){
 				master.channelsPanel = false;
 			}else if(e.text.substring(0,8) == "channel_"){

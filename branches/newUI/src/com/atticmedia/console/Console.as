@@ -174,9 +174,8 @@ package com.atticmedia.console {
 			if(b){
 				var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
 				chPanel.start(_channels);
-			}else{
-				panels.mainPanel.updateMenu();
 			}
+			panels.updateMenu();
 		}
 		//
 		public function get displayRoller():Boolean{
@@ -282,7 +281,7 @@ package com.atticmedia.console {
 			_viewingChannels.splice(0);
 			_viewingChannels.push.apply(this, a);
 			panels.mainPanel.refresh();
-			panels.mainPanel.updateMenu();
+			panels.updateMenu();
 		}
 		public function get defaultChannel():String{
 			return _defaultChannel;

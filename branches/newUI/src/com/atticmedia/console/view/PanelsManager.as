@@ -73,8 +73,15 @@ package com.atticmedia.console.view {
 					addPanel(chpanel);
 				}else {
 					removePanel(Console.PANEL_CHANNELS);
+					updateMenu();
 				}
-				_mainPanel.updateMenu();
+			}
+		}
+		public function updateMenu():void{
+			_mainPanel.updateMenu();
+			var chpanel:ChannelsPanel = getPanel(Console.PANEL_CHANNELS) as ChannelsPanel;
+			if(chpanel){
+				chpanel.update();
 			}
 		}
 		//
