@@ -28,7 +28,7 @@
 			super.close();
 		}
 		public function get current():Number{
-			return Math.round(master.mm.currentMemory/10485.76)/100;
+			return Math.round(master.currentMemory/10485.76)/100;
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);

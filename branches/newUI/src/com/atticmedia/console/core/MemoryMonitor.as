@@ -95,9 +95,6 @@ package com.atticmedia.console.core {
 				watch(new MovieClip(), DUMMY_GARBAGE);
 			}
 		}
-		public function get currentMemory():uint {
-			return System.totalMemory;
-		}
 		
 		public function set notifyGC(b:Boolean):void{
 			if(_notifyGC != b){

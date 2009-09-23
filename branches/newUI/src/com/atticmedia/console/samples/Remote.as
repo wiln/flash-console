@@ -34,12 +34,11 @@ package com.atticmedia.console.samples {
 			C.start(this, "");
 			C.isRemote = true;
 			C.commandLine = true;
-			C.menuMode = 0;
 			
 			//
 			// This is special case for remote to disable scaling and moving
-			C.instance.getChildByName("scaler").visible = false;
-			C.instance.moveable = false;
+			C.instance.panels.mainPanel.moveable = false;
+			C.instance.panels.mainPanel.scalable = false;
 			//
 			
 			stage.scaleMode = StageScaleMode.NO_SCALE;

@@ -135,6 +135,12 @@ package com.atticmedia.console {
 		public static function get version():Number{
 			return Console.VERSION;
 		}
+		public static function set enabled(v:Boolean):void{
+			setter("enabled",v);
+		}
+		public static function get enabled():Boolean{
+			return getter("enabled") as Boolean;
+		}
 		//
 		public static function set fpsMonitor(v:int):void{
 			setter("fpsMonitor", v);
@@ -150,11 +156,48 @@ package com.atticmedia.console {
 			return getter("memoryMonitor");
 		}
 		//
+		public static function get remoting():Boolean{
+			return getter("remoting") as Boolean;
+		}
+		public static function set remoting(v:Boolean):void{
+			setter("remoting",v);
+		}
+		public static function get isRemote():Boolean{
+			return getter("isRemote") as Boolean;
+		}
+		public static function set isRemote(v:Boolean):void{
+			setter("isRemote",v);
+		}
+		//
 		public static function set displayRoller(v:Boolean):void{
 			setter("displayRoller", v);
 		}
 		public static function get displayRoller():Boolean{
 			return getter("displayRoller");
+		}
+		public static function get width():Number{
+			return getter("width") as Number;
+		}
+		public static function set width(v:Number):void{
+			setter("width",v);
+		}
+		public static function get height():Number{
+			return getter("height") as Number;
+		}
+		public static function set height(v:Number):void{
+			setter("height",v);
+		}
+		public static function get x():Number{
+			return getter("x") as Number;
+		}
+		public static function set x(v:Number):void{
+			setter("x",v);
+		}
+		public static function get y():Number{
+			return getter("y") as Number;
+		}
+		public static function set y(v:Number):void{
+			setter("y",v);
 		}
 		//
 		//

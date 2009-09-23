@@ -52,18 +52,7 @@ package com.atticmedia.console.view {
 		}
 		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = -1, a:Number = -1, rounding:int = 10):void{
 			drawBG(col>=0?col:style.panelBackgroundColor, a>=0?a:style.panelBackgroundAlpha, rounding);
-			if(resizable){
-				scaler = new Sprite();
-				scaler.name = "scaler";
-				scaler.graphics.beginFill(style.panelScalerColor, style.panelScalerAlpha);
-	            scaler.graphics.lineTo(-10, 0);
-	            scaler.graphics.lineTo(0, -10);
-	            scaler.graphics.endFill();
-				scaler.buttonMode = true;
-				scaler.doubleClickEnabled = true;
-				scaler.addEventListener(MouseEvent.MOUSE_DOWN,onScalerMouseDown, false, 0, true);
-	            addChild(scaler);
-			}
+			scalable = resizable;
 			width = w;
 			height = h;
 		}
@@ -155,6 +144,28 @@ package com.atticmedia.console.view {
 		//
 		// SCALING
 		//
+		public function get scalable():Boolean{
+			return scaler?true:false;
+		}
+		public function set scalable(b:Boolean):void{
+			if(b && !scaler){
+				scaler = new Sprite();
+				scaler.name = "scaler";
+				scaler.graphics.beginFill(style.panelScalerColor, style.panelScalerAlpha);
+	            scaler.graphics.lineTo(-10, 0);
+	            scaler.graphics.lineTo(0, -10);
+	            scaler.graphics.endFill();
+				scaler.buttonMode = true;
+				scaler.doubleClickEnabled = true;
+				scaler.addEventListener(MouseEvent.MOUSE_DOWN,onScalerMouseDown, false, 0, true);
+	            addChild(scaler);
+			}else if(!b && scaler){
+				if(contains(scaler)){
+					removeChild(scaler);
+				}
+				scaler = null;
+			}
+		}
 		private function onScalerMouseDown(e:Event):void{
 			_resizeTxt = new TextField();
 			_resizeTxt.name = "resizingField";

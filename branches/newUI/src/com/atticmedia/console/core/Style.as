@@ -94,7 +94,7 @@ package com.atticmedia.console.core {
 			_tracecss.setStyle("p7",{color:'#FFAAAA'});
 			_tracecss.setStyle("p8",{color:'#FF7777'});
 			_tracecss.setStyle("p9",{color:'#FF3333'});
-			_tracecss.setStyle("p10",{color:'#FF0000'});
+			_tracecss.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
 			_tracecss.setStyle("p-1",{color:'#0099CC'});
 			_tracecss.setStyle("p-2",{color:'#FF8800'});
 			

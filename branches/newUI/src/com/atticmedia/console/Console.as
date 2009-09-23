@@ -77,14 +77,21 @@ package com.atticmedia.console {
 		public var prefixChannelNames:Boolean = true;
 		public var alwaysOnTop:Boolean = true;
 		public var maxRepeats:Number = 100;
-		public var remoteDelay:int = 25;
+		public var remoteDelay:int = 20;
 		//
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
+		private var _password:String;
+		private var _passwordIndex:int;
 		private var _isRemoting:Boolean;
 		private var _isRemote:Boolean;
 		private var _remoteMSPF:int;
 		private var _remoteMem:int;
+		private var _remoteDelayed:int;
+		private var _keyBinds:Object = {};
+		private var _sharedConnection:LocalConnection;
+		private var _mspf:Number;
+		private var _previousTime:Number;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -98,41 +105,61 @@ package com.atticmedia.console {
 		
 		public function Console(pass:String = "") {
 			name = NAME;
-			
+			_password = pass;
 			style = new Style();
 			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
 			mm = new MemoryMonitor();
 			cl = new CommandLine(this);
 			cl.store("C",this);
 			cl.reserved.push("C");
-			//cl.addEventListener(CommandLine.SEARCH_REQUEST, onCommandSearch, false, 0, true);
+			cl.addEventListener(CommandLine.SEARCH_REQUEST, onCommandSearch, false, 0, true);
 			
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",-2,CONSOLE_CHANNEL,false,true);
-			//
-			// TEST...TEST TEST
-			//
-			/*
-			addLine("Hey how are you, priority 0",0);
-			addLine("<b>priority 0</b>",1);
-			addLine("priority 1",2);
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",3);
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",4, "test");
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",5, "test");
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",6, "rofl");
-			addLine("<test>rolm anasf <gigoe></test>",7, "rofl");
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",8, "rofl");
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",9, "GG");
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",10, "GG");*/
-			panels.mainPanel.height = 350;
-			//addGraph("mouse", this,"mouseX", 0x00DD00, "x");
-			//addGraph("mouse", this,"mouseY", 0xDD0000, "y", new Rectangle(10,120,200,100), true);
+			
+			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
+			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
+			if(_password != ""){
+				if(stage){
+					stageAddedHandle();
+				}
+				visible = false;
+			}
+		}
+		private function stageAddedHandle(e:Event=null):void{
+			if(cl.base == null && root){
+				cl.base = root;
+			}
+			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
+		}
+		private function stageRemovedHandle(e:Event=null):void{
+			stage.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
+		}
+		private function keyUpHandler(e:KeyboardEvent):void{
+			if(!_enabled) return;
+			if(e.keyLocation == 0){
+				var char:String = String.fromCharCode(e.charCode);
+				if(char == _password.substring(_passwordIndex,_passwordIndex+1)){
+					_passwordIndex++;
+					if(_passwordIndex >= _password.length){
+						visible = !visible;
+						_passwordIndex = 0;
+					}
+				}else{
+					_passwordIndex = 0;
+					var key:String = char.toLowerCase()+(e.ctrlKey?"0":"1")+(e.altKey?"0":"1")+(e.shiftKey?"0":"1");
+					if(_keyBinds[key]){
+						var bind:Array = _keyBinds[key];
+						bind[0].apply(this, bind[1]);
+					}
+				}
+			}
 		}
 		
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();
 			try{
-				sCon.allowInsecureDomain("*", "localhost");
+				sCon.allowInsecureDomain("*");
 				sCon.connect(REMOTE_CONN_NAME);
 			}catch(error:Error){
 				return true;
@@ -145,6 +172,30 @@ package com.atticmedia.console {
 		}
 		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			panels.removeGraph(n, obj, prop);
+		}
+		//
+		// WARNING: key binding hard references the function. 
+		// This should only be used for development purposes only.
+		//
+		public function bindKey(char:String, ctrl:Boolean, alt:Boolean, shift:Boolean, fun:Function ,args:Array = null):void{
+			if(!char || char.length!=1){
+				addLine("Binding key must be a single character. You gave ["+char+"]", 10,CONSOLE_CHANNEL);
+				return;
+			}
+			var key:String = char.toLowerCase()+(ctrl?"0":"1")+(alt?"0":"1")+(shift?"0":"1");
+			if(fun is Function){
+				_keyBinds[key] = [fun,args];
+			}else{
+				delete _keyBinds[key];
+			}
+			if(!quiet){
+				addLine((fun is Function?"Bined":"Unbined")+" key <b>"+ char.toUpperCase() +"</b>"+ (ctrl?"+ctrl":"")+(alt?"+alt":"")+(shift?"+shift":"")+".",-1,CONSOLE_CHANNEL);
+			}
+		}
+		private function onCommandSearch(e:Event=null):void{
+			clear(FILTERED_CHANNEL);
+			addLine("Filtering ["+cl.searchTerm+"]", 10,FILTERED_CHANNEL);
+			viewingChannel = FILTERED_CHANNEL;
 		}
 		public function setPanelPosition(panelname:String, p:Point):void{
 			var panel:AbstractPanel = panels.getPanel(panelname);
@@ -215,24 +266,70 @@ package com.atticmedia.console {
 			var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
 			addLine(str,(ok?-1:10),CONSOLE_CHANNEL);
 		}
+		public function set enabled(newB:Boolean):void{
+			if(_enabled == newB) return;
+			if(_enabled && !newB){
+				addLine("Disabled",10,CONSOLE_CHANNEL);
+			}
+			var pre:Boolean = _enabled;
+			_enabled = newB;
+			if(!pre && newB){
+				addLine("Enabled",-1,CONSOLE_CHANNEL);
+			}
+		}
+		public function get enabled():Boolean{
+			return _enabled;
+		}
 		public function get paused():Boolean{
 			return _isPaused;
 		}
 		public function set paused(newV:Boolean):void{
+			if(_isPaused == newV) return;
 			if(newV){
-				this.addLine("Paused",10,CONSOLE_CHANNEL);
-				// refresh page here to show the message before it pauses.
-				//panels.mainPanel.refresh();
+				addLine("Paused",10,CONSOLE_CHANNEL);
 			}else{
-				this.addLine("Resumed",-1,CONSOLE_CHANNEL);
+				addLine("Resumed",-1,CONSOLE_CHANNEL);
 			}
 			_isPaused = newV;
 			panels.mainPanel.refresh();
 		}
+		//
+		//
+		//
+		override public function get width():Number{
+			return panels.mainPanel.width;
+		}
+		override public function set width(newW:Number):void{
+			panels.mainPanel.width = newW;
+		}
+		override public function set height(newW:Number):void{
+			panels.mainPanel.height = newW;
+		}
+		override public function get height():Number{
+			return panels.mainPanel.height;
+		}
+		override public function get x():Number{
+			return panels.mainPanel.x;
+		}
+		override public function set x(newW:Number):void{
+			panels.mainPanel.x = newW;
+		}
+		override public function set y(newW:Number):void{
+			panels.mainPanel.y = newW;
+		}
+		override public function get y():Number{
+			return panels.mainPanel.y;
+		}
+		//
+		//
+		//
 		private function _onEnterFrame(e:Event):void{
 			if(!_enabled){
 				return;
 			}
+			var time:int = getTimer();
+			_mspf = time-_previousTime;
+			_previousTime = time;
 			if(alwaysOnTop && parent &&  parent.getChildIndex(this) < (parent.numChildren-1)){
 				parent.setChildIndex(this,(parent.numChildren-1));
 				if(!quiet){
@@ -246,7 +343,6 @@ package com.atticmedia.console {
 				}
 			}
 			if(!_isPaused && visible){
-				//_fps.update(_isRemote?_remoteMSPF:0);
 				var arr:Array = mm.update();
 				if(arr.length>0){
 					addLine("GARBAGE COLLECTED: "+arr.join(", "),10,CONSOLE_CHANNEL);
@@ -260,14 +356,117 @@ package com.atticmedia.console {
 				}
 			}
 			_linesChanged = false;
-			/*if(_isRemoting){
+			if(_isRemoting){
 				_remoteDelayed++;
 				if(_remoteDelayed > remoteDelay){
 					updateRemote();
 					_remoteDelayed = 0;
 				}
-			}*/
+			}
 		}
+		public function get fps():Number{
+			return 1000/mspf;
+		}
+		public function get mspf():Number{
+			return _isRemote?_remoteMSPF:isNaN(_mspf)?0:_mspf;
+		}
+		public function get currentMemory():uint {
+			return _isRemote?_remoteMem:System.totalMemory;
+		}
+		//
+		// REMOTING
+		// TODO: maybe have it in another class
+		// TODO: FPS from remoting is not very reliable
+		//
+		private function updateRemote():void{
+			if(_remoteLinesQueue.length==0) return;
+			try{
+				_sharedConnection.send(REMOTE_CONN_NAME, "remoteLogSend", [_remoteLinesQueue, mspf, currentMemory]);
+			}catch(e:Error){
+				// don't care
+			}
+			_remoteLinesQueue = new Array();
+		}
+		public function get remoting():Boolean{
+			return _isRemoting;
+		}
+		public function set remoting(newV:Boolean):void{
+			_isRemoting = newV ;
+			_remoteLinesQueue = null;
+			if(newV){
+				_isRemote = false;
+				_remoteDelayed = 0;
+				_remoteLinesQueue = new Array();
+				startSharedConnection();
+				addLine("Remoting started [sandboxType: "+Security.sandboxType+"]",10,CONSOLE_CHANNEL);
+				try{
+					_sharedConnection.allowInsecureDomain("*", "localhost");
+                	_sharedConnection.connect(REMOTER_CONN_NAME);
+           		}catch (error:Error){
+					addLine("Could not create client service. You will not be able to control this console with remote.", 10,CONSOLE_CHANNEL);
+           		}
+			}else{
+				closeSharedConnection();
+			}
+		}
+		public function get isRemote():Boolean{
+			return _isRemote;
+		}
+		public function set isRemote(newV:Boolean):void{
+			_isRemote = newV ;
+			if(newV){
+				_isRemoting = false;
+				startSharedConnection();
+				try{
+					_sharedConnection.allowInsecureDomain("*", "localhost");
+                	_sharedConnection.connect(REMOTE_CONN_NAME);
+					addLine("Remote started [sandboxType: "+Security.sandboxType+"]",10,CONSOLE_CHANNEL);
+           		}catch (error:Error){
+					_isRemoting = false;
+					addLine("Could not create remote service. You might have a console remote already running.", 10,CONSOLE_CHANNEL);
+           		}
+			}else{
+				closeSharedConnection();
+			}
+		}
+		private function startSharedConnection():void{
+			closeSharedConnection();
+			_sharedConnection = new LocalConnection();
+			_sharedConnection.addEventListener(StatusEvent.STATUS, onSharedStatus);
+			_sharedConnection.client = this;
+			// TODO: security measures may need to be looked at.
+		}
+		private function closeSharedConnection():void{
+			if(_sharedConnection){
+				try{
+					_sharedConnection.close();
+				}catch(error:Error){
+					addLine("closeSharedConnection: "+error, 10,CONSOLE_CHANNEL);
+				}
+			}
+			_sharedConnection = null;
+		}
+		public function remoteLogSend(obj:Array):void{
+			if(!_isRemote || !obj) return;
+			var lines:Array = obj[0];
+			for each( var line:Object in lines){
+				if(line){
+					var p:int = line["p"]?line["p"]:5;
+					var channel:String = line["c"]?line["c"]:"";
+					var r:Boolean = line["r"];
+					var safe:Boolean = line["s"];
+					addLine(line["text"],p,channel,r,safe);
+				}
+			}
+			_remoteMSPF = obj[1];
+			_remoteMem = obj[2];
+		}
+		private function onSharedStatus(e:StatusEvent):void{
+			// this will get called quite often if there is no actual remote server running...
+		}
+		//
+		//
+		//
 		public function set viewingChannel(str:String):void{
 			viewingChannels = [str];
 		}
@@ -321,6 +520,18 @@ package com.atticmedia.console {
 			
 			if(_isRemoting){
 				_remoteLinesQueue.push(line);
+			}
+		}
+		public function runCommand(line:String):Object{
+			if(_isRemote){
+				addLine("Run command at remote: "+line,-2,CONSOLE_CHANNEL);
+				try{
+					_sharedConnection.send(REMOTER_CONN_NAME, "runCommand", line);
+				}catch(err:Error){
+					addLine("Command could not be sent to client: " + err, 10,CONSOLE_CHANNEL);
+				}
+			}else{
+				return cl.run(line);
 			}
 		}
 		//

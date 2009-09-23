@@ -47,6 +47,8 @@ package com.atticmedia.console.view {
 		
 		private var _channels:Array;
 		private var _lines:Array;
+		private var _commandsHistory:Array = [];
+		private var _commandsInd:int;
 		
 		private var _needUpdateMenu:Boolean;
 		
@@ -334,10 +336,41 @@ package com.atticmedia.console.view {
 		// COMMAND LINE
 		//
 		private function commandKeyDown(e:KeyboardEvent):void{
-			
+			e.stopPropagation();
 		}
 		private function commandKeyUp(e:KeyboardEvent):void{
-			
+			if(!master.enabled){
+				return;
+			}
+			if( e.keyCode == 13){
+				master.runCommand(_commandField.text);
+				_commandsHistory.unshift(_commandField.text);
+				_commandsInd = -1;
+				_commandField.text = "";
+				// maximum 20 commands history
+				if(_commandsHistory.length>20){
+					_commandsHistory.splice(20);
+				}
+			}else if( e.keyCode == 38 ){
+				if(_commandsInd<(_commandsHistory.length-1)){
+					_commandsInd++;
+					_commandField.text = _commandsHistory[_commandsInd];
+					_commandField.setSelection(_commandField.text.length, _commandField.text.length);
+				}else{
+					_commandsInd = _commandsHistory.length;
+					_commandField.text = "";
+				}
+			}else if( e.keyCode == 40){
+				if(_commandsInd>0){
+					_commandsInd--;
+					_commandField.text = _commandsHistory[_commandsInd];
+					_commandField.setSelection(_commandField.text.length, _commandField.text.length);
+				}else{
+					_commandsInd = -1;
+					_commandField.text = "";
+				}
+			}
+			e.stopPropagation();
 		}
 		public function set commandLine (b:Boolean):void{
 			if(b){
