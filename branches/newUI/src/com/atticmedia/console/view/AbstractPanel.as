@@ -1,4 +1,4 @@
-package com.atticmedia.console.view {
+﻿package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.core.Style;
 	import com.atticmedia.console.events.TextFieldRollOver;
@@ -251,7 +251,7 @@ package com.atticmedia.console.view {
 				return;
 			}
 			
-			var index:int =field.getCharIndexAtPoint(e.localX, e.localY);
+			var index:int =field.getCharIndexAtPoint(field.mouseX, field.mouseY);
 			var url:String = null;
 			var txt:String = null;
 			if(index>0){

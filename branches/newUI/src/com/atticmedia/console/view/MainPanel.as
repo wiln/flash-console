@@ -227,7 +227,9 @@ package com.atticmedia.console.view {
 			str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
 			str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
 			str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
-			str += " ¦</b> <a href=\"event:clear\">C</a> <a href=\"event:trace\">T</a> <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:pause\">P</a> <a href=\"event:close\">X</a>";
+			str += " ¦</b> <a href=\"event:clear\">C</a>";
+			str += doActive(" <a href=\"event:trace\">T</a>", master.tracing);
+			str += " <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:pause\">P</a> <a href=\"event:close\">X</a>";
 			str += " ]</menu> ";
 			if(_traceField.scrollV > 1){
 				str += " <a href=\"event:scrollUp\">^</a>";

@@ -60,7 +60,6 @@ package com.atticmedia.console {
 		public var cl:CommandLine;
 		//
 		public var quiet:Boolean;
-		public var tracing:Boolean;
 		public var maxLines:int = 500;
 		public var prefixChannelNames:Boolean = true;
 		public var alwaysOnTop:Boolean = true;
@@ -74,6 +73,7 @@ package com.atticmedia.console {
 		private var _enabled:Boolean = true;
 		private var _password:String;
 		private var _passwordIndex:int;
+		private var _tracing:Boolean = true;
 		private var _isRemoting:Boolean;
 		private var _isRemote:Boolean;
 		private var _mspfsForRemote:Array;
@@ -531,6 +531,14 @@ package com.atticmedia.console {
 		public function get tracingChannels():String{
 			return String(_tracingChannels);
 		}
+		//
+		public function get tracing():Boolean{
+			return _tracing;
+		}
+		public function set tracing(b:Boolean):void{
+			_tracing = b;
+			panels.mainPanel.updateMenu();
+		}
 		public function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			if(!_enabled){
 				return;
@@ -558,7 +566,7 @@ package com.atticmedia.console {
 				if(_lines.length > maxLines && maxLines > 0 ){
 					_lines.splice(0,1);
 				}
-				if( tracing && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
+				if( _tracing && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
 					if(tracingPriority <= priority || tracingPriority <= 0){
 						trace("["+channel+"] "+tmpText);
 					}
@@ -637,7 +645,7 @@ package com.atticmedia.console {
 				_channels.push(GLOBAL_CHANNEL);
 			}
 			panels.mainPanel.refresh();
-			panels.mainPanel.updateMenu();
+			panels.updateMenu();
 		}
 	}
 }
