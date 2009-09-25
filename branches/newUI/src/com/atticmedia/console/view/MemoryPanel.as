@@ -20,7 +20,7 @@
 			drawEvery = 5;
 			minimumWidth = 32;
 			master.mm.addEventListener(MemoryMonitor.GARBAGE_COLLECTED, onGC, false, 0, true);
-			master.mm.notifyGC = true;
+			master.mm.notifyGC = !m.isRemote;
 			add(this, "current", 0x5060FF, "Memory");
 		}
 		public override function close():void {
@@ -28,13 +28,14 @@
 			super.close();
 		}
 		public function get current():Number{
+			// in MB, up to 2 decimal
 			return Math.round(master.currentMemory/10485.76)/100;
 		}
 		protected override function onFrame(e:Event):void{
 			super.onFrame(e);
 			updateKeyText();
 		}
-		protected override function updateKeyText():void{
+		public override function updateKeyText():void{
 			keyTxt.htmlText =  "<r><s>"+getCurrentOf(0).toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
 		}
 		protected override function linkHandler(e:TextEvent):void{

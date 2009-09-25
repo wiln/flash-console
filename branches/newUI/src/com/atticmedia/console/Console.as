@@ -21,32 +21,20 @@
 * 
 */
 package com.atticmedia.console {
-	import flash.geom.Point;	
-	
-	import com.atticmedia.console.view.GraphingPanel;
-	import flash.text.TextFieldAutoSize;	
-	import flash.system.System;	
-	
+	import com.atticmedia.console.core.*;
 	import com.atticmedia.console.view.*;
 	
-	import flash.utils.getTimer;	
-	import flash.system.Security;	
-	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
 	import flash.events.StatusEvent;
-	import flash.events.TextEvent;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.LocalConnection;
-	import flash.text.TextField;
-	import flash.text.TextFieldType;
-	import flash.text.TextFormat;
-	import flash.ui.Keyboard;
+	import flash.system.Security;
+	import flash.system.System;
 	import flash.utils.getQualifiedClassName;
-	
-	import com.atticmedia.console.core.*;	
+	import flash.utils.getTimer;		
 
 	public class Console extends Sprite {
 
@@ -78,6 +66,9 @@ package com.atticmedia.console {
 		public var alwaysOnTop:Boolean = true;
 		public var maxRepeats:Number = 100;
 		public var remoteDelay:int = 20;
+		public var defaultChannel:String = "traces";
+		public var tracingPriority:int = 0;
+		public var rulerHidesMouse:Boolean = true;
 		//
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
@@ -85,7 +76,7 @@ package com.atticmedia.console {
 		private var _passwordIndex:int;
 		private var _isRemoting:Boolean;
 		private var _isRemote:Boolean;
-		private var _remoteMSPF:int;
+		private var _mspfsForRemote:Array;
 		private var _remoteMem:int;
 		private var _remoteDelayed:int;
 		private var _keyBinds:Object = {};
@@ -95,7 +86,6 @@ package com.atticmedia.console {
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
-		private var _defaultChannel:String = "traces";
 		private var _tracingChannels:Array;
 		private var _remoteLinesQueue:Array;
 		private var _isRepeating:Boolean;
@@ -192,11 +182,6 @@ package com.atticmedia.console {
 				addLine((fun is Function?"Bined":"Unbined")+" key <b>"+ char.toUpperCase() +"</b>"+ (ctrl?"+ctrl":"")+(alt?"+alt":"")+(shift?"+shift":"")+".",-1,CONSOLE_CHANNEL);
 			}
 		}
-		private function onCommandSearch(e:Event=null):void{
-			clear(FILTERED_CHANNEL);
-			addLine("Filtering ["+cl.searchTerm+"]", 10,FILTERED_CHANNEL);
-			viewingChannel = FILTERED_CHANNEL;
-		}
 		public function setPanelPosition(panelname:String, p:Point):void{
 			var panel:AbstractPanel = panels.getPanel(panelname);
 			if(panel){
@@ -262,9 +247,18 @@ package com.atticmedia.console {
 			mm.unwatch(n);
 		}
 		public function gc():void{
-			var ok:Boolean = mm.gc();
-			var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
-			addLine(str,(ok?-1:10),CONSOLE_CHANNEL);
+			if(isRemote){
+				try{
+					addLine("Sending garbage collection request to client",-1,CONSOLE_CHANNEL);
+					_sharedConnection.send(REMOTER_CONN_NAME, "gc");
+				}catch(e:Error){
+					addLine(e,10,CONSOLE_CHANNEL);
+				}
+			}else{
+				var ok:Boolean = mm.gc();
+				var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
+				addLine(str,(ok?-1:10),CONSOLE_CHANNEL);
+			}
 		}
 		public function set enabled(newB:Boolean):void{
 			if(_enabled == newB) return;
@@ -329,6 +323,7 @@ package com.atticmedia.console {
 			}
 			var time:int = getTimer();
 			_mspf = time-_previousTime;
+
 			_previousTime = time;
 			if(alwaysOnTop && parent &&  parent.getChildIndex(this) < (parent.numChildren-1)){
 				parent.setChildIndex(this,(parent.numChildren-1));
@@ -358,6 +353,16 @@ package com.atticmedia.console {
 			_linesChanged = false;
 			if(_isRemoting){
 				_remoteDelayed++;
+				_mspfsForRemote.push(_mspf);
+				if(stage){
+					// this is to try add the frames that have been lagged
+					var frames:int = Math.floor(_mspf/(1000/stage.frameRate));
+					if(frames>FPSPanel.MAX_LAG_FRAMES) frames = FPSPanel.MAX_LAG_FRAMES;
+					while(frames>1){
+						_mspfsForRemote.push(_mspf);
+						frames--;
+					}
+				}
 				if(_remoteDelayed > remoteDelay){
 					updateRemote();
 					_remoteDelayed = 0;
@@ -368,7 +373,7 @@ package com.atticmedia.console {
 			return 1000/mspf;
 		}
 		public function get mspf():Number{
-			return _isRemote?_remoteMSPF:isNaN(_mspf)?0:_mspf;
+			return _mspf;
 		}
 		public function get currentMemory():uint {
 			return _isRemote?_remoteMem:System.totalMemory;
@@ -379,13 +384,13 @@ package com.atticmedia.console {
 		// TODO: FPS from remoting is not very reliable
 		//
 		private function updateRemote():void{
-			if(_remoteLinesQueue.length==0) return;
 			try{
-				_sharedConnection.send(REMOTE_CONN_NAME, "remoteLogSend", [_remoteLinesQueue, mspf, currentMemory]);
+				_sharedConnection.send(REMOTE_CONN_NAME, "remoteLogSend", [_remoteLinesQueue, _mspfsForRemote, currentMemory]);
 			}catch(e:Error){
 				// don't care
 			}
 			_remoteLinesQueue = new Array();
+			_mspfsForRemote = [stage?stage.frameRate:30];
 		}
 		public function get remoting():Boolean{
 			return _isRemoting;
@@ -393,14 +398,16 @@ package com.atticmedia.console {
 		public function set remoting(newV:Boolean):void{
 			_isRemoting = newV ;
 			_remoteLinesQueue = null;
+			_mspfsForRemote = null;
 			if(newV){
 				_isRemote = false;
 				_remoteDelayed = 0;
+				_mspfsForRemote = [stage?stage.frameRate:30];
 				_remoteLinesQueue = new Array();
 				startSharedConnection();
 				addLine("Remoting started [sandboxType: "+Security.sandboxType+"]",10,CONSOLE_CHANNEL);
 				try{
-					_sharedConnection.allowInsecureDomain("*", "localhost");
+					_sharedConnection.allowInsecureDomain("*");
                 	_sharedConnection.connect(REMOTER_CONN_NAME);
            		}catch (error:Error){
 					addLine("Could not create client service. You will not be able to control this console with remote.", 10,CONSOLE_CHANNEL);
@@ -458,7 +465,23 @@ package com.atticmedia.console {
 					addLine(line["text"],p,channel,r,safe);
 				}
 			}
-			_remoteMSPF = obj[1];
+			var remoteMSPFs:Array = obj[1];
+			if(remoteMSPFs){
+				var fpsp:FPSPanel = panels.getPanel(PANEL_FPS) as FPSPanel;
+				if(fpsp){
+					// the first value is stage.FrameRate
+					var highest:Number = remoteMSPFs[0];
+					fpsp.highest = highest;
+					var len:int = remoteMSPFs.length;
+					for(var i:int = 1; i<len;i++){
+						var fps:Number = 1000/remoteMSPFs[i];
+						if(fps > highest) fps = highest;
+						fpsp.addCurrent(fps);
+					}
+					fpsp.updateKeyText();
+					fpsp.drawGraph();
+				}
+			}
 			_remoteMem = obj[2];
 		}
 		private function onSharedStatus(e:StatusEvent):void{
@@ -482,8 +505,13 @@ package com.atticmedia.console {
 			panels.mainPanel.refresh();
 			panels.updateMenu();
 		}
-		public function get defaultChannel():String{
-			return _defaultChannel;
+		public function set tracingChannels(newVar:String):void{
+			if(newVar.length>0){
+				_tracingChannels = newVar.split(",");
+			}
+		}
+		public function get tracingChannels():String{
+			return String(_tracingChannels);
 		}
 		public function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			if(!_enabled){
@@ -496,7 +524,7 @@ package com.atticmedia.console {
  				txt = txt.replace(/>/gim, "&gt;");
 			}
 			if(channel == ""){
-				channel = _defaultChannel;
+				channel = defaultChannel;
 			}
 			if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
@@ -513,7 +541,9 @@ package com.atticmedia.console {
 					_lines.splice(0,1);
 				}
 				if( tracing && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
-					trace("["+channel+"] "+tmpText);
+					if(tracingPriority <= priority || tracingPriority <= 0){
+						trace("["+channel+"] "+tmpText);
+					}
 				}
 			}
 			_isRepeating = isRepeating;
@@ -534,6 +564,11 @@ package com.atticmedia.console {
 				return cl.run(line);
 			}
 		}
+		private function onCommandSearch(e:Event=null):void{
+			clear(FILTERED_CHANNEL);
+			addLine("Filtering ["+cl.searchTerm+"]", 10,FILTERED_CHANNEL);
+			viewingChannel = FILTERED_CHANNEL;
+		}
 		//
 		// LOGGING
 		//
@@ -546,7 +581,7 @@ package com.atticmedia.console {
 				var ind:int = chn.lastIndexOf("::");
 				chn = chn.substring(ind>=0?(ind+2):0);
 			}else{
-				chn = _defaultChannel;
+				chn = defaultChannel;
 			}
 			addLine(newLine,priority,chn, isRepeating);
 		}
@@ -559,7 +594,7 @@ package com.atticmedia.console {
 			addLine(newLine,priority,chn, isRepeating);
 		}
 		public function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
-			addLine(newLine,priority, _defaultChannel, isRepeating);
+			addLine(newLine,priority, defaultChannel, isRepeating);
 		}
 		public function clear(channel:String = null):void{
 			if(channel){

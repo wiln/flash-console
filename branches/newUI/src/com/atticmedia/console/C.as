@@ -141,6 +141,24 @@ package com.atticmedia.console {
 		public static function get enabled():Boolean{
 			return getter("enabled") as Boolean;
 		}
+		public static function set tracing(v:Boolean):void{
+			setter("tracing",v);
+		}
+		public static function get tracing():Boolean{
+			return getter("tracing") as Boolean;
+		}
+		public static function set tracingChannels(v:String):void{
+			setter("tracingChannels",v);
+		}
+		public static function get tracingChannels():String{
+			return getter("tracingChannels") as String;
+		}
+		public static function set tracingPriority(v:int):void{
+			setter("tracingPriority",v);
+		}
+		public static function get tracingPriority():int{
+			return getter("tracingChannels") as int;
+		}
 		//
 		public static function set fpsMonitor(v:int):void{
 			setter("fpsMonitor", v);
@@ -167,6 +185,12 @@ package com.atticmedia.console {
 		}
 		public static function set isRemote(v:Boolean):void{
 			setter("isRemote",v);
+		}
+		public static function set rulerHidesMouse(v:Boolean):void{
+			setter("rulerHidesMouse",v);
+		}
+		public static function get rulerHidesMouse():Boolean{
+			return getter("rulerHidesMouse") as Boolean;
 		}
 		//
 		public static function set displayRoller(v:Boolean):void{

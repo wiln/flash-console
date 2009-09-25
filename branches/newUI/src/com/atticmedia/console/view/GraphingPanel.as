@@ -218,7 +218,7 @@
 			}
 		}
 		// TODO: MAYBE USE BITMAPDATA INSTEAD OF DRAW
-		private function drawGraph():void{
+		public function drawGraph():void{
 			_drawnFrame++;
 			if(!_needRedraw && _drawnFrame < drawEvery) return;
 			_needRedraw = false;
@@ -270,9 +270,9 @@
 				graph.graphics.lineTo(W-mark, H);
 			}
 			lowTxt.text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
-			highTxt.text = isNaN(highest)?"":"<s>"+highest+"</s>";;
+			highTxt.text = isNaN(highest)?"":"<s>"+highest+"</s>";
 		}
-		protected function updateKeyText():void{
+		public function updateKeyText():void{
 			var str:String = "<r><s>";
 			for each(var interest:Interest in _interests){
 				str += " <font color='#"+interest.col.toString(16)+"'>"+interest.key+"</font>";
