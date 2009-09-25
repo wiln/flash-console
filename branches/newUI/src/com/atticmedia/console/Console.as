@@ -590,6 +590,7 @@ package com.atticmedia.console {
 			}else{
 				return cl.run(line);
 			}
+			return null;
 		}
 		private function onCommandSearch(e:Event=null):void{
 			clear(FILTERED_CHANNEL);

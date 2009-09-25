@@ -217,14 +217,14 @@ package com.atticmedia.console {
 			setter("fpsMonitor", v);
 		}
 		public static function get fpsMonitor():int{
-			return getter("fpsMonitor");
+			return getter("fpsMonitor") as int;
 		}
 		//
 		public static function set memoryMonitor(v:int):void{
 			setter("memoryMonitor", v);
 		}
 		public static function get memoryMonitor():int{
-			return getter("memoryMonitor");
+			return getter("memoryMonitor") as int;
 		}
 		public static function set rulerHidesMouse(v:Boolean):void{
 			setter("rulerHidesMouse",v);
@@ -236,7 +236,7 @@ package com.atticmedia.console {
 			setter("displayRoller", v);
 		}
 		public static function get displayRoller():Boolean{
-			return getter("displayRoller");
+			return getter("displayRoller") as Boolean;
 		}
 		public static function get remoting():Boolean{
 			return getter("remoting") as Boolean;
@@ -351,14 +351,14 @@ package com.atticmedia.console {
 		}
 		//
 		//
-		private static function getter(str:String):Object{
+		private static function getter(str:String):*{
 			if(_console){
 				return _console[str];
 			}else{
 				return null;
 			}
 		}
-		private static function setter(str:String,v:Object):void{
+		private static function setter(str:String,v:*):void{
 			if(_console){
 				_console[str] = v;
 			}
