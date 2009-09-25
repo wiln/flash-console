@@ -26,7 +26,7 @@ package com.atticmedia.console.core {
 
 	public class Style {
 
-		private var _preset:int;
+		private var _preset:int = 0;
 		
 		private var _css:StyleSheet;
 		private var _tracecss:StyleSheet;
@@ -39,10 +39,13 @@ package com.atticmedia.console.core {
 		public var textFormat:TextFormat;
 		public var tooltipBackgroundColor:Number;
 				
-		public function Style() {
+		public function Style(uiset:int = 1) {
 			_css = new StyleSheet();
 			_tracecss = new StyleSheet();
-			preset = 1;
+			preset = uiset;
+			if(_preset<=0){
+				preset = 1;
+			}
 		}
 		public function get css():StyleSheet{
 			return _css;
@@ -52,7 +55,7 @@ package com.atticmedia.console.core {
 		}
 		
 		public function set preset(num:int):void{
-			if(this["preset"+num]){
+			if(hasOwnProperty(["preset"+num])){
 				this["preset"+num]();
 				_preset = num;
 			}
@@ -115,6 +118,49 @@ package com.atticmedia.console.core {
 		}
 		
 		public function preset2():void{
+			
+			
+			panelBackgroundColor = 0;
+			panelBackgroundAlpha = 0.6;
+			panelScalerColor = 0;
+			panelScalerAlpha = 0.6;
+			bottomLineColor = 0xFF0000;
+			
+			_css.setStyle("r",{textAlign:'right', display:'inline'});
+			//_css.setStyle("a",{textDecoration:'underline'});
+			_css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
+			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
+			_css.setStyle("y",{color:'#DD5500', display:'inline'});
+			_css.setStyle("ro",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
+			_css.setStyle("roBold",{color:'#EE6611', fontWeight:'bold'});
+			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
+			_css.setStyle("ch",{color:'#0099CC', display:'inline'});
+			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
+			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);
+			tooltipBackgroundColor = 0;
+			
+			
+			_tracecss.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
+			_tracecss.setStyle("l1",{color:'#0099CC'});
+			_tracecss.setStyle("l2",{color:'#FF8800'});
+			_tracecss.setStyle("p0",{color:'#000000'});
+			_tracecss.setStyle("p1",{color:'#33AA33'});
+			_tracecss.setStyle("p2",{color:'#77D077'});
+			_tracecss.setStyle("p3",{color:'#AAEEAA'});
+			_tracecss.setStyle("p4",{color:'#D6FFD6'});
+			_tracecss.setStyle("p5",{color:'#E6E6E6'});
+			_tracecss.setStyle("p6",{color:'#FFD6D6'});
+			_tracecss.setStyle("p7",{color:'#FFAAAA'});
+			_tracecss.setStyle("p8",{color:'#FF7777'});
+			_tracecss.setStyle("p9",{color:'#FF3333'});
+			_tracecss.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
+			_tracecss.setStyle("p-1",{color:'#0099CC'});
+			_tracecss.setStyle("p-2",{color:'#FF8800'});
+			
+			
+			
+			
+			
 			panelBackgroundColor = 0xFFFFFF;
 			panelBackgroundAlpha = 0.6;
 			panelScalerColor = 0xFF0000;

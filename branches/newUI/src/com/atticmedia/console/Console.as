@@ -93,10 +93,10 @@ package com.atticmedia.console {
 		private var _lines:Array = [];
 		private var _linesChanged:Boolean;
 		
-		public function Console(pass:String = "") {
+		public function Console(pass:String = "", uiset:int = 1) {
 			name = NAME;
 			_password = pass;
-			style = new Style();
+			style = new Style(uiset);
 			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
 			mm = new MemoryMonitor();
 			cl = new CommandLine(this);
@@ -145,7 +145,15 @@ package com.atticmedia.console {
 				}
 			}
 		}
-		
+		public function destroy():void{
+			enabled = false;
+			closeSharedConnection();
+			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
+			cl.destory();
+			if(stage){
+				stageRemovedHandle();
+			}
+		}
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();
 			try{
@@ -260,6 +268,16 @@ package com.atticmedia.console {
 				addLine(str,(ok?-1:10),CONSOLE_CHANNEL);
 			}
 		}
+		public function store(n:String, obj:Object, strong:Boolean = false):void{
+			var nn:String = cl.store(n, obj, strong);
+			if(!quiet && nn){
+				var str:String = obj is Function?"using <b>STRONG</b> reference":("for <b>"+getQualifiedClassName(obj)+"</b> using WEAK reference");
+				addLine("Stored <font color=\"#FF0000\"><b>$"+nn+"</b></font> in commandLine for "+ str +".",-1,CONSOLE_CHANNEL,false,true);
+			}
+		}
+		public function inspect(obj:Object, detail:Boolean = true):void{
+			add("INSPECT: "+ cl.inspect(obj,detail));
+		}
 		public function set enabled(newB:Boolean):void{
 			if(_enabled == newB) return;
 			if(_enabled && !newB){
@@ -342,15 +360,15 @@ package com.atticmedia.console {
 				if(arr.length>0){
 					addLine("GARBAGE COLLECTED: "+arr.join(", "),10,CONSOLE_CHANNEL);
 				}
-			}
-			panels.mainPanel.update(!_isPaused && _linesChanged);
-			if(_linesChanged) {
-				var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
-				if(chPanel){
-					chPanel.update();
+				panels.mainPanel.update(!_isPaused && _linesChanged);
+				if(_linesChanged) {
+					var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
+					if(chPanel){
+						chPanel.update();
+					}
 				}
+				_linesChanged = false;
 			}
-			_linesChanged = false;
 			if(_isRemoting){
 				_remoteDelayed++;
 				_mspfsForRemote.push(_mspf);
@@ -551,6 +569,15 @@ package com.atticmedia.console {
 			if(_isRemoting){
 				_remoteLinesQueue.push(line);
 			}
+		}
+		//
+		// COMMAND LINE
+		//
+		public function set commandLine (newB:Boolean):void{
+			panels.mainPanel.commandLine = newB;
+		}
+		public function get commandLine ():Boolean{
+			return panels.mainPanel.commandLine;
 		}
 		public function runCommand(line:String):Object{
 			if(_isRemote){
