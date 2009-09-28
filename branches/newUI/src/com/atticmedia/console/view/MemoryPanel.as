@@ -1,11 +1,10 @@
 ﻿package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.MemoryMonitor;
 	import com.atticmedia.console.events.TextFieldRollOver;
 	import com.atticmedia.console.view.GraphingPanel;
 	
 	import flash.events.Event;
-	import flash.events.TextEvent;		
+	import flash.events.TextEvent;	
 
 	/**
 	 * @author LuAye
@@ -19,12 +18,12 @@
 			updateEvery = 5;
 			drawEvery = 5;
 			minimumWidth = 32;
-			master.mm.addEventListener(MemoryMonitor.GARBAGE_COLLECTED, onGC, false, 0, true);
-			master.mm.notifyGC = !m.isRemote;
+			//master.mm.addEventListener(MemoryMonitor.GARBAGE_COLLECTED, onGC, false, 0, true);
+			//master.mm.notifyGC = !m.isRemote;
 			add(this, "current", 0x5060FF, "Memory");
 		}
 		public override function close():void {
-			master.mm.notifyGC = false;
+			//master.mm.notifyGC = false;
 			super.close();
 		}
 		public function get current():Number{
@@ -53,8 +52,8 @@
 			}
 			master.panels.tooltip(txt, this);
 		}
-		private function onGC(e:Event):void{
+		/*private function onGC(e:Event):void{
 			mark(0xFF000000);
-		}
+		}*/
 	}
 }

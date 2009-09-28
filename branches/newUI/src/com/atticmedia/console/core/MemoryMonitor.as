@@ -35,7 +35,7 @@ package com.atticmedia.console.core {
 		
 		private var _namesList:Object;
 		private var _objectsList:Dictionary;
-		private var _notifyGC:Boolean;
+		//private var _notifyGC:Boolean;
 		//
 		//
 		public function MemoryMonitor() {
@@ -83,10 +83,10 @@ package com.atticmedia.console.core {
 					delete _namesList[Y];
 				}
 			}
-			if(_notifyGC && gced){
+			/*if(_notifyGC && gced){
 				dispatchEvent(new Event(GARBAGE_COLLECTED));
 				seedGCDummy();
-			}
+			}*/
 			return arr;
 		}
 		private function seedGCDummy():void{
@@ -95,7 +95,7 @@ package com.atticmedia.console.core {
 				watch(new MovieClip(), DUMMY_GARBAGE);
 			}
 		}
-		
+		/*
 		public function set notifyGC(b:Boolean):void{
 			if(_notifyGC != b){
 				_notifyGC = b;
@@ -108,7 +108,7 @@ package com.atticmedia.console.core {
 		}
 		public function get notifyGC():Boolean{
 			return _notifyGC;
-		}
+		}*/
 		//
 		// only works in debugger player version
 		//

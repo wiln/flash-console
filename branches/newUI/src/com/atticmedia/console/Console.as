@@ -73,7 +73,7 @@ package com.atticmedia.console {
 		private var _enabled:Boolean = true;
 		private var _password:String;
 		private var _passwordIndex:int;
-		private var _tracing:Boolean = true;
+		private var _tracing:Boolean = false;
 		private var _isRemoting:Boolean;
 		private var _isRemote:Boolean;
 		private var _mspfsForRemote:Array;

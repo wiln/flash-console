@@ -40,6 +40,7 @@ package com.atticmedia.console.view {
 
 	public class Ruler extends Sprite{
 		public static const EXIT:String = "exit";
+		private static const POINTER_DISTANCE:int = 12;
 		
 		private var _master:Console;
 		private var _area:Rectangle;
@@ -89,8 +90,15 @@ package com.atticmedia.console.view {
 			_pointer.graphics.lineTo(mouseX, _area.y+_area.height);
 			_pointer.blendMode = BlendMode.INVERT;
 			_posTxt.text = "<s>"+mouseX+","+mouseY+"</s>";
-			_posTxt.x = mouseX-_posTxt.width-12;
-			_posTxt.y = mouseY-_posTxt.height-12;
+			//
+			_posTxt.x = mouseX-_posTxt.width-POINTER_DISTANCE;
+			_posTxt.y = mouseY-_posTxt.height-POINTER_DISTANCE;
+			if(_posTxt.x < 0){
+				_posTxt.x = mouseX+POINTER_DISTANCE;
+			}
+			if(_posTxt.y < 0){
+				_posTxt.y = mouseY+POINTER_DISTANCE;
+			}
 		}
 		private function onMouseClick(e:MouseEvent):void{
 			e.stopPropagation();

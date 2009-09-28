@@ -250,15 +250,23 @@
 				field.dispatchEvent(new TextFieldRollOver());
 				return;
 			}
+			var len:int = field.text.length;
+			var lastchar:Rectangle = field.getCharBoundaries(len-1);
+			var offseting:Number = lastchar.x+lastchar.width-field.width;
+			if(offseting<0) offseting=0;
+			else offseting+=3;
+			var index:int = field.getCharIndexAtPoint(field.mouseX+offseting, field.mouseY+5);
 			
-			var index:int =field.getCharIndexAtPoint(field.mouseX, field.mouseY);
 			var url:String = null;
 			var txt:String = null;
 			if(index>0){
 				var X:XML = new XML(field.getXMLText(index,index+1));
-				if(X.textformat && X.textformat.length()>0){
-					url = X.textformat[0].@url;
-					txt = X.textformat[0].toString();
+				if(X.hasOwnProperty("textformat")){
+					var txtformat:XML = X["textformat"][0] as XML;
+					if(txtformat){
+						url = txtformat.@url;
+						txt = txtformat.toString();
+					}
 				}
 			}
 			field.dispatchEvent(new TextFieldRollOver(url, txt));

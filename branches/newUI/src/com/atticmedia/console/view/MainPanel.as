@@ -18,7 +18,7 @@ package com.atticmedia.console.view {
 	 */
 	public class MainPanel extends AbstractPanel {
 		
-		private static const CHANNELS_IN_MENU:int = 5;
+		private static const CHANNELS_IN_MENU:int = 4;
 		
 		private static const _ToolTips:Object = {
 				fps:"Frames Per Second",
@@ -150,7 +150,10 @@ package com.atticmedia.console.view {
 					str += makeLine(line);
 				}
 			}
-			var sd:Boolean = _traceField.scrollV == _traceField.maxScrollV;
+			var sd:Boolean = _traceField.scrollV >= _traceField.maxScrollV-1;
+			//
+			// TODO: try use appendText() - which should improve performace a lot!
+			//
 			_traceField.htmlText = str;
 			if(sd){
 				_traceField.scrollV = _traceField.maxScrollV;
@@ -192,7 +195,7 @@ package com.atticmedia.console.view {
 			}
 			_menuField.visible = !minimize;
 			_traceField.y = minimize?0:12;
-			_traceField.height = n-(_commandField.visible?18:0)-(minimize?0:12);
+			_traceField.height = n-(_commandField.visible?16:0)-(minimize?0:12);
 			var cmdy:Number = n-18;
 			_commandField.y = cmdy;
 			_commandBackground.y = cmdy;
@@ -383,7 +386,6 @@ package com.atticmedia.console.view {
 				_commandBackground.visible = false;
 			}
 			this.height = height;
-			updateMenu();
 		}
 		public function get commandLine ():Boolean{
 			return _commandField.visible;
