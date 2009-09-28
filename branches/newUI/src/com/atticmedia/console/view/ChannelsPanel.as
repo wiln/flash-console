@@ -58,13 +58,13 @@ package com.atticmedia.console.view {
 		public function update():void{
 			_txtField.wordWrap = false;
 			_txtField.width = 80;
-			var str:String = "<w><menu><b><a href=\"event:close\">X</a></b></menu> <textformat leading=\"2\"><font face=\"Arial\" size=\"11\" color=\"#FFFFFF\" >";
+			var str:String = "<w><menu><b><a href=\"event:close\">X</a></b></menu> <textformat leading=\"2\"><chs>";
 			for each(var channel:String in _channels){
 				var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<font color=\"#0099CC\"><b>"+channel+"</b></font>" : channel;
 				channelTxt = channel==master.defaultChannel ? "<i>"+channelTxt+"</i>" : channelTxt;
 				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
-			_txtField.htmlText = str+"</font></textformat></w>";
+			_txtField.htmlText = str+"</chs></textformat></w>";
 			if(_txtField.width>160){
 				_txtField.wordWrap = true;
 				_txtField.width = 160;

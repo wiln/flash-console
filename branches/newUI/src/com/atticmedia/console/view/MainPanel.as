@@ -216,13 +216,14 @@ package com.atticmedia.console.view {
 		private function _updateMenu():void{
 			var str:String = "<r><w>";
 			if(!master.channelsPanel){
+				str += "<chs>";
 				for(var ci:int = 0; (ci<_channels.length && ci<= CHANNELS_IN_MENU);  ci++){
 					var channel:String = _channels[ci];
 					var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
 					channelTxt = channel==master.defaultChannel? "<i>"+channelTxt+"</i>" : channelTxt;
 					str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 				}
-				str += "<ch><a href=\"event:channels\"><b>"+(_channels.length>CHANNELS_IN_MENU?"...":"")+"</b>^ </a></ch> ";
+				str += "<ch><a href=\"event:channels\"><b>"+(_channels.length>CHANNELS_IN_MENU?"...":"")+"</b>^ </a></ch></chs> ";
 			}
 			str += "<menu>[ <b>";
 			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
