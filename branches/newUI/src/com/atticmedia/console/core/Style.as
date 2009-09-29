@@ -78,7 +78,7 @@ package com.atticmedia.console.core {
 			_css.setStyle("ro",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
 			_css.setStyle("roBold",{color:'#EE6611', fontWeight:'bold'});
 			_css.setStyle("menu",{color:'#FF8800', display:'inline'});
-			_css.setStyle("chs",{color:'#FFFFFF', fontSize:'11', display:'inline'});
+			_css.setStyle("chs",{color:'#FFFFFF', fontSize:'11', leading:'2', display:'inline'});
 			_css.setStyle("ch",{color:'#0099CC', display:'inline'});
 			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
 			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);

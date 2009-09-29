@@ -45,7 +45,8 @@ package com.atticmedia.console {
 		public static const PANEL_MEMORY:String = "memoryPanel";
 		public static const PANEL_ROLLER:String = "rollerPanel";
 		
-		public static const VERSION:Number = 1.5;
+		public static const VERSION:Number = 2;
+		public static const VERSION_STAGE:uint = 2;
 
 		public static const REMOTE_CONN_NAME:String = "_ConsoleRemote";
 		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoter";
@@ -105,7 +106,8 @@ package com.atticmedia.console {
 			cl.addEventListener(CommandLine.SEARCH_REQUEST, onCommandSearch, false, 0, true);
 			
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
-			addLine("<b>v"+VERSION+", Happy bug fixing!</b>",-2,CONSOLE_CHANNEL,false,true);
+			var t:String = VERSION_STAGE==1?" alpha":(VERSION_STAGE==2?" beta":(VERSION_STAGE==3?" RC":""));
+			addLine("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2,CONSOLE_CHANNEL,false,true);
 			
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
@@ -120,10 +122,15 @@ package com.atticmedia.console {
 			if(cl.base == null && root){
 				cl.base = root;
 			}
+			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
+			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
 			stage.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
+		}
+		private function onStageMouseLeave(e:Event):void{
+			panels.tooltip(null);
 		}
 		private function keyUpHandler(e:KeyboardEvent):void{
 			if(!_enabled) return;
@@ -303,6 +310,7 @@ package com.atticmedia.console {
 				addLine("Resumed",-1,CONSOLE_CHANNEL);
 			}
 			_isPaused = newV;
+			panels.mainPanel.updateMenu(true);
 			panels.mainPanel.refresh();
 		}
 		//

@@ -37,8 +37,6 @@ package com.atticmedia.console.samples {
 			
 			C.commandLine = true; // enable command line
 			
-			C.fpsMode = 2; // enable FPS monitor with setting 2
-			C.menuMode = 2;
 			C.width = 600;
 			C.height = 200;//C.tracing = true; // trace on flash's normal trace
 			
@@ -69,7 +67,6 @@ package com.atticmedia.console.samples {
 			// it will probably never get collected in this example
 			// but if you have debugger version of flash player installed,
 			// you can press G in console menu (press @ at top) to force garbage collect
-			
 			
 			txtPriority.restrict = "0-9";
 			txtPriority2.restrict = "0-9";

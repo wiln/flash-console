@@ -20,7 +20,7 @@ package com.atticmedia.console.view {
 		
 		private static const CHANNELS_IN_MENU:int = 4;
 		
-		private static const _ToolTips:Object = {
+		public static const TOOLTIPS:Object = {
 				fps:"Frames Per Second",
 				mm:"Memory Monitor",
 				roller:"Display Roller::Map the display list under your mouse",
@@ -231,9 +231,12 @@ package com.atticmedia.console.view {
 			str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
 			str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
 			str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
-			str += " ¦</b> <a href=\"event:clear\">C</a>";
+			str += " ¦</b>";
 			str += doActive(" <a href=\"event:trace\">T</a>", master.tracing);
-			str += " <a href=\"event:priority\">P"+_priority+"</a> <a href=\"event:pause\">P</a> <a href=\"event:close\">X</a>";
+			str += " <a href=\"event:priority\">P"+_priority+"</a>";
+			str += doActive(" <a href=\"event:pause\">P</a>", master.paused);
+			str += " <a href=\"event:clear\">C</a> <a href=\"event:close\">X</a>";
+			
 			str += " ]</menu> ";
 			if(_traceField.scrollV > 1){
 				str += " <a href=\"event:scrollUp\">^</a>";
@@ -256,15 +259,15 @@ package com.atticmedia.console.view {
 		private function onMenuRollOver(e:TextFieldRollOver):void{
 			var txt:String = e.url?e.url.replace("event:",""):"";
 			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
-				txt = _ToolTips["viewall"];
+				txt = TOOLTIPS["viewall"];
 				// TODO: also have tip on current channel and default channel
 			}else if(txt == "pause"){
 				if(master.paused)
-					txt = _ToolTips["resume"];
+					txt = TOOLTIPS["resume"];
 				else
-					txt = _ToolTips["pause"];
+					txt = TOOLTIPS["pause"];
 			}else{
-				txt = _ToolTips[txt];
+				txt = TOOLTIPS[txt];
 			}
 			master.panels.tooltip(txt, this);
 		}
@@ -278,10 +281,10 @@ package com.atticmedia.console.view {
 			}else if(e.text == "pause"){
 				if(master.paused){
 					master.paused = false;
-					master.panels.tooltip(_ToolTips["pause"], this);
+					master.panels.tooltip(TOOLTIPS["pause"], this);
 				}else{
 					master.paused = true;
-					master.panels.tooltip(_ToolTips["resume"], this);
+					master.panels.tooltip(TOOLTIPS["resume"], this);
 				}
 			}else if(e.text == "trace"){
 				master.tracing = !master.tracing;
@@ -304,7 +307,7 @@ package com.atticmedia.console.view {
 					_priority = 0;
 				}
 				refresh();
-				updateMenu();
+				updateMenu(true);
 			}else if(e.text == "mm"){
 				master.memoryMonitor = master.memoryMonitor>0?0:1;
 			}else if(e.text == "roller"){

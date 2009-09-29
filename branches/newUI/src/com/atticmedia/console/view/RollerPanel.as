@@ -93,7 +93,7 @@ package com.atticmedia.console.view {
 							str += j==1?" ∟":" -";
 						}
 						if(obj == stg){
-							str +=  "<menu><a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
+							str +=  "<menu> <a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
 						}else if(i == len-1){
 							str +=  "<roBold>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</roBold>";
 						}else {

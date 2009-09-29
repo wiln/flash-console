@@ -58,13 +58,13 @@ package com.atticmedia.console.view {
 		public function update():void{
 			_txtField.wordWrap = false;
 			_txtField.width = 80;
-			var str:String = "<w><menu><b><a href=\"event:close\">X</a></b></menu> <textformat leading=\"2\"><chs>";
+			var str:String = "<w><menu> <b><a href=\"event:close\">X</a></b></menu> <chs>";
 			for each(var channel:String in _channels){
-				var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<font color=\"#0099CC\"><b>"+channel+"</b></font>" : channel;
+				var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
 				channelTxt = channel==master.defaultChannel ? "<i>"+channelTxt+"</i>" : channelTxt;
 				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
-			_txtField.htmlText = str+"</chs></textformat></w>";
+			_txtField.htmlText = str+"</chs></w>";
 			if(_txtField.width>160){
 				_txtField.wordWrap = true;
 				_txtField.width = 160;
@@ -73,7 +73,13 @@ package com.atticmedia.console.view {
 			height = _txtField.height;
 		}
 		private function onMenuRollOver(e:TextFieldRollOver):void{
-			//master.panels.tooltip(e.url?"Close":null, this);
+			var txt:String = e.url?e.url.replace("event:",""):"";
+			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
+				txt = MainPanel.TOOLTIPS["viewall"];
+			}else if(txt=="close"){
+				txt = "Close";
+			}
+			master.panels.tooltip(txt, this);
 		}
 		protected function linkHandler(e:TextEvent):void{
 			_txtField.setSelection(0, 0);

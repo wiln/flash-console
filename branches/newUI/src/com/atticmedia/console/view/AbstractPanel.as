@@ -250,13 +250,18 @@
 				field.dispatchEvent(new TextFieldRollOver());
 				return;
 			}
-			var len:int = field.text.length;
-			var lastchar:Rectangle = field.getCharBoundaries(len-1);
-			var offseting:Number = lastchar.x+lastchar.width-field.width;
-			if(offseting<0) offseting=0;
-			else offseting+=3;
-			var index:int = field.getCharIndexAtPoint(field.mouseX+offseting, field.mouseY+5);
-			
+			var index:int;
+			if(field.scrollH>0){
+				// kinda a hack really :(
+				var scrollH:Number = field.scrollH;
+				var w:Number = field.width;
+				field.width = w+scrollH;
+				index = field.getCharIndexAtPoint(field.mouseX+scrollH, field.mouseY);
+				field.width = w;
+				field.scrollH = scrollH;
+			}else{
+				index = field.getCharIndexAtPoint(field.mouseX, field.mouseY);
+			}
 			var url:String = null;
 			var txt:String = null;
 			if(index>0){

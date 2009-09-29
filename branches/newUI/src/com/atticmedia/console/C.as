@@ -25,22 +25,22 @@
 		import com.atticmedia.console.*;
 		C.start(this); // this = preferably the root
 		
-		// OR  c.start(this,"debug");
+		// OR  C.start(this,"debug");
 		// Start console, parameter "debug" (optional) sets the console's password.
 		//  console will only open after you type "debug" in sequence at anytime on stage. 
 		// Leave blank to disable password, where console will launch straight away.
 		
 		C.add("Hello World"); 
-		// Output "Hello World" with default priority in currentChannel
+		// Output "Hello World" with default priority in defaultChannel
 		
 		C.add( ["Hello World" , "this is", "an array", "of arguments"] );
 		// Passes multiple arguments as array (for the time being this is the only alternative)
 		
 		C.add("Important Trace!", 10);
-		// Output "Important Trace!" with priority 10 in currentChannel
+		// Output "Important Trace!" with priority 10 in defaultChannel
 		
 		C.add("A Looping trace that I dont want to see a long list", 10, true);
-		// Output the text in currentChannel, replacing the last 'repeating' line. preventing it from generating so many lines.
+		// Output the text in defaultChannel, replacing the last 'repeating' line. preventing it from generating so many lines.
 		// good for tracing loops.
 		// use C.forceLine = # to force print the line on # frames. # = a number.
 		
@@ -61,17 +61,14 @@
 		C.remove(); // Completely remove console
 		C.clear(); // Clear tracing lines
 		
-		C.fpsMode = 1 // 0 = off. 1-5 various fps display formats
-		
-		C.ui.preset = 2 // (default: 1) change layout format to preset number 
 		C.paused = true // pauses printing in console, it still record and print back out on resume.
 		C.enabled = false // disables printing and recording. pauses FPS/memory monitor.
 		C.visible = false // (defauilt: true) set to change visibility. It will still record but will not update prints etc
 		C.maxRepeats = 100; // (default:100)  frames before repeating line is forced to print to next line. set to -1 to never force. set to 0 to force every line.
 		
-		C.menuMode = 0 // (default:1) 0=channels+options 1=channels 2=options
 		C.commandLine = true; // (default: false) enable command line
-		C.memoryMonitor = 1; // (default: 0) show memory usage in kb.
+		C.fpsMonitor = 1; // (default: 0) show FPS graph monitor.
+		C.memoryMonitor = 1; // (default: 0) show memory usage graph.
 		C.width = 200; // (defauilt: 420) change width of console
 		C.height = 200; //(defauilt: 16) change hight of console
 		C.x = 300; // (defauilt: 0) change x of console
@@ -80,14 +77,17 @@
 		C.tracing = true; // (default: false) when set, all console input will be re-traced during authoring
 		C.alwaysOnTop = false; // (default: true) when set this console will try to keep it self on top of its parent display container.
 
-		C.currentChannel = "myChannel"; // (default: "traces") change default channel to print.
+		C.defaultChannel = "myChannel"; // (default: "traces") change default channel to print.
 		C.viewingChannel = "myChannel"; // (default: "global") change current channel view. If you want to view multiple channels, seperate the names with commas.
 		
-		C.remoting = true; // (default: false) set to broadcast traces to sharedobject
+		C.remoting = true; // (default: false) set to broadcast traces to LocalConnection
+		C.isRemote = true; // (default: false) set to recieve broadcasts from LocalConnection remote
 
 */
 		
 package com.atticmedia.console {
+	import flash.geom.Point;	
+	import flash.geom.Rectangle;	
 	import flash.display.DisplayObjectContainer;
 	import flash.system.Capabilities;		
 
@@ -112,14 +112,23 @@ package com.atticmedia.console {
 				mc.addChild(_console);
 			}
 		}
-		public static function ch(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
-			if(_console){
-				_console.ch(channel,newLine,priority, isRepeating);
-			}
+		public static function get version():Number{
+			return Console.VERSION;
 		}
+		public static function get versionStage():uint{
+			return Console.VERSION_STAGE;
+		}
+		//
+		//
+		//
 		public static function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
 			if(_console){
 				_console.add(newLine,priority, isRepeating);
+			}
+		}
+		public static function ch(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+			if(_console){
+				_console.ch(channel,newLine,priority, isRepeating);
 			}
 		}
 		public static function pk(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
@@ -127,9 +136,9 @@ package com.atticmedia.console {
 				_console.pk(channel,newLine,priority, isRepeating);
 			}
 		}
-		public static function get version():Number{
-			return Console.VERSION;
-		}
+		//
+		//
+		//
 		public static function remove():void{
 			if(_console){
 				if(_console.parent){
@@ -139,36 +148,19 @@ package com.atticmedia.console {
 				_console = null;
 			}
 		}
-		public static function clear(channel:String = null):void{
-			if(_console){
-				_console.clear(channel);
-			}
-		}
-		//
-		//
-		public static function watch(o:Object,n:String = null):String{
-			if(_console){
-				return _console.watch(o,n);
-			}
-			return null;
-		}
-		public static function unwatch(n:String):void{
-			if(_console){
-				_console.unwatch(n);
-			}
-		}
-		public static function gc():void {
-			if(_console){
-				_console.gc();
-			}
-		}
-		//
-		//
 		public static function set enabled(v:Boolean):void{
 			setter("enabled",v);
 		}
 		public static function get enabled():Boolean{
 			return getter("enabled") as Boolean;
+		}
+		//
+		// Logging settings
+		//
+		public static function clear(channel:String = null):void{
+			if(_console){
+				_console.clear(channel);
+			}
 		}
 		public static function set tracing(v:Boolean):void{
 			setter("tracing",v);
@@ -187,6 +179,12 @@ package com.atticmedia.console {
 		}
 		public static function get tracingPriority():int{
 			return getter("tracingChannels") as int;
+		}
+		public static function get defaultChannel():String{
+			return getter("defaultChannel") as String;
+		}
+		public static function set defaultChannel(v:String):void{
+			setter("defaultChannel",v);
 		}
 		public static function get viewingChannel():String{
 			return getter("viewingChannel") as String;
@@ -211,6 +209,26 @@ package com.atticmedia.console {
 		}
 		public static function set maxRepeats(v:Number):void{
 			setter("maxRepeats",v);
+		}
+		public static function get paused():Boolean{
+			return getter("paused") as Boolean;
+		}
+		public static function set paused(v:Boolean):void{
+			setter("paused",v);
+		}
+		//
+		// Panel settings
+		//
+		// see panelnames in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
+		public static function setPanelPosition(panelname:String, p:Point):void{
+			if(_console){
+				_console.setPanelPosition(panelname, p);
+			}
+		}
+		public static function setPanelArea(panelname:String, rect:Rectangle):void{
+			if(_console){
+				_console.setPanelArea(panelname, rect);
+			}
 		}
 		//
 		public static function set fpsMonitor(v:int):void{
@@ -237,18 +255,6 @@ package com.atticmedia.console {
 		}
 		public static function get displayRoller():Boolean{
 			return getter("displayRoller") as Boolean;
-		}
-		public static function get remoting():Boolean{
-			return getter("remoting") as Boolean;
-		}
-		public static function set remoting(v:Boolean):void{
-			setter("remoting",v);
-		}
-		public static function get isRemote():Boolean{
-			return getter("isRemote") as Boolean;
-		}
-		public static function set isRemote(v:Boolean):void{
-			setter("isRemote",v);
 		}
 		//
 		public static function get width():Number{
@@ -281,12 +287,8 @@ package com.atticmedia.console {
 		public static function set visible(v:Boolean):void{
 			setter("visible",v);
 		}
-		public static function get paused():Boolean{
-			return getter("paused") as Boolean;
-		}
-		public static function set paused(v:Boolean):void{
-			setter("paused",v);
-		}
+		//
+		//
 		public static function get exists():Boolean{
 			var e:Boolean = _console? true: false;
 			return e;
@@ -304,7 +306,22 @@ package com.atticmedia.console {
 			return getter("alwaysOnTop") as Boolean;
 		}
 		//
+		// Remoting
 		//
+		public static function get remoting():Boolean{
+			return getter("remoting") as Boolean;
+		}
+		public static function set remoting(v:Boolean):void{
+			setter("remoting",v);
+		}
+		public static function get isRemote():Boolean{
+			return getter("isRemote") as Boolean;
+		}
+		public static function set isRemote(v:Boolean):void{
+			setter("isRemote",v);
+		}
+		//
+		// Command line tools
 		//
 		public static function set commandLine (v:Boolean):void{
 			setter("commandLine",v);
@@ -339,6 +356,38 @@ package com.atticmedia.console {
 				return _console.runCommand(str);
 			}
 			return null;
+		}
+		//
+		// Memory management tools
+		//
+		public static function watch(o:Object,n:String = null):String{
+			if(_console){
+				return _console.watch(o,n);
+			}
+			return null;
+		}
+		public static function unwatch(n:String):void{
+			if(_console){
+				_console.unwatch(n);
+			}
+		}
+		public static function gc():void {
+			if(_console){
+				_console.gc();
+			}
+		}
+		//
+		// Graphing utilites
+		//
+		public static function addGraph(n:String, obj:Object, prop:String, col:Number, key:String, rect:Rectangle = null, inverse:Boolean = false):void{
+			if(_console){
+				_console.addGraph(n,obj,prop,col,key,rect,inverse);
+			}
+		}
+		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
+			if(_console){
+				_console.removeGraph(n, obj, prop);
+			}
 		}
 		//
 		// WARNING: key binding hard references the function. 
