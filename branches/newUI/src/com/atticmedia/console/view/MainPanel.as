@@ -321,6 +321,9 @@ package com.atticmedia.console.view {
 				master.clear();
 			}else if(e.text.substring(0,8) == "channel_"){
 				onChannelPressed(e.text.substring(8));
+			}else if(e.text.substring(0,5) == "clip_"){
+				var str:String = "/remap "+e.text.substring(5);
+				master.runCommand(str);
 			}
 			e.stopPropagation();
 		}				
