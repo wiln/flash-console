@@ -146,7 +146,7 @@ package com.atticmedia.console.view {
 		public function refresh():void{
 			var str:String = "";
 			for each (var line:LogLineVO in _lines ){
-				if((master.viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 || line.c!=Console.FILTERED_CHANNEL) && ((master.cl.searchTerm && line.c != Console.CONSOLE_CHANNEL && line.c != Console.FILTERED_CHANNEL && line.text.toLowerCase().indexOf(master.cl.searchTerm.toLowerCase())>=0 ) || (master.viewingChannels.indexOf(line.c)>=0 || master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0) && (line.p >= _priority || _priority == 0) )){
+				if((master.viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 || line.c!=Console.FILTERED_CHANNEL) && ((master.filterText && line.c != Console.FILTERED_CHANNEL && line.text.toLowerCase().indexOf(master.filterText.toLowerCase())>=0 ) || (master.viewingChannels.indexOf(line.c)>=0 || master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0) && (line.p >= _priority || _priority == 0) )){
 					str += makeLine(line);
 				}
 			}
@@ -228,9 +228,11 @@ package com.atticmedia.console.view {
 			str += "<menu>[ <b>";
 			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
 			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
-			str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
-			str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
-			str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
+			if(!master.isRemote){
+				str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
+				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
+				str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
+			}
 			str += " ¦</b>";
 			str += doActive(" <a href=\"event:trace\">T</a>", master.tracing);
 			str += " <a href=\"event:priority\">P"+_priority+"</a>";

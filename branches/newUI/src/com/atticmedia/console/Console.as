@@ -1,8 +1,11 @@
 ﻿/*
 * 
-* Copyright (c) 2008 Atticmedia
+* Copyright (c) 2008-2009 Lu Aye Oo
 * 
 * @author 		Lu Aye Oo
+* 
+* http://code.google.com/p/flash-console/
+* 
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +21,6 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 * 
-* 
 */
 package com.atticmedia.console {
 	import com.atticmedia.console.core.*;
@@ -27,14 +29,12 @@ package com.atticmedia.console {
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
-	import flash.events.StatusEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.net.LocalConnection;
-	import flash.system.Security;
 	import flash.system.System;
 	import flash.utils.getQualifiedClassName;
-	import flash.utils.getTimer;		
+	import flash.utils.getTimer;	
 
 	public class Console extends Sprite {
 
@@ -44,6 +44,7 @@ package com.atticmedia.console {
 		public static const PANEL_FPS:String = "fpsPanel";
 		public static const PANEL_MEMORY:String = "memoryPanel";
 		public static const PANEL_ROLLER:String = "rollerPanel";
+		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		
 		public static const VERSION:Number = 2;
 		public static const VERSION_STAGE:uint = 2;
@@ -52,43 +53,39 @@ package com.atticmedia.console {
 		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoter";
 		
 		public static const CONSOLE_CHANNEL:String = "C";
-		public static const FILTERED_CHANNEL:String = "Filtered";
+		public static const FILTERED_CHANNEL:String = "filtered";
 		public static const GLOBAL_CHANNEL:String = "global";
 		//
 		public var style:Style;
 		public var panels:PanelsManager;
-		public var mm:MemoryMonitor;
-		public var cl:CommandLine;
+		private var mm:MemoryMonitor;
+		private var cl:CommandLine;
+		private var remote:Remoting;
 		//
 		public var quiet:Boolean;
 		public var maxLines:int = 500;
 		public var prefixChannelNames:Boolean = true;
 		public var alwaysOnTop:Boolean = true;
-		public var maxRepeats:Number = 100;
+		public var maxRepeats:Number = 75;
 		public var remoteDelay:int = 20;
 		public var defaultChannel:String = "traces";
 		public var tracingPriority:int = 0;
 		public var rulerHidesMouse:Boolean = true;
+		public var traceCall:Function = trace;
 		//
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
 		private var _password:String;
 		private var _passwordIndex:int;
 		private var _tracing:Boolean = false;
-		private var _isRemoting:Boolean;
-		private var _isRemote:Boolean;
-		private var _mspfsForRemote:Array;
-		private var _remoteMem:int;
-		private var _remoteDelayed:int;
+		private var _filterText:String;
 		private var _keyBinds:Object = {};
-		private var _sharedConnection:LocalConnection;
 		private var _mspf:Number;
 		private var _previousTime:Number;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
 		private var _tracingChannels:Array;
-		private var _remoteLinesQueue:Array;
 		private var _isRepeating:Boolean;
 		private var _repeated:int;
 		private var _lines:Array = [];
@@ -101,9 +98,10 @@ package com.atticmedia.console {
 			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
 			mm = new MemoryMonitor();
 			cl = new CommandLine(this);
+			remote = new Remoting(this);
+			remote.logsend = remoteLogSend; // Don't want to expose remoteLogSend else where
 			cl.store("C",this);
 			cl.reserved.push("C");
-			cl.addEventListener(CommandLine.SEARCH_REQUEST, onCommandSearch, false, 0, true);
 			
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			var t:String = VERSION_STAGE==1?" alpha":(VERSION_STAGE==2?" beta":(VERSION_STAGE==3?" RC":""));
@@ -154,7 +152,7 @@ package com.atticmedia.console {
 		}
 		public function destroy():void{
 			enabled = false;
-			closeSharedConnection();
+			remote.close();
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			cl.destory();
 			if(stage){
@@ -265,7 +263,7 @@ package com.atticmedia.console {
 			if(isRemote){
 				try{
 					addLine("Sending garbage collection request to client",-1,CONSOLE_CHANNEL);
-					_sharedConnection.send(REMOTER_CONN_NAME, "gc");
+					remote.send("gc");
 				}catch(e:Error){
 					addLine(e,10,CONSOLE_CHANNEL);
 				}
@@ -283,7 +281,7 @@ package com.atticmedia.console {
 			}
 		}
 		public function inspect(obj:Object, detail:Boolean = true):void{
-			add("INSPECT: "+ cl.inspect(obj,detail));
+			addLine("INSPECT: "+ cl.inspect(obj,detail),5 ,CONSOLE_CHANNEL, false, true);
 		}
 		public function set enabled(newB:Boolean):void{
 			if(_enabled == newB) return;
@@ -377,22 +375,8 @@ package com.atticmedia.console {
 				}
 				_linesChanged = false;
 			}
-			if(_isRemoting){
-				_remoteDelayed++;
-				_mspfsForRemote.push(_mspf);
-				if(stage){
-					// this is to try add the frames that have been lagged
-					var frames:int = Math.floor(_mspf/(1000/stage.frameRate));
-					if(frames>FPSPanel.MAX_LAG_FRAMES) frames = FPSPanel.MAX_LAG_FRAMES;
-					while(frames>1){
-						_mspfsForRemote.push(_mspf);
-						frames--;
-					}
-				}
-				if(_remoteDelayed > remoteDelay){
-					updateRemote();
-					_remoteDelayed = 0;
-				}
+			if(remote.remoting){
+				remote.update(_mspf, stage?stage.frameRate:0);
 			}
 		}
 		public function get fps():Number{
@@ -402,84 +386,26 @@ package com.atticmedia.console {
 			return _mspf;
 		}
 		public function get currentMemory():uint {
-			return _isRemote?_remoteMem:System.totalMemory;
+			return remote.isRemote?remote.remoteMem:System.totalMemory;
 		}
 		//
 		// REMOTING
-		// TODO: maybe have it in another class
 		//
-		private function updateRemote():void{
-			try{
-				_sharedConnection.send(REMOTE_CONN_NAME, "remoteLogSend", [_remoteLinesQueue, _mspfsForRemote, currentMemory]);
-			}catch(e:Error){
-				// don't care
-			}
-			_remoteLinesQueue = new Array();
-			_mspfsForRemote = [stage?stage.frameRate:30];
-		}
 		public function get remoting():Boolean{
-			return _isRemoting;
+			return remote.remoting;
 		}
 		public function set remoting(newV:Boolean):void{
-			_isRemoting = newV ;
-			_remoteLinesQueue = null;
-			_mspfsForRemote = null;
-			if(newV){
-				_isRemote = false;
-				_remoteDelayed = 0;
-				_mspfsForRemote = [stage?stage.frameRate:30];
-				_remoteLinesQueue = new Array();
-				startSharedConnection();
-				addLine("Remoting started [sandboxType: "+Security.sandboxType+"]",10,CONSOLE_CHANNEL);
-				try{
-					_sharedConnection.allowInsecureDomain("*");
-                	_sharedConnection.connect(REMOTER_CONN_NAME);
-           		}catch (error:Error){
-					addLine("Could not create client service. You will not be able to control this console with remote.", 10,CONSOLE_CHANNEL);
-           		}
-			}else{
-				closeSharedConnection();
-			}
+			remote.remoting = newV;
 		}
 		public function get isRemote():Boolean{
-			return _isRemote;
+			return remote.isRemote;
 		}
 		public function set isRemote(newV:Boolean):void{
-			_isRemote = newV ;
-			if(newV){
-				_isRemoting = false;
-				startSharedConnection();
-				try{
-					_sharedConnection.allowInsecureDomain("*", "localhost");
-                	_sharedConnection.connect(REMOTE_CONN_NAME);
-					addLine("Remote started [sandboxType: "+Security.sandboxType+"]",10,CONSOLE_CHANNEL);
-           		}catch (error:Error){
-					_isRemoting = false;
-					addLine("Could not create remote service. You might have a console remote already running.", 10,CONSOLE_CHANNEL);
-           		}
-			}else{
-				closeSharedConnection();
-			}
+			remote.isRemote = newV;
+			panels.updateMenu();
 		}
-		private function startSharedConnection():void{
-			closeSharedConnection();
-			_sharedConnection = new LocalConnection();
-			_sharedConnection.addEventListener(StatusEvent.STATUS, onSharedStatus);
-			_sharedConnection.client = this;
-			// TODO: security measures may need to be looked at.
-		}
-		private function closeSharedConnection():void{
-			if(_sharedConnection){
-				try{
-					_sharedConnection.close();
-				}catch(error:Error){
-					addLine("closeSharedConnection: "+error, 10,CONSOLE_CHANNEL);
-				}
-			}
-			_sharedConnection = null;
-		}
-		public function remoteLogSend(obj:Array):void{
-			if(!_isRemote || !obj) return;
+		private function remoteLogSend(obj:Array):void{
+			if(!remote.isRemote || !obj) return;
 			var lines:Array = obj[0];
 			for each( var line:Object in lines){
 				if(line){
@@ -507,10 +433,7 @@ package com.atticmedia.console {
 					fpsp.drawGraph();
 				}
 			}
-			_remoteMem = obj[2];
-		}
-		private function onSharedStatus(e:StatusEvent):void{
-			// this will get called quite often if there is no actual remote server running...
+			remote.remoteMem = obj[2];
 		}
 		//
 		//
@@ -554,7 +477,7 @@ package com.atticmedia.console {
 			var txt:String = String(obj);
 			if( _tracing && !isRepeat && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
 				if(tracingPriority <= priority || tracingPriority <= 0){
-					trace("["+channel+"] "+txt);
+					traceCall("["+channel+"] "+txt);
 				}
 			}
 			if(!skipSafe){
@@ -581,8 +504,8 @@ package com.atticmedia.console {
 			}
 			_isRepeating = isRepeating;
 			
-			if(_isRemoting){
-				_remoteLinesQueue.push(line);
+			if(remote.remoting){
+				remote.addLineQueue(line);
 			}
 		}
 		//
@@ -595,10 +518,10 @@ package com.atticmedia.console {
 			return panels.mainPanel.commandLine;
 		}
 		public function runCommand(line:String):Object{
-			if(_isRemote){
+			if(remote.isRemote){
 				addLine("Run command at remote: "+line,-2,CONSOLE_CHANNEL);
 				try{
-					_sharedConnection.send(REMOTER_CONN_NAME, "runCommand", line);
+					remote.send("runCommand", line);
 				}catch(err:Error){
 					addLine("Command could not be sent to client: " + err, 10,CONSOLE_CHANNEL);
 				}
@@ -606,11 +529,6 @@ package com.atticmedia.console {
 				return cl.run(line);
 			}
 			return null;
-		}
-		private function onCommandSearch(e:Event=null):void{
-			clear(FILTERED_CHANNEL);
-			addLine("Filtering ["+cl.searchTerm+"]", 10,FILTERED_CHANNEL);
-			viewingChannel = FILTERED_CHANNEL;
 		}
 		//
 		// LOGGING
@@ -638,6 +556,19 @@ package com.atticmedia.console {
 		}
 		public function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
 			addLine(newLine,priority, defaultChannel, isRepeating);
+		}
+		public function set filterText(str:String):void{
+			_filterText = str;
+			if(str){
+				clear(FILTERED_CHANNEL);
+				addLine("Filtering ["+str+"]", 10,FILTERED_CHANNEL);
+				viewingChannels = [FILTERED_CHANNEL];
+			}else if(viewingChannel == FILTERED_CHANNEL){
+				viewingChannels = [GLOBAL_CHANNEL];
+			}
+		}
+		public function get filterText():String{
+			return _filterText;
 		}
 		public function clear(channel:String = null):void{
 			if(channel){

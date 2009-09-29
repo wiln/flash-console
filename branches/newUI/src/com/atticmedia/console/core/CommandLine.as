@@ -34,10 +34,7 @@ package com.atticmedia.console.core {
 	
 	public class CommandLine extends EventDispatcher {
 
-		public static const SEARCH_REQUEST:String = "SearchRequest";
-		
 		private var _saved:WeakObject;
-		private var _lastSearchTerm:String;
 		private var _master:Console;
 		
 		public var reserved:Array;
@@ -79,9 +76,6 @@ package com.atticmedia.console.core {
 			}
 			return n;
 		}
-		public function get searchTerm():String{
-			return _lastSearchTerm;
-		}
 		public function run(str:String):Object {
 			report("&gt; "+str, -1, false);
 			var returned:Object;
@@ -119,8 +113,7 @@ package com.atticmedia.console.core {
 						report("Nothing to save", 10);
 					}
 				} else if (line[0] == "/filter") {
-					_lastSearchTerm = str.substring(8);
-					dispatchEvent(new Event(SEARCH_REQUEST));
+					_master.filterText = str.substring(8);
 				} else if (line[0] == "/inspect" || line[0] == "/inspectfull") {
 					if (_saved.get("_returned")) {
 						var viewAll:Boolean = (line[0] == "/inspectfull")? true: false;

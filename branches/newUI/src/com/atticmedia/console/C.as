@@ -1,8 +1,11 @@
 ﻿/*
 * 
-* Copyright (c) 2008 Atticmedia
+* Copyright (c) 2008-2009 Lu Aye Oo
 * 
 * @author 		Lu Aye Oo
+* 
+* http://code.google.com/p/flash-console/
+* 
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -189,8 +192,11 @@ package com.atticmedia.console {
 		public static function get viewingChannel():String{
 			return getter("viewingChannel") as String;
 		}
-		public static function set viewingChannel(v:String):void{
-			setter("viewingChannel",v);
+		public static function get filterText():String{
+			return getter("filterText") as String;
+		}
+		public static function set filterText(v:String):void{
+			setter("filterText",v);
 		}
 		public static function get prefixChannelNames():Boolean{
 			return getter("prefixChannelNames") as Boolean;
@@ -397,6 +403,13 @@ package com.atticmedia.console {
 			if(_console){
 				_console.bindKey(char, ctrl, alt, shift, fun ,args);
 			}
+		}
+		// if you want to use a special 'trace' call, you can override it here, default is flash's build in trace(...args);
+		public static function set traceCall(v:Function):void{
+			setter("traceCall",v);
+		}
+		public static function get traceCall():Function{
+			return getter("traceCall") as Function;
 		}
 		//
 		//

@@ -274,7 +274,6 @@
 				}
 			}
 			/*for each(var mark:int in marks){
-				// TODO: Mark should have its own special color and value point
 				graph.graphics.lineStyle(1,0xFFCC00, 0.4);
 				graph.graphics.moveTo(W-mark, 0);
 				graph.graphics.lineTo(W-mark, H);

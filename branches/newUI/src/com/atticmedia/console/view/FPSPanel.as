@@ -9,7 +9,6 @@ package com.atticmedia.console.view {
 	 */
 	public class FPSPanel extends GraphingPanel {
 		//
-		public static const MAX_LAG_FRAMES:uint = 25;
 		private var _cachedCurrent:Number;
 		//
 		public function FPSPanel(m:Console) {
@@ -52,7 +51,7 @@ package com.atticmedia.console.view {
 					highest = stage.frameRate;
 					var frames:int = Math.floor(mspf/(1000/highest));
 					// this is to try add the frames that have been lagged
-					if(frames>MAX_LAG_FRAMES) frames = MAX_LAG_FRAMES; // Don't add too many
+					if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES; // Don't add too many
 					while(frames>1){
 						updateData();
 						frames--;

@@ -44,7 +44,7 @@ package com.atticmedia.console.samples {
 
 			// LOGGING
 			C.add("This is an important error alert! (priority 10)", 10);
-			C.add("This is a less importnat error alert. (priority 9)", 9);
+			C.add("This is a less important error alert. (priority 9)", 9);
 			C.add("This is a warning! (priority 8)", 8);
 			C.add("This is a message (priority 5)", 5);
 			C.add("This is a default log level (priority 2)", 2);
@@ -53,9 +53,6 @@ package com.atticmedia.console.samples {
 			//
 			C.ch("myChannel", "Hello my Channel");
 			C.ch("myChannel", "Hello important message at my channel", 10);
-
-			// press @ at the top for console menu.
-			// press H on second right for console menu help
 
 			// if you want to use command line, please type /help 
 			// in command line at the bottom for examples
@@ -66,7 +63,7 @@ package com.atticmedia.console.samples {
 			aSprite = null;
 			// it will probably never get collected in this example
 			// but if you have debugger version of flash player installed,
-			// you can press G in console menu (press @ at top) to force garbage collect
+			// you can open memory monitor (M) and then press G in that panel to force garbage collect
 			
 			txtPriority.restrict = "0-9";
 			txtPriority2.restrict = "0-9";

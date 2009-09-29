@@ -1,6 +1,6 @@
 ﻿package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.Style;
+	import com.atticmedia.console.view.Style;
 	import com.atticmedia.console.events.TextFieldRollOver;
 	
 	import flash.display.DisplayObject;
