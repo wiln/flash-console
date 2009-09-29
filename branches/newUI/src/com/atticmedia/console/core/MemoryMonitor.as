@@ -21,17 +21,15 @@
 * 
 */
 package com.atticmedia.console.core {
-	import flash.display.MovieClip;	
-	import flash.events.Event;	
-	import flash.events.EventDispatcher;	
+	import flash.events.EventDispatcher;
 	import flash.system.System;
 	import flash.utils.Dictionary;
-	import flash.utils.getTimer;	
+	import flash.utils.getTimer;		
 
 	public class MemoryMonitor extends EventDispatcher{
 		
 		public static const GARBAGE_COLLECTED:String = "garbageCollected";
-		private static const DUMMY_GARBAGE:String = "_memoryMonitor_dummy_garbage";
+		//private static const DUMMY_GARBAGE:String = "_memoryMonitor_dummy_garbage";
 		
 		private var _namesList:Object;
 		private var _objectsList:Dictionary;
@@ -77,9 +75,9 @@ package com.atticmedia.console.core {
 			for(var Y:String in _namesList){
 				if(!o[Y]){
 					gced = true;
-					if(Y != DUMMY_GARBAGE){
-						arr.push(Y);
-					}
+					//if(Y != DUMMY_GARBAGE){
+					//	arr.push(Y);
+					//}
 					delete _namesList[Y];
 				}
 			}
@@ -89,13 +87,12 @@ package com.atticmedia.console.core {
 			}*/
 			return arr;
 		}
-		private function seedGCDummy():void{
+		/*private function seedGCDummy():void{
 			if(!_namesList[DUMMY_GARBAGE]){
 				// using MovieClip as dummy garbate as it doenst get collected straight away like others
 				watch(new MovieClip(), DUMMY_GARBAGE);
 			}
 		}
-		/*
 		public function set notifyGC(b:Boolean):void{
 			if(_notifyGC != b){
 				_notifyGC = b;

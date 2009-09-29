@@ -38,8 +38,8 @@ package com.atticmedia.console.core {
 		private static const INTERNAL_BASE:String = "base";
 		private static const INTERNAL_RETURNED:String = "returned";
 		
-		private var _internal:Weak;
-		private var _saved:Weak;
+		private var _internal:WeakObject;
+		private var _saved:WeakObject;
 		private var _lastSearchTerm:String;
 		private var _reportFunction:Function;
 		
@@ -50,10 +50,10 @@ package com.atticmedia.console.core {
 
 		public function CommandLine_new(base:Object, reportFunction:Function = null) {
 			_reportFunction = reportFunction;
-			_internal = new Weak();
+			_internal = new WeakObject();
 			_internal.set(INTERNAL_BASE,base);
 			_internal.set(INTERNAL_RETURNED,base);
-			_saved = new Weak();
+			_saved = new WeakObject();
 			reserved = new Array("_base", "_returned","_returned2","_lastMapBase");
 		}
 		public function set base(obj:Object):void {

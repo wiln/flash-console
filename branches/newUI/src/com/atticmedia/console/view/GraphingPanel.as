@@ -187,7 +187,7 @@
 			if(_updatedFrame < updateEvery) return;
 			_updatedFrame= 0;
 			var values:Array = [];
-			for each(var interest in _interests){
+			for each(var interest:Interest in _interests){
 				var v:Number = interest.obj[interest.prop];
 				if(isNaN(v)){
 					v = 0;

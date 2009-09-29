@@ -36,7 +36,7 @@ package com.atticmedia.console.core {
 
 		public static const SEARCH_REQUEST:String = "SearchRequest";
 		
-		private var _saved:Weak;
+		private var _saved:WeakObject;
 		private var _lastSearchTerm:String;
 		private var _master:Console;
 		
@@ -45,7 +45,7 @@ package com.atticmedia.console.core {
 
 		public function CommandLine(m:Console) {
 			_master = m;
-			_saved = new Weak();
+			_saved = new WeakObject();
 			_saved.set("_base",null);
 			_saved.set("_returned",null);
 			reserved = new Array("_base", "_returned","_returned2","_lastMapBase");
