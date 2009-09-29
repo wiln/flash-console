@@ -71,12 +71,12 @@ package com.atticmedia.console.core {
 			for (var X:Object in _objectsList) {
 				o[_objectsList[X]] = true;
 			}
-			var gced:Boolean = false;
+			//var gced:Boolean = false;
 			for(var Y:String in _namesList){
 				if(!o[Y]){
-					gced = true;
+					//gced = true;
 					//if(Y != DUMMY_GARBAGE){
-					//	arr.push(Y);
+						arr.push(Y);
 					//}
 					delete _namesList[Y];
 				}

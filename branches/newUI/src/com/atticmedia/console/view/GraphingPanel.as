@@ -89,19 +89,24 @@
 			//
 			start();
 		}
-		public function remove(obj:Object, prop:String):void{
+		public function remove(obj:Object = null, prop:String = null):void{
 			for(var X:String in _interests){
 				var interest:Interest = _interests[X];
-				if(interest && interest.obj == obj && interest.prop == prop){
+				if(interest && (interest.obj == null || interest.obj == obj) && (interest.prop == null || interest.prop == prop)){
 					_interests.splice(int(X), 1);
 				}
 			}
+			if(_interests.length==0){
+				close();
+			}else{
+				updateKeyText();
+			}
 		}
-		public function mark(col:Number = -1, v:Number = NaN):void{
+		/*public function mark(col:Number = -1, v:Number = NaN):void{
 			if(_history.length==0) return;
 			var interests:Array = _history[_history.length-1];
 			interests.push([col, v]);
-		}
+		}*/
 		public function start():void{
 			_isRunning = true;
 			// Note that if it has already started, it won't add another listener on top.
@@ -188,25 +193,30 @@
 			_updatedFrame= 0;
 			var values:Array = [];
 			for each(var interest:Interest in _interests){
-				var v:Number = interest.obj[interest.prop];
-				if(isNaN(v)){
-					v = 0;
-				}else{
-					if(isNaN(lowest)) lowest = v;
-					if(isNaN(highest)) highest = v;
-				}
-				values.push(v);
-				if(averaging>0){
-					var avg:Number = interest.avg;
-					if(isNaN(avg)) {
-						interest.avg = v;
+				var obj:Object = interest.obj;
+				if(obj){
+					var v:Number = obj[interest.prop];
+					if(isNaN(v)){
+						v = 0;
 					}else{
-						interest.avg = Utils.averageOut(avg, v, averaging);
+						if(isNaN(lowest)) lowest = v;
+						if(isNaN(highest)) highest = v;
 					}
-				}
-				if(!fixed){
-					if(v > highest) highest = v;
-					if(v < lowest) lowest = v;
+					values.push(v);
+					if(averaging>0){
+						var avg:Number = interest.avg;
+						if(isNaN(avg)) {
+							interest.avg = v;
+						}else{
+							interest.avg = Utils.averageOut(avg, v, averaging);
+						}
+					}
+					if(!fixed){
+						if(v > highest) highest = v;
+						if(v < lowest) lowest = v;
+					}
+				}else{
+					remove(obj, interest.prop);
 				}
 			}
 			_history.push(values);
@@ -230,7 +240,7 @@
 			var numInterests:int = _interests.length;
 			var len:int = _history.length;
 			var firstpass:Boolean = true;
-			var marks:Array = [];
+			//var marks:Array = [];
 			for(var j:int = 0;j<numInterests;j++){
 				var interest:Interest = _interests[j];
 				var first:Boolean = true;
@@ -246,11 +256,11 @@
 					if(Y>H)Y=H;
 					graph.graphics[(first?"moveTo":"lineTo")]((W-i), Y);
 					first = false;
-					if(firstpass){
-						if(values.length>numInterests){
-							marks.push(i);
-						}
-					}
+					//if(firstpass){
+					//	if(values.length>numInterests){
+					//		marks.push(i);
+					//	}
+					//}
 				}
 				firstpass = false;
 				if(averaging>0 && diffGraph){
@@ -263,12 +273,12 @@
 					graph.graphics.lineTo(W, Y);
 				}
 			}
-			for each(var mark:int in marks){
+			/*for each(var mark:int in marks){
 				// TODO: Mark should have its own special color and value point
 				graph.graphics.lineStyle(1,0xFFCC00, 0.4);
 				graph.graphics.moveTo(W-mark, 0);
 				graph.graphics.lineTo(W-mark, H);
-			}
+			}*/
 			lowTxt.text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
 			highTxt.text = isNaN(highest)?"":"<s>"+highest+"</s>";
 		}
@@ -293,17 +303,23 @@
 		}
 	}
 }
+
+import com.atticmedia.console.core.WeakRef;
+
 class Interest{
-	public var obj:Object;
+	private var _ref:WeakRef;
 	public var prop:String;
 	public var col:Number;
 	public var key:String;
 	public var avg:Number;
 	public function Interest(object:Object, property:String, color:Number, keystr:String):void{
-		obj = object;
+		_ref = new WeakRef(object);
 		prop = property;
 		col = color;
 		key = keystr;
+	}
+	public function get obj():Object{
+		return _ref.reference;
 	}
 }
 /*class Mark{

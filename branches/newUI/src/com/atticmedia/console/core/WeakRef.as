@@ -1,4 +1,4 @@
-﻿/*
+/*
 * 
 * Copyright (c) 2008 Atticmedia
 * 
@@ -21,38 +21,21 @@
 * 
 */
 package com.atticmedia.console.core {
-	import flash.utils.Proxy;
-	import flash.utils.flash_proxy;
+	import flash.utils.Dictionary;
 	
-	public dynamic class WeakObject extends Proxy{
-		private var _dir:Object;
+	public dynamic class WeakRef{
+		private var _dic:Dictionary;
 		
-		public function WeakObject() {
-			_dir = new Object();
+		public function WeakRef(obj:*, strong:Boolean = false) {
+			_dic = new Dictionary(!strong);
+			_dic[obj] = null;
 		}
-		
-		
-		public function set(n:String,obj:Object, strong:Boolean = false):void{
-			if(obj == null){
-				return;
-			}
-			_dir[n] = new WeakRef(obj, strong);
-		}
-		
-		public function get(n:String):Object{
-			if(_dir[n]){
-				return _dir[n].reference;
+		public function get reference():*{
+			//there should be only 1 key in it anyway
+			for(var X:* in _dic){
+				return X;
 			}
 			return null;
-		}
-		//
-		// PROXY
-		//
-		override flash_proxy function getProperty(n:*):* {
-			return get(n);
-		}
-		override flash_proxy function setProperty(n:*, v:*):void {
-			set(n,v);
 		}
 	}
 }

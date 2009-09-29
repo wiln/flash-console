@@ -65,7 +65,7 @@ package com.atticmedia.console.view {
 			_traceField.wordWrap = true;
 			_traceField.background  = false;
 			_traceField.multiline = true;
-			_traceField.styleSheet = style.tracecss;
+			_traceField.styleSheet = style.css;
 			_traceField.y = 12;
 			addChild(_traceField);
 			//

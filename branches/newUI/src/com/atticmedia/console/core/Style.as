@@ -29,7 +29,6 @@ package com.atticmedia.console.core {
 		private var _preset:int = 0;
 		
 		private var _css:StyleSheet;
-		private var _tracecss:StyleSheet;
 		
 		public var panelBackgroundColor:int;
 		public var panelBackgroundAlpha:Number;
@@ -41,7 +40,7 @@ package com.atticmedia.console.core {
 				
 		public function Style(uiset:int = 1) {
 			_css = new StyleSheet();
-			_tracecss = new StyleSheet();
+			_css = new StyleSheet();
 			preset = uiset;
 			if(_preset<=0){
 				preset = 1;
@@ -49,9 +48,6 @@ package com.atticmedia.console.core {
 		}
 		public function get css():StyleSheet{
 			return _css;
-		}
-		public function get tracecss():StyleSheet{
-			return _tracecss;
 		}
 		
 		public function set preset(num:int):void{
@@ -69,9 +65,10 @@ package com.atticmedia.console.core {
 			panelScalerColor = 0;
 			panelScalerAlpha = 0.6;
 			bottomLineColor = 0xFF0000;
-			
+			tooltipBackgroundColor = 0;
+			textFormat = new TextFormat('Arial', 12, 0xFFFFFF);
+			//
 			_css.setStyle("r",{textAlign:'right', display:'inline'});
-			//_css.setStyle("a",{textDecoration:'underline'});
 			_css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
 			_css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
 			_css.setStyle("y",{color:'#DD5500', display:'inline'});
@@ -81,45 +78,28 @@ package com.atticmedia.console.core {
 			_css.setStyle("chs",{color:'#FFFFFF', fontSize:'11', leading:'2', display:'inline'});
 			_css.setStyle("ch",{color:'#0099CC', display:'inline'});
 			_css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
-			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);
-			tooltipBackgroundColor = 0;
-			
-			
-			_tracecss.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
-			_tracecss.setStyle("l1",{color:'#0099CC'});
-			_tracecss.setStyle("l2",{color:'#FF8800'});
-			_tracecss.setStyle("p0",{color:'#000000'});
-			_tracecss.setStyle("p1",{color:'#33AA33'});
-			_tracecss.setStyle("p2",{color:'#77D077'});
-			_tracecss.setStyle("p3",{color:'#AAEEAA'});
-			_tracecss.setStyle("p4",{color:'#D6FFD6'});
-			_tracecss.setStyle("p5",{color:'#E6E6E6'});
-			_tracecss.setStyle("p6",{color:'#FFD6D6'});
-			_tracecss.setStyle("p7",{color:'#FFAAAA'});
-			_tracecss.setStyle("p8",{color:'#FF7777'});
-			_tracecss.setStyle("p9",{color:'#FF3333'});
-			_tracecss.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
-			_tracecss.setStyle("p-1",{color:'#0099CC'});
-			_tracecss.setStyle("p-2",{color:'#FF8800'});
-			
-			/*
-			_priorities[0] = "#000000";
-			_priorities[1] = "#33AA33";
-			_priorities[2] = "#77D077";
-			_priorities[3] = "#AAEEAA";
-			_priorities[4] = "#D6FFD6";
-			_priorities[5] = "#E6E6E6";
-			_priorities[6] = "#FFD6D6";
-			_priorities[7] = "#FFAAAA";
-			_priorities[8] = "#FF7777";
-			_priorities[9] = "#FF3333";
-			_priorities[10] = "#FF0000";
-			_priorities[-1] = "#0099CC";
-			_priorities[-2] = "#FF8800";*/
+			//
+			_css.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
+			_css.setStyle("l1",{color:'#0099CC'});
+			_css.setStyle("l2",{color:'#FF8800'});
+			_css.setStyle("p0",{color:'#000000'});
+			_css.setStyle("p1",{color:'#33AA33'});
+			_css.setStyle("p2",{color:'#77D077'});
+			_css.setStyle("p3",{color:'#AAEEAA'});
+			_css.setStyle("p4",{color:'#D6FFD6'});
+			_css.setStyle("p5",{color:'#E6E6E6'});
+			_css.setStyle("p6",{color:'#FFD6D6'});
+			_css.setStyle("p7",{color:'#FFAAAA'});
+			_css.setStyle("p8",{color:'#FF7777'});
+			_css.setStyle("p9",{color:'#FF3333'});
+			_css.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
+			_css.setStyle("p-1",{color:'#0099CC'});
+			_css.setStyle("p-2",{color:'#FF8800'});
 		}
 		
 		public function preset2():void{
 			
+			// TODO: finish defining...
 			
 			panelBackgroundColor = 0;
 			panelBackgroundAlpha = 0.6;
@@ -141,22 +121,22 @@ package com.atticmedia.console.core {
 			tooltipBackgroundColor = 0;
 			
 			
-			_tracecss.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
-			_tracecss.setStyle("l1",{color:'#0099CC'});
-			_tracecss.setStyle("l2",{color:'#FF8800'});
-			_tracecss.setStyle("p0",{color:'#000000'});
-			_tracecss.setStyle("p1",{color:'#33AA33'});
-			_tracecss.setStyle("p2",{color:'#77D077'});
-			_tracecss.setStyle("p3",{color:'#AAEEAA'});
-			_tracecss.setStyle("p4",{color:'#D6FFD6'});
-			_tracecss.setStyle("p5",{color:'#E6E6E6'});
-			_tracecss.setStyle("p6",{color:'#FFD6D6'});
-			_tracecss.setStyle("p7",{color:'#FFAAAA'});
-			_tracecss.setStyle("p8",{color:'#FF7777'});
-			_tracecss.setStyle("p9",{color:'#FF3333'});
-			_tracecss.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
-			_tracecss.setStyle("p-1",{color:'#0099CC'});
-			_tracecss.setStyle("p-2",{color:'#FF8800'});
+			_css.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
+			_css.setStyle("l1",{color:'#0099CC'});
+			_css.setStyle("l2",{color:'#FF8800'});
+			_css.setStyle("p0",{color:'#000000'});
+			_css.setStyle("p1",{color:'#33AA33'});
+			_css.setStyle("p2",{color:'#77D077'});
+			_css.setStyle("p3",{color:'#AAEEAA'});
+			_css.setStyle("p4",{color:'#D6FFD6'});
+			_css.setStyle("p5",{color:'#E6E6E6'});
+			_css.setStyle("p6",{color:'#FFD6D6'});
+			_css.setStyle("p7",{color:'#FFAAAA'});
+			_css.setStyle("p8",{color:'#FF7777'});
+			_css.setStyle("p9",{color:'#FF3333'});
+			_css.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
+			_css.setStyle("p-1",{color:'#0099CC'});
+			_css.setStyle("p-2",{color:'#FF8800'});
 			
 			
 			
@@ -179,10 +159,10 @@ package com.atticmedia.console.core {
 			
 			
 			
-			_tracecss.setStyle("p",{fontFamily:'Arial', fontSize:'11'});
-			_tracecss.setStyle("l1",{color:'#0099CC'});
-			_tracecss.setStyle("l2",{color:'#FF8800'});
-			_tracecss.setStyle("p0",{color:'#000000'});
+			_css.setStyle("p",{fontFamily:'Arial', fontSize:'11'});
+			_css.setStyle("l1",{color:'#0099CC'});
+			_css.setStyle("l2",{color:'#FF8800'});
+			_css.setStyle("p0",{color:'#000000'});
 			/*setbackgroundColour(1,1,1);
 			backgroundAlpha = 0.8;
 			backgroundBlendMode = "normal";

@@ -366,7 +366,7 @@ package com.atticmedia.console {
 			if(!_isPaused && visible){
 				var arr:Array = mm.update();
 				if(arr.length>0){
-					addLine("GARBAGE COLLECTED: "+arr.join(", "),10,CONSOLE_CHANNEL);
+					addLine("GARBAGE COLLECTED "+arr.length+" item(s): "+arr.join(", "),10,CONSOLE_CHANNEL);
 				}
 				panels.mainPanel.update(!_isPaused && _linesChanged);
 				if(_linesChanged) {
@@ -407,7 +407,6 @@ package com.atticmedia.console {
 		//
 		// REMOTING
 		// TODO: maybe have it in another class
-		// TODO: FPS from remoting is not very reliable
 		//
 		private function updateRemote():void{
 			try{
@@ -551,21 +550,26 @@ package com.atticmedia.console {
 			if(!_enabled){
 				return;
 			}
+			var isRepeat:Boolean = (isRepeating && _isRepeating);
 			var txt:String = String(obj);
-			var tmpText:String = txt;
+			if( _tracing && !isRepeat && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
+				if(tracingPriority <= priority || tracingPriority <= 0){
+					trace("["+channel+"] "+txt);
+				}
+			}
 			if(!skipSafe){
 				txt = txt.replace(/</gim, "&lt;");
  				txt = txt.replace(/>/gim, "&gt;");
 			}
-			if(channel == ""){
+			if(!channel){
 				channel = defaultChannel;
 			}
 			if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
 			}
-			var line:LogLineVO = new LogLineVO(txt,channel,priority, isRepeating, skipSafe);
 			_linesChanged = true;
-			if(isRepeating && _isRepeating){
+			var line:LogLineVO = new LogLineVO(txt,channel,priority, isRepeating, skipSafe);
+			if(isRepeat){
 				_lines.pop();
 				_lines.push(line);
 			}else{
@@ -573,11 +577,6 @@ package com.atticmedia.console {
 				_lines.push(line);
 				if(_lines.length > maxLines && maxLines > 0 ){
 					_lines.splice(0,1);
-				}
-				if( _tracing && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
-					if(tracingPriority <= priority || tracingPriority <= 0){
-						trace("["+channel+"] "+tmpText);
-					}
 				}
 			}
 			_isRepeating = isRepeating;

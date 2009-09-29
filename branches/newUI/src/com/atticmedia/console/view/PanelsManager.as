@@ -149,7 +149,7 @@ package com.atticmedia.console.view {
 		//
 		//
 		//
-		public function addGraph(n:String, obj:Object, prop:String, col:Number, key:String, rect:Rectangle = null, inverse:Boolean = false):void{
+		public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			n = USER_GRAPH_PREFIX+n;
 			var graph:GraphingPanel = getPanel(n) as GraphingPanel;
 			if(!graph){
@@ -173,12 +173,7 @@ package com.atticmedia.console.view {
 		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			var graph:GraphingPanel = getPanel(USER_GRAPH_PREFIX+n) as GraphingPanel;
 			if(graph){
-				if(obj && prop){
-					graph.remove(obj, prop);
-				}
-				if(graph.numInterests <= 0 || !obj || !prop){
-					removePanel(graph.name);
-				}
+				graph.remove(obj, prop);
 			}
 		}
 		//

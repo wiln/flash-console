@@ -379,7 +379,7 @@ package com.atticmedia.console {
 		//
 		// Graphing utilites
 		//
-		public static function addGraph(n:String, obj:Object, prop:String, col:Number, key:String, rect:Rectangle = null, inverse:Boolean = false):void{
+		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			if(_console){
 				_console.addGraph(n,obj,prop,col,key,rect,inverse);
 			}
