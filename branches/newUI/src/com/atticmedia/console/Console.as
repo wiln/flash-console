@@ -23,8 +23,16 @@
 * 
 */
 package com.atticmedia.console {
-	import com.atticmedia.console.core.*;
-	import com.atticmedia.console.view.*;
+	import com.atticmedia.console.core.CommandLine;
+	import com.atticmedia.console.core.LogLineVO;
+	import com.atticmedia.console.core.MemoryMonitor;
+	import com.atticmedia.console.core.Remoting;
+	import com.atticmedia.console.view.AbstractPanel;
+	import com.atticmedia.console.view.ChannelsPanel;
+	import com.atticmedia.console.view.FPSPanel;
+	import com.atticmedia.console.view.MainPanel;
+	import com.atticmedia.console.view.PanelsManager;
+	import com.atticmedia.console.view.Style;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -34,7 +42,7 @@ package com.atticmedia.console {
 	import flash.net.LocalConnection;
 	import flash.system.System;
 	import flash.utils.getQualifiedClassName;
-	import flash.utils.getTimer;	
+	import flash.utils.getTimer;		
 
 	public class Console extends Sprite {
 
