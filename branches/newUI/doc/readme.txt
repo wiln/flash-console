@@ -36,6 +36,14 @@ Features include: priorities, channels, FPS display, memory/garbage collection m
 
 == Change Log ==
 
+===2.0===
+  * MAJOR revamp to interface and code structure.
+  * Features such as fpsMonitor and MemoryMonitor are now independent panels.
+  * Graphing feature added.
+  * Minor C. accessor name changes, such as fpsMode is now changed to fpsMonitor
+  * Console traces will no longer render HTML, it will appear as plain text.
+
+
 ===1.15===
   * `C.inspect(...)` or commandline: `/inspect` should now also print 'variables' of the object.
   * Fixed bug with ignoring HTML tags - still not perfect.

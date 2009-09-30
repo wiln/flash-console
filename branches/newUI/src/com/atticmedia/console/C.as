@@ -128,7 +128,7 @@ package com.atticmedia.console {
 		public static function get version():Number{
 			return Console.VERSION;
 		}
-		public static function get versionStage():uint{
+		public static function get versionStage():String{
 			return Console.VERSION_STAGE;
 		}
 		//

@@ -204,9 +204,15 @@ package com.atticmedia.console.view {
 		//
 		//
 		//
-		protected function onFrame(e:Event):void{
-			updateData();
-			drawGraph();
+		protected function onFrame(e:Event):Boolean{
+			var ok:Boolean = (master.visible && master.enabled && !master.paused);
+			if(ok) {
+				updateData();
+			}
+			if(ok || _needRedraw){
+				drawGraph();
+			}
+			return ok;
 		}
 		protected function updateData():void{
 			_updatedFrame++;

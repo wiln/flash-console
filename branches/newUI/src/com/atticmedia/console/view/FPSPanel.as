@@ -62,24 +62,27 @@ package com.atticmedia.console.view {
 			_cachedCurrent = n;
 			updateData();
 		}
-		protected override function onFrame(e:Event):void{
-			if(master.isRemote) return;
+		protected override function onFrame(e:Event):Boolean{
+			if(master.isRemote) return false;
 			var mspf:Number = master.mspf;
 			if (!isNaN(mspf)) {
-				updateKeyText();
-				if(stage){
-					fixed = true;
-					highest = stage.frameRate;
-					var frames:int = Math.floor(mspf/(1000/highest));
-					// this is to try add the frames that have been lagged
-					if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES; // Don't add too many
-					while(frames>1){
-						updateData();
-						frames--;
+				if(super.onFrame(e)){
+					updateKeyText();
+					if(stage){
+						fixed = true;
+						highest = stage.frameRate;
+						var frames:int = Math.floor(mspf/(1000/highest));
+						// this is to try add the frames that have been lagged
+						if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES; // Don't add too many
+						while(frames>1){
+							updateData();
+							frames--;
+						}
 					}
+					return true;
 				}
-				super.onFrame(e);
 			}
+			return false;
 		}
 	}
 }

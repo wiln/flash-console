@@ -35,9 +35,9 @@ package com.atticmedia.console.samples {
 			//
 			// SET UP
 			//C.start(this, "", 2);
-			C.start(this, "");  
+			C.start(this, "`");  
 			// "" - change for password. this will start hidden
-			
+			C.visible = true;
 			C.commandLine = true; // enable command line
 			
 			C.width = 600;

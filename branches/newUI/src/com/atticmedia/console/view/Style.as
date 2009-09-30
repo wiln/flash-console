@@ -58,11 +58,11 @@ package com.atticmedia.console.view {
 		}
 		public function preset1():void{
 			panelBackgroundColor = 0;
-			panelBackgroundAlpha = 0.6;
 			panelScalerColor = 0x880000;
-			commandLineColor = 0x00CC44;
+			commandLineColor = 0x108000;
 			bottomLineColor = 0xFF0000;
 			tooltipBackgroundColor = 0;
+			panelBackgroundAlpha = 0.6;
 			textFormat = new TextFormat('Arial', 12, 0xFFFFFF);
 			//
 			css.setStyle("r",{textAlign:'right', display:'inline'});
@@ -96,11 +96,11 @@ package com.atticmedia.console.view {
 		
 		public function preset2():void{
 			panelBackgroundColor = 0xFFFFFF;
-			panelBackgroundAlpha = 0.8;
 			panelScalerColor = 0xFF0000;
 			commandLineColor = 0x66CC00;
 			bottomLineColor = 0xFF0000;
 			tooltipBackgroundColor = 0xFFFFFF;
+			panelBackgroundAlpha = 0.8;
 			textFormat = new TextFormat('Arial', 12, 0);
 			//
 			css.setStyle("r",{textAlign:'right', display:'inline'});

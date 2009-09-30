@@ -47,7 +47,7 @@ package com.atticmedia.console {
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		
 		public static const VERSION:Number = 2;
-		public static const VERSION_STAGE:uint = 2;
+		public static const VERSION_STAGE:String = "beta2";
 
 		public static const REMOTE_CONN_NAME:String = "_ConsoleRemote";
 		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoter";
@@ -99,12 +99,12 @@ package com.atticmedia.console {
 			mm = new MemoryMonitor();
 			cl = new CommandLine(this);
 			remote = new Remoting(this);
-			remote.logsend = remoteLogSend; // Don't want to expose remoteLogSend else where
+			remote.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
 			cl.store("C",this);
 			cl.reserved.push("C");
 			
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
-			var t:String = VERSION_STAGE==1?" alpha":(VERSION_STAGE==2?" beta":(VERSION_STAGE==3?" RC":""));
+			var t:String = VERSION_STAGE?(" "+VERSION_STAGE):"";
 			addLine("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2,CONSOLE_CHANNEL,false,true);
 			
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
@@ -137,8 +137,12 @@ package com.atticmedia.console {
 				if(char == _password.substring(_passwordIndex,_passwordIndex+1)){
 					_passwordIndex++;
 					if(_passwordIndex >= _password.length){
-						visible = !visible;
 						_passwordIndex = 0;
+						if(visible && !panels.mainPanel.visible){
+							panels.mainPanel.visible = true;
+						}else{
+							visible = !visible;
+						}
 					}
 				}else{
 					_passwordIndex = 0;
