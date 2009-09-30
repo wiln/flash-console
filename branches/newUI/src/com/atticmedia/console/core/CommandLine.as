@@ -1,8 +1,11 @@
 ﻿/*
 * 
-* Copyright (c) 2008 Atticmedia
+* Copyright (c) 2008-2009 Lu Aye Oo
 * 
 * @author 		Lu Aye Oo
+* 
+* http://code.google.com/p/flash-console/
+* 
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -18,20 +21,18 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 * 
-* 
 */
 package com.atticmedia.console.core {
-	import com.atticmedia.console.Console;	
+	import com.atticmedia.console.Console;
 	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-	import flash.utils.getQualifiedSuperclassName;	
-	
+	import flash.utils.getQualifiedSuperclassName;		
+
 	public class CommandLine extends EventDispatcher {
 
 		private var _saved:WeakObject;
@@ -49,7 +50,7 @@ package com.atticmedia.console.core {
 		}
 		public function set base(obj:Object):void {
 			var old:Object = _saved.get("_base");
-			_saved.set("_base",obj,useStrong);
+			_saved.set("_base",obj, useStrong);
 			if (old) {
 				report("Set new commandLine base from "+old+ " to "+ obj, 10);
 			}else{
@@ -471,7 +472,7 @@ package com.atticmedia.console.core {
 			report("__Use * to access static classes",10);
 			report("com.atticmedia.console.C => <b>*com.atticmedia.console.C</b>",5);
 			report("(save reference) => <b>/save c</b>",5);
-			report("com.atticmedia.console.C.add('test',10) => <b>$c.add('test',10)</b>",5);
+			report("com.atticmedia.console.C.add('test',10) => <b>$C.add('test',10)</b>",5);
 			report("Strings can not have spaces...",7);
 			report("__Filtering:",10);
 			report("/filter &lt;text you want to filter&gt;",5);

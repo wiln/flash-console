@@ -1,8 +1,11 @@
 ﻿/*
 * 
-* Copyright (c) 2008 Atticmedia
+* Copyright (c) 2008-2009 Lu Aye Oo
 * 
 * @author 		Lu Aye Oo
+* 
+* http://code.google.com/p/flash-console/
+* 
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +21,6 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 * 
-* 
 */
 package com.atticmedia.console.samples {
 	import flash.utils.*;	
@@ -27,12 +29,13 @@ package com.atticmedia.console.samples {
 	import flash.text.*;
 	import com.atticmedia.console.*;
 
-	public class Sample extends MovieClip{
+	public dynamic class Sample extends MovieClip{
 
 		public function Sample() {
 			//
 			// SET UP
-			C.start(this, ""); 
+			//C.start(this, "", 2);
+			C.start(this, "");  
 			// "" - change for password. this will start hidden
 			
 			C.commandLine = true; // enable command line
@@ -81,7 +84,7 @@ package com.atticmedia.console.samples {
 			btn.addEventListener(MouseEvent.ROLL_OUT, onButtonEvent);
 		}
 		private function onButtonEvent(e:MouseEvent):void{
-			MovieClip(e.currentTarget).gotoAndStop(e.type==MouseEvent.ROLL_OVER?"over":"out")
+			MovieClip(e.currentTarget).gotoAndStop(e.type==MouseEvent.ROLL_OVER?"over":"out");
 		}
 		private function onButtonClick(e:MouseEvent):void{
 			switch(e.currentTarget){

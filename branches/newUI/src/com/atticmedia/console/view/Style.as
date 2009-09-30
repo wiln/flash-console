@@ -1,8 +1,11 @@
 /*
 * 
-* Copyright (c) 2008 Atticmedia
+* Copyright (c) 2008-2009 Lu Aye Oo
 * 
 * @author 		Lu Aye Oo
+* 
+* http://code.google.com/p/flash-console/
+* 
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +21,6 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 * 
-* 
 */
 package com.atticmedia.console.view {
 	import flash.text.TextFormat;	
@@ -32,7 +34,7 @@ package com.atticmedia.console.view {
 		public var panelBackgroundColor:int;
 		public var panelBackgroundAlpha:Number;
 		public var panelScalerColor:Number;
-		public var panelScalerAlpha:Number;
+		public var commandLineColor:Number;
 		public var bottomLineColor:Number;
 		public var textFormat:TextFormat;
 		public var tooltipBackgroundColor:Number;
@@ -57,8 +59,8 @@ package com.atticmedia.console.view {
 		public function preset1():void{
 			panelBackgroundColor = 0;
 			panelBackgroundAlpha = 0.6;
-			panelScalerColor = 0;
-			panelScalerAlpha = 0.6;
+			panelScalerColor = 0x880000;
+			commandLineColor = 0x00CC44;
 			bottomLineColor = 0xFF0000;
 			tooltipBackgroundColor = 0;
 			textFormat = new TextFormat('Arial', 12, 0xFFFFFF);
@@ -93,92 +95,49 @@ package com.atticmedia.console.view {
 		}
 		
 		public function preset2():void{
-			
-			// TODO: finish defining...
-			
-			panelBackgroundColor = 0;
-			panelBackgroundAlpha = 0.6;
-			panelScalerColor = 0;
-			panelScalerAlpha = 0.6;
+			panelBackgroundColor = 0xFFFFFF;
+			panelBackgroundAlpha = 0.8;
+			panelScalerColor = 0xFF0000;
+			commandLineColor = 0x66CC00;
 			bottomLineColor = 0xFF0000;
-			
+			tooltipBackgroundColor = 0xFFFFFF;
+			textFormat = new TextFormat('Arial', 12, 0);
+			//
 			css.setStyle("r",{textAlign:'right', display:'inline'});
-			//css.setStyle("a",{textDecoration:'underline'});
-			css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
-			css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
-			css.setStyle("y",{color:'#DD5500', display:'inline'});
-			css.setStyle("ro",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
-			css.setStyle("roBold",{color:'#EE6611', fontWeight:'bold'});
-			css.setStyle("menu",{color:'#FF8800', display:'inline'});
-			css.setStyle("ch",{color:'#0099CC', display:'inline'});
-			css.setStyle("tooltip",{color:'#DD5500',fontFamily:'Arial', textAlign:'center'});
-			textFormat = new TextFormat('Arial', 11, 0xFFFFFF);
-			tooltipBackgroundColor = 0;
-			
-			
+			css.setStyle("w",{color:'#000000', fontFamily:'Arial', fontSize:'12', display:'inline'});
+			css.setStyle("s",{color:'#333333', fontFamily:'Arial', fontSize:'10', display:'inline'});
+			css.setStyle("y",{color:'#881100', display:'inline'});
+			css.setStyle("ro",{color:'#661100', fontFamily:'Arial', fontSize:'11', display:'inline'});
+			css.setStyle("roBold",{color:'#AA4400', fontWeight:'bold'});
+			css.setStyle("menu",{color:'#CC1100', display:'inline'});
+			css.setStyle("chs",{color:'#000000', fontSize:'11', leading:'2', display:'inline'});
+			css.setStyle("ch",{color:'#0066AA', display:'inline'});
+			css.setStyle("tooltip",{color:'#AA3300',fontFamily:'Arial', textAlign:'center'});
+			//
 			css.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
 			css.setStyle("l1",{color:'#0099CC'});
 			css.setStyle("l2",{color:'#FF8800'});
-			css.setStyle("p0",{color:'#000000'});
-			css.setStyle("p1",{color:'#33AA33'});
-			css.setStyle("p2",{color:'#77D077'});
-			css.setStyle("p3",{color:'#AAEEAA'});
-			css.setStyle("p4",{color:'#D6FFD6'});
-			css.setStyle("p5",{color:'#E6E6E6'});
-			css.setStyle("p6",{color:'#FFD6D6'});
-			css.setStyle("p7",{color:'#FFAAAA'});
-			css.setStyle("p8",{color:'#FF7777'});
-			css.setStyle("p9",{color:'#FF3333'});
+			css.setStyle("p0",{color:'#666666'});
+			css.setStyle("p1",{color:'#339033'});
+			css.setStyle("p2",{color:'#227722'});
+			css.setStyle("p3",{color:'#115511'});
+			css.setStyle("p4",{color:'#003300'});
+			css.setStyle("p5",{color:'#000000'});
+			css.setStyle("p6",{color:'#660000'});
+			css.setStyle("p7",{color:'#990000'});
+			css.setStyle("p8",{color:'#BB0000'});
+			css.setStyle("p9",{color:'#DD0000'});
 			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
 			css.setStyle("p-1",{color:'#0099CC'});
-			css.setStyle("p-2",{color:'#FF8800'});
-			
-			
-			
-			
-			
-			panelBackgroundColor = 0xFFFFFF;
-			panelBackgroundAlpha = 0.6;
-			panelScalerColor = 0xFF0000;
-			panelScalerAlpha = 0.6;
-			bottomLineColor = 0xFFFFFFF;
-			
-			css.setStyle("r",{textAlign:'right', display:'inline'});
-			//css.setStyle("a",{textDecoration:'underline'});
-			css.setStyle("w",{color:'#FFFFFF', fontFamily:'Arial', fontSize:'12', display:'inline'});
-			css.setStyle("y",{color:'#DD5500', fontFamily:'Arial', fontSize:'11', display:'inline'});
-			css.setStyle("y2",{color:'#EE6611', fontWeight:'bold'});
-			css.setStyle("s",{color:'#CCCCCC', fontFamily:'Arial', fontSize:'10', display:'inline'});
-			css.setStyle("menu",{color:'#FF8800', display:'inline'});
-			css.setStyle("menu2",{color:'#77D077', fontWeight:'bold', display:'inline'});
-			
-			
-			
-			css.setStyle("p",{fontFamily:'Arial', fontSize:'11'});
-			css.setStyle("l1",{color:'#0099CC'});
-			css.setStyle("l2",{color:'#FF8800'});
-			css.setStyle("p0",{color:'#000000'});
-			/*setbackgroundColour(1,1,1);
-			backgroundAlpha = 0.8;
-			backgroundBlendMode = "normal";
-			var format:TextFormat = new TextFormat();
-			format.font = "Arial";
-			format.size = 12;
-			format.color = 0;
-			menuFormat = format;
-			_priorities[0] = "#666666";
-			_priorities[1] = "#44DD44";
-			_priorities[2] = "#33AA33";
-			_priorities[3] = "#227722";
-			_priorities[4] = "#115511";
-			_priorities[5] = "#000000";
-			_priorities[6] = "#660000";
-			_priorities[7] = "#990000";
-			_priorities[8] = "#BB0000";
-			_priorities[9] = "#DD0000";
-			_priorities[10] = "#FF0000";
-			_priorities[-1] = "#0099CC";
-			_priorities[-2] = "#FF6600";*/
+			css.setStyle("p-2",{color:'#FF6600'});
+		}
+		public function preset3():void{
+			preset1();
+			panelBackgroundAlpha = 1;
+		}
+		public function preset4():void{
+			preset2();
+			panelBackgroundAlpha = 1;
 		}
 	}
 }

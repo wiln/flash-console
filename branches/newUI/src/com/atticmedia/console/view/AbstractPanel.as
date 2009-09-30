@@ -1,4 +1,28 @@
-﻿package com.atticmedia.console.view {
+﻿/*
+* 
+* Copyright (c) 2008-2009 Lu Aye Oo
+* 
+* @author 		Lu Aye Oo
+* 
+* http://code.google.com/p/flash-console/
+* 
+*
+* This software is provided 'as-is', without any express or implied
+* warranty.  In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely, subject to the following restrictions:
+* 1. The origin of this software must not be misrepresented; you must not
+* claim that you wrote the original software. If you use this software
+* in a product, an acknowledgment in the product documentation would be
+* appreciated but is not required.
+* 2. Altered source versions must be plainly marked as such, and must not be
+* misrepresented as being the original software.
+* 3. This notice may not be removed or altered from any source distribution.
+* 
+*/
+package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.view.Style;
 	import com.atticmedia.console.events.TextFieldRollOver;
@@ -12,9 +36,6 @@
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;		
 
-	/**
-	 * @author LuAye
-	 */
 	public class AbstractPanel extends Sprite {
 		
 		public static const STARTED_DRAGGING:String = "startedDragging";
@@ -151,7 +172,7 @@
 			if(b && !scaler){
 				scaler = new Sprite();
 				scaler.name = "scaler";
-				scaler.graphics.beginFill(style.panelScalerColor, style.panelScalerAlpha);
+				scaler.graphics.beginFill(style.panelScalerColor, style.panelBackgroundAlpha);
 	            scaler.graphics.lineTo(-10, 0);
 	            scaler.graphics.lineTo(0, -10);
 	            scaler.graphics.endFill();
@@ -207,7 +228,7 @@
 		//
 		private function formatText(txt:TextField):void{
             txt.background = true;
-            txt.backgroundColor = 0;
+            txt.backgroundColor = style.tooltipBackgroundColor;
 			txt.styleSheet = style.css;
 			txt.mouseEnabled = false;
 		}
@@ -265,6 +286,7 @@
 			var url:String = null;
 			var txt:String = null;
 			if(index>0){
+				// TextField.getXMLText(...) is not documented
 				var X:XML = new XML(field.getXMLText(index,index+1));
 				if(X.hasOwnProperty("textformat")){
 					var txtformat:XML = X["textformat"][0] as XML;

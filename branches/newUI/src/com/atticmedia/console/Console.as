@@ -71,7 +71,6 @@ package com.atticmedia.console {
 		public var defaultChannel:String = "traces";
 		public var tracingPriority:int = 0;
 		public var rulerHidesMouse:Boolean = true;
-		public var traceCall:Function = trace;
 		//
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
@@ -82,6 +81,7 @@ package com.atticmedia.console {
 		private var _keyBinds:Object = {};
 		private var _mspf:Number;
 		private var _previousTime:Number;
+		private var _traceCall:Function = trace;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -280,6 +280,12 @@ package com.atticmedia.console {
 				addLine("Stored <font color=\"#FF0000\"><b>$"+nn+"</b></font> in commandLine for "+ str +".",-1,CONSOLE_CHANNEL,false,true);
 			}
 		}
+		public function get strongRef():Boolean{
+			return cl.useStrong;
+		}
+		public function set strongRef(b:Boolean):void{
+			cl.useStrong = b;
+		}
 		public function inspect(obj:Object, detail:Boolean = true):void{
 			addLine("INSPECT: "+ cl.inspect(obj,detail),5 ,CONSOLE_CHANNEL, false, true);
 		}
@@ -469,6 +475,16 @@ package com.atticmedia.console {
 			_tracing = b;
 			panels.mainPanel.updateMenu();
 		}
+		public function set traceCall (f:Function):void{
+			if(f==null){
+				addLine("C.traceCall function setter must be not be null.", 10,CONSOLE_CHANNEL);
+			}else{
+				_traceCall = f;
+			}
+		}
+		public function get traceCall ():Function{
+			return _traceCall;
+		}
 		public function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			if(!_enabled){
 				return;
@@ -477,7 +493,7 @@ package com.atticmedia.console {
 			var txt:String = String(obj);
 			if( _tracing && !isRepeat && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
 				if(tracingPriority <= priority || tracingPriority <= 0){
-					traceCall("["+channel+"] "+txt);
+					_traceCall("["+channel+"] "+txt);
 				}
 			}
 			if(!skipSafe){

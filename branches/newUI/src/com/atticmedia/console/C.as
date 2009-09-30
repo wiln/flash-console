@@ -99,8 +99,18 @@ package com.atticmedia.console {
 		private static var _console:Console;
 		
 		public function C() {
-			throw new Error("[CONSOLE] Do not construct class. Please use c.start(mc:DisplayObjectContainer, password:String='')");
+			throw new Error("[CONSOLE] Do not construct class. Please use C.start(mc:DisplayObjectContainer, password:String='')");
 		}
+		/**
+		 * Start Console. Calling any other C calls before this will fail silently.
+		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
+		 *
+		 * @param  mc  	Display in which console should be added to. Preferably stage or root of your flash document.
+		 * @param  pass Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
+		 * @param  skin Skin preset number to use. 1 = black base, 2 = white base
+		 * @param  allowInBrowser If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * 
+		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, allowInBrowser:Boolean = true, forceRunOnRemote:Boolean = true):void{
 			if(!allowInBrowser && mc.stage && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
 				var flashVars:Object = mc.stage.loaderInfo.parameters;
@@ -109,7 +119,7 @@ package com.atticmedia.console {
 				}
 			}
 			if(_console){
-				trace("[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, c.remove() first.");
+				trace("[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.");
 			}else{
 				_console = new Console(pass, skin);
 				mc.addChild(_console);
@@ -385,28 +395,71 @@ package com.atticmedia.console {
 		//
 		// Graphing utilites
 		//
+		/**
+		 * Add graph
+		 * Creates a new graph panel (or use an already existing one)
+		 * Graphs numeric values every frame. Reference to the object is weak, so when the object is garbage collected 
+		 * graph will also remove that particular graph line. (hopefully)
+		 * 
+		 * Example: to graph both mouseX and mouseY of stage:
+		 * C.addGraph("mouse", stage, "mouseX", 0xFF0000, "x");
+		 * C.addGraph("mouse", stage, "mouseY", 0x0000FF, "y");
+		 *
+		 * @param  n  Name of graph, if same name already exist, graph line will be added to it.
+		 * @param  obj  Object of interest.
+		 * @param  prop	Property name of interest belonging to obj.
+		 * @param  col	color of graph line (optional, if not passed it will randomally generate).
+		 * @param  key	key string to use as identifier (optional, if not passed, it will use string from 'prop' param).
+		 * 
+		 */
 		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			if(_console){
 				_console.addGraph(n,obj,prop,col,key,rect,inverse);
 			}
 		}
+		/**
+		 * Remove graph
+		 * 
+		 * Leave obj and prop params blank to remove the whole graph.
+		 *
+		 * @param  n  Name of graph.
+		 * @param  obj  Object of interest to remove (optional).
+		 * @param  prop	Property name of interest to remove (optional).
+		 * 
+		 */
 		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			if(_console){
 				_console.removeGraph(n, obj, prop);
 			}
 		}
-		//
-		// WARNING: key binding hard references the function. 
-		// This should only be used for development purposes only.
-		//
+		/**
+		 * Bind keyboard key to a function
+		 * WARNING: key binding hard references the function. 
+		 * This should only be used for development purposes.
+		 *
+		 * @param  char  Keyboard character, must be ASCII.
+		 * @param  ctrl  set to true if CTRL key press is required to trigger.
+		 * @param  alt	set to true if ALT key press is required to trigger.
+		 * @param  shift	set to true if SHIFT key press is required to trigger.
+		 * @param  fun	Function to call on trigger.
+		 * @param  args	Arguments to pass when calling the Function.
+		 * 
+		 */
 		public static function bindKey(char:String, ctrl:Boolean, alt:Boolean, shift:Boolean, fun:Function ,args:Array = null):void{
 			if(_console){
 				_console.bindKey(char, ctrl, alt, shift, fun ,args);
 			}
 		}
-		// if you want to use a special 'trace' call, you can override it here, default is flash's build in trace(...args);
-		public static function set traceCall(v:Function):void{
-			setter("traceCall",v);
+		/**
+		 * Assign custom trace function.
+		 * Console will only call this when C.tracing is true.
+		 *
+		 * @param  f  Custom function to use, must accept at least 1 parameter as String.
+		 * @return	Current trace function, default is flash's build in trace.
+		 * 
+		 */
+		public static function set traceCall(f:Function):void{
+			setter("traceCall",f);
 		}
 		public static function get traceCall():Function{
 			return getter("traceCall") as Function;
