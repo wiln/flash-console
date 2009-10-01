@@ -57,8 +57,8 @@ package com.atticmedia.console {
 		public static const VERSION:Number = 2;
 		public static const VERSION_STAGE:String = "beta3";
 
-		public static const REMOTE_CONN_NAME:String = "_ConsoleRemote";
-		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoter";
+		public static const REMOTE_CONN_NAME:String = "_ConsoleRemoteV2";
+		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoterV2";
 		
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "filtered";
@@ -68,7 +68,7 @@ package com.atticmedia.console {
 		public var panels:PanelsManager;
 		private var mm:MemoryMonitor;
 		private var cl:CommandLine;
-		private var remote:Remoting;
+		private var remoter:Remoting;
 		//
 		public var quiet:Boolean;
 		public var maxLines:int = 500;
@@ -79,8 +79,6 @@ package com.atticmedia.console {
 		public var defaultChannel:String = "traces";
 		public var tracingPriority:int = 0;
 		public var rulerHidesMouse:Boolean = true;
-		//
-		public var disallowBrowser:uint = 0; // this is just a start up setting used by C
 		//
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
@@ -95,7 +93,7 @@ package com.atticmedia.console {
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
-		private var _tracingChannels:Array;
+		private var _tracingChannels:Array = [];
 		private var _isRepeating:Boolean;
 		private var _repeated:int;
 		private var _lines:Array = [];
@@ -108,8 +106,8 @@ package com.atticmedia.console {
 			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
 			mm = new MemoryMonitor();
 			cl = new CommandLine(this);
-			remote = new Remoting(this);
-			remote.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
+			remoter = new Remoting(this);
+			remoter.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
 			
 			var t:String = VERSION_STAGE?(" "+VERSION_STAGE):"";
 			report("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2);
@@ -165,7 +163,7 @@ package com.atticmedia.console {
 		}
 		public function destroy():void{
 			enabled = false;
-			remote.close();
+			remoter.close();
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			cl.destory();
 			if(stage){
@@ -273,10 +271,10 @@ package com.atticmedia.console {
 			mm.unwatch(n);
 		}
 		public function gc():void{
-			if(isRemote){
+			if(remote){
 				try{
 					report("Sending garbage collection request to client",-1);
-					remote.send("gc");
+					remoter.send("gc");
 				}catch(e:Error){
 					report(e,10);
 				}
@@ -394,8 +392,8 @@ package com.atticmedia.console {
 				}
 				_linesChanged = false;
 			}
-			if(remote.remoting){
-				remote.update(_mspf, stage?stage.frameRate:0);
+			if(remoter.remoting){
+				remoter.update(_mspf, stage?stage.frameRate:0);
 			}
 		}
 		public function get fps():Number{
@@ -405,26 +403,26 @@ package com.atticmedia.console {
 			return _mspf;
 		}
 		public function get currentMemory():uint {
-			return remote.isRemote?remote.remoteMem:System.totalMemory;
+			return remoter.isRemote?remoter.remoteMem:System.totalMemory;
 		}
 		//
 		// REMOTING
 		//
 		public function get remoting():Boolean{
-			return remote.remoting;
+			return remoter.remoting;
 		}
 		public function set remoting(newV:Boolean):void{
-			remote.remoting = newV;
+			remoter.remoting = newV;
 		}
-		public function get isRemote():Boolean{
-			return remote.isRemote;
+		public function get remote():Boolean{
+			return remoter.isRemote;
 		}
-		public function set isRemote(newV:Boolean):void{
-			remote.isRemote = newV;
+		public function set remote(newV:Boolean):void{
+			remoter.isRemote = newV;
 			panels.updateMenu();
 		}
 		private function remoteLogSend(obj:Array):void{
-			if(!remote.isRemote || !obj) return;
+			if(!remoter.isRemote || !obj) return;
 			var lines:Array = obj[0];
 			for each( var line:Object in lines){
 				if(line){
@@ -452,13 +450,17 @@ package com.atticmedia.console {
 					fpsp.drawGraph();
 				}
 			}
-			remote.remoteMem = obj[2];
+			remoter.remoteMem = obj[2];
 		}
 		//
 		//
 		//
 		public function set viewingChannel(str:String):void{
-			viewingChannels = [str];
+			if(str){
+				viewingChannels = [str];
+			}else{
+				viewingChannels = [GLOBAL_CHANNEL];
+			}
 		}
 		public function get viewingChannel():String{
 			return _viewingChannels.join(",");
@@ -468,17 +470,19 @@ package com.atticmedia.console {
 		}
 		public function set viewingChannels(a:Array):void{
 			_viewingChannels.splice(0);
-			_viewingChannels.push.apply(this, a);
+			if(a && a.length){
+				_viewingChannels.push.apply(this, a);
+			}else{
+				_viewingChannels.push(GLOBAL_CHANNEL);
+			}
 			panels.mainPanel.refresh();
 			panels.updateMenu();
 		}
-		public function set tracingChannels(newVar:String):void{
-			if(newVar.length>0){
-				_tracingChannels = newVar.split(",");
-			}
+		public function set tracingChannels(newVar:Array):void{
+			_tracingChannels = newVar?newVar.concat():[];
 		}
-		public function get tracingChannels():String{
-			return String(_tracingChannels);
+		public function get tracingChannels():Array{
+			return _tracingChannels;
 		}
 		//
 		public function get tracing():Boolean{
@@ -507,7 +511,7 @@ package com.atticmedia.console {
 			}
 			var isRepeat:Boolean = (isRepeating && _isRepeating);
 			var txt:String = String(obj);
-			if( _tracing && !isRepeat && (_tracingChannels == null || _tracingChannels.indexOf(channel)>=0) ){
+			if( _tracing && !isRepeat && (_tracingChannels.indexOf(channel)>=0) ){
 				if(tracingPriority <= priority || tracingPriority <= 0){
 					_traceCall("["+channel+"] "+txt);
 				}
@@ -536,8 +540,8 @@ package com.atticmedia.console {
 			}
 			_isRepeating = isRepeating;
 			
-			if(remote.remoting){
-				remote.addLineQueue(line);
+			if(remoter.remoting){
+				remoter.addLineQueue(line);
 			}
 		}
 		//
@@ -550,10 +554,10 @@ package com.atticmedia.console {
 			return panels.mainPanel.commandLine;
 		}
 		public function runCommand(line:String):Object{
-			if(remote.isRemote){
+			if(remoter.isRemote){
 				report("Run command at remote: "+line,-2);
 				try{
-					remote.send("runCommand", line);
+					remoter.send("runCommand", line);
 				}catch(err:Error){
 					report("Command could not be sent to client: " + err, 10);
 				}
@@ -565,7 +569,7 @@ package com.atticmedia.console {
 		//
 		// LOGGING
 		//
-		public function ch(channel:*, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		public function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			var chn:String;
 			if(channel is String){
 				chn = String(channel);
@@ -578,14 +582,14 @@ package com.atticmedia.console {
 			}
 			addLine(newLine,priority,chn, isRepeating);
 		}
-		public function pk(channel:*, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		/*public function pk(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			var chn:String = getQualifiedClassName(channel);
 			var ind:int = chn.lastIndexOf("::");
 			if(ind>=0){
 				chn = chn.substring(0,ind);
 			}
 			addLine(newLine,priority,chn, isRepeating);
-		}
+		}*/
 		public function add(newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			addLine(newLine,priority, defaultChannel, isRepeating);
 		}

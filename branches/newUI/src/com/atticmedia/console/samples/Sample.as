@@ -38,7 +38,7 @@ package com.atticmedia.console.samples {
 			C.start(this, "`");  
 			// "`" - change for password. This will start hidden
 			C.visible = true; // show console, because having password hides console.
-			
+			C.tracing = true;
 			C.commandLine = true; // enable command line
 			
 			C.width = 600;

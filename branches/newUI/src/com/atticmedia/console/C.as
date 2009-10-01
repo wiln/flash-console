@@ -26,7 +26,7 @@
 	USAGE:
 		
 		import com.atticmedia.console.*;
-		C.start(this); // this = preferably the root
+		C.start(this); // this = preferably the root or stage
 		
 		// OR  C.start(this,"debug");
 		// Start console, parameter "debug" (optional) sets the console's password.
@@ -72,10 +72,10 @@
 		C.commandLine = true; // (default: false) enable command line
 		C.fpsMonitor = 1; // (default: 0) show FPS graph monitor.
 		C.memoryMonitor = 1; // (default: 0) show memory usage graph.
-		C.width = 200; // (defauilt: 420) change width of console
-		C.height = 200; //(defauilt: 16) change hight of console
-		C.x = 300; // (defauilt: 0) change x of console
-		C.y = 200; // (defauilt: 0) change y of console
+		C.width = 200; // (default: 420) change width of console
+		C.height = 200; //(default: 16) change hight of console
+		C.x = 300; // (default: 0) change x of console
+		C.y = 200; // (default: 0) change y of console
 		C.maxLines = 500; // maximum number of lines allowed to store. 0 = unlimited. setting to very high will slow down as it grows
 		C.tracing = true; // (default: false) when set, all console input will be re-traced during authoring
 		C.alwaysOnTop = false; // (default: true) when set this console will try to keep it self on top of its parent display container.
@@ -98,14 +98,17 @@ package com.atticmedia.console {
 
 	public class C{
 		
+		private static const ERROR_EXISTS:String = "[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.";
+		
 		private static var _console:Console;
+		private static var _disallowBrowser:uint;
 		
 		public function C() {
 			throw new Error("[CONSOLE] Do not construct class. Please use C.start(mc:DisplayObjectContainer, password:String='')");
 		}
 		/**
-		 * Start Console inside given Display.
-		 * Calling any other C calls before this will fail silently.
+		 * Start Console inside the given Display.
+		 * Calling any other C calls before this (or startOnStage(...)) will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 *
 		 * @param  mc  	Display in which console should be added to. Preferably stage or root of your flash document.
@@ -116,7 +119,7 @@ package com.atticmedia.console {
 		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
 			if(_console){
-				trace("[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.");
+				trace(ERROR_EXISTS);
 			}else{
 				if(canRunWithBrowserSetup(mc.stage, disallowBrowser)){
 					_console = new Console(pass, skin);
@@ -134,52 +137,26 @@ package com.atticmedia.console {
 		 * @param  mc  	Display which is Stage or will be added to Stage.
 		 * @param  pass Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
 		 * @param  skin Skin preset number to use. 1 = black base, 2 = white base
-		 * @param  allowInBrowser If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * @param  allowInBrowser If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * 							If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 * 
 		 */
 		public static function startOnStage(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
 			if(_console){
-				trace("[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.");
+				trace(ERROR_EXISTS);
 			}else if(mc.stage){
 				start(mc.stage, pass, skin, disallowBrowser);
 			}else{
 			 	_console = new Console(pass, skin);
-			 	_console.disallowBrowser = disallowBrowser;
+			 	_disallowBrowser = disallowBrowser;
 				mc.addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			}
-		}
-		private static function stageAddedHandle(e:Event):void{
-			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
-			mc.removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
-			if(_console && !_console.parent){
-				if(canRunWithBrowserSetup(mc.stage, _console.disallowBrowser)){
-					mc.stage.addChild(_console);
-				}else{
-					_console = null;
-				}
-			}
-		}
-		private static function canRunWithBrowserSetup(s:Stage, setup:uint):Boolean{
-			if(setup>0 && s && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
-				var flashVars:Object = s.loaderInfo.parameters;
-				if(flashVars["allowConsole"] != "true" && (setup == 1 || (setup == 2 && !Console.remoteIsRunning)) ){
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		public static function get version():Number{
-			return Console.VERSION;
-		}
-		public static function get versionStage():String{
-			return Console.VERSION_STAGE;
 		}
 		//
 		//
 		//
 		/**
-		 * Add log line
+		 * Add log line to default channel
 		 *
 		 * @param  str  String to add
 		 * @param  priority Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
@@ -191,19 +168,24 @@ package com.atticmedia.console {
 				_console.add(str,priority, isRepeating);
 			}
 		}
-		public static function ch(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		/**
+		 * Add log line to channel
+		 * If channel name doesn't exists it creates it
+		 *
+		 * @param  channel  name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param  str  String to add
+		 * @param  priority Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param  isRepeating When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
+		 * 
+		 */
+		public static function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			if(_console){
 				_console.ch(channel,newLine,priority, isRepeating);
 			}
 		}
-		public static function pk(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
-			if(_console){
-				_console.pk(channel,newLine,priority, isRepeating);
-			}
-		}
-		//
-		//
-		//
+		/**
+		 * Remove console from it's parent display and clean up
+		 */
 		public static function remove():void{
 			if(_console){
 				if(_console.parent){
@@ -213,6 +195,20 @@ package com.atticmedia.console {
 				_console = null;
 			}
 		}
+		/**
+		 * Pauses output log and graphs in Console.
+		 * It still record and print back out on resume.
+		 */
+		public static function get paused():Boolean{
+			return getter("paused") as Boolean;
+		}
+		public static function set paused(v:Boolean):void{
+			setter("paused",v);
+		}
+		/**
+		 * Enable/Disable logging and graphs in Console.
+		 * Does not record logs or graphs while disabled
+		 */
 		public static function set enabled(v:Boolean):void{
 			setter("enabled",v);
 		}
@@ -222,72 +218,144 @@ package com.atticmedia.console {
 		//
 		// Logging settings
 		//
+		/**
+		 * Clear console logs
+		 * @param  channel  (optional) name of log channel to clear, leave blank to clear all.
+		 */
 		public static function clear(channel:String = null):void{
 			if(_console){
 				_console.clear(channel);
 			}
 		}
-		public static function set tracing(v:Boolean):void{
-			setter("tracing",v);
-		}
-		public static function get tracing():Boolean{
-			return getter("tracing") as Boolean;
-		}
-		public static function set tracingChannels(v:String):void{
-			setter("tracingChannels",v);
-		}
-		public static function get tracingChannels():String{
-			return getter("tracingChannels") as String;
-		}
-		public static function set tracingPriority(v:int):void{
-			setter("tracingPriority",v);
-		}
-		public static function get tracingPriority():int{
-			return getter("tracingChannels") as int;
-		}
+		/**
+		 * Accessor for default channel name
+		 * This is the channel name used for C.add(...) logs
+		 */
 		public static function get defaultChannel():String{
 			return getter("defaultChannel") as String;
 		}
 		public static function set defaultChannel(v:String):void{
 			setter("defaultChannel",v);
 		}
+		/**
+		 * Accessor for currently viewing channel
+		 * set to null or empty string to view all channels (global channel).
+		 */
 		public static function get viewingChannel():String{
 			return getter("viewingChannel") as String;
 		}
+		public static function set viewingChannel(v:String):void{
+			setter("viewingChannel",v);
+		}
+		/**
+		 * Accessor for currently viewing channels
+		 * set to null or empty array to view all channels (global channel).
+		 */
+		public static function get viewingChannels():Array{
+			return getter("viewingChannels") as Array;
+		}
+		public static function set viewingChannels(v:Array):void{
+			setter("viewingChannels",v);
+		}
+		/**
+		 * Accessor for filtering text
+		 * When set, Console will create a new channel called filtered and
+		 * show all log lines that match the param text
+		 * 
+		 * Same as using /filter (text) in commandLine.
+		 */
 		public static function get filterText():String{
 			return getter("filterText") as String;
 		}
 		public static function set filterText(v:String):void{
 			setter("filterText",v);
 		}
+		/**
+		 * Enable/disable prefixing channel names infront of log lines.
+		 * When turned on, it shows channel names when multiple channels are visible in the same log view.
+		 * Default: true
+		 */
 		public static function get prefixChannelNames():Boolean{
 			return getter("prefixChannelNames") as Boolean;
 		}
 		public static function set prefixChannelNames(v:Boolean):void{
 			setter("prefixChannelNames",v);
 		}
+		/**
+		 * Maximum number of logs Console should remember
+		 * 0 = unlimited. Setting to very high will slow down performance as it grows
+		 */
 		public static function get maxLines():int{
 			return getter("maxLines") as int;
 		}
 		public static function set maxLines(v:int):void{
 			setter("maxLines",v);
 		}
+		/**
+		 * Frames before repeating line is forced to print to next line. 
+		 * Set to -1 to never force. Set to 0 to force every line.
+		 * Default = 75;
+		 */
 		public static function get maxRepeats():Number{
 			return getter("maxRepeats") as Number;
 		}
 		public static function set maxRepeats(v:Number):void{
 			setter("maxRepeats",v);
 		}
-		public static function get paused():Boolean{
-			return getter("paused") as Boolean;
+		/**
+		 * Accessor for using flash's build in (or external) trace()
+		 * When turned on, Console will also call trace() for all console logs.
+		 * trace function can be replaced with something of your own (such as Flex's logging).
+		 * default is trace(...);
+		 * @see C.traceCall
+		 */
+		public static function set tracing(v:Boolean):void{
+			setter("tracing",v);
 		}
-		public static function set paused(v:Boolean):void{
-			setter("paused",v);
+		public static function get tracing():Boolean{
+			return getter("tracing") as Boolean;
+		}
+		/**
+		 * Accessor for channels to call trace
+		 * When set, console will only call trace for channels that match the channel name.
+		 * set to null or empty array to trace on all channels.
+		 * C.tracing must be set to true for this to effect
+		 */
+		public static function set tracingChannels(v:Array):void{
+			setter("tracingChannels",v);
+		}
+		public static function get tracingChannels():Array{
+			return getter("tracingChannels") as Array;
+		}
+		/**
+		 * Accessor for minimum priority required to call trace
+		 * set to zero (default) to call on all priorities
+		 * C.tracing must be set to true for this to effect
+		 */
+		public static function set tracingPriority(v:int):void{
+			setter("tracingPriority",v);
+		}
+		public static function get tracingPriority():int{
+			return getter("tracingChannels") as int;
+		}
+		/**
+		 * Assign custom trace function.
+		 * Console will only call this when C.tracing is true.
+		 *
+		 * @param  f  Custom function to use, must accept at least 1 parameter as String.
+		 * @return	Current trace function, default is flash's build in trace.
+		 * 
+		 */
+		public static function set traceCall(f:Function):void{
+			setter("traceCall",f);
+		}
+		public static function get traceCall():Function{
+			return getter("traceCall") as Function;
 		}
 		//
 		// Panel settings
 		//
-		// see panelnames in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
+		// see panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
 		public static function setPanelPosition(panelname:String, p:Point):void{
 			if(_console){
 				_console.setPanelPosition(panelname, p);
@@ -324,49 +392,76 @@ package com.atticmedia.console {
 		public static function get displayRoller():Boolean{
 			return getter("displayRoller") as Boolean;
 		}
-		//
+		/**
+		 * width of main console panel
+		 */
 		public static function get width():Number{
 			return getter("width") as Number;
 		}
 		public static function set width(v:Number):void{
 			setter("width",v);
 		}
+		/**
+		 * height of main console panel
+		 */
 		public static function get height():Number{
 			return getter("height") as Number;
 		}
 		public static function set height(v:Number):void{
 			setter("height",v);
 		}
+		/**
+		 * x position of main console panel
+		 */
 		public static function get x():Number{
 			return getter("x") as Number;
 		}
 		public static function set x(v:Number):void{
 			setter("x",v);
 		}
+		/**
+		 * y position of main console panel
+		 */
 		public static function get y():Number{
 			return getter("y") as Number;
 		}
 		public static function set y(v:Number):void{
 			setter("y",v);
 		}
+		/**
+		 * visibility of all console panels
+		 */
 		public static function get visible():Boolean{
 			return getter("visible") as Boolean;
 		}
 		public static function set visible(v:Boolean):void{
 			setter("visible",v);
 		}
-		//
-		//
-		public static function get exists():Boolean{
-			var e:Boolean = _console? true: false;
-			return e;
-		}
+		/**
+		 * When set to true, Console will *try* not to trace too much info about it self.
+		 * It will stop tracing about start of storing and watching objects - and a few others
+		 * If not sure, keep it turned off.
+		 * Default: false; 
+		 * 
+		 */
 		public static function set quiet(v:Boolean):void{
 			setter("quiet",v);
 		}
 		public static function get quiet():Boolean{
 			return getter("quiet") as Boolean;
 		}
+		/**
+		 * Accessor for keeping Console on top of display list
+		 * When turned on (by default), console will always try to put it self on top of the parent's display list.
+		 * For example, if console is started in root, when a child display is added in root, console will move it self to the 
+		 * top of root's display list to try to overlay the new child display. - making sure that console don't get covered.
+		 * However, if Console's parent display (root in example) is covered by another display (example: adding a child directly to stage), 
+		 * console will not be able to pull it self above it as it is in root, not stage.
+		 * If console is added on stage in the first place, there won't be an issue as described above. Use C.startOnStage(...)
+		 * Keeping it turned on may have other side effects if another display is also trying to put it self on top, 
+		 * they could be jumping layers as they fight for the top layer.
+		 * 
+		 */
 		public static function set alwaysOnTop(v:Boolean):void{
 			setter("alwaysOnTop",v);
 		}
@@ -376,49 +471,117 @@ package com.atticmedia.console {
 		//
 		// Remoting
 		//
+		/**
+		 * Accessor for remoting (sender)
+		 * When turned on, Console will periodically broadcast logs, FPS history and memory usage
+		 * for another Console remote to receive. The broadcast interval can be changed through C.remoteDelay
+		 * Can not be remoting (sender) and remote (reciever) at the same time
+		 * 
+		 */
 		public static function get remoting():Boolean{
 			return getter("remoting") as Boolean;
 		}
 		public static function set remoting(v:Boolean):void{
 			setter("remoting",v);
 		}
-		public static function get isRemote():Boolean{
-			return getter("isRemote") as Boolean;
+		/**
+		 * Accessor for remote (reciever)
+		 * When turned on, Console will listen for broadcast of logs/FPS/memory usage from another Console
+		 * Can not be remoting (sender) and remote (reciever) at the same time
+		 * 
+		 */
+		public static function get remote():Boolean{
+			return getter("remote") as Boolean;
 		}
-		public static function set isRemote(v:Boolean):void{
-			setter("isRemote",v);
+		public static function set remote(v:Boolean):void{
+			setter("remote",v);
+		}
+		/**
+		 * Accessor for remoter's broadcast interval in frames
+		 * Default = 20 
+		 * 
+		 */
+		public static function get remoteDelay():int{
+			return getter("remoteDelay") as int;
+		}
+		public static function set remoteDelay(v:int):void{
+			setter("remoteDelay",v);
 		}
 		//
 		// Command line tools
 		//
+		/**
+		 * Output an object's info such as it's variables, methods (if any), properties,
+		 * superclass, children displays (if Display), parent displays (if Display), etc
+		 * commandLine: /inspect  OR  /inspectfull
+		 * 
+		 * @param  obj Object to inspect
+		 * @param detail if true, it will also ouput more detailed, such as the value of properties and variables
+		 * 
+		 */
+		public static function inspect(obj:Object, detail:Boolean = true):void {
+			if(_console){
+				_console.inspect(obj,detail);
+			}
+		}
+		/**
+		 * CommandLine UI's visibility
+		 * CommandLine will still be avaviable to use through code.
+		 * 
+		 */
 		public static function set commandLine (v:Boolean):void{
 			setter("commandLine",v);
 		}
 		public static function get commandLine ():Boolean{
 			return getter("commandLine") as Boolean;
 		}
-		public static function inspect(obj:Object, detail:Boolean = true):void {
-			if(_console){
-				_console.inspect(obj,detail);
-			}
-		}
+		/**
+		 * Command line base.
+		 * This is the value returned from /base in commandLine.
+		 * Default is set to console's parent DisplayContainer.
+		 * 
+		 */
 		public static function get commandBase():Object{
 			return getter("commandBase") as int;
 		}
 		public static function set commandBase(v:Object):void{
 			setter("commandBase",v);
 		}
+		/**
+		 * Accessor for using strong referencing in CommandLine.
+		 * Default is false; Which means all outside references Console store are weak referenced,
+		 * allowing them to be garbage collected when required.
+		 * 
+		 * @param  v  new value
+		 * @return current strong referencing setting
+		 * 
+		 */
 		public static function get strongRef():Boolean{
 			return getter("strongRef") as Boolean;
 		}
 		public static function set strongRef(v:Boolean):void{
 			setter("strongRef",v);
 		}
+		/**
+		 * Store a reference in Console for use in CommandLine
+		 * (same as /save in command line)
+		 * 
+		 * @param  n  name to save as
+		 * @param  obj object reference to save, pass null to remove previous save.
+		 * @param  strong (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
+		 * 
+		 */
 		public static function store(n:String, obj:Object, strong:Boolean = false):void{
 			if(_console ){
 				_console.store(n, obj, strong);
 			}
 		}
+		/**
+		 * Run a command string
+		 *
+		 * @param  str  string to run
+		 * 
+		 */
 		public static function runCommand(str:String):Object{
 			if(_console){
 				return _console.runCommand(str);
@@ -428,17 +591,35 @@ package com.atticmedia.console {
 		//
 		// Memory management tools
 		//
-		public static function watch(o:Object,n:String = null):String{
+		/**
+		 * Watches an object to be notified in console when it is being garbage collected
+		 *
+		 * @param  obj  object to watch
+		 * @param  n  	object's identification/name
+		 * @return	name Console used to identify the object - this can be different to param n if another object of the same name is already being watched
+		 * 
+		 */
+		public static function watch(obj:Object,n:String = null):String{
 			if(_console){
-				return _console.watch(o,n);
+				return _console.watch(obj,n);
 			}
 			return null;
 		}
+		/**
+		 * Stop watching an object from garbage collection
+		 *
+		 * @param  n  name of object to stop watching
+		 * 
+		 */
 		public static function unwatch(n:String):void{
 			if(_console){
 				_console.unwatch(n);
 			}
 		}
+		/**
+		 * Force Garbage collect
+		 * Requires debugger version of flash player
+		 */
 		public static function gc():void {
 			if(_console){
 				_console.gc();
@@ -502,22 +683,40 @@ package com.atticmedia.console {
 				_console.bindKey(char, ctrl, alt, shift, fun ,args);
 			}
 		}
-		/**
-		 * Assign custom trace function.
-		 * Console will only call this when C.tracing is true.
-		 *
-		 * @param  f  Custom function to use, must accept at least 1 parameter as String.
-		 * @return	Current trace function, default is flash's build in trace.
-		 * 
-		 */
-		public static function set traceCall(f:Function):void{
-			setter("traceCall",f);
-		}
-		public static function get traceCall():Function{
-			return getter("traceCall") as Function;
-		}
 		//
 		//
+		//
+		public static function get exists():Boolean{
+			var e:Boolean = _console? true: false;
+			return e;
+		}
+		public static function get version():Number{
+			return Console.VERSION;
+		}
+		public static function get versionStage():String{
+			return Console.VERSION_STAGE;
+		}
+		//
+		private static function stageAddedHandle(e:Event):void{
+			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
+			mc.removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
+			if(_console && !_console.parent){
+				if(canRunWithBrowserSetup(mc.stage, _disallowBrowser)){
+					mc.stage.addChild(_console);
+				}else{
+					_console = null;
+				}
+			}
+		}
+		private static function canRunWithBrowserSetup(s:Stage, setup:uint):Boolean{
+			if(setup>0 && s && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
+				var flashVars:Object = s.loaderInfo.parameters;
+				if(flashVars["allowConsole"] != "true" && (setup == 1 || (setup == 2 && !Console.remoteIsRunning)) ){
+					return false;
+				}
+			}
+			return true;
+		}
 		private static function getter(str:String):*{
 			if(_console){
 				return _console[str];

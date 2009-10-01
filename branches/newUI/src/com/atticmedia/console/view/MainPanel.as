@@ -129,9 +129,6 @@ package com.atticmedia.console.view {
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
-			//
-			//
-			_traceField.htmlText = "<p><l1>Happy bug fixing!</l1></p><p><p0>Hows the new Console so far?</p0></p>";
 		}
 		private function stageAddedHandle(e:Event=null):void{
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
@@ -252,7 +249,7 @@ package com.atticmedia.console.view {
 			str += "<menu>[ <b>";
 			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
 			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
-			if(!master.isRemote){
+			if(!master.remote){
 				str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
 				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
 				str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);

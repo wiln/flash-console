@@ -63,7 +63,7 @@ package com.atticmedia.console.view {
 			updateData();
 		}
 		protected override function onFrame(e:Event):Boolean{
-			if(master.isRemote) return false;
+			if(master.remote) return false;
 			var mspf:Number = master.mspf;
 			if (!isNaN(mspf)) {
 				if(super.onFrame(e)){
