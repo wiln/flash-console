@@ -81,7 +81,7 @@ package com.atticmedia.console.view {
 			addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove, false, 0, true);
 			onMouseMove();
 			if(_master.rulerHidesMouse) Mouse.hide();
-			report("<b>Ruler started. Click on two locations to measure.</b>", -1);
+			_master.report("<b>Ruler started. Click on two locations to measure.</b>", -1);
 		}
 		private function onMouseMove(e:MouseEvent = null):void{
 			_pointer.graphics.clear();
@@ -201,12 +201,12 @@ package com.atticmedia.console.view {
 				graphics.moveTo(p.x, p.y);
 				graphics.lineTo(p2.x, p2.y);
 				//
-				report("Ruler results: (red) <b>["+p.x+","+p.y+"]</b> to (orange) <b>["+p2.x+","+p2.y+"]</b>", -2);
-				report("Distance: <b>"+Utils.round(d,100) +"</b>", -2);
-				report("Mid point: <b>["+mp.x+","+mp.y+"]</b>", -2);
-				report("Width:<b>"+w+"</b>, Height: <b>"+h+"</b>", -2);
-				report("Angle from first point (red): <b>"+a1+"°</b>", -2);
-				report("Angle from second point (orange): <b>"+a2+"°</b>", -2);
+				_master.report("Ruler results: (red) <b>["+p.x+","+p.y+"]</b> to (orange) <b>["+p2.x+","+p2.y+"]</b>", -2);
+				_master.report("Distance: <b>"+Utils.round(d,100) +"</b>", -2);
+				_master.report("Mid point: <b>["+mp.x+","+mp.y+"]</b>", -2);
+				_master.report("Width:<b>"+w+"</b>, Height: <b>"+h+"</b>", -2);
+				_master.report("Angle from first point (red): <b>"+a1+"°</b>", -2);
+				_master.report("Angle from second point (orange): <b>"+a2+"°</b>", -2);
 			}else{
 				exit();
 			}
@@ -223,13 +223,6 @@ package com.atticmedia.console.view {
 			txt.selectable = false;
         	txt.defaultTextFormat = format;
            	return txt;
-		}
-		private function report(txt:String, prio:Number=5, skipSafe:Boolean = true, quiet:Boolean = false):void {
-			if (_master != null && !(_master.quiet && quiet)) {
-				_master.addLine(txt,prio,Console.CONSOLE_CHANNEL, false, skipSafe);
-			} else {
-				trace("C: "+ txt);
-			}
 		}
 	}
 }

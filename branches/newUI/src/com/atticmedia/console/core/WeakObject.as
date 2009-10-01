@@ -26,7 +26,9 @@ package com.atticmedia.console.core {
 	import flash.utils.Proxy;
 	import flash.utils.flash_proxy;
 	
-	public dynamic class WeakObject extends Proxy{
+	public class WeakObject extends Proxy{
+		
+		private var _item:Array; // array of object's properties
 		private var _dir:Object;
 		
 		public function WeakObject() {
@@ -40,7 +42,6 @@ package com.atticmedia.console.core {
 			}
 			_dir[n] = new WeakRef(obj, strong);
 		}
-		
 		public function get(n:String):Object{
 			if(_dir[n]){
 				return _dir[n].reference;
@@ -56,5 +57,22 @@ package com.atticmedia.console.core {
 		override flash_proxy function setProperty(n:*, v:*):void {
 			set(n,v);
 		}
+		override flash_proxy function nextNameIndex (index:int):int {
+         // initial call
+         if (index == 0) {
+             _item = new Array();
+             for (var x:* in _dir) {
+                _item.push(x);
+             }
+         }
+         if (index < _item.length) {
+             return index + 1;
+         } else {
+             return 0;
+         }
+     }
+     override flash_proxy function nextName(index:int):String {
+         return _item[index - 1];
+     }
 	}
 }

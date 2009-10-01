@@ -317,9 +317,9 @@ package com.atticmedia.console.view {
 			}else if(e.text == "trace"){
 				master.tracing = !master.tracing;
 				if(master.tracing){
-					report("Tracing turned [<b>On</b>]",-1);
+					master.report("Tracing turned [<b>On</b>]",-1);
 				}else{
-					report("Tracing turned [<b>Off</b>]",-1);
+					master.report("Tracing turned [<b>Off</b>]",-1);
 				}
 			}else if(e.text == "close"){
 				master.panels.tooltip();

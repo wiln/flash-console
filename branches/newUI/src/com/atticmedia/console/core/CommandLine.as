@@ -36,6 +36,11 @@ package com.atticmedia.console.core {
 	public class CommandLine extends EventDispatcher {
 
 		private var _saved:WeakObject;
+		
+		private var _returned:WeakRef;
+		private var _returned2:WeakRef;
+		private var _lastMapBase:WeakRef;
+		
 		private var _master:Console;
 		
 		public var reserved:Array;
@@ -44,21 +49,20 @@ package com.atticmedia.console.core {
 		public function CommandLine(m:Console) {
 			_master = m;
 			_saved = new WeakObject();
-			_saved.set("_base",null);
-			_saved.set("_returned",null);
-			reserved = new Array("_base", "_returned","_returned2","_lastMapBase");
+			_returned = new WeakRef(m);
+			_saved.set("C", m);
+			reserved = new Array("base", "C");
 		}
 		public function set base(obj:Object):void {
-			var old:Object = _saved.get("_base");
-			_saved.set("_base",obj, useStrong);
-			if (old) {
-				report("Set new commandLine base from "+old+ " to "+ obj, 10);
+			if (base) {
+				report("Set new commandLine base from "+base+ " to "+ obj, 10);
 			}else{
-				_saved.set("_returned",obj,useStrong);
+				_returned = new WeakRef(obj, useStrong);
 			}
+			_saved.set("base", obj,useStrong);
 		}
 		public function get base():Object {
-			return _saved.get("_base");
+			return _saved.get("base");
 		}
 		public function destory():void {
 			_saved = null;
@@ -78,7 +82,7 @@ package com.atticmedia.console.core {
 			return n;
 		}
 		public function run(str:String):Object {
-			report("&gt; "+str, -1, false);
+			report("&gt; "+str, -1);
 			var returned:Object;
 			var line:Array = str.split(" ");
 			if(line[0].charAt(0)=="/"){
@@ -101,14 +105,14 @@ package com.atticmedia.console.core {
 						report("Using WEAK referencing. '/strong true' to use strong", -2);
 					}
 				} else if (line[0] == "/save") {
-					if (_saved.get("_returned")) {
+					if (_returned.reference) {
 						if(!line[1]){
 							report("ERROR: Give a name to save.",10);
 						}else if(reserved.indexOf(line[1])>=0){
 							report("ERROR: The name ["+line[1]+ "] is reserved",10);
 						}else{
-							_saved.set(line[1], _saved.get("_returned"),useStrong);
-							report("SAVED "+getQualifiedClassName(_saved.get("_returned")) + " at "+ line[1]);
+							_saved.set(line[1], _returned.reference,useStrong);
+							report("SAVED "+getQualifiedClassName(_returned.reference) + " at "+ line[1]);
 						}
 					} else {
 						report("Nothing to save", 10);
@@ -117,27 +121,39 @@ package com.atticmedia.console.core {
 					if(line.length>1){
 						var savestring:String = line.slice(1).join(" ");
 						report("String with "+savestring.length+" chars stored. Use /save <i>(name)</i> to save.", -2);
-						_saved.set("_returned", savestring,true);
+						_returned = new WeakRef(savestring, useStrong);
 					}
+				} else if (line[0] == "/saved") {
+					report("Saved vars: ", -1);
+					var sii:uint = 0;
+					var sii2:uint = 0;
+					for(var X:String in _saved){
+						var sao:* = _saved[X];
+						sii++;
+						if(sao==null) sii2++;
+						report("<b>$"+X+"</b> = "+(sao==null?"null":getQualifiedClassName(sao)), -2);
+					}
+					report("Found "+sii+" item(s), "+sii2+" empty (or garbage collected).", -1);
 				} else if (line[0] == "/filter") {
 					_master.filterText = str.substring(8);
 				} else if (line[0] == "/inspect" || line[0] == "/inspectfull") {
-					if (_saved.get("_returned")) {
+					if (_returned.reference) {
 						var viewAll:Boolean = (line[0] == "/inspectfull")? true: false;
-						report(inspect(_saved.get("_returned"),viewAll), 5,true);
+						report(inspect(_returned.reference,viewAll), 5);
 					} else {
 						report("Empty", 10);
 					}
 				} else if (line[0] == "/map") {
-					if (_saved.get("_returned")) {
-						map(_saved.get("_returned") as DisplayObjectContainer);
+					if (_returned.reference) {
+						map(_returned.reference as DisplayObjectContainer);
 					} else {
 						report("Empty", 10);
 					}
 				} else if (line[0] == "/base" || line[0] == "//") {
-					var o:Object = line[0] == "//"?_saved.get("_returned2"):_saved.get("_base");
-					_saved.set("_returned2",_saved.get("_returned"),useStrong);
-					_saved.set("_returned", o,useStrong);
+					var o:Object = line[0] == "//"?(_returned2?_returned2.reference:null):base;
+					_returned2 = new WeakRef(_returned.reference, useStrong);
+					_returned = new WeakRef(o, useStrong);
+					
 					report("Returned "+ getQualifiedClassName(o) +": "+o,10);
 				} else{
 					report("Undefined commandLine syntex <b>/help</b> for info.",10);
@@ -184,13 +200,13 @@ package com.atticmedia.console.core {
 					}
 					
 					if (returned == null) {
-						report("Ran successfully.",1, false, true);
+						report("Ran successfully.",1);
 					}else{
 						var newb:Boolean = false;
 						if(typeof(returned) == "object" && !(returned is Array) && !(returned is Date)){
 							newb = true;
-							_saved.set("_returned2",_saved.get("_returned"),useStrong);
-							_saved.set("_returned", returned,useStrong);
+							_returned2 = new WeakRef(_returned.reference, useStrong);
+							_returned = new WeakRef(returned, useStrong);
 						}
 						report((newb?"+ ":"")+"Returned "+ getQualifiedClassName(returned) +": "+returned,10);
 					}
@@ -202,7 +218,7 @@ package com.atticmedia.console.core {
 		}
 		private function getPartData(strPart:String):Array{
 			try{
-				var base:Object = _saved.get("_returned");
+				var base:Object = _returned.reference;
 				var partNames:Array = new Array();
 				var partValues:Array = new Array();
 				
@@ -244,7 +260,7 @@ package com.atticmedia.console.core {
 							// this could be a string without '...'
 							partNames.unshift(dotPart);
 							partValues.unshift(dotPart);
-							report("Assumed "+dotPart+" is a String as "+getQualifiedClassName(base)+" do not have this property.", 7, false, true);
+							report("Assumed "+dotPart+" is a String as "+getQualifiedClassName(base)+" do not have this property.", 7);
 							break;
 						}else if(!obj){
 							partNames.unshift(base);
@@ -282,7 +298,7 @@ package com.atticmedia.console.core {
 			}else if (str == "false") {
 				return false;
 			}else if (str == "this") {
-				return _saved.get("_returned");
+				return _returned.reference;
 			}else if (!isNaN(Number(str))) {
 				return Number(str);
 			}else if (str == "null") {
@@ -376,7 +392,7 @@ package com.atticmedia.console.core {
 				report("It is not a DisplayObjectContainer", 10);
 				return;
 			}
-			_saved.set("_lastMapBase", base,useStrong); 
+			_lastMapBase = new WeakRef(base,useStrong);
 			
 			var list:Array = new Array();
 			var index:int = 0;
@@ -432,7 +448,7 @@ package com.atticmedia.console.core {
 					n = "<i>"+n+"</i>";
 				}
 				str += n+" ("+getQualifiedClassName(mcDO)+")";
-				report(str,mcDO is DisplayObjectContainer?5:2, true);
+				report(str,mcDO is DisplayObjectContainer?5:2);
 				lastmcDO = mcDO;
 			}
 			
@@ -440,7 +456,7 @@ package com.atticmedia.console.core {
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
 		private function reMap(path:String):void{
-			var mc:DisplayObjectContainer = _saved.get("_lastMapBase") as DisplayObjectContainer;
+			var mc:DisplayObjectContainer = _lastMapBase?(_lastMapBase.reference as DisplayObjectContainer):null;
 			var pathArr:Array = path.split("|");
 			var child:DisplayObject = mc as DisplayObject;
 			try{
@@ -456,7 +472,7 @@ package com.atticmedia.console.core {
 						}
 					}
 				}
-				_saved.set("_returned", child,useStrong);
+				_returned = new WeakRef(child, useStrong);
 				report("Returned "+ child.name +": "+getQualifiedClassName(child),10);
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
@@ -485,16 +501,12 @@ package com.atticmedia.console.core {
 			report("This will create a new channel called filtered with all matching lines",5);
 			report("__Other useful examples:",10);
 			report("<b>stage.width</b>",5);
-			report("<b>stage.scaleMode = 'noScale'</b>",5);
+			report("<b>stage.scaleMode = noScale</b>",5);
 			report("<b>stage.frameRate = 12</b>",5);
 			report("__________",10);
 		}
-		private function report(txt:String, prio:Number=5, skipSafe:Boolean = true, quiet:Boolean = false):void {
-			if (_master != null && !(_master.quiet && quiet)) {
-				_master.addLine(txt,prio,Console.CONSOLE_CHANNEL, false, skipSafe);
-			} else {
-				trace("C: "+ txt);
-			}
+		public function report(obj:*,priority:Number = 0):void{
+			_master.report(obj, priority);
 		}
 	}
 }

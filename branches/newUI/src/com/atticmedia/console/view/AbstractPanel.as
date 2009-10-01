@@ -84,11 +84,6 @@ package com.atticmedia.console.view {
 				parent.removeChild(this);
 			}
 		}
-		protected function report(txt:String, p:int, quiet:Boolean = false):void{
-			if (!(master.quiet && quiet)) {
-				master.addLine(txt, p, Console.CONSOLE_CHANNEL, false, true);
-			}
-		}
 		//
 		// SIZE
 		//

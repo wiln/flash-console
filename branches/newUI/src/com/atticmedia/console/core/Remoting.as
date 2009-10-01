@@ -92,10 +92,10 @@ package com.atticmedia.console.core {
 				startSharedConnection();
 				try{
                 	_sharedConnection.connect(Console.REMOTER_CONN_NAME);
-					report("Remoting started [sandboxType: "+Security.sandboxType+"]",10);
+					_master.report("Remoting started [sandboxType: "+Security.sandboxType+"]",10);
 					_isRemoting = true;
            		}catch (error:Error){
-					report("Could not create client service. You will not be able to control this console with remote.", 10);
+					_master.report("Could not create client service. You will not be able to control this console with remote.", 10);
            		}
 			}else{
 				_isRemoting = false;
@@ -112,10 +112,10 @@ package com.atticmedia.console.core {
 				startSharedConnection();
 				try{
                 	_sharedConnection.connect(Console.REMOTE_CONN_NAME);
-					report("Remote started [sandboxType: "+Security.sandboxType+"]",10);
+					_master.report("Remote started [sandboxType: "+Security.sandboxType+"]",10);
            		}catch (error:Error){
 					_isRemoting = false;
-					report("Could not create remote service. You might have a console remote already running.", 10);
+					_master.report("Could not create remote service. You might have a console remote already running.", 10);
            		}
 			}else{
 				close();
@@ -138,18 +138,10 @@ package com.atticmedia.console.core {
 				try{
 					_sharedConnection.close();
 				}catch(error:Error){
-					report("Remote.close: "+error, 10);
+					_master.report("Remote.close: "+error, 10);
 				}
 			}
 			_sharedConnection = null;
-		}
-		
-		private function report(txt:String, prio:Number=5, skipSafe:Boolean = true, quiet:Boolean = false):void {
-			if (!(_master.quiet && quiet)) {
-				_master.addLine(txt,prio,Console.CONSOLE_CHANNEL, false, skipSafe);
-			} else {
-				trace("C: "+ txt);
-			}
 		}
 	}
 }

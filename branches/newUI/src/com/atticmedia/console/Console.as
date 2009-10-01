@@ -108,12 +108,10 @@ package com.atticmedia.console {
 			cl = new CommandLine(this);
 			remote = new Remoting(this);
 			remote.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
-			cl.store("C",this);
-			cl.reserved.push("C");
 			
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			var t:String = VERSION_STAGE?(" "+VERSION_STAGE):"";
-			addLine("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2,CONSOLE_CHANNEL,false,true);
+			report("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2);
 			
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
@@ -194,7 +192,7 @@ package com.atticmedia.console {
 		//
 		public function bindKey(char:String, ctrl:Boolean, alt:Boolean, shift:Boolean, fun:Function ,args:Array = null):void{
 			if(!char || char.length!=1){
-				addLine("Binding key must be a single character. You gave ["+char+"]", 10,CONSOLE_CHANNEL);
+				report("Binding key must be a single character. You gave ["+char+"]", 10);
 				return;
 			}
 			var key:String = char.toLowerCase()+(ctrl?"0":"1")+(alt?"0":"1")+(shift?"0":"1");
@@ -204,7 +202,7 @@ package com.atticmedia.console {
 				delete _keyBinds[key];
 			}
 			if(!quiet){
-				addLine((fun is Function?"Bined":"Unbined")+" key <b>"+ char.toUpperCase() +"</b>"+ (ctrl?"+ctrl":"")+(alt?"+alt":"")+(shift?"+shift":"")+".",-1,CONSOLE_CHANNEL);
+				report((fun is Function?"Bined":"Unbined")+" key <b>"+ char.toUpperCase() +"</b>"+ (ctrl?"+ctrl":"")+(alt?"+alt":"")+(shift?"+shift":"")+".",-1);
 			}
 		}
 		public function setPanelPosition(panelname:String, p:Point):void{
@@ -265,7 +263,7 @@ package com.atticmedia.console {
 			if(!n) n = className+"@"+getTimer();
 			var nn:String = mm.watch(o,n);
 			if(!quiet)
-				addLine("Watching <b>"+className+"</b> as <font color=\"#FF0000\"><b>"+ nn +"</b></font>.",-1,CONSOLE_CHANNEL, false, true);
+				report("Watching <b>"+className+"</b> as <font color=\"#FF0000\"><b>"+ nn +"</b></font>.",-1);
 			return nn;
 		}
 		public function unwatch(n:String):void{
@@ -274,22 +272,22 @@ package com.atticmedia.console {
 		public function gc():void{
 			if(isRemote){
 				try{
-					addLine("Sending garbage collection request to client",-1,CONSOLE_CHANNEL);
+					report("Sending garbage collection request to client",-1);
 					remote.send("gc");
 				}catch(e:Error){
-					addLine(e,10,CONSOLE_CHANNEL);
+					report(e,10);
 				}
 			}else{
 				var ok:Boolean = mm.gc();
 				var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
-				addLine(str,(ok?-1:10),CONSOLE_CHANNEL);
+				report(str,(ok?-1:10));
 			}
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):void{
 			var nn:String = cl.store(n, obj, strong);
 			if(!quiet && nn){
 				var str:String = obj is Function?"using <b>STRONG</b> reference":("for <b>"+getQualifiedClassName(obj)+"</b> using WEAK reference");
-				addLine("Stored <font color=\"#FF0000\"><b>$"+nn+"</b></font> in commandLine for "+ str +".",-1,CONSOLE_CHANNEL,false,true);
+				report("Stored <font color=\"#FF0000\"><b>$"+nn+"</b></font> in commandLine for "+ str +".",-1);
 			}
 		}
 		public function get strongRef():Boolean{
@@ -299,17 +297,17 @@ package com.atticmedia.console {
 			cl.useStrong = b;
 		}
 		public function inspect(obj:Object, detail:Boolean = true):void{
-			addLine("INSPECT: "+ cl.inspect(obj,detail),5 ,CONSOLE_CHANNEL, false, true);
+			report("INSPECT: "+ cl.inspect(obj,detail),5);
 		}
 		public function set enabled(newB:Boolean):void{
 			if(_enabled == newB) return;
 			if(_enabled && !newB){
-				addLine("Disabled",10,CONSOLE_CHANNEL);
+				report("Disabled",10);
 			}
 			var pre:Boolean = _enabled;
 			_enabled = newB;
 			if(!pre && newB){
-				addLine("Enabled",-1,CONSOLE_CHANNEL);
+				report("Enabled",-1);
 			}
 		}
 		public function get enabled():Boolean{
@@ -321,9 +319,9 @@ package com.atticmedia.console {
 		public function set paused(newV:Boolean):void{
 			if(_isPaused == newV) return;
 			if(newV){
-				addLine("Paused",10,CONSOLE_CHANNEL);
+				report("Paused",10);
 			}else{
-				addLine("Resumed",-1,CONSOLE_CHANNEL);
+				report("Resumed",-1);
 			}
 			_isPaused = newV;
 			panels.mainPanel.updateMenu(true);
@@ -370,7 +368,7 @@ package com.atticmedia.console {
 			if(alwaysOnTop && parent &&  parent.getChildIndex(this) < (parent.numChildren-1)){
 				parent.setChildIndex(this,(parent.numChildren-1));
 				if(!quiet){
-					addLine("Attempted to move console on top (alwaysOnTop enabled)",-1,CONSOLE_CHANNEL);
+					report("Attempted to move console on top (alwaysOnTop enabled)",-1);
 				}
 			}
 			if( _isRepeating ){
@@ -382,7 +380,7 @@ package com.atticmedia.console {
 			if(!_isPaused && visible){
 				var arr:Array = mm.update();
 				if(arr.length>0){
-					addLine("GARBAGE COLLECTED "+arr.length+" item(s): "+arr.join(", "),10,CONSOLE_CHANNEL);
+					report("GARBAGE COLLECTED "+arr.length+" item(s): "+arr.join(", "),10);
 				}
 				panels.mainPanel.update(!_isPaused && _linesChanged);
 				if(_linesChanged) {
@@ -489,7 +487,7 @@ package com.atticmedia.console {
 		}
 		public function set traceCall (f:Function):void{
 			if(f==null){
-				addLine("C.traceCall function setter must be not be null.", 10,CONSOLE_CHANNEL);
+				report("C.traceCall function setter must be not be null.", 10);
 			}else{
 				_traceCall = f;
 			}
@@ -497,7 +495,10 @@ package com.atticmedia.console {
 		public function get traceCall ():Function{
 			return _traceCall;
 		}
-		public function addLine(obj:Object,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
+		public function report(obj:*,priority:Number = 0):void{
+			addLine(obj, priority, CONSOLE_CHANNEL, false, true);
+		}
+		private function addLine(obj:*,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			if(!_enabled){
 				return;
 			}
@@ -547,11 +548,11 @@ package com.atticmedia.console {
 		}
 		public function runCommand(line:String):Object{
 			if(remote.isRemote){
-				addLine("Run command at remote: "+line,-2,CONSOLE_CHANNEL);
+				report("Run command at remote: "+line,-2);
 				try{
 					remote.send("runCommand", line);
 				}catch(err:Error){
-					addLine("Command could not be sent to client: " + err, 10,CONSOLE_CHANNEL);
+					report("Command could not be sent to client: " + err, 10);
 				}
 			}else{
 				return cl.run(line);
@@ -561,7 +562,7 @@ package com.atticmedia.console {
 		//
 		// LOGGING
 		//
-		public function ch(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		public function ch(channel:*, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
 			var chn:String;
 			if(channel is String){
 				chn = String(channel);
@@ -574,7 +575,7 @@ package com.atticmedia.console {
 			}
 			addLine(newLine,priority,chn, isRepeating);
 		}
-		public function pk(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		public function pk(channel:*, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
 			var chn:String = getQualifiedClassName(channel);
 			var ind:int = chn.lastIndexOf("::");
 			if(ind>=0){
@@ -582,7 +583,7 @@ package com.atticmedia.console {
 			}
 			addLine(newLine,priority,chn, isRepeating);
 		}
-		public function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		public function add(newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			addLine(newLine,priority, defaultChannel, isRepeating);
 		}
 		public function set filterText(str:String):void{
