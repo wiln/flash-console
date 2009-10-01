@@ -40,10 +40,10 @@ package com.atticmedia.console.core {
 		private var _returned:WeakRef;
 		private var _returned2:WeakRef;
 		private var _lastMapBase:WeakRef;
+		private var _reserved:Array;
 		
 		private var _master:Console;
 		
-		public var reserved:Array;
 		public var useStrong:Boolean;
 
 		public function CommandLine(m:Console) {
@@ -51,7 +51,7 @@ package com.atticmedia.console.core {
 			_saved = new WeakObject();
 			_returned = new WeakRef(m);
 			_saved.set("C", m);
-			reserved = new Array("base", "C");
+			_reserved = new Array("base", "C");
 		}
 		public function set base(obj:Object):void {
 			if (base) {
@@ -67,11 +67,11 @@ package com.atticmedia.console.core {
 		public function destory():void {
 			_saved = null;
 			_master = null;
-			reserved = null;
+			_reserved = null;
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):String {
 			n = n.replace(/[^\w]*/g, "");
-			if(reserved.indexOf(n)>=0){
+			if(_reserved.indexOf(n)>=0){
 				report("ERROR: The name ["+n+"] is reserved",10);
 				return null;
 			}else{
@@ -108,7 +108,7 @@ package com.atticmedia.console.core {
 					if (_returned.reference) {
 						if(!line[1]){
 							report("ERROR: Give a name to save.",10);
-						}else if(reserved.indexOf(line[1])>=0){
+						}else if(_reserved.indexOf(line[1])>=0){
 							report("ERROR: The name ["+line[1]+ "] is reserved",10);
 						}else{
 							_saved.set(line[1], _returned.reference,useStrong);

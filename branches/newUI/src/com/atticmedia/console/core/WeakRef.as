@@ -25,22 +25,21 @@
 package com.atticmedia.console.core {
 	import flash.utils.Dictionary;
 	
-	public dynamic class WeakRef{
+	public class WeakRef{
 		
 		private var _val:*;
 		private var _strong:Boolean;
 		
-		// There is abilty to actually store it 'strong' but thats incase
-		// you need to mix weak and strong references somewhere, this lets you manage them all together.
-		public function WeakRef(obj:*, strong:Boolean = false) {
+		//
+		// There is abilty to use strong reference incase you need to mix - 
+		// weak and strong references together somewhere
+		public function WeakRef(ref:*, strong:Boolean = false) {
 			_strong = strong;
-			if(strong){
-				_val = obj;
-			}else{
-				_val = new Dictionary(true);
-				_val[obj] = null;
-			}
+			reference = ref;
 		}
+		//
+		//
+		//
 		public function get reference():*{
 			if(_strong){
 				return _val;
@@ -52,8 +51,26 @@ package com.atticmedia.console.core {
 			}
 			return null;
 		}
+		public function set reference(ref:*):void{
+			if(_strong){
+				_val = ref;
+			}else{
+				_val = new Dictionary(true);
+				_val[ref] = null;
+			}
+		}
+		//
+		//
+		//
 		public function get strong():Boolean{
 			return _strong;
+		}
+		public function set strong(b:Boolean):void{
+			if(_strong != b){
+				var ref:* = reference;
+				_strong = b;
+				reference = ref;
+			}
 		}
 	}
 }

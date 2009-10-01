@@ -36,8 +36,9 @@ package com.atticmedia.console.samples {
 			// SET UP
 			//C.start(this, "", 2);
 			C.start(this, "`");  
-			// "" - change for password. this will start hidden
-			C.visible = true;
+			// "`" - change for password. This will start hidden
+			C.visible = true; // show console, because having password hides console.
+			
 			C.commandLine = true; // enable command line
 			
 			C.width = 600;
@@ -63,6 +64,7 @@ package com.atticmedia.console.samples {
 			// garbage collection monitor
 			var aSprite:Sprite = new Sprite();
 			C.watch(aSprite, "aSprite");
+			C.store("sprite", aSprite);
 			aSprite = null;
 			// it will probably never get collected in this example
 			// but if you have debugger version of flash player installed,

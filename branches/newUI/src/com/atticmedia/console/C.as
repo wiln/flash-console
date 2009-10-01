@@ -370,9 +370,9 @@ package com.atticmedia.console {
 		public static function set strongRef(v:Boolean):void{
 			setter("strongRef",v);
 		}
-		public static function store(n:String, obj:Object):void{
+		public static function store(n:String, obj:Object, strong:Boolean = false):void{
 			if(_console ){
-				_console.store(n, obj);
+				_console.store(n, obj, strong);
 			}
 		}
 		public static function runCommand(str:String):Object{
