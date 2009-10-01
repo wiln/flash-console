@@ -113,6 +113,12 @@ package com.atticmedia.console.core {
 					} else {
 						report("Nothing to save", 10);
 					}
+				} else if (line[0] == "/string") {
+					if(line.length>1){
+						var savestring:String = line.slice(1).join(" ");
+						report("String with "+savestring.length+" chars stored. Use /save <i>(name)</i> to save.", -2);
+						_saved.set("_returned", savestring,true);
+					}
 				} else if (line[0] == "/filter") {
 					_master.filterText = str.substring(8);
 				} else if (line[0] == "/inspect" || line[0] == "/inspectfull") {

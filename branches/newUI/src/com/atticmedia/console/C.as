@@ -134,9 +134,17 @@ package com.atticmedia.console {
 		//
 		//
 		//
-		public static function add(newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
+		/**
+		 * Add log line
+		 *
+		 * @param  str  String to add
+		 * @param  priority Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param  isRepeating When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
+		 * 
+		 */
+		public static function add(str:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			if(_console){
-				_console.add(newLine,priority, isRepeating);
+				_console.add(str,priority, isRepeating);
 			}
 		}
 		public static function ch(channel:Object, newLine:Object, priority:Number = 2, isRepeating:Boolean = false):void{
