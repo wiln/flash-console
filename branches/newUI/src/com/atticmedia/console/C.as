@@ -89,9 +89,11 @@
 */
 		
 package com.atticmedia.console {
-	import flash.geom.Point;	
-	import flash.geom.Rectangle;	
 	import flash.display.DisplayObjectContainer;
+	import flash.display.Stage;
+	import flash.events.Event;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.system.Capabilities;		
 
 	public class C{
@@ -102,7 +104,8 @@ package com.atticmedia.console {
 			throw new Error("[CONSOLE] Do not construct class. Please use C.start(mc:DisplayObjectContainer, password:String='')");
 		}
 		/**
-		 * Start Console. Calling any other C calls before this will fail silently.
+		 * Start Console inside given Display.
+		 * Calling any other C calls before this will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 *
 		 * @param  mc  	Display in which console should be added to. Preferably stage or root of your flash document.
@@ -111,20 +114,61 @@ package com.atticmedia.console {
 		 * @param  allowInBrowser If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
 		 * 
 		 */
-		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, allowInBrowser:Boolean = true, forceRunOnRemote:Boolean = true):void{
-			if(!allowInBrowser && mc.stage && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
-				var flashVars:Object = mc.stage.loaderInfo.parameters;
-				if(flashVars["allowConsole"] != "true" && (!forceRunOnRemote || (forceRunOnRemote && !Console.remoteIsRunning)) ){
-					return;
-				}
-			}
+		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
 			if(_console){
 				trace("[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.");
 			}else{
-				_console = new Console(pass, skin);
-				mc.addChild(_console);
+				if(canRunWithBrowserSetup(mc.stage, disallowBrowser)){
+					_console = new Console(pass, skin);
+					mc.addChild(_console);
+				}
 			}
 		}
+		/**
+		 * Start Console in top level (Stage). 
+		 * Starting in stage makes sure console is added at the very top level.
+		 * It will look for stage of mc (first param), if mc isn't a Stage or on Stage, console will be added to stage when mc get added to stage.
+		 * Calling any other C calls before this will fail silently.
+		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
+		 * 
+		 * @param  mc  	Display which is Stage or will be added to Stage.
+		 * @param  pass Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
+		 * @param  skin Skin preset number to use. 1 = black base, 2 = white base
+		 * @param  allowInBrowser If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * 
+		 */
+		public static function startOnStage(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
+			if(_console){
+				trace("[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.");
+			}else if(mc.stage){
+				start(mc.stage, pass, skin, disallowBrowser);
+			}else{
+			 	_console = new Console(pass, skin);
+			 	_console.disallowBrowser = disallowBrowser;
+				mc.addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
+			}
+		}
+		private static function stageAddedHandle(e:Event):void{
+			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
+			mc.removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
+			if(_console && !_console.parent){
+				if(canRunWithBrowserSetup(mc.stage, _console.disallowBrowser)){
+					mc.stage.addChild(_console);
+				}else{
+					_console = null;
+				}
+			}
+		}
+		private static function canRunWithBrowserSetup(s:Stage, setup:uint):Boolean{
+			if(setup>0 && s && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
+				var flashVars:Object = s.loaderInfo.parameters;
+				if(flashVars["allowConsole"] != "true" && (setup == 1 || (setup == 2 && !Console.remoteIsRunning)) ){
+					return false;
+				}
+			}
+			return true;
+		}
+		
 		public static function get version():Number{
 			return Console.VERSION;
 		}

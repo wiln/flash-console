@@ -55,7 +55,7 @@ package com.atticmedia.console {
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		
 		public static const VERSION:Number = 2;
-		public static const VERSION_STAGE:String = "beta2";
+		public static const VERSION_STAGE:String = "beta3";
 
 		public static const REMOTE_CONN_NAME:String = "_ConsoleRemote";
 		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoter";
@@ -79,6 +79,8 @@ package com.atticmedia.console {
 		public var defaultChannel:String = "traces";
 		public var tracingPriority:int = 0;
 		public var rulerHidesMouse:Boolean = true;
+		//
+		public var disallowBrowser:uint = 0; // this is just a start up setting used by C
 		//
 		private var _isPaused:Boolean;
 		private var _enabled:Boolean = true;
@@ -109,7 +111,6 @@ package com.atticmedia.console {
 			remote = new Remoting(this);
 			remote.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
 			
-			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			var t:String = VERSION_STAGE?(" "+VERSION_STAGE):"";
 			report("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2);
 			
@@ -126,10 +127,12 @@ package com.atticmedia.console {
 			if(cl.base == null && root){
 				cl.base = root;
 			}
+			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
+			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
 			stage.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
 		}
