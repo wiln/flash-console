@@ -99,6 +99,14 @@ package com.atticmedia.console {
 		private var _lines:Array = [];
 		private var _linesChanged:Boolean;
 		
+		/**
+		 * Console is the main class. However please use C for singleton Console access.
+		 * Using Console through C will also make sure you can remove console in a later date
+		 * by simply removing C.start() or C.startOnStage()
+		 * 
+		 * @see com.atticmedia.console.C
+		 * @see http://code.google.com/p/flash-console/
+		 */
 		public function Console(pass:String = "", uiset:int = 1) {
 			name = NAME;
 			_password = pass;

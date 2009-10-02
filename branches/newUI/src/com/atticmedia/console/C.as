@@ -23,14 +23,14 @@
 * 
 * 
 
-	USAGE:
+	BASIC USAGE:
 		
 		import com.atticmedia.console.*;
 		C.start(this); // this = preferably the root or stage
 		
 		// OR  C.start(this,"debug");
 		// Start console, parameter "debug" (optional) sets the console's password.
-		//  console will only open after you type "debug" in sequence at anytime on stage. 
+		// console will only open after you type "debug" in sequence at anytime on stage. 
 		// Leave blank to disable password, where console will launch straight away.
 		
 		C.add("Hello World"); 
@@ -61,22 +61,12 @@
 		
 		
 		// OPTIONAL USAGE
-		C.remove(); // Completely remove console
-		C.clear(); // Clear tracing lines
-		
 		C.paused = true // pauses printing in console, it still record and print back out on resume.
 		C.enabled = false // disables printing and recording. pauses FPS/memory monitor.
 		C.visible = false // (defauilt: true) set to change visibility. It will still record but will not update prints etc
-		C.maxRepeats = 100; // (default:100)  frames before repeating line is forced to print to next line. set to -1 to never force. set to 0 to force every line.
 		
-		C.commandLine = true; // (default: false) enable command line
-		C.fpsMonitor = 1; // (default: 0) show FPS graph monitor.
-		C.memoryMonitor = 1; // (default: 0) show memory usage graph.
-		C.width = 200; // (default: 420) change width of console
-		C.height = 200; //(default: 16) change hight of console
-		C.x = 300; // (default: 0) change x of console
-		C.y = 200; // (default: 0) change y of console
 		C.maxLines = 500; // maximum number of lines allowed to store. 0 = unlimited. setting to very high will slow down as it grows
+		C.maxRepeats = 100; // (default:100)  frames before repeating line is forced to print to next line. set to -1 to never force. set to 0 to force every line.
 		C.tracing = true; // (default: false) when set, all console input will be re-traced during authoring
 		C.alwaysOnTop = false; // (default: true) when set this console will try to keep it self on top of its parent display container.
 
@@ -85,17 +75,26 @@
 		
 		C.remoting = true; // (default: false) set to broadcast traces to LocalConnection
 		C.isRemote = true; // (default: false) set to recieve broadcasts from LocalConnection remote
-
 */
-		
 package com.atticmedia.console {
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import flash.system.Capabilities;		
-
+	import flash.system.Capabilities;	
+		
+	/**
+	 * C is a static / singleton adapter for Console (com.atticmedia.console.Console).
+	 * In a later date when Console is no longer needed, remove C.start(..) or C.startOnStage(..) 
+	 * and the rest of console related codes will stop executing to save memory and performance.
+	 * @author  Lu Aye Oo
+	 * @version 2.0
+	 * @see http://code.google.com/p/flash-console/
+	 * @see #start()
+	 * @see #startOnStage()
+	 * 
+	 */
 	public class C{
 		
 		private static const ERROR_EXISTS:String = "[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.";
@@ -103,6 +102,13 @@ package com.atticmedia.console {
 		private static var _console:Console;
 		private static var _disallowBrowser:uint;
 		
+		/**
+		 * Do not construct.
+		 * Please use C.start(..); or C.startOnStage(...);
+		 * @see #start()
+		 * @see #startOnStage()
+		 *
+		 */
 		public function C() {
 			throw new Error("[CONSOLE] Do not construct class. Please use C.start(mc:DisplayObjectContainer, password:String='')");
 		}
