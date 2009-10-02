@@ -313,7 +313,7 @@ package com.atticmedia.console.view {
 			for each(var interest:Interest in _interests){
 				str += " <font color='#"+interest.col.toString(16)+"'>"+interest.key+"</font>";
 			}
-			str +=  " | <font color='#FF8800'><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></font></s></r>";
+			str +=  " | <menu><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></s></r>";
 			keyTxt.htmlText = str;
 		}
 		protected function linkHandler(e:TextEvent):void{

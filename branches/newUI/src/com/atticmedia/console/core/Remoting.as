@@ -70,7 +70,7 @@ package com.atticmedia.console.core {
 			}
 		}
 		public function send(command:String, ...args):void{
-			var target:String = _isRemote?Console.REMOTER_CONN_NAME:Console.REMOTE_CONN_NAME;
+			var target:String = _isRemote?Console.CLIENT_CONN_NAME:Console.REMOTE_CONN_NAME;
 			args = [target, command].concat(args);
 			try{
 				_sharedConnection.send.apply(this, args);
@@ -91,8 +91,8 @@ package com.atticmedia.console.core {
 				_remoteLinesQueue = new Array();
 				startSharedConnection();
 				try{
-                	_sharedConnection.connect(Console.REMOTER_CONN_NAME);
-					_master.report("Remoting started [sandboxType: "+Security.sandboxType+"]",10);
+                	_sharedConnection.connect(Console.CLIENT_CONN_NAME);
+					_master.report("<b>Remoting started.</b> "+getInfo(),-1);
 					_isRemoting = true;
            		}catch (error:Error){
 					_master.report("Could not create client service. You will not be able to control this console with remote.", 10);
@@ -112,7 +112,7 @@ package com.atticmedia.console.core {
 				startSharedConnection();
 				try{
                 	_sharedConnection.connect(Console.REMOTE_CONN_NAME);
-					_master.report("Remote started [sandboxType: "+Security.sandboxType+"]",10);
+					_master.report("<b>Remote started.</b> "+getInfo(),-1);
            		}catch (error:Error){
 					_isRemoting = false;
 					_master.report("Could not create remote service. You might have a console remote already running.", 10);
@@ -120,6 +120,9 @@ package com.atticmedia.console.core {
 			}else{
 				close();
 			}
+		}
+		private function getInfo():String{
+			return "sandboxType:<p5>"+Security.sandboxType+"</p5> remote:<p5>"+Console.REMOTE_CONN_NAME+"</p5> client:<p5>"+Console.CLIENT_CONN_NAME+"</p5>.";
 		}
 		private function startSharedConnection():void{
 			close();

@@ -79,19 +79,19 @@ package com.atticmedia.console.view {
 			css.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
 			css.setStyle("l1",{color:'#0099CC'});
 			css.setStyle("l2",{color:'#FF8800'});
-			css.setStyle("p0",{color:'#000000'});
-			css.setStyle("p1",{color:'#33AA33'});
-			css.setStyle("p2",{color:'#77D077'});
-			css.setStyle("p3",{color:'#AAEEAA'});
-			css.setStyle("p4",{color:'#D6FFD6'});
-			css.setStyle("p5",{color:'#E6E6E6'});
-			css.setStyle("p6",{color:'#FFD6D6'});
-			css.setStyle("p7",{color:'#FFAAAA'});
-			css.setStyle("p8",{color:'#FF7777'});
-			css.setStyle("p9",{color:'#FF3333'});
-			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
-			css.setStyle("p-1",{color:'#0099CC'});
-			css.setStyle("p-2",{color:'#FF8800'});
+			css.setStyle("p0",{color:'#000000', display:'inline'});
+			css.setStyle("p1",{color:'#33AA33', display:'inline'});
+			css.setStyle("p2",{color:'#77D077', display:'inline'});
+			css.setStyle("p3",{color:'#AAEEAA', display:'inline'});
+			css.setStyle("p4",{color:'#D6FFD6', display:'inline'});
+			css.setStyle("p5",{color:'#E6E6E6', display:'inline'});
+			css.setStyle("p6",{color:'#FFD6D6', display:'inline'});
+			css.setStyle("p7",{color:'#FFAAAA', display:'inline'});
+			css.setStyle("p8",{color:'#FF7777', display:'inline'});
+			css.setStyle("p9",{color:'#FF3333', display:'inline'});
+			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold', display:'inline'});
+			css.setStyle("p-1",{color:'#0099CC', display:'inline'});
+			css.setStyle("p-2",{color:'#FF8800', display:'inline'});
 		}
 		
 		public function preset2():void{
@@ -117,19 +117,19 @@ package com.atticmedia.console.view {
 			css.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
 			css.setStyle("l1",{color:'#0099CC'});
 			css.setStyle("l2",{color:'#FF8800'});
-			css.setStyle("p0",{color:'#666666'});
-			css.setStyle("p1",{color:'#339033'});
-			css.setStyle("p2",{color:'#227722'});
-			css.setStyle("p3",{color:'#115511'});
-			css.setStyle("p4",{color:'#003300'});
-			css.setStyle("p5",{color:'#000000'});
-			css.setStyle("p6",{color:'#660000'});
-			css.setStyle("p7",{color:'#990000'});
-			css.setStyle("p8",{color:'#BB0000'});
-			css.setStyle("p9",{color:'#DD0000'});
-			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold'});
-			css.setStyle("p-1",{color:'#0099CC'});
-			css.setStyle("p-2",{color:'#FF6600'});
+			css.setStyle("p0",{color:'#666666', display:'inline'});
+			css.setStyle("p1",{color:'#339033', display:'inline'});
+			css.setStyle("p2",{color:'#227722', display:'inline'});
+			css.setStyle("p3",{color:'#115511', display:'inline'});
+			css.setStyle("p4",{color:'#003300', display:'inline'});
+			css.setStyle("p5",{color:'#000000', display:'inline'});
+			css.setStyle("p6",{color:'#660000', display:'inline'});
+			css.setStyle("p7",{color:'#990000', display:'inline'});
+			css.setStyle("p8",{color:'#BB0000', display:'inline'});
+			css.setStyle("p9",{color:'#DD0000', display:'inline'});
+			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold', display:'inline'});
+			css.setStyle("p-1",{color:'#0099CC', display:'inline'});
+			css.setStyle("p-2",{color:'#FF6600', display:'inline'});
 		}
 		public function preset3():void{
 			preset1();

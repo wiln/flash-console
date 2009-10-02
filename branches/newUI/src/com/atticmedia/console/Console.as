@@ -56,9 +56,10 @@ package com.atticmedia.console {
 		
 		public static const VERSION:Number = 2;
 		public static const VERSION_STAGE:String = "beta3";
-
-		public static const REMOTE_CONN_NAME:String = "_ConsoleRemoteV2";
-		public static const REMOTER_CONN_NAME:String = "_ConsoleRemoterV2";
+		
+		// you can change this if you need BEFORE starting remote / remoting
+		public static var REMOTE_CONN_NAME:String = "ConsoleRemote2";
+		public static var CLIENT_CONN_NAME:String = "ConsoleClient2";
 		
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "filtered";
@@ -110,24 +111,25 @@ package com.atticmedia.console {
 		public function Console(pass:String = "", uiset:int = 1) {
 			name = NAME;
 			_password = pass;
+			tabChildren = false; // Tabbing is not supported
+			//
 			style = new Style(uiset);
 			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
 			mm = new MemoryMonitor();
 			cl = new CommandLine(this);
 			remoter = new Remoting(this);
 			remoter.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
-			
+			//
 			var t:String = VERSION_STAGE?(" "+VERSION_STAGE):"";
 			report("<b>Console v"+VERSION+t+", Happy bug fixing!</b>",-2);
-			
-			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
-			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
 			if(_password != ""){
 				if(stage){
 					stageAddedHandle();
 				}
 				visible = false;
 			}
+			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
+			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
 		}
 		private function stageAddedHandle(e:Event=null):void{
 			if(cl.base == null && root){
@@ -272,7 +274,7 @@ package com.atticmedia.console {
 			if(!n) n = className+"@"+getTimer();
 			var nn:String = mm.watch(o,n);
 			if(!quiet)
-				report("Watching <b>"+className+"</b> as <font color=\"#FF0000\"><b>"+ nn +"</b></font>.",-1);
+				report("Watching <b>"+className+"</b> as <p5>"+ nn +"</p5>.",-1);
 			return nn;
 		}
 		public function unwatch(n:String):void{
@@ -296,7 +298,7 @@ package com.atticmedia.console {
 			var nn:String = cl.store(n, obj, strong);
 			if(!quiet && nn){
 				var str:String = obj is Function?"using <b>STRONG</b> reference":("for <b>"+getQualifiedClassName(obj)+"</b> using WEAK reference");
-				report("Stored <font color=\"#FF0000\"><b>$"+nn+"</b></font> in commandLine for "+ str +".",-1);
+				report("Stored <p5>$"+nn+"</p5> in commandLine for "+ str +".",-1);
 			}
 		}
 		public function get strongRef():Boolean{

@@ -34,7 +34,7 @@ package com.atticmedia.console.samples {
 
 		public function Remote() {
 			C.start(this, "");
-			C.isRemote = true;
+			C.remote = true;
 			C.commandLine = true;
 			
 			//

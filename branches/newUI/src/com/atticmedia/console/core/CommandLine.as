@@ -279,6 +279,7 @@ package com.atticmedia.console.core {
 					return [partNames,partValues];
 				}
 			}catch(e:Error){
+				// TODO: make first 2-3 lines RED, but the rest at normal color
 				report(e.getStackTrace(),10);
 			}
 			return [strPart,strPart];
