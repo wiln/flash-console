@@ -548,7 +548,7 @@ package com.atticmedia.console {
 		 * 
 		 */
 		public static function get commandBase():Object{
-			return getter("commandBase") as int;
+			return getter("commandBase") as Object;
 		}
 		public static function set commandBase(v:Object):void{
 			setter("commandBase",v);

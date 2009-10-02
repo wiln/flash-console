@@ -563,6 +563,12 @@ package com.atticmedia.console {
 		public function get commandLine ():Boolean{
 			return panels.mainPanel.commandLine;
 		}
+		public function set commandBase (v:Object):void{
+			if(v) cl.base = v;
+		}
+		public function get commandBase ():Object{
+			return cl.base;
+		}
 		public function runCommand(line:String):Object{
 			if(remoter.isRemote){
 				report("Run command at remote: "+line,-2);

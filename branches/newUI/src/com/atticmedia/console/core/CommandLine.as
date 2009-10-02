@@ -59,7 +59,7 @@ package com.atticmedia.console.core {
 			}else{
 				_returned = new WeakRef(obj, useStrong);
 			}
-			_saved.set("base", obj,useStrong);
+			_saved.set("base", obj, useStrong);
 		}
 		public function get base():Object {
 			return _saved.get("base");
@@ -177,6 +177,7 @@ package com.atticmedia.console.core {
 							values.push(strPart);
 						} else{
 							var arr:Array = getPartData(line[i]);
+							if(arr == null) return null; // had error and already done stack trace
 							names.push(arr[0]);
 							values.push(arr[1]);
 						}
@@ -211,10 +212,21 @@ package com.atticmedia.console.core {
 						report((newb?"+ ":"")+"Returned "+ getQualifiedClassName(returned) +": "+returned,10);
 					}
 				}catch (e:Error) {
-					report(e.getStackTrace(),10);
+					reportStackTrace(e.getStackTrace());
 				}
 			}
 			return returned;
+		}
+		private function reportStackTrace(str:String):void{
+			var lines:Array = str.split(/\n\s*/);
+			var p:int = 10;
+			var block:String = "";
+			for each(var line:String in lines){
+				block += "<p"+p+">&gt;&nbsp;"+line.replace(/\s/, "&nbsp;")+"</p"+p+"><br/>";
+				if(p>6) p--;
+			}
+			report(block, 9);
+			
 		}
 		private function getPartData(strPart:String):Array{
 			try{
@@ -245,6 +257,7 @@ package com.atticmedia.console.core {
 							for(var jj:int = (j+1);jj<endIndex;jj++){
 								if(dotParts[jj] && dotParts[jj] != ","){
 									var data:Array = getPartData(dotParts[jj]);
+									if(data == null) return null; // had error and already done stack trace
 									funArr.push(data[1][0]);
 								}
 							}
@@ -279,8 +292,8 @@ package com.atticmedia.console.core {
 					return [partNames,partValues];
 				}
 			}catch(e:Error){
-				// TODO: make first 2-3 lines RED, but the rest at normal color
-				report(e.getStackTrace(),10);
+				reportStackTrace(e.getStackTrace());
+				return null;
 			}
 			return [strPart,strPart];
 		}
@@ -477,7 +490,7 @@ package com.atticmedia.console.core {
 				report("Returned "+ child.name +": "+getQualifiedClassName(child),10);
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
-				report(e.getStackTrace(),10);
+				reportStackTrace(e.getStackTrace());
 			}
 		}
 		private function printHelp():void {
