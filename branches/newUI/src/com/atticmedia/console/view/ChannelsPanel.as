@@ -1,4 +1,4 @@
-/*
+﻿/*
 * 
 * Copyright (c) 2008-2009 Lu Aye Oo
 * 
@@ -77,11 +77,10 @@ package com.atticmedia.console.view {
 		private function onMenuRollOver(e:TextFieldRollOver):void{
 			var txt:String = e.url?e.url.replace("event:",""):"";
 			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
-				txt = MainPanel.TOOLTIPS["viewall"];
+				master.panels.tooltip(MainPanel.TOOLTIPS["viewall"], this);
 			}else if(txt=="close"){
-				txt = "Close";
+				master.panels.tooltip("Close", this);
 			}
-			master.panels.tooltip(txt, this);
 		}
 		protected function linkHandler(e:TextEvent):void{
 			_txtField.setSelection(0, 0);

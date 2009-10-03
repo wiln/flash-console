@@ -56,7 +56,7 @@ package com.atticmedia.console {
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		
 		public static const VERSION:Number = 2;
-		public static const VERSION_STAGE:String = "beta3";
+		public static const VERSION_STAGE:String = "";
 		
 		// you can change this if you need BEFORE starting remote / remoting
 		public static var REMOTE_CONN_NAME:String = "ConsoleRemote2";
@@ -103,7 +103,7 @@ package com.atticmedia.console {
 		private var _linesChanged:Boolean;
 		
 		/**
-		 * Console is the main class. However please use C for singleton Console access.
+		 * Console is the main class. However please use C for singleton Console adapter.
 		 * Using Console through C will also make sure you can remove console in a later date
 		 * by simply removing C.start() or C.startOnStage()
 		 * 

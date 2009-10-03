@@ -36,14 +36,14 @@ package com.atticmedia.console.samples {
 			//
 			// SET UP
 			//C.start(this, "", 2);
-			C.start(this, "`");  
+			C.start(this, "`"); 
 			// "`" - change for password. This will start hidden
 			C.visible = true; // show console, because having password hides console.
-			C.tracing = true;
+			C.tracing = true; // trace on flash's normal trace
 			C.commandLine = true; // enable command line
 			
 			C.width = 600;
-			C.height = 200;//C.tracing = true; // trace on flash's normal trace
+			C.height = 200;
 			
 			C.remoting = true;
 

@@ -59,7 +59,7 @@ package com.atticmedia.console.view {
 		public function preset1():void{
 			panelBackgroundColor = 0;
 			panelScalerColor = 0x880000;
-			commandLineColor = 0x108000;
+			commandLineColor = 0x10AA00;
 			bottomLineColor = 0xFF0000;
 			tooltipBackgroundColor = 0;
 			panelBackgroundAlpha = 0.6;
@@ -88,7 +88,7 @@ package com.atticmedia.console.view {
 			css.setStyle("p6",{color:'#FFD6D6', display:'inline'});
 			css.setStyle("p7",{color:'#FFAAAA', display:'inline'});
 			css.setStyle("p8",{color:'#FF7777', display:'inline'});
-			css.setStyle("p9",{color:'#FF3333', display:'inline'});
+			css.setStyle("p9",{color:'#FF4444', display:'inline'});
 			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold', display:'inline'});
 			css.setStyle("p-1",{color:'#0099CC', display:'inline'});
 			css.setStyle("p-2",{color:'#FF8800', display:'inline'});

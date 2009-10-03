@@ -34,12 +34,15 @@ package com.atticmedia.console.core {
 	import flash.utils.getQualifiedSuperclassName;		
 
 	public class CommandLine extends EventDispatcher {
-
+		
+		private static const MAPPING_SPLITTER:String = "|";
+		
 		private var _saved:WeakObject;
 		
 		private var _returned:WeakRef;
 		private var _returned2:WeakRef;
-		private var _lastMapBase:WeakRef;
+		private var _mapBases:WeakObject;
+		private var _mapBaseIndex:uint;
 		private var _reserved:Array;
 		
 		private var _master:Console;
@@ -49,6 +52,7 @@ package com.atticmedia.console.core {
 		public function CommandLine(m:Console) {
 			_master = m;
 			_saved = new WeakObject();
+			_mapBases = new WeakObject();
 			_returned = new WeakRef(m);
 			_saved.set("C", m);
 			_reserved = new Array("base", "C");
@@ -406,7 +410,8 @@ package com.atticmedia.console.core {
 				report("It is not a DisplayObjectContainer", 10);
 				return;
 			}
-			_lastMapBase = new WeakRef(base,useStrong);
+			_mapBases[_mapBaseIndex] = base;
+			var basestr:String = _mapBaseIndex+MAPPING_SPLITTER;
 			
 			var list:Array = new Array();
 			var index:int = 0;
@@ -455,7 +460,7 @@ package com.atticmedia.console.core {
 				for(i=0;i<steps;i++){
 					str += (i==steps-1)?" ∟ ":" - ";
 				}
-				var n:String = "<a href='event:clip_"+indexes.join("|")+"'>"+mcDO.name+"</a>";
+				var n:String = "<a href='event:clip_"+basestr+indexes.join(MAPPING_SPLITTER)+"'>"+mcDO.name+"</a>";
 				if(mcDO is DisplayObjectContainer){
 					n = "<b>"+n+"</b>";
 				}else{
@@ -465,22 +470,22 @@ package com.atticmedia.console.core {
 				report(str,mcDO is DisplayObjectContainer?5:2);
 				lastmcDO = mcDO;
 			}
-			
+			_mapBaseIndex++;
 			report(base.name+":"+getQualifiedClassName(base)+" has "+list.length+" children/sub-children.", 10);
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
 		public function reMap(path:String, mc:DisplayObjectContainer = null):void{
+			var pathArr:Array = path.split(MAPPING_SPLITTER);
 			if(!mc){
-				mc = _lastMapBase?(_lastMapBase.reference as DisplayObjectContainer):null;
+				var first:String = pathArr.shift();
+				mc = _mapBases[first];
 			}
-			var pathArr:Array = path.split("|");
 			var child:DisplayObject = mc as DisplayObject;
 			try{
 				if(path.length>0){
 					for each(var ind:String in pathArr){
 						child = mc.getChildByName(ind);
 						if(child is DisplayObjectContainer){
-							//mc = mc.getChildAt(ind) as DisplayObjectContainer;
 							mc = child as DisplayObjectContainer;;
 						}else{
 							// assume it reached to end since there can no longer be a child
@@ -492,7 +497,7 @@ package com.atticmedia.console.core {
 				report("+ Returned "+ child.name +": "+getQualifiedClassName(child),10);
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
-				reportStackTrace(e.getStackTrace());
+				//reportStackTrace(e.getStackTrace());
 			}
 		}
 		private function printHelp():void {

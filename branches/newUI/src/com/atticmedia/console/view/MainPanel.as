@@ -353,7 +353,7 @@ package com.atticmedia.console.view {
 				master.cl.reMap(e.text.substring(6), stage);
 			}
 			e.stopPropagation();
-		}				
+		}
 		public function onChannelPressed(chn:String):void{
 			var current:Array = master.viewingChannels.concat();
 			if(_shift && master.viewingChannel != Console.GLOBAL_CHANNEL && chn != Console.GLOBAL_CHANNEL){

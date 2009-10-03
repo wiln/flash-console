@@ -61,18 +61,11 @@
 		
 		
 		// OPTIONAL USAGE
-		C.paused = true // pauses printing in console, it still record and print back out on resume.
-		C.enabled = false // disables printing and recording. pauses FPS/memory monitor.
 		C.visible = false // (defauilt: true) set to change visibility. It will still record but will not update prints etc
-		
-		C.maxLines = 500; // maximum number of lines allowed to store. 0 = unlimited. setting to very high will slow down as it grows
-		C.maxRepeats = 100; // (default:100)  frames before repeating line is forced to print to next line. set to -1 to never force. set to 0 to force every line.
+
 		C.tracing = true; // (default: false) when set, all console input will be re-traced during authoring
 		C.alwaysOnTop = false; // (default: true) when set this console will try to keep it self on top of its parent display container.
 
-		C.defaultChannel = "myChannel"; // (default: "traces") change default channel to print.
-		C.viewingChannel = "myChannel"; // (default: "global") change current channel view. If you want to view multiple channels, seperate the names with commas.
-		
 		C.remoting = true; // (default: false) set to broadcast traces to LocalConnection
 		C.isRemote = true; // (default: false) set to recieve broadcasts from LocalConnection remote
 */
@@ -93,7 +86,6 @@ package com.atticmedia.console {
 	 * @see http://code.google.com/p/flash-console/
 	 * @see #start()
 	 * @see #startOnStage()
-	 * 
 	 */
 	public class C{
 		
@@ -104,7 +96,9 @@ package com.atticmedia.console {
 		
 		/**
 		 * Do not construct.
+		 * <p>
 		 * Please use C.start(..); or C.startOnStage(...);
+		 * @throws Error error
 		 * @see #start()
 		 * @see #startOnStage()
 		 *
@@ -114,15 +108,19 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Start Console inside the given Display.
+		 * <p>
 		 * Calling any other C calls before this (or startOnStage(...)) will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
+		 * <p>
 		 * In flex, it is more convenient to use C.startOnStage() as it will avoid UIComponent typing issue.
 		 * @see #startOnStage()
 		 *
 		 * @param  Display in which console should be added to. Preferably stage or root of your flash document.
-		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
+		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Set C.visible = ture to unhide at start.
+		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
-		 * @param  If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * @param  If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * 			If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 * 
 		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
@@ -138,15 +136,18 @@ package com.atticmedia.console {
 		/**
 		 * Start Console in top level (Stage). 
 		 * Starting in stage makes sure console is added at the very top level.
+		 * <p>
 		 * It will look for stage of mc (first param), if mc isn't a Stage or on Stage, console will be added to stage when mc get added to stage.
+		 * <p>
 		 * Calling any other C calls before this will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 * 
 		 * @param  Display which is Stage or will be added to Stage.
-		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
+		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Set C.visible = ture to unhide at start.
+		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
 		 * @param  If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
-		 * 							If set to 2, optoin 1 apples except it still runs if there is Console remote running.
+		 * 			If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 * 
 		 */
 		public static function startOnStage(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
@@ -177,8 +178,8 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Add log line to channel
-		 * If channel name doesn't exists it creates it
+		 * Add log line to channel.
+		 * If channel name doesn't exists it creates one.
 		 *
 		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
 		 * @param  String to add
@@ -215,7 +216,7 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Enable/Disable logging and graphs in Console.
-		 * Does not record logs or graphs while disabled
+		 * Does not record logs or graphs while disabled.
 		 */
 		public static function set enabled(v:Boolean):void{
 			setter("enabled",v);
@@ -227,7 +228,7 @@ package com.atticmedia.console {
 		// Logging settings
 		//
 		/**
-		 * Clear console logs
+		 * Clear console logs.
 		 * @param  (optional) name of log channel to clear, leave blank to clear all.
 		 */
 		public static function clear(channel:String = null):void{
@@ -236,7 +237,8 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Accessor for default channel name
+		 * Accessor for default channel name.
+		 * <p>
 		 * This is the channel name used for C.add(...) logs
 		 */
 		public static function get defaultChannel():String{
@@ -246,8 +248,9 @@ package com.atticmedia.console {
 			setter("defaultChannel",v);
 		}
 		/**
-		 * Accessor for currently viewing channel
-		 * set to null or empty string to view all channels (global channel).
+		 * Accessor for currently viewing channel.
+		 * <p>
+		 * Set to null or empty string to view all channels (global channel).
 		 */
 		public static function get viewingChannel():String{
 			return getter("viewingChannel") as String;
@@ -256,8 +259,9 @@ package com.atticmedia.console {
 			setter("viewingChannel",v);
 		}
 		/**
-		 * Accessor for currently viewing channels
-		 * set to null or empty array to view all channels (global channel).
+		 * Accessor for currently viewing channels.
+		 * <p>
+		 * Set to null or empty array to view all channels (global channel).
 		 */
 		public static function get viewingChannels():Array{
 			return getter("viewingChannels") as Array;
@@ -266,9 +270,10 @@ package com.atticmedia.console {
 			setter("viewingChannels",v);
 		}
 		/**
-		 * Accessor for filtering text
+		 * Accessor for filtering text.
+		 * <p>
 		 * When set, Console will create a new channel called filtered and
-		 * show all log lines that match the param text
+		 * show all log lines that match the param text.
 		 * 
 		 * Same as using /filter (text) in commandLine.
 		 */
@@ -280,6 +285,7 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Enable/disable prefixing channel names infront of log lines.
+		 * <p>
 		 * When turned on, it shows channel names when multiple channels are visible in the same log view.
 		 * Default: true
 		 */
@@ -290,7 +296,7 @@ package com.atticmedia.console {
 			setter("prefixChannelNames",v);
 		}
 		/**
-		 * Maximum number of logs Console should remember
+		 * Maximum number of logs Console should remember.
 		 * 0 = unlimited. Setting to very high will slow down performance as it grows
 		 */
 		public static function get maxLines():int{
@@ -300,7 +306,8 @@ package com.atticmedia.console {
 			setter("maxLines",v);
 		}
 		/**
-		 * Frames before repeating line is forced to print to next line. 
+		 * Frames before repeating line is forced to print to next line.
+		 * <p>
 		 * Set to -1 to never force. Set to 0 to force every line.
 		 * Default = 75;
 		 */
@@ -311,7 +318,8 @@ package com.atticmedia.console {
 			setter("maxRepeats",v);
 		}
 		/**
-		 * Accessor for using flash's build in (or external) trace()
+		 * Accessor for using flash's build in (or external) trace().
+		 * <p>
 		 * When turned on, Console will also call trace() for all console logs.
 		 * trace function can be replaced with something of your own (such as Flex's logging).
 		 * default is trace(...);
@@ -324,7 +332,8 @@ package com.atticmedia.console {
 			return getter("tracing") as Boolean;
 		}
 		/**
-		 * Accessor for channels to call trace
+		 * Accessor for channels to call trace.
+		 * <p>
 		 * When set, console will only call trace for channels that match the channel name.
 		 * set to null or empty array to trace on all channels.
 		 * C.tracing must be set to true for this to effect
@@ -337,8 +346,9 @@ package com.atticmedia.console {
 			return getter("tracingChannels") as Array;
 		}
 		/**
-		 * Accessor for minimum priority required to call trace
-		 * set to zero (default) to call on all priorities
+		 * Accessor for minimum priority required to call trace.
+		 * <p>
+		 * set to zero (default) to call on all priorities.
 		 * C.tracing must be set to true for this to effect
 		 * @see #tracing
 		 */
@@ -350,7 +360,9 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Assign custom trace function.
-		 * Console will only call this when C.tracing is true.
+		 * <p>
+		 * Strong reference to function. Console will only call this when C.tracing is true.
+		 * @see #tracing
 		 *
 		 * @param  Custom function to use, must accept at least 1 parameter as String.
 		 * @return Current trace function, default is flash's build in trace.
@@ -367,8 +379,9 @@ package com.atticmedia.console {
 		//
 		/**
 		 * Set panel position.
+		 * <p>
 		 * See panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
-		 * No effect if panel of that name doesn't exist
+		 * No effect if panel of that name doesn't exist.
 		 * 
 		 * @param	Name of panel to set
 		 * @param	Point location to move
@@ -380,8 +393,9 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Set panel position and size.
+		 * <p>
 		 * See panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
-		 * No effect if panel of that name doesn't exist
+		 * No effect if panel of that name doesn't exist.
 		 * 
 		 * @param	Name of panel to set
 		 * @param	Rectangle area for panel size and position
@@ -420,6 +434,7 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Determine if Console should hide the mouse cursor when using Ruler tool.
+		 * <p>
 		 * You may want to turn it off if your app/game don't use system mouse.
 		 * Default: true
 		 */
@@ -476,7 +491,8 @@ package com.atticmedia.console {
 		}
 		/**
 		 * When set to true, Console will *try* not to trace too much info about it self.
-		 * It will stop tracing about start of storing and watching objects - and a few others
+		 * <p>
+		 * It will stop tracing about start of storing and watching objects - and a few others.
 		 * If not sure, keep it to false.
 		 * Default: false;
 		 */
@@ -487,13 +503,16 @@ package com.atticmedia.console {
 			return getter("quiet") as Boolean;
 		}
 		/**
-		 * Accessor for keeping Console on top of display list
+		 * Accessor for keeping Console on top of display list.
+		 * <p>
 		 * When turned on (by default), console will always try to put it self on top of the parent's display list.
 		 * For example, if console is started in root, when a child display is added in root, console will move it self to the 
 		 * top of root's display list to try to overlay the new child display. - making sure that console don't get covered.
+		 * <p>
 		 * However, if Console's parent display (root in example) is covered by another display (example: adding a child directly to stage), 
 		 * console will not be able to pull it self above it as it is in root, not stage.
-		 * If console is added on stage in the first place, there won't be an issue as described above. Use C.startOnStage(...)
+		 * If console is added on stage in the first place, there won't be an issue as described above. Use C.startOnStage(...).
+		 * <p>
 		 * Keeping it turned on may have other side effects if another display is also trying to put it self on top, 
 		 * they could be jumping layers as they fight for the top layer.
 		 */
@@ -507,10 +526,13 @@ package com.atticmedia.console {
 		// Remoting
 		//
 		/**
-		 * Accessor for remoting (sender)
+		 * Accessor for remoting (sender).
 		 * When turned on, Console will periodically broadcast logs, FPS history and memory usage
-		 * for another Console remote to receive. The broadcast interval can be changed through C.remoteDelay
-		 * Can not be remoting (sender) and remote (reciever) at the same time
+		 * for another Console remote to receive. 
+		 * <p>
+		 * Can not be remoting (sender) and remote (reciever) at the same time.
+		 * The broadcast interval can be changed through C.remoteDelay.
+		 * @see #remoteDelay
 		 */
 		public static function get remoting():Boolean{
 			return getter("remoting") as Boolean;
@@ -519,8 +541,9 @@ package com.atticmedia.console {
 			setter("remoting",v);
 		}
 		/**
-		 * Accessor for remote (reciever)
-		 * When turned on, Console will listen for broadcast of logs/FPS/memory usage from another Console
+		 * Accessor for remote (reciever).
+		 * When turned on, Console will listen for broadcast of logs/FPS/memory usage from another Console.
+		 * <p>
 		 * Can not be remoting (sender) and remote (reciever) at the same time
 		 */
 		public static function get remote():Boolean{
@@ -530,7 +553,7 @@ package com.atticmedia.console {
 			setter("remote",v);
 		}
 		/**
-		 * Accessor for remoter's broadcast interval in frames
+		 * Accessor for remoter's broadcast interval in frames.
 		 * Default = 20 
 		 */
 		public static function get remoteDelay():int{
@@ -544,7 +567,8 @@ package com.atticmedia.console {
 		//
 		/**
 		 * Output an object's info such as it's variables, methods (if any), properties,
-		 * superclass, children displays (if Display), parent displays (if Display), etc
+		 * superclass, children displays (if Display), parent displays (if Display), etc.
+		 * <p>
 		 * commandLine: /inspect  OR  /inspectfull
 		 * 
 		 * @param Object to inspect
@@ -557,7 +581,8 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * CommandLine UI's visibility
+		 * CommandLine UI's visibility.
+		 * <p>
 		 * CommandLine will still be avaviable to use through code.
 		 */
 		public static function set commandLine (v:Boolean):void{
@@ -568,7 +593,8 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Command line base.
-		 * This is the value returned from /base in commandLine.
+		 * The value returned from /base in commandLine.
+		 * <p>
 		 * Default is set to console's parent DisplayContainer.
 		 */
 		public static function get commandBase():Object{
@@ -593,7 +619,7 @@ package com.atticmedia.console {
 			setter("strongRef",v);
 		}
 		/**
-		 * Store a reference in Console for use in CommandLine
+		 * Store a reference in Console for use in CommandLine.
 		 * (same as /save in commandLine)
 		 * 
 		 * @param  name to save as
@@ -620,7 +646,7 @@ package com.atticmedia.console {
 		// Memory management tools
 		//
 		/**
-		 * Watches an object to be notified in console when it is being garbage collected
+		 * Watch an object to be notified in console when it is being garbage collected
 		 *
 		 * @param  Object to watch
 		 * @param  Object's identification/name
@@ -644,7 +670,7 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Force Garbage collect
+		 * Force Garbage collect.
 		 * Requires debugger version of flash player
 		 */
 		public static function gc():void {
@@ -656,12 +682,13 @@ package com.atticmedia.console {
 		// Graphing utilites
 		//
 		/**
-		 * Add graph
-		 * Creates a new graph panel (or use an already existing one)
-		 * Graphs numeric values every frame. 
+		 * Add graph.
+		 * Creates a new graph panel (or use an already existing one) and
+		 * graphs numeric values every frame. 
+		 * <p>
 		 * Reference to the object is weak, so when the object is garbage collected 
 		 * graph will also remove that particular graph line. (hopefully)
-		 * 
+		 * <p>
 		 * Example: To graph both mouseX and mouseY of stage:
 		 * C.addGraph("mouse", stage, "mouseX", 0xFF0000, "x");
 		 * C.addGraph("mouse", stage, "mouseY", 0x0000FF, "y");
@@ -681,12 +708,12 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Fix graph's range
+		 * Fix graph's range.
 		 * When fixed, graph will only show within the fixed value however offset the real values may be.
-		 * 
+		 * <p>
 		 * For example: if the graph is fixed between 100 and 200, and the graph value at one point is 300, 
 		 * graph will not expand to accompany up to value 10, but remain fixed to 100 - 200 range.
-		 * 
+		 * <p>
 		 * Pass NaN to min or max to unfix graph.
 		 * No effect if no graph of the name exists.
 		 *
@@ -701,8 +728,8 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Remove graph
-		 * 
+		 * Remove graph.
+		 * <p>
 		 * Leave obj and prop params blank to remove the whole graph.
 		 *
 		 * @param  Name of graph.
@@ -716,7 +743,8 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Bind keyboard key to a function
+		 * Bind keyboard key to a function.
+		 * <p>
 		 * WARNING: key binding hard references the function. 
 		 * This should only be used for development purposes.
 		 * Pass null Function to unbind.
@@ -736,8 +764,10 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Assign key binding to capture Display roller's display mapping.
-		 * This will output whatever display roller is mapping into console.
+		 * <p>
+		 * Pressing the key will output whatever display roller is mapping into console.
 		 * You can then press on each display name in Console to get reference to that display for CommandLine use.
+		 * <p>
 		 * Only activates when Display Roller is enabled.
 		 * Default: null (not assigned)
 		 *
