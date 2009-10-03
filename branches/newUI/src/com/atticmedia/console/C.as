@@ -116,6 +116,8 @@ package com.atticmedia.console {
 		 * Start Console inside the given Display.
 		 * Calling any other C calls before this (or startOnStage(...)) will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
+		 * In flex, it is more convenient to use C.startOnStage() as it will avoid UIComponent typing issue.
+		 * @see #startOnStage()
 		 *
 		 * @param  Display in which console should be added to. Preferably stage or root of your flash document.
 		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
