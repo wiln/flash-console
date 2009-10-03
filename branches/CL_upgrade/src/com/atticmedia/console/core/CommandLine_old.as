@@ -33,7 +33,7 @@ package com.atticmedia.console.core {
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getQualifiedSuperclassName;		
 
-	public class CommandLine extends EventDispatcher {
+	public class CommandLine_old extends EventDispatcher {
 		
 		private static const MAPPING_SPLITTER:String = "|";
 		
@@ -49,7 +49,7 @@ package com.atticmedia.console.core {
 		
 		public var useStrong:Boolean;
 
-		public function CommandLine(m:Console) {
+		public function CommandLine_old(m:Console) {
 			_master = m;
 			_saved = new WeakObject();
 			_mapBases = new WeakObject();
