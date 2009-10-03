@@ -23,6 +23,7 @@
 * 
 */
 package com.atticmedia.console {
+	import com.atticmedia.console.view.RollerPanel;	
 	import com.atticmedia.console.core.CommandLine;
 	import com.atticmedia.console.core.LogLineVO;
 	import com.atticmedia.console.core.MemoryMonitor;
@@ -68,7 +69,7 @@ package com.atticmedia.console {
 		public var style:Style;
 		public var panels:PanelsManager;
 		private var mm:MemoryMonitor;
-		private var cl:CommandLine;
+		public var cl:CommandLine;
 		private var remoter:Remoting;
 		//
 		public var quiet:Boolean;
@@ -91,6 +92,7 @@ package com.atticmedia.console {
 		private var _mspf:Number;
 		private var _previousTime:Number;
 		private var _traceCall:Function = trace;
+		private var _rollerCaptureKey:String;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -137,12 +139,12 @@ package com.atticmedia.console {
 			}
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
-			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyUpHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
-			stage.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyUpHandler);
 		}
 		private function onStageMouseLeave(e:Event):void{
 			panels.tooltip(null);
@@ -192,7 +194,14 @@ package com.atticmedia.console {
 			return false;
 		}
 		public function addGraph(n:String, obj:Object, prop:String, col:Number, key:String, rect:Rectangle = null, inverse:Boolean = false):void{
+			if(obj == null) {
+				report("ERROR: Graph ["+n+"] received a null object to graph property ["+prop+"].", 10);
+				return;
+			}
 			panels.addGraph(n,obj,prop,col,key,rect,inverse);
+		}
+		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
+			panels.fixGraphRange(n, min, max);
 		}
 		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			panels.removeGraph(n, obj, prop);
@@ -206,15 +215,20 @@ package com.atticmedia.console {
 				report("Binding key must be a single character. You gave ["+char+"]", 10);
 				return;
 			}
-			var key:String = char.toLowerCase()+(ctrl?"0":"1")+(alt?"0":"1")+(shift?"0":"1");
-			if(fun is Function){
-				_keyBinds[key] = [fun,args];
-			}else{
-				delete _keyBinds[key];
-			}
+			bindByKey(getKey(char, ctrl, alt, shift), fun, args);
 			if(!quiet){
 				report((fun is Function?"Bined":"Unbined")+" key <b>"+ char.toUpperCase() +"</b>"+ (ctrl?"+ctrl":"")+(alt?"+alt":"")+(shift?"+shift":"")+".",-1);
 			}
+		}
+		private function bindByKey(key:String, fun:Function ,args:Array = null):void{
+			if(fun==null){
+				delete _keyBinds[key];
+			}else{
+				_keyBinds[key] = [fun,args];
+			}
+		}
+		private function getKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):String{
+			return char.toLowerCase()+(ctrl?"0":"1")+(alt?"0":"1")+(shift?"0":"1");
 		}
 		public function setPanelPosition(panelname:String, p:Point):void{
 			var panel:AbstractPanel = panels.getPanel(panelname);
@@ -253,6 +267,20 @@ package com.atticmedia.console {
 		}
 		public function set displayRoller(b:Boolean):void{
 			panels.displayRoller = b;
+		}
+		public function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
+			if(_rollerCaptureKey){
+				bindByKey(_rollerCaptureKey, null);
+			}
+			if(char && char.length==1){
+				_rollerCaptureKey = getKey(char, ctrl, alt, shift);
+				bindByKey(_rollerCaptureKey, onRollerCaptureKey);
+			}
+		}
+		private function onRollerCaptureKey():void{
+			if(displayRoller){
+				report("Display Roller Capture:"+RollerPanel(panels.getPanel(PANEL_ROLLER)).capture(), -1);
+			}
 		}
 		//
 		public function get fpsMonitor():int{

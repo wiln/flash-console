@@ -96,7 +96,6 @@ package com.atticmedia.console.view {
 			return Math.random();
 		}
 		public function add(obj:Object, prop:String, col:Number = -1, key:String=null):void{
-			if(obj == null) return;
 			var cur:Number = obj[prop];
 			if(!isNaN(cur)){
 				if(isNaN(lowest)) lowest = cur;
@@ -305,8 +304,8 @@ package com.atticmedia.console.view {
 				graph.graphics.moveTo(W-mark, 0);
 				graph.graphics.lineTo(W-mark, H);
 			}*/
-			lowTxt.text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
-			highTxt.text = isNaN(highest)?"":"<s>"+highest+"</s>";
+			(inverse?highTxt:lowTxt).text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
+			(inverse?lowTxt:highTxt).text = isNaN(highest)?"":"<s>"+highest+"</s>";
 		}
 		public function updateKeyText():void{
 			var str:String = "<r><s>";

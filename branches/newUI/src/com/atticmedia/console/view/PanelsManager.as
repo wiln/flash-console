@@ -191,6 +191,12 @@ package com.atticmedia.console.view {
 			graph.add(obj,prop,col, key);
 			addPanel(graph);
 		}
+		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
+			var graph:GraphingPanel = getPanel(USER_GRAPH_PREFIX+n) as GraphingPanel;
+			if(graph){
+				graph.fixRange(min, max);
+			}
+		}
 		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			var graph:GraphingPanel = getPanel(USER_GRAPH_PREFIX+n) as GraphingPanel;
 			if(graph){

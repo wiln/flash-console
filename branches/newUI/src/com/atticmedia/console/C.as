@@ -117,10 +117,10 @@ package com.atticmedia.console {
 		 * Calling any other C calls before this (or startOnStage(...)) will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 *
-		 * @param  mc  	Display in which console should be added to. Preferably stage or root of your flash document.
-		 * @param  pass Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
-		 * @param  skin Skin preset number to use. 1 = black base, 2 = white base
-		 * @param  allowInBrowser If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * @param  Display in which console should be added to. Preferably stage or root of your flash document.
+		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
+		 * @param  Skin preset number to use. 1 = black base, 2 = white base
+		 * @param  If set to false, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
 		 * 
 		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
@@ -140,10 +140,10 @@ package com.atticmedia.console {
 		 * Calling any other C calls before this will fail silently.
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 * 
-		 * @param  mc  	Display which is Stage or will be added to Stage.
-		 * @param  pass Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
-		 * @param  skin Skin preset number to use. 1 = black base, 2 = white base
-		 * @param  allowInBrowser If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
+		 * @param  Display which is Stage or will be added to Stage.
+		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Must be ASCII chars.
+		 * @param  Skin preset number to use. 1 = black base, 2 = white base
+		 * @param  If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
 		 * 							If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 * 
 		 */
@@ -164,9 +164,9 @@ package com.atticmedia.console {
 		/**
 		 * Add log line to default channel
 		 *
-		 * @param  str  String to add
-		 * @param  priority Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
-		 * @param  isRepeating When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
+		 * @param  String to add
+		 * @param  Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
 		 * 
 		 */
 		public static function add(str:*, priority:Number = 2, isRepeating:Boolean = false):void{
@@ -178,10 +178,10 @@ package com.atticmedia.console {
 		 * Add log line to channel
 		 * If channel name doesn't exists it creates it
 		 *
-		 * @param  channel  name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param  str  String to add
-		 * @param  priority Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
-		 * @param  isRepeating When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
+		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param  String to add
+		 * @param  Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
 		 * 
 		 */
 		public static function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
@@ -226,7 +226,7 @@ package com.atticmedia.console {
 		//
 		/**
 		 * Clear console logs
-		 * @param  channel  (optional) name of log channel to clear, leave blank to clear all.
+		 * @param  (optional) name of log channel to clear, leave blank to clear all.
 		 */
 		public static function clear(channel:String = null):void{
 			if(_console){
@@ -313,7 +313,7 @@ package com.atticmedia.console {
 		 * When turned on, Console will also call trace() for all console logs.
 		 * trace function can be replaced with something of your own (such as Flex's logging).
 		 * default is trace(...);
-		 * @see C.traceCall
+		 * @see #traceCall()
 		 */
 		public static function set tracing(v:Boolean):void{
 			setter("tracing",v);
@@ -326,6 +326,7 @@ package com.atticmedia.console {
 		 * When set, console will only call trace for channels that match the channel name.
 		 * set to null or empty array to trace on all channels.
 		 * C.tracing must be set to true for this to effect
+		 * @see #tracing
 		 */
 		public static function set tracingChannels(v:Array):void{
 			setter("tracingChannels",v);
@@ -337,6 +338,7 @@ package com.atticmedia.console {
 		 * Accessor for minimum priority required to call trace
 		 * set to zero (default) to call on all priorities
 		 * C.tracing must be set to true for this to effect
+		 * @see #tracing
 		 */
 		public static function set tracingPriority(v:int):void{
 			setter("tracingPriority",v);
@@ -348,8 +350,8 @@ package com.atticmedia.console {
 		 * Assign custom trace function.
 		 * Console will only call this when C.tracing is true.
 		 *
-		 * @param  f  Custom function to use, must accept at least 1 parameter as String.
-		 * @return	Current trace function, default is flash's build in trace.
+		 * @param  Custom function to use, must accept at least 1 parameter as String.
+		 * @return Current trace function, default is flash's build in trace.
 		 * 
 		 */
 		public static function set traceCall(f:Function):void{
@@ -361,42 +363,69 @@ package com.atticmedia.console {
 		//
 		// Panel settings
 		//
-		// see panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
+		/**
+		 * Set panel position.
+		 * See panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
+		 * No effect if panel of that name doesn't exist
+		 * 
+		 * @param	Name of panel to set
+		 * @param	Point location to move
+		 */
 		public static function setPanelPosition(panelname:String, p:Point):void{
 			if(_console){
 				_console.setPanelPosition(panelname, p);
 			}
 		}
+		/**
+		 * Set panel position and size.
+		 * See panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
+		 * No effect if panel of that name doesn't exist
+		 * 
+		 * @param	Name of panel to set
+		 * @param	Rectangle area for panel size and position
+		 */
 		public static function setPanelArea(panelname:String, rect:Rectangle):void{
 			if(_console){
 				_console.setPanelArea(panelname, rect);
 			}
 		}
-		//
+		/**
+		 * Start/stop FPS monitor graph.
+		 */
 		public static function set fpsMonitor(v:int):void{
 			setter("fpsMonitor", v);
 		}
 		public static function get fpsMonitor():int{
 			return getter("fpsMonitor") as int;
 		}
-		//
+		/**
+		 * Start/stop Memory monitor graph.
+		 */
 		public static function set memoryMonitor(v:int):void{
 			setter("memoryMonitor", v);
 		}
 		public static function get memoryMonitor():int{
 			return getter("memoryMonitor") as int;
 		}
-		public static function set rulerHidesMouse(v:Boolean):void{
-			setter("rulerHidesMouse",v);
-		}
-		public static function get rulerHidesMouse():Boolean{
-			return getter("rulerHidesMouse") as Boolean;
-		}
+		/**
+		 * Start/stop Display Roller.
+		 */
 		public static function set displayRoller(v:Boolean):void{
 			setter("displayRoller", v);
 		}
 		public static function get displayRoller():Boolean{
 			return getter("displayRoller") as Boolean;
+		}
+		/**
+		 * Determine if Console should hide the mouse cursor when using Ruler tool.
+		 * You may want to turn it off if your app/game don't use system mouse.
+		 * Default: true
+		 */
+		public static function set rulerHidesMouse(v:Boolean):void{
+			setter("rulerHidesMouse",v);
+		}
+		public static function get rulerHidesMouse():Boolean{
+			return getter("rulerHidesMouse") as Boolean;
 		}
 		/**
 		 * width of main console panel
@@ -446,9 +475,8 @@ package com.atticmedia.console {
 		/**
 		 * When set to true, Console will *try* not to trace too much info about it self.
 		 * It will stop tracing about start of storing and watching objects - and a few others
-		 * If not sure, keep it turned off.
-		 * Default: false; 
-		 * 
+		 * If not sure, keep it to false.
+		 * Default: false;
 		 */
 		public static function set quiet(v:Boolean):void{
 			setter("quiet",v);
@@ -466,7 +494,6 @@ package com.atticmedia.console {
 		 * If console is added on stage in the first place, there won't be an issue as described above. Use C.startOnStage(...)
 		 * Keeping it turned on may have other side effects if another display is also trying to put it self on top, 
 		 * they could be jumping layers as they fight for the top layer.
-		 * 
 		 */
 		public static function set alwaysOnTop(v:Boolean):void{
 			setter("alwaysOnTop",v);
@@ -482,7 +509,6 @@ package com.atticmedia.console {
 		 * When turned on, Console will periodically broadcast logs, FPS history and memory usage
 		 * for another Console remote to receive. The broadcast interval can be changed through C.remoteDelay
 		 * Can not be remoting (sender) and remote (reciever) at the same time
-		 * 
 		 */
 		public static function get remoting():Boolean{
 			return getter("remoting") as Boolean;
@@ -494,7 +520,6 @@ package com.atticmedia.console {
 		 * Accessor for remote (reciever)
 		 * When turned on, Console will listen for broadcast of logs/FPS/memory usage from another Console
 		 * Can not be remoting (sender) and remote (reciever) at the same time
-		 * 
 		 */
 		public static function get remote():Boolean{
 			return getter("remote") as Boolean;
@@ -505,7 +530,6 @@ package com.atticmedia.console {
 		/**
 		 * Accessor for remoter's broadcast interval in frames
 		 * Default = 20 
-		 * 
 		 */
 		public static function get remoteDelay():int{
 			return getter("remoteDelay") as int;
@@ -521,8 +545,8 @@ package com.atticmedia.console {
 		 * superclass, children displays (if Display), parent displays (if Display), etc
 		 * commandLine: /inspect  OR  /inspectfull
 		 * 
-		 * @param  obj Object to inspect
-		 * @param detail if true, it will also ouput more detailed, such as the value of properties and variables
+		 * @param Object to inspect
+		 * @param Set true to ouput in more detailed, such as the value of properties and variables
 		 * 
 		 */
 		public static function inspect(obj:Object, detail:Boolean = true):void {
@@ -533,7 +557,6 @@ package com.atticmedia.console {
 		/**
 		 * CommandLine UI's visibility
 		 * CommandLine will still be avaviable to use through code.
-		 * 
 		 */
 		public static function set commandLine (v:Boolean):void{
 			setter("commandLine",v);
@@ -545,7 +568,6 @@ package com.atticmedia.console {
 		 * Command line base.
 		 * This is the value returned from /base in commandLine.
 		 * Default is set to console's parent DisplayContainer.
-		 * 
 		 */
 		public static function get commandBase():Object{
 			return getter("commandBase") as Object;
@@ -558,8 +580,8 @@ package com.atticmedia.console {
 		 * Default is false; Which means all outside references Console store are weak referenced,
 		 * allowing them to be garbage collected when required.
 		 * 
-		 * @param  v  new value
-		 * @return current strong referencing setting
+		 * @param  new value
+		 * @return Current strong referencing setting
 		 * 
 		 */
 		public static function get strongRef():Boolean{
@@ -570,12 +592,11 @@ package com.atticmedia.console {
 		}
 		/**
 		 * Store a reference in Console for use in CommandLine
-		 * (same as /save in command line)
+		 * (same as /save in commandLine)
 		 * 
-		 * @param  n  name to save as
-		 * @param  obj object reference to save, pass null to remove previous save.
-		 * @param  strong (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
-		 * 
+		 * @param  name to save as
+		 * @param  Object reference to save, pass null to remove previous save.
+		 * @param  (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
 		 */
 		public static function store(n:String, obj:Object, strong:Boolean = false):void{
 			if(_console ){
@@ -583,10 +604,9 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Run a command string
+		 * Run a commandLine string
 		 *
-		 * @param  str  string to run
-		 * 
+		 * @param  String to run
 		 */
 		public static function runCommand(str:String):Object{
 			if(_console){
@@ -600,10 +620,10 @@ package com.atticmedia.console {
 		/**
 		 * Watches an object to be notified in console when it is being garbage collected
 		 *
-		 * @param  obj  object to watch
-		 * @param  n  	object's identification/name
-		 * @return	name Console used to identify the object - this can be different to param n if another object of the same name is already being watched
+		 * @param  Object to watch
+		 * @param  Object's identification/name
 		 * 
+		 * @return	Name console used to identify the object - this can be different to param n if another object of the same name is already being watched
 		 */
 		public static function watch(obj:Object,n:String = null):String{
 			if(_console){
@@ -614,8 +634,7 @@ package com.atticmedia.console {
 		/**
 		 * Stop watching an object from garbage collection
 		 *
-		 * @param  n  name of object to stop watching
-		 * 
+		 * @param	identification/name given to the object for watch
 		 */
 		public static function unwatch(n:String):void{
 			if(_console){
@@ -637,18 +656,21 @@ package com.atticmedia.console {
 		/**
 		 * Add graph
 		 * Creates a new graph panel (or use an already existing one)
-		 * Graphs numeric values every frame. Reference to the object is weak, so when the object is garbage collected 
+		 * Graphs numeric values every frame. 
+		 * Reference to the object is weak, so when the object is garbage collected 
 		 * graph will also remove that particular graph line. (hopefully)
 		 * 
-		 * Example: to graph both mouseX and mouseY of stage:
+		 * Example: To graph both mouseX and mouseY of stage:
 		 * C.addGraph("mouse", stage, "mouseX", 0xFF0000, "x");
 		 * C.addGraph("mouse", stage, "mouseY", 0x0000FF, "y");
 		 *
-		 * @param  n  Name of graph, if same name already exist, graph line will be added to it.
-		 * @param  obj  Object of interest.
-		 * @param  prop	Property name of interest belonging to obj.
-		 * @param  col	color of graph line (optional, if not passed it will randomally generate).
-		 * @param  key	key string to use as identifier (optional, if not passed, it will use string from 'prop' param).
+		 * @param  Name of graph, if same name already exist, graph line will be added to it.
+		 * @param  Object of interest.
+		 * @param  Property name of interest belonging to obj.
+		 * @param  (optional) Color of graph line (If not passed it will randomally generate).
+		 * @param  (optional) Key string to use as identifier (If not passed, it will use string from 'prop' param).
+		 * @param  (optional) Rectangle area for size and position of graph.
+		 * @param  (optional) If set it will invert the graph, meaning the highest value at the bottom and lowest at the top.
 		 * 
 		 */
 		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
@@ -657,13 +679,33 @@ package com.atticmedia.console {
 			}
 		}
 		/**
+		 * Fix graph's range
+		 * When fixed, graph will only show within the fixed value however offset the real values may be.
+		 * 
+		 * For example: if the graph is fixed between 100 and 200, and the graph value at one point is 300, 
+		 * graph will not expand to accompany up to value 10, but remain fixed to 100 - 200 range.
+		 * 
+		 * Pass NaN to min or max to unfix graph.
+		 * No effect if no graph of the name exists.
+		 *
+		 * @param  Name of graph
+		 * @param  Minimum value. pass NaN to unfix.
+		 * @param  Maximum value. pass NaN to unfix.
+		 * 
+		 */
+		public static function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
+			if(_console){
+				_console.fixGraphRange(n, min, max);
+			}
+		}
+		/**
 		 * Remove graph
 		 * 
 		 * Leave obj and prop params blank to remove the whole graph.
 		 *
-		 * @param  n  Name of graph.
-		 * @param  obj  Object of interest to remove (optional).
-		 * @param  prop	Property name of interest to remove (optional).
+		 * @param  Name of graph.
+		 * @param  Object of interest to remove (optional).
+		 * @param  Property name of interest to remove (optional).
 		 * 
 		 */
 		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
@@ -675,18 +717,37 @@ package com.atticmedia.console {
 		 * Bind keyboard key to a function
 		 * WARNING: key binding hard references the function. 
 		 * This should only be used for development purposes.
+		 * Pass null Function to unbind.
 		 *
-		 * @param  char  Keyboard character, must be ASCII.
-		 * @param  ctrl  set to true if CTRL key press is required to trigger.
-		 * @param  alt	set to true if ALT key press is required to trigger.
-		 * @param  shift	set to true if SHIFT key press is required to trigger.
-		 * @param  fun	Function to call on trigger.
-		 * @param  args	Arguments to pass when calling the Function.
+		 * @param  Keyboard character, must be ASCII.
+		 * @param  Set to true if CTRL key press is required to trigger.
+		 * @param  Set to true if ALT key press is required to trigger.
+		 * @param  Set to true if SHIFT key press is required to trigger.
+		 * @param  Function to call on trigger. pass null to unbind previous.
+		 * @param  Arguments to pass when calling the Function.
 		 * 
 		 */
-		public static function bindKey(char:String, ctrl:Boolean, alt:Boolean, shift:Boolean, fun:Function ,args:Array = null):void{
+		public static function bindKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false, fun:Function = null,args:Array = null):void{
 			if(_console){
 				_console.bindKey(char, ctrl, alt, shift, fun ,args);
+			}
+		}
+		/**
+		 * Assign key binding to capture Display roller's display mapping.
+		 * This will output whatever display roller is mapping into console.
+		 * You can then press on each display name in Console to get reference to that display for CommandLine use.
+		 * Only activates when Display Roller is enabled.
+		 * Default: null (not assigned)
+		 *
+		 * @param  Keyboard character, must be ASCII. (pass null to remove binding)
+		 * @param  Set to true if CTRL key press is required to trigger.
+		 * @param  Set to true if ALT key press is required to trigger.
+		 * @param  Set to true if SHIFT key press is required to trigger.
+		 * 
+		 */
+		public static function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
+			if(_console){
+				_console.setRollerCaptureKey(char, ctrl, alt, shift);
 			}
 		}
 		//

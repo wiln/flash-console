@@ -349,6 +349,8 @@ package com.atticmedia.console.view {
 			}else if(e.text.substring(0,5) == "clip_"){
 				var str:String = "/remap "+e.text.substring(5);
 				master.runCommand(str);
+			}else if(e.text.substring(0,6) == "sclip_"){
+				master.cl.reMap(e.text.substring(6), stage);
 			}
 			e.stopPropagation();
 		}				

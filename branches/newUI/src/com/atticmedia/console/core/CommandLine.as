@@ -154,7 +154,7 @@ package com.atticmedia.console.core {
 					_returned2 = new WeakRef(_returned.reference, useStrong);
 					_returned = new WeakRef(o, useStrong);
 					
-					report("Returned "+ getQualifiedClassName(o) +": "+o,10);
+					report("+ Returned "+ getQualifiedClassName(o) +": "+o,10);
 				} else{
 					report("Undefined commandLine syntex <b>/help</b> for info.",10);
 				}
@@ -469,8 +469,10 @@ package com.atticmedia.console.core {
 			report(base.name+":"+getQualifiedClassName(base)+" has "+list.length+" children/sub-children.", 10);
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
-		private function reMap(path:String):void{
-			var mc:DisplayObjectContainer = _lastMapBase?(_lastMapBase.reference as DisplayObjectContainer):null;
+		public function reMap(path:String, mc:DisplayObjectContainer = null):void{
+			if(!mc){
+				mc = _lastMapBase?(_lastMapBase.reference as DisplayObjectContainer):null;
+			}
 			var pathArr:Array = path.split("|");
 			var child:DisplayObject = mc as DisplayObject;
 			try{
@@ -487,7 +489,7 @@ package com.atticmedia.console.core {
 					}
 				}
 				_returned = new WeakRef(child, useStrong);
-				report("Returned "+ child.name +": "+getQualifiedClassName(child),10);
+				report("+ Returned "+ child.name +": "+getQualifiedClassName(child),10);
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
 				reportStackTrace(e.getStackTrace());

@@ -23,6 +23,7 @@
 * 
 */
 package com.atticmedia.console.samples {
+	import flash.geom.Rectangle;	
 	import flash.utils.*;	
 	import flash.events.MouseEvent;	
 	import flash.display.*;
@@ -53,7 +54,8 @@ package com.atticmedia.console.samples {
 			C.add("This is a message (priority 5)", 5);
 			C.add("This is a default log level (priority 2)", 2);
 			C.add("This is totally a dummy (priority 0)", 0);
-
+			
+			C.setRollerCaptureKey("c");
 			//
 			C.ch("myChannel", "Hello my Channel");
 			C.ch("myChannel", "Hello important message at my channel", 10);
@@ -70,8 +72,13 @@ package com.atticmedia.console.samples {
 			// but if you have debugger version of flash player installed,
 			// you can open memory monitor (M) and then press G in that panel to force garbage collect
 			
-			txtPriority.restrict = "0-9";
-			txtPriority2.restrict = "0-9";
+			//Add graph show the mouse X/Y positions
+			C.addGraph("mouse", this,"mouseX", 0xff3333,"mouseX");
+			C.addGraph("mouse", this,"mouseY", 0x3333ff,"Y", new Rectangle(340,210,80,80), true);
+			//C.fixGraphRange("mouse", 100,300);
+			
+			TextField(txtPriority).restrict = "0-9";
+			TextField(txtPriority2).restrict = "0-9";
 			setUpButton(btnInterval, "Start interval");
 			setUpButton(btnAdd1, "Add");
 			setUpButton(btnAdd2, "Add");

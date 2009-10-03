@@ -63,7 +63,9 @@ package com.atticmedia.console.view {
 			_base = base;
 			addEventListener(Event.ENTER_FRAME, _onFrame, false, 0, true);
 		}
-		
+		public function capture():String{
+			return getMapString(true);
+		}
 		private function onMenuRollOver(e:TextFieldRollOver):void{
 			master.panels.tooltip(e.url?"Close":null, this);
 		}
@@ -72,8 +74,14 @@ package com.atticmedia.console.view {
 				close();
 				return;
 			}
+			_txtField.htmlText = "<ro>"+getMapString()+"</ro>";
+			_txtField.autoSize = TextFieldAutoSize.LEFT;
+			width = _txtField.width+4;
+			height = _txtField.height;
+		}
+		private function getMapString(dolink:Boolean = false):String{
 			var stg:Stage = _base.stage;
-			var str:String = "<ro>";
+			var str:String = "";
 			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
 			var stepMap:Dictionary = new Dictionary(true);
 			if(objs.length == 0){
@@ -91,26 +99,41 @@ package com.atticmedia.console.view {
 					var obj:DisplayObject = chain[i];
 					if(stepMap[obj] == undefined){
 						stepMap[obj] = i;
+						if(dolink) str+="<br/>";
 						for(var j:uint = i;j>0;j--){
 							str += j==1?" ∟":" -";
 						}
-						if(obj == stg){
-							str +=  "<menu> <a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
-						}else if(i == len-1){
-							str +=  "<roBold>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</roBold>";
-						}else {
-							str +=  "<i>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</i><br/>";
+						if(dolink){
+							if(obj == stg){
+								str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3>";
+							}else if(i == len-1){
+								str +=  "<p5><a href='event:sclip_"+mapUpward(obj)+"'>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</a></p5>";
+							}else {
+								str +=  "<p2><a href='event:sclip_"+mapUpward(obj)+"'><i>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</i></a></p2>";
+							}
+						}else{
+							if(obj == stg){
+								str +=  "<menu> <a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
+							}else if(i == len-1){
+								str +=  "<roBold>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</roBold>";
+							}else {
+								str +=  "<i>"+obj.name+"("+getQualifiedClassName(obj).split("::").pop()+")</i><br/>";
+							}
 						}
 					}
 				}
 			}
-			str += "</ro>";
-			_txtField.htmlText = str;
-			_txtField.autoSize = TextFieldAutoSize.LEFT;
-			width = _txtField.width+4;
-			height = _txtField.height;
+			return str;
 		}
-		
+		private function mapUpward(mc:DisplayObject):String{
+			var arr:Array = [mc.name];
+			mc = mc.parent;
+			while(mc && mc!=mc.stage){
+				arr.push(mc.name);
+				mc = mc.parent;
+			}
+			return arr.reverse().join("|");
+		}
 		public override function close():void {
 			removeEventListener(Event.ENTER_FRAME, _onFrame);
 			_base = null;
