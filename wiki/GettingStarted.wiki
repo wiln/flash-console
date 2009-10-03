@@ -20,22 +20,11 @@ import com.atticmedia.console.C;
 C.start(this, "");
 }}}
 
-If you are using Flex you need to wrap Console into a flex friendly component. Use ConsoleWrapper as below instead of doing C.start():
+If you are using Flex, it may be easier to start console on stage, using C.startOnStage(), where first parameter can be any display which is already on stage or to be added later.
 
 {{{
 import com.atticmedia.console.C;
-import com.atticmedia.console.flex.ConsoleWrapper;
-ConsoleWrapper.start(this);
-}}}
-
-Below is recommended (but optional) settings.
-{{{
-C.commandLine = true; // enable command line
-C.fpsMode = 2; // enable FPS monitor with setting 2
-C.memoryMonitor = 1; // enable memory usage monitor with setting 1
-C.width = 600;
-C.height = 300;
-//C.tracing = true; // trace on flash's normal 'trace'
+ConsoleWrapper.startOnStage(this);
 }}}
 
 Logging...
@@ -50,9 +39,6 @@ C.add("This is totally a dummy", 0);
 C.ch("myChannel","Hello my Channel");
 C.ch("myChannel","Hello, important message at my channel", 10);
 }}}
-
-Press @ at the top for console menu.
-Press H on second right for console menu help.
 
 ==Advanced==
 
@@ -84,7 +70,7 @@ C.remoting = true;
 // recieve remoting broadcasts
 // start logging broadcasted logs from another swf.
 // it can not be remoting while it is a remote...
-C.isRemote = true;
+C.remote = true;
 
 
 
@@ -98,7 +84,6 @@ C.viewingChannel = "myChannel";
 C.paused = true;
 
 // hide console
-// This is the same as pressing H button from console menu
 // It will keep logging but will stop all update processes
 C.visible = false;
 
@@ -109,5 +94,3 @@ C.enabled = false;
 // disable always on top (default is on)
 // when disabled console will stop from keeping it self at the top of the display list
 // this can sometimes fix some problems if you need to manage the display list
-C.alwaysOnTop = false;
-}}}
