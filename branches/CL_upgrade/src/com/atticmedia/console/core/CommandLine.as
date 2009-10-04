@@ -37,6 +37,7 @@ package com.atticmedia.console.core {
 		
 		private static const MAPPING_SPLITTER:String = "|";
 		private static const VALUE_CONST:String = "^";
+		private static const MAX_INTERNAL_STACK_TRACE:int = -1;
 		
 		private var _saved:WeakObject;
 		
@@ -90,29 +91,26 @@ package com.atticmedia.console.core {
 		public function run(str:String):Object {
 			//
 			// STRIP strings out - '...' and "..."
-			_values = [""];
-			// first, empty strings "",''
-			var strReg:RegExp = /('')|("")/g;
+			_values = [];
+			// First, empty strings "",''
+			str = replaceValues(str, /('')|("")/g, String);
+			// Second, strings with stuff in it "...",'...', but can't do replaceValues because matching string got extra first char
+			var strReg:RegExp = /([^\\]'(.*?[^\\])')|([^\\]"(.*?[^\\])")/g;
 			var result:Object = strReg.exec(str);
-			while(result != null){
-				var ind:int = result["index"];
-				str = str.substring(0,ind)+VALUE_CONST+"0"+str.substring(ind+2);
-				strReg.lastIndex = ind+1;
-				result = strReg.exec(str);
-			}
-			// second, strings with stuff in it "...",'...'
-			strReg = /([^\\]'(.*?[^\\])')|([^\\]"(.*?[^\\])")/g;
-			result = strReg.exec(str);
 			while(result != null){
 				var matchstring:String = result[0];
 				var substring:String = result[2]?result[2]:result[4]?result[4]:"";
 				var ind2:int = result["index"]+matchstring.indexOf(substring);
 				strReg.lastIndex = ind2+1;
-				str = str.substring(0,(ind2-1))+VALUE_CONST+_values.length+str.substring(ind2+substring.length+1);
-				_values.push(substring);
+				str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, ind2-1, ind2+substring.length+1);
+				_values.push(new Value(substring));
 				result = strReg.exec(str);
 			}
 			// All strings will have replaced by ^0, ^1, etc
+			//
+			// Cast Classes...
+			// TODO: maybe do an automatic detection on the fly
+			str = replaceValues(str, /\*(.*?)\*/g, castClass);
 			//
 			var lineBreaks:Array = str.split(/[ ]*;[ ]*/);
 			for each(var line:String in lineBreaks){
@@ -120,44 +118,61 @@ package com.atticmedia.console.core {
 			}
 			return _returned.reference;
 		}
-		
+		private function replaceValues(str:String, strReg:RegExp, casting:Object):String{
+			var result:Object = strReg.exec(str);
+			while(result != null){
+				var ind:int = result["index"];
+				var matchstring:String = result[0];
+				str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, ind, ind+matchstring.length);
+				var v:Object = casting(matchstring);
+				_values.push(new Value(v, v, matchstring));
+				strReg.lastIndex = ind+1;
+				result = strReg.exec(str);
+			}
+			return str;
+		}
+		private function castClass(str:String):Object{
+			return getDefinitionByName(str.slice(1,str.length-1));
+		}
 		
 		private function runLine(line:String):void{
-			trace("line = "+line);
+			report("&gt; "+line,5);
 			var majorParts:Array = line.split(/([ ]*=[ ]*)/);
 			majorParts.reverse();
-			for (var X:String in majorParts){
-				var majorPart:String = majorParts[X];
-				if(majorPart.indexOf("=")>=0){
-					
-				}else{
-					majorParts[X] = doMajorPart(majorPart);
+			try{
+				var v:Value;
+				for (var X:String in majorParts){
+					var majorPart:String = majorParts[X];
+					if(majorPart.indexOf("=")>=0){
+						
+					}else{
+						majorParts[X] = doMajorPart(majorPart);
+						v = majorParts[X];
+					}
 				}
+				var returned:* = v.value;
+				var newb:Boolean = false;
+				if(returned && typeof(returned) == "object" && !(returned is Array) && !(returned is Date)){
+					newb = true;
+					_returned2 = new WeakRef(_returned.reference, useStrong);
+					_returned = new WeakRef(returned, useStrong);
+				}
+				report("base = "+v.base + " prop = "+v.prop);
+				report((newb?"<b>+</b> ":"")+"Returned "+ getQualifiedClassName(returned) +": <b>"+returned+"</b>", -2);
+			}catch(e:Error){
+				reportStackTrace(e.getStackTrace());
 			}
 		}
-		private function doMajorPart(line:String):*{
-			// TODO, need to only search for (...) without VALUE_CONST , so avoid fun(^1), etc
-			//var funReg:RegExp = new RegExp("\\([^\\"+VALUE_CONST+"]","g");
-			//var result:Object = funReg.exec(line);
-			line = valueInsideFunctions(line);
-			return null;
-		}
-		// test('simple stuff. what ya think?');
-		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
-		// this.getChildAt(0); 
-		// stage.addChild(root.addChild(this.getChildAt(0)));
-		// third(second(first('console'))).final(0).alpha;
-		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
-		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
-		// *com.atticmedia.console.C*.add('Hey how are you?');
-		// $f = this;
-		private function valueInsideFunctions(line:String):String{
-			report("valueInsideFunctions: "+line, 8);
+		private function doMajorPart(line:String):Value{
+			// trim white space.
+			//line = line.replace(/\s/g, "");
+			//
+			// exec values inside functions (params of functions)
 			var indOpen:int = line.lastIndexOf("(");
 			while(indOpen>0){
 				var firstchar:String = line.charAt(indOpen+1);
-				if(firstchar != VALUE_CONST && firstchar!=")"){
-					// find increment closing if there ir more opening inside
+				if(firstchar!=")"){
+					// increment closing if there r more opening inside
 					var indopen2:int = indOpen;
 					var indClose:int = indOpen+1;
 					while(indopen2>=0 && indopen2<indClose){
@@ -167,37 +182,109 @@ package com.atticmedia.console.core {
 					}
 					//
 					var inside:String = line.substring(indOpen+1, indClose);
-					var value:* = basicValue(inside);
-					line = line.substring(0,indOpen+1)+VALUE_CONST+_values.length+line.substring(indClose);
-					_values.push(value);
+					line = Utils.replaceByIndexes(line, VALUE_CONST+_values.length, indOpen+1, indClose);
+					var params:Array = inside.split(",");
+					for(var X:String in params){
+						params[X] = execValue(params[X].replace(/\s*(.+)\s*/,"$1")).value;
+						report("^"+_values.length+" stores params ["+X+"] = "+params[X]);
+					}
+					_values.push(new Value(params));
 					report(line);
 				}
 				indOpen = line.lastIndexOf("(", indOpen-1);
 			}
-			
-			return line;
+			return execValue(line);
 		}
-		private function basicValue(str:String):*{
-			if (str == "true") {
-				return true;
-			}else if (str == "false") {
-				return false;
-			}else if (str == "this") {
-				return _returned.reference;
-			}else if (str == "null") {
-				return null;
-			}else if (str == "NaN") {
-				return NaN;
-			}else if(str.indexOf(VALUE_CONST)==0){
-				return _values[str.substring(VALUE_CONST.length)];
-			}else if(str.charAt(0) == "$"){
-				return _saved[str.substring(1)];
-			}else if (str.indexOf(".")>=0) {
-				//
-			}else if (!isNaN(Number(str))) {
-				return Number(str);
+		// *com.atticmedia.console.C*.instance.visible
+		// *com.atticmedia.console.C*.instance.addGraph('test',stage,'mouseX')
+		// test('simple stuff. what ya think?');
+		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
+		// this.getChildAt(0); 
+		// stage.addChild(root.addChild(this.getChildAt(0)));
+		// third(second(first('console'))).final(0).alpha;
+		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
+		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
+		// *com.atticmedia.console.C*.add('Hey how are you?');
+		// $f = this;
+		private function execValue(str:String, base:* = null):Value{
+			base = base?base:_returned.reference;
+			var v:Value = new Value(null, base);
+			
+			var reg:RegExp = /\.|\(/g;
+			var result:Object = reg.exec(str);
+			
+			if(!result || !isNaN(Number(str))){
+				return basicValue(str, v.base);
 			}
-			return str;
+			// NESTED...
+			var previndex:int = 0;
+			while(result){
+				var index:int = result.index;
+				var isFun:Boolean = str.charAt(index)=="(";
+				var basestr:String = str.substring(previndex, index);
+				report("basestr = "+basestr+ " v.base = "+v.base);
+				var newv:Value = basicValue(basestr, v.base);
+				var newbase:* = newv.value;
+				v.base = newv.base;
+				report("newbase = "+newbase+"  isFun:"+isFun);
+				if(isFun){
+					var closeindex:int = str.indexOf(")", index);
+					var paramstr:String = str.substring(index+1, closeindex);
+					report("paramstr = "+paramstr);
+					var params:Array = [];
+					if(paramstr){
+						params = basicValue(paramstr).value;
+					}
+					report("params = "+params.length+" -- "+ params);
+					v.prop = basestr;
+					v.value = (newbase as Function).apply(v.base, params);
+					v.base = v.value;
+					index = closeindex+1;
+				}else{
+					v.value = newbase;
+				}
+				previndex = index+1;
+				reg.lastIndex = index+1;
+				result = reg.exec(str);
+				if(result){
+					report("result");
+					v.base = v.value;
+				}else if(index+1 < str.length){
+					report("no more result: index="+index+" str.length="+str.length);
+					report("LEFT: "+str.substring(index+1, str.length));
+					reg.lastIndex = str.length;
+					result = {index:str.length};
+				}
+			}
+			return v;
+		}
+		private function basicValue(str:String, base:* = null):Value{
+			base = base?base:_returned.reference;
+			var v:Value = new Value(null, base, str);
+			if (str == "true") {
+				v.value = true;
+			}else if (str == "false") {
+				v.value = false;
+			}else if (str == "this") {
+				v.value = _returned.reference;
+			}else if (str == "null") {
+				v.value = null;
+			}else if (str == "NaN") {
+				v.value = NaN;
+			}else if (!isNaN(Number(str))) {
+				v.value = Number(str);
+			}else if(str.indexOf(VALUE_CONST)==0){
+				var vv:Value = _values[str.substring(VALUE_CONST.length)];
+				v.base = vv.base;
+				v.value = vv.value;
+			}else if(str.charAt(0) == "$"){
+				v.base = _saved[str.substring(1)];
+				v.value = v.base;
+			}else {
+				v.value = v.base[str];
+			}
+			report("basicValue("+str+","+base+") return: "+getQualifiedClassName(v.value)+" - "+v.value+" base:"+v.base);
+			return v;
 		}
 		/*
 		private function runLine(line:String):void{
@@ -458,9 +545,20 @@ package com.atticmedia.console.core {
 		private function reportStackTrace(str:String):void{
 			var lines:Array = str.split(/\n\s*/);
 			var p:int = 10;
+			var internalerrs:int = 0;
+			var self:String = getQualifiedClassName(this);
 			var block:String = "";
-			for each(var line:String in lines){
-				block += "<p"+p+">&gt;&nbsp;"+line.replace(/\s/, "&nbsp;")+"</p"+p+"><br/>";
+			var len:int = lines.length;
+			for (var i:int = 0; i < len; i++){
+				var line:String = lines[i];
+				if(MAX_INTERNAL_STACK_TRACE >=0 && line.search(new RegExp("\\s*at "+self)) == 0 ){
+					// don't trace too many internal errors :)
+					if(internalerrs>=MAX_INTERNAL_STACK_TRACE && i > 0) {
+						break;
+					}
+					internalerrs++;
+				}
+				block += "<p"+p+">&gt;&nbsp;"+line.replace(/\s/, "&nbsp;")+"</p"+p+"><br/>\n";
 				if(p>6) p--;
 			}
 			report(block, 9);
@@ -676,5 +774,16 @@ package com.atticmedia.console.core {
 		public function report(obj:*,priority:Number = 0):void{
 			_master.report(obj, priority);
 		}
+	}
+}
+class Value{
+	public var base:Object;
+	public var prop:String;
+	public var value:*;
+	
+	public function Value(v:*, b:Object = null, p:String = null):void{
+		base = b;
+		prop = p;
+		value = v;
 	}
 }

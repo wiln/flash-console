@@ -193,7 +193,7 @@ package com.atticmedia.console {
 			sCon.close();
 			return false;
 		}
-		public function addGraph(n:String, obj:Object, prop:String, col:Number, key:String, rect:Rectangle = null, inverse:Boolean = false):void{
+		public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			if(obj == null) {
 				report("ERROR: Graph ["+n+"] received a null object to graph property ["+prop+"].", 10);
 				return;
@@ -532,7 +532,7 @@ package com.atticmedia.console {
 		}
 		public function set traceCall (f:Function):void{
 			if(f==null){
-				report("C.traceCall function setter must be not be null.", 10);
+				report("C.traceCall function setter can not be null.", 10);
 			}else{
 				_traceCall = f;
 			}
@@ -549,7 +549,7 @@ package com.atticmedia.console {
 			}
 			var isRepeat:Boolean = (isRepeating && _isRepeating);
 			var txt:String = String(obj);
-			if( _tracing && !isRepeat && (_tracingChannels.indexOf(channel)>=0) ){
+			if( _tracing && !isRepeat && (_tracingChannels.length==0 || _tracingChannels.indexOf(channel)>=0) ){
 				if(tracingPriority <= priority || tracingPriority <= 0){
 					_traceCall("["+channel+"] "+txt);
 				}

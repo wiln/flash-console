@@ -41,7 +41,6 @@ package com.atticmedia.console.samples {
 			C.visible = true; // show console, because having password hides console.
 			C.tracing = true; // trace on flash's normal trace
 			C.commandLine = true; // enable command line
-			
 			C.width = 600;
 			C.height = 200;
 			
