@@ -24,6 +24,7 @@
 */
 
 package com.atticmedia.console.view {
+	import flash.events.MouseEvent;
 	import flash.text.TextFieldAutoSize;
 
 	import com.atticmedia.console.core.CommandLine;
@@ -61,7 +62,8 @@ package com.atticmedia.console.view {
 				close:"Close",
 				viewall:"View all channels",
 				scrollUp:"Scroll up",
-				scrollDown:"Scroll down"
+				scrollDown:"Scroll down",
+				scope:"Current scope"
 		};
 		
 		private var _traceField:TextField;
@@ -132,6 +134,8 @@ package com.atticmedia.console.view {
 			_commandPrefx.selectable = false;
 			_commandPrefx.styleSheet = style.css;
 			_commandPrefx.text = " ";
+			_commandPrefx.addEventListener(MouseEvent.MOUSE_MOVE, onCmdPrefRollOverOut, false, 0, true);
+			_commandPrefx.addEventListener(MouseEvent.ROLL_OUT, onCmdPrefRollOverOut, false, 0, true);
 			addChild(_commandPrefx);
 			//
 			_bottomLine = new Shape();
@@ -153,6 +157,7 @@ package com.atticmedia.console.view {
 			master.cl.addEventListener(CommandLine.CHANGED_SCOPE, onUpdateCommandLineScope, false, 0, true);
 		}
 		
+
 		private function stageAddedHandle(e:Event=null):void{
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
@@ -160,6 +165,9 @@ package com.atticmedia.console.view {
 		private function stageRemovedHandle(e:Event=null):void{
 			stage.removeEventListener(KeyboardEvent.KEY_UP, keyUpHandler);
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+		}
+		private function onCmdPrefRollOverOut(e : MouseEvent) : void {
+			master.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?TOOLTIPS["scope"]:"", this);
 		}
 		private function keyDownHandler(e:KeyboardEvent):void{
 			if(e.keyCode == Keyboard.SHIFT){
