@@ -63,7 +63,7 @@ package com.atticmedia.console.view {
 				viewall:"View all channels",
 				scrollUp:"Scroll up",
 				scrollDown:"Scroll down",
-				scope:"Current scope"
+				scope:"Current scope::(CommandLine)"
 		};
 		
 		private var _traceField:TextField;
@@ -134,6 +134,7 @@ package com.atticmedia.console.view {
 			_commandPrefx.selectable = false;
 			_commandPrefx.styleSheet = style.css;
 			_commandPrefx.text = " ";
+			_commandPrefx.addEventListener(MouseEvent.MOUSE_DOWN, onCmdPrefMouseDown, false, 0, true);
 			_commandPrefx.addEventListener(MouseEvent.MOUSE_MOVE, onCmdPrefRollOverOut, false, 0, true);
 			_commandPrefx.addEventListener(MouseEvent.ROLL_OUT, onCmdPrefRollOverOut, false, 0, true);
 			addChild(_commandPrefx);
@@ -168,6 +169,10 @@ package com.atticmedia.console.view {
 		}
 		private function onCmdPrefRollOverOut(e : MouseEvent) : void {
 			master.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?TOOLTIPS["scope"]:"", this);
+		}
+		private function onCmdPrefMouseDown(e : MouseEvent) : void {
+			stage.focus = _commandField;
+			_commandField.setSelection(_commandField.text.length, _commandField.text.length);
 		}
 		private function keyDownHandler(e:KeyboardEvent):void{
 			if(e.keyCode == Keyboard.SHIFT){

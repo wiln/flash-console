@@ -137,6 +137,7 @@ package com.atticmedia.console.view {
 			removeEventListener(Event.ENTER_FRAME, _onFrame);
 			_base = null;
 			super.close();
+			master.panels.updateMenu(); // should be black boxed :/
 		}
 		protected function linkHandler(e:TextEvent):void{
 			if(e.text == "close"){
