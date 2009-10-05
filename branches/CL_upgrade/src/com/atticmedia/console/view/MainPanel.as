@@ -24,6 +24,10 @@
 */
 
 package com.atticmedia.console.view {
+	import flash.text.TextFieldAutoSize;
+
+	import com.atticmedia.console.core.CommandLine;
+
 	import flash.ui.Keyboard;	
 	import flash.events.Event;	
 	
@@ -62,6 +66,7 @@ package com.atticmedia.console.view {
 		
 		private var _traceField:TextField;
 		private var _menuField:TextField;
+		private var _commandPrefx:TextField;
 		private var _commandField:TextField;
 		private var _commandBackground:Shape;
 		private var _bottomLine:Shape;
@@ -112,17 +117,31 @@ package com.atticmedia.console.view {
 			_commandField = new TextField();
 			_commandField.name = "commandField";
 			_commandField.type  = TextFieldType.INPUT;
-			_commandField.x = 4;
+			_commandField.x = 40;
 			_commandField.height = 18;
 			_commandField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
 			_commandField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
 			_commandField.defaultTextFormat = style.textFormat;
 			addChild(_commandField);
+			
+			_commandPrefx = new TextField();
+			_commandPrefx.name = "commandPrefx";
+			_commandPrefx.type  = TextFieldType.DYNAMIC;
+			_commandPrefx.x = 2;
+			_commandPrefx.height = 18;
+			_commandPrefx.selectable = false;
+			_commandPrefx.styleSheet = style.css;
+			_commandPrefx.text = " ";
+			addChild(_commandPrefx);
 			//
 			_bottomLine = new Shape();
 			_bottomLine.name = "blinkLine";
 			_bottomLine.alpha = 0.2;
 			addChild(_bottomLine);
+			
+			_commandField.visible = false;
+			_commandPrefx.visible = false;
+			_commandBackground.visible = false;
 			//
 			init(420,100,true);
 			registerDragger(_menuField);
@@ -130,7 +149,10 @@ package com.atticmedia.console.view {
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
+			
+			master.cl.addEventListener(CommandLine.CHANGED_SCOPE, onUpdateCommandLineScope, false, 0, true);
 		}
+		
 		private function stageAddedHandle(e:Event=null):void{
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
@@ -195,13 +217,14 @@ package com.atticmedia.console.view {
 			super.width = n;
 			_traceField.width = n;
 			_menuField.width = n;
-			_commandField.width = n-15;
+			_commandField.width = width-15-_commandField.x;
 			_commandBackground.width = n;
 			
 			_bottomLine.graphics.clear();
 			_bottomLine.graphics.lineStyle(1, style.bottomLineColor);
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
+			onUpdateCommandLineScope();
 			updateMenu();
 		}
 		override public function set height(n:Number):void{
@@ -220,6 +243,7 @@ package com.atticmedia.console.view {
 			_traceField.height = n-(_commandField.visible?16:0)-(minimize?0:12);
 			var cmdy:Number = n-18;
 			_commandField.y = cmdy;
+			_commandPrefx.y = cmdy;
 			_commandBackground.y = cmdy;
 			_bottomLine.y = _commandField.visible?cmdy:n;
 			_traceField.scrollV = _traceField.maxScrollV;
@@ -412,12 +436,26 @@ package com.atticmedia.console.view {
 			}
 			e.stopPropagation();
 		}
+		private function onUpdateCommandLineScope(e:Event=null):void{
+			_commandPrefx.autoSize = TextFieldAutoSize.LEFT;
+			_commandPrefx.htmlText = "<w><p1>"+master.cl.scopeString+":</p1></w>";
+			var w:Number = width-48;
+			if(_commandPrefx.width > 120 || _commandPrefx.width > w){
+				_commandPrefx.autoSize = TextFieldAutoSize.NONE;
+				_commandPrefx.width = w>120?120:w;
+				_commandPrefx.scrollH = _commandPrefx.maxScrollH;
+			}
+			_commandField.x = _commandPrefx.width+2;
+			_commandField.width = width-15-_commandField.x;
+		}
 		public function set commandLine (b:Boolean):void{
 			if(b){
 				_commandField.visible = true;
+				_commandPrefx.visible = true;
 				_commandBackground.visible = true;
 			}else{
 				_commandField.visible = false;
+				_commandPrefx.visible = false;
 				_commandBackground.visible = false;
 			}
 			this.height = height;

@@ -23,6 +23,8 @@
 * 
 */
 package com.atticmedia.console.core {
+	import flash.events.Event;
+
 	import com.atticmedia.console.Console;
 	
 	import flash.display.DisplayObject;
@@ -34,15 +36,15 @@ package com.atticmedia.console.core {
 	import flash.utils.getQualifiedSuperclassName;		
 
 	public class CommandLine extends EventDispatcher {
+		public static const CHANGED_SCOPE:String = "changedScope";
 		
-		private static const MAPPING_SPLITTER:String = "|";
 		private static const VALUE_CONST:String = "^";
 		private static const MAX_INTERNAL_STACK_TRACE:int = 1;
 		
 		private var _saved:WeakObject;
 		
-		private var _returned:WeakRef;
-		private var _returned2:WeakRef;
+		private var _returned:*;
+		private var _returned2:*;
 		private var _mapBases:WeakObject;
 		private var _mapBaseIndex:uint;
 		private var _reserved:Array;
@@ -56,7 +58,7 @@ package com.atticmedia.console.core {
 			_master = m;
 			_saved = new WeakObject();
 			_mapBases = new WeakObject();
-			_returned = new WeakRef(m);
+			_returned = m;
 			_saved.set("C", m);
 			_reserved = new Array("base", "C");
 		}
@@ -64,7 +66,8 @@ package com.atticmedia.console.core {
 			if (base) {
 				report("Set new commandLine base from "+base+ " to "+ obj, 10);
 			}else{
-				_returned = new WeakRef(obj, useStrong);
+				_returned = obj;
+				dispatchEvent(new Event(CHANGED_SCOPE));
 			}
 			_saved.set("base", obj, useStrong);
 		}
@@ -88,11 +91,22 @@ package com.atticmedia.console.core {
 			}
 			return n;
 		}
+		public function get scopeString():String{
+			var str:String = getQualifiedClassName(_returned);
+			var ind:int = str.lastIndexOf("::");
+			if(ind>=0){
+				str = str.substring(ind+2);
+			}
+			return str;
+		}
 		public function run(str:String):* {
 			report("&gt; "+str,5, false);
-			if(str.indexOf("/string ") == 0){
-				// exception to store just as string...
-				doCommand(str);
+			if(str.charAt(0) == "/"){
+				try{
+					doCommand(str);
+				}catch(e:Error){
+					reportStackTrace(e.getStackTrace());
+				}
 				return;
 			}
 			// incase you are calling a new command from commandLine... paradox?
@@ -147,7 +161,7 @@ package com.atticmedia.console.core {
 			}
 			return str;
 		}
-		private function castBlankStr(str:String):String{
+		private function castBlankStr(...args):String{
 			return "";
 		}
 		private function castClass(str:String):Object{
@@ -166,10 +180,6 @@ package com.atticmedia.console.core {
 		// $f = this;
 		private function runLine(line:String):*{
 			try{
-				if(line.charAt(0) == "/"){
-					doCommand(line);
-					return;
-				}
 				var majorParts:Array = line.split(/\s*\=\s*/);
 				majorParts.reverse();
 				var v:Value = execChunk(majorParts[0]);
@@ -186,12 +196,13 @@ package com.atticmedia.console.core {
 			}
 			return null;
 		}
-		private function doReturn(returned:*):void{
+		private function doReturn(returned:*, isNew:Boolean = false):void{
 			var newb:Boolean = false;
-			if(returned && returned is Function || (returned != _returned.reference && typeof(returned) == "object") && !(returned is Array) && !(returned is Date)){
+			if(returned && (returned is Function || isNew || (returned != _returned && typeof(returned) == "object") && !(returned is Array) && !(returned is Date))){
 				newb = true;
-				_returned2 = new WeakRef(_returned.reference, useStrong);
-				_returned = new WeakRef(returned, useStrong);
+				_returned2 = _returned;
+				_returned = returned;
+				dispatchEvent(new Event(CHANGED_SCOPE));
 			}
 			report((newb?"<b>+</b> ":"")+"Returned "+ getQualifiedClassName(returned) +": <b>"+returned+"</b>", -2);
 		}
@@ -240,11 +251,11 @@ package com.atticmedia.console.core {
 				var index:int = result.index;
 				var isFun:Boolean = str.charAt(index)=="(";
 				var basestr:String = str.substring(previndex, index);
-				//report("basestr = "+basestr+ " v.base = "+v.base);
+				//report("scopestr = "+basestr+ " v.base = "+v.base);
 				var newv:Value = execValue(basestr, v.base);
 				var newbase:* = newv.value;
 				v.base = newv.base;
-				//report("newbase = "+newbase+"  isFun:"+isFun);
+				report("scope = "+newbase+"  isFun:"+isFun);
 				if(isFun){
 					var closeindex:int = str.indexOf(")", index);
 					var paramstr:String = str.substring(index+1, closeindex);
@@ -277,15 +288,15 @@ package com.atticmedia.console.core {
 		}
 		private function execValue(str:String, base:* = null):Value{
 			var nobase:Boolean = base?false:true;
-			base = base?base:_returned.reference;
+			base = base?base:_returned;
 			var v:Value = new Value(null, base, str);
 			if (str == "true") {
 				v.value = true;
 			}else if (str == "false") {
 				v.value = false;
 			}else if (str == "this") {
-				v.base = _returned.reference;
-				v.value = _returned.reference;
+				v.base = _returned;
+				v.value = _returned;
 			}else if (str == "null") {
 				v.value = null;
 			}else if (str == "NaN") {
@@ -335,21 +346,22 @@ package com.atticmedia.console.core {
 					report("Using WEAK referencing. '/strong true' to use strong", -2);
 				}
 			} else if (cmd == "save") {
-				if (_returned.reference) {
+				if (_returned) {
 					if(!param){
 						report("ERROR: Give a name to save.",10);
 					}else if(_reserved.indexOf(param)>=0){
 						report("ERROR: The name ["+param+ "] is reserved",10);
 					}else{
-						_saved.set(param, _returned.reference,useStrong);
-						report("SAVED "+getQualifiedClassName(_returned.reference) + " at "+ param);
+						_saved.set(param, _returned,useStrong);
+						report("SAVED "+getQualifiedClassName(_returned) + " at "+ param);
 					}
 				} else {
 					report("Nothing to save", 10);
 				}
 			} else if (cmd == "string") {
 				report("String with "+param.length+" chars stored. Use /save <i>(name)</i> to save.", -2);
-				_returned = new WeakRef(param, useStrong);
+				_returned = param;
+				dispatchEvent(new Event(CHANGED_SCOPE));
 			} else if (cmd == "saved") {
 				report("Saved vars: ", -1);
 				var sii:uint = 0;
@@ -364,22 +376,25 @@ package com.atticmedia.console.core {
 			} else if (cmd == "filter") {
 				_master.filterText = str.substring(8);
 			} else if (cmd == "inspect" || cmd == "inspectfull") {
-				if (_returned.reference) {
+				if (_returned) {
 					var viewAll:Boolean = (cmd == "inspectfull")? true: false;
-					report(inspect(_returned.reference,viewAll), 5);
+					report(inspect(_returned,viewAll), 5);
 				} else {
 					report("Empty", 10);
 				}
 			} else if (cmd == "map") {
-				if (_returned.reference) {
-					map(_returned.reference as DisplayObjectContainer);
+				if (_returned) {
+					map(_returned as DisplayObjectContainer);
 				} else {
 					report("Empty", 10);
 				}
 			} else if (cmd == "/") {
-				doReturn(_returned2?_returned2.reference:base);
+				doReturn(_returned2?_returned2:base);
 			} else if (cmd == "base") {
 				doReturn(base);
+			} else if (cmd == "new") {
+				// TODO: accept params
+				doReturn(new (getDefinitionByName(param))(), true);
 			}else{
 				report("Undefined commandLine syntex <b>/help</b> for info.",10);
 			}
@@ -489,7 +504,7 @@ package com.atticmedia.console.core {
 				return;
 			}
 			_mapBases[_mapBaseIndex] = base;
-			var basestr:String = _mapBaseIndex+MAPPING_SPLITTER;
+			var basestr:String = _mapBaseIndex+Console.MAPPING_SPLITTER;
 			
 			var list:Array = new Array();
 			var index:int = 0;
@@ -538,7 +553,7 @@ package com.atticmedia.console.core {
 				for(i=0;i<steps;i++){
 					str += (i==steps-1)?" ∟ ":" - ";
 				}
-				var n:String = "<a href='event:clip_"+basestr+indexes.join(MAPPING_SPLITTER)+"'>"+mcDO.name+"</a>";
+				var n:String = "<a href='event:clip_"+basestr+indexes.join(Console.MAPPING_SPLITTER)+"'>"+mcDO.name+"</a>";
 				if(mcDO is DisplayObjectContainer){
 					n = "<b>"+n+"</b>";
 				}else{
@@ -553,7 +568,7 @@ package com.atticmedia.console.core {
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
 		public function reMap(path:String, mc:DisplayObjectContainer = null):void{
-			var pathArr:Array = path.split(MAPPING_SPLITTER);
+			var pathArr:Array = path.split(Console.MAPPING_SPLITTER);
 			if(!mc){
 				var first:String = pathArr.shift();
 				mc = _mapBases[first];

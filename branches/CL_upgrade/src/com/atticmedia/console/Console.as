@@ -55,8 +55,8 @@ package com.atticmedia.console {
 		public static const PANEL_ROLLER:String = "rollerPanel";
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		
-		public static const VERSION:Number = 2;
-		public static const VERSION_STAGE:String = "";
+		public static const VERSION:Number = 2.1;
+		public static const VERSION_STAGE:String = "beta";
 		
 		// you can change this if you need BEFORE starting remote / remoting
 		public static var REMOTE_CONN_NAME:String = "ConsoleRemote2";
@@ -65,6 +65,8 @@ package com.atticmedia.console {
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "filtered";
 		public static const GLOBAL_CHANNEL:String = "global";
+		//
+		public static const MAPPING_SPLITTER:String = "|";
 		//
 		public var style:Style;
 		public var panels:PanelsManager;
@@ -115,11 +117,11 @@ package com.atticmedia.console {
 			_password = pass;
 			tabChildren = false; // Tabbing is not supported
 			//
+			cl = new CommandLine(this);
+			remoter = new Remoting(this);
 			style = new Style(uiset);
 			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
 			mm = new MemoryMonitor();
-			cl = new CommandLine(this);
-			remoter = new Remoting(this);
 			remoter.logsend = remoteLogSend; // Don't want to expose remoteLogSend in this class
 			//
 			var t:String = VERSION_STAGE?(" "+VERSION_STAGE):"";
