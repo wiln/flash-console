@@ -540,8 +540,8 @@ package com.atticmedia.console {
 		public function get traceCall ():Function{
 			return _traceCall;
 		}
-		public function report(obj:*,priority:Number = 0):void{
-			addLine(obj, priority, CONSOLE_CHANNEL, false, true);
+		public function report(obj:*,priority:Number = 0, skipSafe:Boolean = true):void{
+			addLine(obj, priority, CONSOLE_CHANNEL, false, skipSafe);
 		}
 		private function addLine(obj:*,priority:Number = 0,channel:String = "",isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			if(!_enabled){
@@ -597,7 +597,7 @@ package com.atticmedia.console {
 		public function get commandBase ():Object{
 			return cl.base;
 		}
-		public function runCommand(line:String):Object{
+		public function runCommand(line:String):*{
 			if(remoter.isRemote){
 				report("Run command at remote: "+line,-2);
 				try{

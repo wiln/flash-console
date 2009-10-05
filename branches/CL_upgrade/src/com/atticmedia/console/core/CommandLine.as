@@ -37,7 +37,7 @@ package com.atticmedia.console.core {
 		
 		private static const MAPPING_SPLITTER:String = "|";
 		private static const VALUE_CONST:String = "^";
-		private static const MAX_INTERNAL_STACK_TRACE:int = -1;
+		private static const MAX_INTERNAL_STACK_TRACE:int = 1;
 		
 		private var _saved:WeakObject;
 		
@@ -88,12 +88,22 @@ package com.atticmedia.console.core {
 			}
 			return n;
 		}
-		public function run(str:String):Object {
-			//
-			// STRIP strings out - '...' and "..."
-			_values = [];
+		public function run(str:String):* {
+			report("&gt; "+str,5, false);
+			if(str.indexOf("/string ") == 0){
+				// exception to store just as string...
+				doCommand(str);
+				return;
+			}
+			// incase you are calling a new command from commandLine... paradox?
+			// EXAMPLE: $C.runCommand('/help') - but why would you?
+			var isclean:Boolean = _values?false:true;
+			if(isclean){
+				_values = [];
+			}
+			// STRIP strings out - '...' and "..." wihle ignoring \' \" inside.
 			// First, empty strings "",''
-			str = replaceValues(str, /('')|("")/g, String);
+			str = replaceValues(str, /('')|("")/g, castBlankStr);
 			// Second, strings with stuff in it "...",'...', but can't do replaceValues because matching string got extra first char
 			var strReg:RegExp = /([^\\]'(.*?[^\\])')|([^\\]"(.*?[^\\])")/g;
 			var result:Object = strReg.exec(str);
@@ -103,6 +113,7 @@ package com.atticmedia.console.core {
 				var ind2:int = result["index"]+matchstring.indexOf(substring);
 				strReg.lastIndex = ind2+1;
 				str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, ind2-1, ind2+substring.length+1);
+				report(VALUE_CONST+_values.length+" = "+substring, 2, false);
 				_values.push(new Value(substring));
 				result = strReg.exec(str);
 			}
@@ -112,11 +123,16 @@ package com.atticmedia.console.core {
 			// TODO: maybe do an automatic detection on the fly
 			str = replaceValues(str, /\*(.*?)\*/g, castClass);
 			//
-			var lineBreaks:Array = str.split(/[ ]*;[ ]*/);
+			// Run each line
+			var v:* = null;
+			var lineBreaks:Array = str.split(/\s*;\s*/);
 			for each(var line:String in lineBreaks){
-				runLine(line);
+				v = runLine(line);
 			}
-			return _returned.reference;
+			if(isclean){
+				_values = null;
+			}
+			return v;
 		}
 		private function replaceValues(str:String, strReg:RegExp, casting:Object):String{
 			var result:Object = strReg.exec(str);
@@ -131,42 +147,55 @@ package com.atticmedia.console.core {
 			}
 			return str;
 		}
+		private function castBlankStr(str:String):String{
+			return "";
+		}
 		private function castClass(str:String):Object{
 			return getDefinitionByName(str.slice(1,str.length-1));
 		}
-		
-		private function runLine(line:String):void{
-			report("&gt; "+line,5);
-			var majorParts:Array = line.split(/([ ]*=[ ]*)/);
-			majorParts.reverse();
+		// *com.atticmedia.console.C*.instance.visible
+		// *com.atticmedia.console.C*.instance.addGraph('test',stage,'mouseX')
+		// test('simple stuff. what ya think?');
+		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
+		// this.getChildAt(0); 
+		// stage.addChild(root.addChild(this.getChildAt(0)));
+		// third(second(first('console'))).final(0).alpha;
+		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
+		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
+		// *com.atticmedia.console.C*.add('Hey how are you?');
+		// $f = this;
+		private function runLine(line:String):*{
 			try{
-				var v:Value;
-				for (var X:String in majorParts){
-					var majorPart:String = majorParts[X];
-					if(majorPart.indexOf("=")>=0){
-						
-					}else{
-						majorParts[X] = doMajorPart(majorPart);
-						v = majorParts[X];
-					}
+				if(line.charAt(0) == "/"){
+					doCommand(line);
+					return;
 				}
-				var returned:* = v.value;
-				var newb:Boolean = false;
-				if(returned && typeof(returned) == "object" && !(returned is Array) && !(returned is Date)){
-					newb = true;
-					_returned2 = new WeakRef(_returned.reference, useStrong);
-					_returned = new WeakRef(returned, useStrong);
+				var majorParts:Array = line.split(/\s*\=\s*/);
+				majorParts.reverse();
+				var v:Value = execChunk(majorParts[0]);
+				for(var i:int = 1;i<majorParts.length;i++){
+					var vtoset:Value = execChunk(majorParts[i]);
+					report("Target base = "+vtoset.base + " prop = "+vtoset.prop);
+					vtoset.base[vtoset.prop] = v.value;
+					report("<b>SET</b> "+getQualifiedClassName(vtoset.base)+"."+vtoset.prop+" = <b>"+v.value+"</b>", -2);
 				}
-				report("base = "+v.base + " prop = "+v.prop);
-				report((newb?"<b>+</b> ":"")+"Returned "+ getQualifiedClassName(returned) +": <b>"+returned+"</b>", -2);
+				doReturn(v.value);
+				return v.value;
 			}catch(e:Error){
 				reportStackTrace(e.getStackTrace());
 			}
+			return null;
 		}
-		private function doMajorPart(line:String):Value{
-			// trim white space.
-			//line = line.replace(/\s/g, "");
-			//
+		private function doReturn(returned:*):void{
+			var newb:Boolean = false;
+			if(returned && returned is Function || (returned != _returned.reference && typeof(returned) == "object") && !(returned is Array) && !(returned is Date)){
+				newb = true;
+				_returned2 = new WeakRef(_returned.reference, useStrong);
+				_returned = new WeakRef(returned, useStrong);
+			}
+			report((newb?"<b>+</b> ":"")+"Returned "+ getQualifiedClassName(returned) +": <b>"+returned+"</b>", -2);
+		}
+		private function execChunk(line:String):Value{
 			// exec values inside functions (params of functions)
 			var indOpen:int = line.lastIndexOf("(");
 			while(indOpen>0){
@@ -185,80 +214,69 @@ package com.atticmedia.console.core {
 					line = Utils.replaceByIndexes(line, VALUE_CONST+_values.length, indOpen+1, indClose);
 					var params:Array = inside.split(",");
 					for(var X:String in params){
-						params[X] = execValue(params[X].replace(/\s*(.+)\s*/,"$1")).value;
-						report("^"+_values.length+" stores params ["+X+"] = "+params[X]);
+						params[X] = execNest(params[X].replace(/\s*(.+)\s*/,"$1")).value;
 					}
+					report("^"+_values.length+" stores params ["+params+"]");
 					_values.push(new Value(params));
 					report(line);
 				}
 				indOpen = line.lastIndexOf("(", indOpen-1);
 			}
-			return execValue(line);
+			return execNest(line);
 		}
-		// *com.atticmedia.console.C*.instance.visible
-		// *com.atticmedia.console.C*.instance.addGraph('test',stage,'mouseX')
-		// test('simple stuff. what ya think?');
-		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
-		// this.getChildAt(0); 
-		// stage.addChild(root.addChild(this.getChildAt(0)));
-		// third(second(first('console'))).final(0).alpha;
-		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
-		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
-		// *com.atticmedia.console.C*.add('Hey how are you?');
-		// $f = this;
-		private function execValue(str:String, base:* = null):Value{
-			base = base?base:_returned.reference;
-			var v:Value = new Value(null, base);
+		private function execNest(str:String):Value{
+			var v:Value = new Value();
 			
 			var reg:RegExp = /\.|\(/g;
 			var result:Object = reg.exec(str);
 			
-			if(!result || !isNaN(Number(str))){
-				return basicValue(str, v.base);
+			if(result==null || !isNaN(Number(str))){
+				return execValue(str, null);
 			}
 			// NESTED...
+			// TODO: AUTOMATICALLY detect classes in packages rather than using *...* 
 			var previndex:int = 0;
-			while(result){
+			while(result != null){
 				var index:int = result.index;
 				var isFun:Boolean = str.charAt(index)=="(";
 				var basestr:String = str.substring(previndex, index);
-				report("basestr = "+basestr+ " v.base = "+v.base);
-				var newv:Value = basicValue(basestr, v.base);
+				//report("basestr = "+basestr+ " v.base = "+v.base);
+				var newv:Value = execValue(basestr, v.base);
 				var newbase:* = newv.value;
 				v.base = newv.base;
-				report("newbase = "+newbase+"  isFun:"+isFun);
+				//report("newbase = "+newbase+"  isFun:"+isFun);
 				if(isFun){
 					var closeindex:int = str.indexOf(")", index);
 					var paramstr:String = str.substring(index+1, closeindex);
-					report("paramstr = "+paramstr);
 					var params:Array = [];
 					if(paramstr){
-						params = basicValue(paramstr).value;
+						params = execValue(paramstr).value;
 					}
-					report("params = "+params.length+" -- "+ params);
-					v.prop = basestr;
+					report("params = "+params.length+" - ["+ params+"]");
 					v.value = (newbase as Function).apply(v.base, params);
 					v.base = v.value;
 					index = closeindex+1;
 				}else{
 					v.value = newbase;
 				}
+				v.prop = basestr;
 				previndex = index+1;
 				reg.lastIndex = index+1;
 				result = reg.exec(str);
-				if(result){
-					report("result");
+				if(result != null){
 					v.base = v.value;
 				}else if(index+1 < str.length){
-					report("no more result: index="+index+" str.length="+str.length);
-					report("LEFT: "+str.substring(index+1, str.length));
+					//report("no more result: index="+index+" str.length="+str.length);
+					//report("LEFT: "+str.substring(index+1, str.length));
+					v.base = v.value;
 					reg.lastIndex = str.length;
 					result = {index:str.length};
 				}
 			}
 			return v;
 		}
-		private function basicValue(str:String, base:* = null):Value{
+		private function execValue(str:String, base:* = null):Value{
+			var nobase:Boolean = base?false:true;
 			base = base?base:_returned.reference;
 			var v:Value = new Value(null, base, str);
 			if (str == "true") {
@@ -266,6 +284,7 @@ package com.atticmedia.console.core {
 			}else if (str == "false") {
 				v.value = false;
 			}else if (str == "this") {
+				v.base = _returned.reference;
 				v.value = _returned.reference;
 			}else if (str == "null") {
 				v.value = null;
@@ -280,268 +299,91 @@ package com.atticmedia.console.core {
 			}else if(str.charAt(0) == "$"){
 				v.base = _saved[str.substring(1)];
 				v.value = v.base;
-			}else {
+			}else if(nobase){
+				try{
+					v.value = getDefinitionByName(str);
+					v.base = v.value;
+				}catch(e:Error){
+					v.value = v.base[str];
+				}
+			}else{
 				v.value = v.base[str];
 			}
-			report("basicValue("+str+","+base+") return: "+getQualifiedClassName(v.value)+" - "+v.value+" base:"+v.base);
+			report("value: "+str+" = "+getQualifiedClassName(v.value)+" - "+v.value+" base:"+v.base);
 			return v;
 		}
-		/*
-		private function runLine(line:String):void{
-			report("&gt; "+line, -1);
-			_strings = [];
-			var majorParts:Array = line.split(/([ ]*=[ ]*)/);
-			majorParts.reverse();
-			for (var X:String in majorParts){
-				var majorPart:String = majorParts[X];
-				if(majorPart.indexOf("=")>=0){
-					
+		private function doCommand(str:String):void{
+			var brk:int = str.indexOf(" ");
+			var cmd:String = str.substring(1, brk>0?brk:str.length);
+			var param:String = brk>0?str.substring(brk+1):"";
+			//report("doCommand: "+ cmd+(param?(": "+param):""));
+			if (cmd == "help") {
+				printHelp();
+			} else if (cmd == "remap") {
+				// this is a special case... no user will be able to do this command
+				reMap(param);
+			} else if (cmd == "strong") {
+				if(param == "true"){
+					useStrong = true;
+					report("Now using STRONG referencing.", 10);
+				}else if (param == "false"){
+					useStrong = false;
+					report("Now using WEAK referencing.", 10);
+				}else if(useStrong){
+					report("Using STRONG referencing. '/strong false' to use weak", -2);
 				}else{
-					majorParts[X] = doMajorPart(majorPart);
+					report("Using WEAK referencing. '/strong true' to use strong", -2);
 				}
-			}
-		}
-		
-		private function doMajorPart(majorPart:String):*{
-			var stringParts:Array = majorPart.match(/'.*?'/gm);
-			_strings = _strings.concat(stringParts);
-			majorPart = majorPart.replace(/'.*?'/gm, "^string");
-			//
-			var parts:Array = majorPart.match(/\(.*?\)/g);
-			var partjoins:Array = majorPart.split(/\(.*?\)/g);
-			trace("partjoins = " +partjoins);
-			var str:String;
-			if(parts && parts.length>0){
-				// PUT before and after text of EACH PART 'getChildAt' , (0) , '.visible' 
-				var newparts:Array = [];
-				newparts.push(partjoins.shift());
-				for(var X:String in parts){
-					newparts.push(doMajorPart(parts[X].substring(1)));
-					if(partjoins.length>0){
-						var endstr:String = partjoins.shift();
-						// TODO: remove . and ( s  on endstr
-						endstr = endstr.replace(/\(.* /g, "");
-						trace("endstr = "+endstr);
-						newparts.push(endstr);
+			} else if (cmd == "save") {
+				if (_returned.reference) {
+					if(!param){
+						report("ERROR: Give a name to save.",10);
+					}else if(_reserved.indexOf(param)>=0){
+						report("ERROR: The name ["+param+ "] is reserved",10);
+					}else{
+						_saved.set(param, _returned.reference,useStrong);
+						report("SAVED "+getQualifiedClassName(_returned.reference) + " at "+ param);
 					}
+				} else {
+					report("Nothing to save", 10);
 				}
-				trace("newparts = "+newparts.join(" | "));
-				return newparts;
+			} else if (cmd == "string") {
+				report("String with "+param.length+" chars stored. Use /save <i>(name)</i> to save.", -2);
+				_returned = new WeakRef(param, useStrong);
+			} else if (cmd == "saved") {
+				report("Saved vars: ", -1);
+				var sii:uint = 0;
+				var sii2:uint = 0;
+				for(var X:String in _saved){
+					var sao:* = _saved[X];
+					sii++;
+					if(sao==null) sii2++;
+					report("<b>$"+X+"</b> = "+(sao==null?"null":getQualifiedClassName(sao)), -2);
+				}
+				report("Found "+sii+" item(s), "+sii2+" empty (or garbage collected).", -1);
+			} else if (cmd == "filter") {
+				_master.filterText = str.substring(8);
+			} else if (cmd == "inspect" || cmd == "inspectfull") {
+				if (_returned.reference) {
+					var viewAll:Boolean = (cmd == "inspectfull")? true: false;
+					report(inspect(_returned.reference,viewAll), 5);
+				} else {
+					report("Empty", 10);
+				}
+			} else if (cmd == "map") {
+				if (_returned.reference) {
+					map(_returned.reference as DisplayObjectContainer);
+				} else {
+					report("Empty", 10);
+				}
+			} else if (cmd == "/") {
+				doReturn(_returned2?_returned2.reference:base);
+			} else if (cmd == "base") {
+				doReturn(base);
 			}else{
-				str = majorPart;
-				if(str.lastIndexOf(")") == str.length-1){
-					str = str.substring(0,str.length-1);
-				}
-				trace("str = "+str);
-				return str;
+				report("Undefined commandLine syntex <b>/help</b> for info.",10);
 			}
-		}*/
-		/*
-		public function run(str:String):Object {
-			report("&gt; "+str, -1);
-			var returned:Object;
-			var line:Array = str.split(" ");
-			if(line[0].charAt(0)=="/"){
-				if (line[0] == "/help") {
-					printHelp();
-				} else if (line[0] == "/remap") {
-					// this is a special case... no user will be able to do this command
-					line.shift();
-					reMap(line.join(""));
-				} else if (line[0] == "/strong") {
-					if(line[1] == "true"){
-						useStrong = true;
-						report("Now using STRONG referencing.", 10);
-					}else if (line[1] == "false"){
-						useStrong = false;
-						report("Now using WEAK referencing.", 10);
-					}else if(useStrong){
-						report("Using STRONG referencing. '/strong false' to use weak", -2);
-					}else{
-						report("Using WEAK referencing. '/strong true' to use strong", -2);
-					}
-				} else if (line[0] == "/save") {
-					if (_returned.reference) {
-						if(!line[1]){
-							report("ERROR: Give a name to save.",10);
-						}else if(_reserved.indexOf(line[1])>=0){
-							report("ERROR: The name ["+line[1]+ "] is reserved",10);
-						}else{
-							_saved.set(line[1], _returned.reference,useStrong);
-							report("SAVED "+getQualifiedClassName(_returned.reference) + " at "+ line[1]);
-						}
-					} else {
-						report("Nothing to save", 10);
-					}
-				} else if (line[0] == "/string") {
-					if(line.length>1){
-						var savestring:String = line.slice(1).join(" ");
-						report("String with "+savestring.length+" chars stored. Use /save <i>(name)</i> to save.", -2);
-						_returned = new WeakRef(savestring, useStrong);
-					}
-				} else if (line[0] == "/saved") {
-					report("Saved vars: ", -1);
-					var sii:uint = 0;
-					var sii2:uint = 0;
-					for(var X:String in _saved){
-						var sao:* = _saved[X];
-						sii++;
-						if(sao==null) sii2++;
-						report("<b>$"+X+"</b> = "+(sao==null?"null":getQualifiedClassName(sao)), -2);
-					}
-					report("Found "+sii+" item(s), "+sii2+" empty (or garbage collected).", -1);
-				} else if (line[0] == "/filter") {
-					_master.filterText = str.substring(8);
-				} else if (line[0] == "/inspect" || line[0] == "/inspectfull") {
-					if (_returned.reference) {
-						var viewAll:Boolean = (line[0] == "/inspectfull")? true: false;
-						report(inspect(_returned.reference,viewAll), 5);
-					} else {
-						report("Empty", 10);
-					}
-				} else if (line[0] == "/map") {
-					if (_returned.reference) {
-						map(_returned.reference as DisplayObjectContainer);
-					} else {
-						report("Empty", 10);
-					}
-				} else if (line[0] == "/base" || line[0] == "//") {
-					var o:Object = line[0] == "//"?(_returned2?_returned2.reference:null):base;
-					_returned2 = new WeakRef(_returned.reference, useStrong);
-					_returned = new WeakRef(o, useStrong);
-					
-					report("+ Returned "+ getQualifiedClassName(o) +": "+o,10);
-				} else{
-					report("Undefined commandLine syntex <b>/help</b> for info.",10);
-				}
-			
-			}else {
-				
-				try {
-					
-					// Get objects and values before operation, such as (, ), =
-					var names:Array = new Array();
-					var values:Array = new Array();
-					line = str.split(/( |=|;)/);
-					var lineLen:int = line.length;
-					for (var i:int = 0;i<lineLen;i++){
-						var strPart:String = line[i];
-						if(!strPart || strPart==" " || strPart=="" || strPart==";"){
-							// ignore
-						}else if(strPart=="="){
-							names.push(strPart);
-							values.push(strPart);
-						} else{
-							var arr:Array = getPartData(line[i]);
-							if(arr == null) return null; // had error and already done stack trace
-							names.push(arr[0]);
-							values.push(arr[1]);
-						}
-					}
-					
-					// APPLY operation
-					for(i = 0;i<names.length;i++){
-						strPart = names[i];
-						if(strPart == "="){
-							var tarValArr:Array = values[i-1];
-							var tarNameArr:Array = names[i-1];
-							var srcValueArr:Object = values[i+1];
-							
-							tarValArr[1][tarNameArr[0]] = srcValueArr[0];
-							i++;
-							report("SET "+getQualifiedClassName(tarValArr[1])+"."+tarNameArr[0]+" = "+srcValueArr[0], 10);
-							returned = null;
-						}else{
-							returned = values[i][0];
-						}
-					}
-					
-					if (returned == null) {
-						report("Ran successfully.",1);
-					}else{
-						var newb:Boolean = false;
-						if(typeof(returned) == "object" && !(returned is Array) && !(returned is Date)){
-							newb = true;
-							_returned2 = new WeakRef(_returned.reference, useStrong);
-							_returned = new WeakRef(returned, useStrong);
-						}
-						report((newb?"+ ":"")+"Returned "+ getQualifiedClassName(returned) +": "+returned,10);
-					}
-				}catch (e:Error) {
-					reportStackTrace(e.getStackTrace());
-				}
-			}
-			return returned;
 		}
-		private function getPartData(strPart:String):Array{
-			try{
-				var base:Object = _returned.reference;
-				var partNames:Array = new Array();
-				var partValues:Array = new Array();
-				
-				if(strPart.charAt(0)=="*"){
-					partNames.push(strPart.substring(1));
-					partValues.push(getDefinitionByName(strPart.substring(1)));
-				}else if(isTypeable(strPart)){
-					partNames.push(strPart);
-					partValues.push(reType(strPart));
-				}else{
-					var dotParts:Array = strPart.split(/(\.|\(|\)|\,)/);
-					var dotLen:int = dotParts.length;
-							
-					var obj:Object = null;
-					
-					for(var j:int = 0;j<dotLen;j++){
-						var dotPart:String = dotParts[j];
-						if(dotPart.charAt(0)=="."){
-							dotPart = null;
-						}else if(dotPart.charAt(0)=="("){
-							var funArr:Array = new Array();
-							var endIndex:int = dotParts.indexOf(")", j);
-							
-							for(var jj:int = (j+1);jj<endIndex;jj++){
-								if(dotParts[jj] && dotParts[jj] != ","){
-									var data:Array = getPartData(dotParts[jj]);
-									if(data == null) return null; // had error and already done stack trace
-									funArr.push(data[1][0]);
-								}
-							}
-							obj = (obj as Function).apply(base,funArr);
-							j = endIndex+1;
-						}else if(dotPart.charAt(0)==","){
-							dotPart = null;
-						}else if(dotPart.charAt(0)==")"){
-							dotPart = null;
-						}else if(dotPart.charAt(0)=="$"){
-							obj = _saved.get(dotPart.substring(1));
-						}else if(dotLen == 1 && !base.hasOwnProperty(dotPart)){
-							// this could be a string without '...'
-							partNames.unshift(dotPart);
-							partValues.unshift(dotPart);
-							report("Assumed "+dotPart+" is a String as "+getQualifiedClassName(base)+" do not have this property.", 7);
-							break;
-						}else if(!obj){
-							partNames.unshift(base);
-							partValues.unshift(base);
-							obj = base[dotPart];
-						}else{
-							obj = obj[dotPart];
-						}
-						if(dotPart){
-							partNames.unshift(dotPart);
-							partValues.unshift(obj);
-						}
-					}
-				}
-				if(partNames.length>0){
-					return [partNames,partValues];
-				}
-			}catch(e:Error){
-				reportStackTrace(e.getStackTrace());
-				return null;
-			}
-			return [strPart,strPart];
-		}*/
 		private function reportStackTrace(str:String):void{
 			var lines:Array = str.split(/\n\s*/);
 			var p:int = 10;
@@ -558,20 +400,11 @@ package com.atticmedia.console.core {
 					}
 					internalerrs++;
 				}
-				block += "<p"+p+">&gt;&nbsp;"+line.replace(/\s/, "&nbsp;")+"</p"+p+"><br/>\n";
+				block += "<p"+p+">&gt;&nbsp;"+line.replace(/\s/, "&nbsp;")+"</p"+p+">\n";
 				if(p>6) p--;
 			}
 			report(block, 9);
 			
-		}
-		private function isTypeable(str:String):Boolean{
-			if (str == "true" || str == "false" || str == "this" || str == "null" || str == "NaN" || !isNaN(Number(str))) {
-				return true;
-			}
-			if(str.charAt(0) == "'" && str.charAt(str.length-1) == "'"){
-				return true;
-			}
-			return false;
 		}
 		public function inspect(obj:Object, viewAll:Boolean= true):String {
 			var typeStr:String = getQualifiedClassName(obj);
@@ -738,8 +571,7 @@ package com.atticmedia.console.core {
 						}
 					}
 				}
-				_returned = new WeakRef(child, useStrong);
-				report("+ Returned "+ child.name +": "+getQualifiedClassName(child),10);
+				doReturn(child);
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
 				//reportStackTrace(e.getStackTrace());
@@ -758,10 +590,9 @@ package com.atticmedia.console.core {
 			report("(view all info) => <b>/inspectfull</b>",5);
 			report("(see display map) => <b>/map</b>",5);
 			report("__Use * to access static classes",10);
-			report("com.atticmedia.console.C => <b>*com.atticmedia.console.C</b>",5);
+			report("com.atticmedia.console.C => <b>*com.atticmedia.console.C*</b>",5);
 			report("(save reference) => <b>/save c</b>",5);
 			report("com.atticmedia.console.C.add('test',10) => <b>$C.add('test',10)</b>",5);
-			report("Strings can not have spaces...",7);
 			report("__Filtering:",10);
 			report("/filter &lt;text you want to filter&gt;",5);
 			report("This will create a new channel called filtered with all matching lines",5);
@@ -771,17 +602,18 @@ package com.atticmedia.console.core {
 			report("<b>stage.frameRate = 12</b>",5);
 			report("__________",10);
 		}
-		public function report(obj:*,priority:Number = 0):void{
-			_master.report(obj, priority);
+		public function report(obj:*,priority:Number = 1, skipSafe:Boolean = true):void{
+			_master.report(obj, priority, skipSafe);
 		}
 	}
 }
 class Value{
+	// this is a class to remember the base object and property name that holds the value...
 	public var base:Object;
 	public var prop:String;
 	public var value:*;
 	
-	public function Value(v:*, b:Object = null, p:String = null):void{
+	public function Value(v:* = null, b:Object = null, p:String = null):void{
 		base = b;
 		prop = p;
 		value = v;

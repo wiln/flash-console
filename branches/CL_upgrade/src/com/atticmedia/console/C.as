@@ -636,7 +636,7 @@ package com.atticmedia.console {
 		 *
 		 * @param  String to run
 		 */
-		public static function runCommand(str:String):Object{
+		public static function runCommand(str:String):*{
 			if(_console){
 				return _console.runCommand(str);
 			}
