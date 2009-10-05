@@ -1,10 +1,12 @@
 ==Console Enhancements Ideas==
 
- * Better Command Line syntax reading - currently can't handle nested calls and strings with spaces
  * Support Flex debugging like logging method. (like making channel instances with package path)
+ * Support for easier priority logs, such as C.debug(...) or C.error(...) - channel support on top?
 
+=== Implementing for version 2.1===
+ * Better Command Line syntax reading - currently can't handle nested calls and strings with spaces
 
-===Implemented in Version 2.0===
+===Implemented in version 2.0===
  * Data graphing - such as showing FPS in graph and add multiple graphs of your own data
  * Display Roller to capture current display map on key/mouse click, for better examination of the map - click on display name to get instance of the clip for command line use. - and also print mouseX and mouseY in the list.
 
