@@ -588,10 +588,24 @@ package com.atticmedia.console {
 		// COMMAND LINE
 		//
 		public function set commandLine (newB:Boolean):void{
-			panels.mainPanel.commandLine = newB;
+			if(!newB || cl.permission>0){
+				panels.mainPanel.commandLine = newB;
+			}else{
+				panels.updateMenu();
+				report("CommandLine is disabled. Set commandLinePermission from source code to allow.");
+			}
 		}
 		public function get commandLine ():Boolean{
 			return panels.mainPanel.commandLine;
+		}
+		public function set commandLinePermission (v:uint):void{
+			cl.permission = v;
+			if(v==0 && commandLine){
+				commandLine = false;
+			}
+		}
+		public function get commandLinePermission ():uint{
+			return cl.permission;
 		}
 		public function set commandBase (v:Object):void{
 			if(v) cl.base = v;

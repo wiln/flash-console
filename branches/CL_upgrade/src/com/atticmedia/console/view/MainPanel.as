@@ -287,9 +287,11 @@ package com.atticmedia.console.view {
 			str += "<menu>[ <b>";
 			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
 			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
+			if(master.commandLinePermission>0){
+				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
+			}
 			if(!master.remote){
 				str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
-				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
 				str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
 			}
 			str += " ¦</b>";
@@ -390,6 +392,7 @@ package com.atticmedia.console.view {
 			}else if(e.text.substring(0,6) == "sclip_"){
 				master.cl.reMap(e.text.substring(6), stage);
 			}
+			_menuField.setSelection(0, 0);
 			e.stopPropagation();
 		}
 		public function onChannelPressed(chn:String):void{
@@ -462,7 +465,7 @@ package com.atticmedia.console.view {
 			_commandField.width = width-15-_commandField.x;
 		}
 		public function set commandLine (b:Boolean):void{
-			if(b){
+			if(b && master.commandLinePermission>0){
 				_commandField.visible = true;
 				_commandPrefx.visible = true;
 				_commandBackground.visible = true;

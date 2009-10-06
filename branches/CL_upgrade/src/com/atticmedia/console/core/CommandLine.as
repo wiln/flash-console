@@ -53,6 +53,7 @@ package com.atticmedia.console.core {
 		private var _master:Console;
 		
 		public var useStrong:Boolean;
+		public var permission:uint = 1;	//TODO: to implement level 1 security
 
 		public function CommandLine(m:Console) {
 			_master = m;
