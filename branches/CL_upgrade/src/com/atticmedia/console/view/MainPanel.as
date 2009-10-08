@@ -45,7 +45,7 @@ package com.atticmedia.console.view {
 
 	public class MainPanel extends AbstractPanel {
 		
-		private static const CHANNELS_IN_MENU:int = 4;
+		private static const CHANNELS_IN_MENU:int = 5;
 		
 		public static const TOOLTIPS:Object = {
 				fps:"Frames Per Second",
@@ -276,7 +276,7 @@ package com.atticmedia.console.view {
 			var str:String = "<r><w>";
 			if(!master.channelsPanel){
 				str += "<chs>";
-				for(var ci:int = 0; (ci<_channels.length && ci<= CHANNELS_IN_MENU);  ci++){
+				for(var ci:int = 0; (ci<_channels.length && ci< CHANNELS_IN_MENU);  ci++){
 					var channel:String = _channels[ci];
 					var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
 					channelTxt = channel==master.defaultChannel? "<i>"+channelTxt+"</i>" : channelTxt;
