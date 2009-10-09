@@ -1,4 +1,4 @@
-/*
+﻿/*
 * 
 * Copyright (c) 2008-2009 Lu Aye Oo
 * 
@@ -361,6 +361,7 @@ package com.atticmedia.console.view {
 			}else if(e.text == "close"){
 				master.panels.tooltip();
 				visible = false;
+				dispatchEvent(new Event(AbstractPanel.CLOSED));
 			}else if(e.text == "channels"){
 				master.channelsPanel = !master.channelsPanel;
 			}else if(e.text == "fps"){
