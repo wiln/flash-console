@@ -1,4 +1,4 @@
-/*
+﻿/*
 * 
 * Copyright (c) 2008-2009 Lu Aye Oo
 * 
@@ -43,6 +43,7 @@ package com.atticmedia.console.core {
 		public var logsend:Function;
 		
 		public var remoteMem:int;
+		public var domain:String;
 		
 		public function Remoting(m:Console) {
 			_master = m;
@@ -71,6 +72,12 @@ package com.atticmedia.console.core {
 		}
 		public function send(command:String, ...args):void{
 			var target:String = _isRemote?Console.CLIENT_CONN_NAME:Console.REMOTE_CONN_NAME;
+			// NEED TO AUTOMATICALLY RESOLVE DOMAIN PREFIX. BUT HOW?
+			if(_isRemote){
+				target = "localhost:"+target;
+			}else{
+				target = "app#com.luaye.consoleRemote:"+target;
+			}
 			args = [target, command].concat(args);
 			try{
 				_sharedConnection.send.apply(this, args);
@@ -122,11 +129,13 @@ package com.atticmedia.console.core {
 			}
 		}
 		private function getInfo():String{
-			return "sandboxType:<p5>"+Security.sandboxType+"</p5> remote:<p5>"+Console.REMOTE_CONN_NAME+"</p5> client:<p5>"+Console.CLIENT_CONN_NAME+"</p5>.";
+			return "domain:<p5>"+_sharedConnection.domain+"</p5> remote:<p5>"+Console.REMOTE_CONN_NAME+"</p5> client:<p5>"+Console.CLIENT_CONN_NAME+"</p5>.";
 		}
 		private function startSharedConnection():void{
 			close();
 			_sharedConnection = new LocalConnection();
+			_sharedConnection.allowDomain("*");
+			_sharedConnection.allowInsecureDomain("*");
 			_sharedConnection.addEventListener(StatusEvent.STATUS, onSharedStatus);
 			_sharedConnection.allowInsecureDomain("*");
 			// just for sort of security

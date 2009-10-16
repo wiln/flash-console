@@ -30,25 +30,25 @@ package com.atticmedia.console.samples{
 
 	import flash.display.*;
 	import flash.events.*;
+	import flash.filters.GlowFilter;
 
 	public class RemoteAIR extends MovieClip {
 
 		public function RemoteAIR() {
 
 			
-			C.start(stage, "`");
+			C.start(stage, "`", 5);
 			C.visible = true;
 			C.remote = true;
 			C.commandLine = true;
+			C.x = 5;
+			C.y = 5;
+			var console:Console = C.instance;
 			
-			C.instance.panels.mainPanel.addEventListener(AbstractPanel.STARTED_DRAGGING, moveHandle);
-			C.instance.panels.mainPanel.addEventListener(AbstractPanel.STARTED_SCALING, scaleHandle);
-			C.instance.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
-			
-			//
-			// This is special case for remote to disable scaling and moving
-			//C.instance.panels.mainPanel.moveable = false;
-			//C.instance.panels.mainPanel.scalable = false;
+			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_DRAGGING, moveHandle);
+			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_SCALING, scaleHandle);
+			console.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
+			console.filters = [new GlowFilter(0, 0.8, 5, 5)];
 			//
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
@@ -65,8 +65,8 @@ package com.atticmedia.console.samples{
 			stage.nativeWindow.close();
 		}
 		private function onStageResize(e : Event = null):void {
-			C.width = stage.stageWidth;
-			C.height = stage.stageHeight;
+			C.width = stage.stageWidth-10;
+			C.height = stage.stageHeight-10;
 		}
 	}
 }
