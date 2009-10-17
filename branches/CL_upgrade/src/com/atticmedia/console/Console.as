@@ -655,6 +655,38 @@ package com.atticmedia.console {
 		public function add(newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			addLine(newLine,priority, defaultChannel, isRepeating);
 		}
+		public function log(...args):void{
+			addLine(args.join(" "),1);
+		}
+		public function message(...args):void{
+			addLine(args.join(" "),3);
+		}
+		public function debug(...args):void{
+			addLine(args.join(" "),6);
+		}
+		public function warning(...args):void{
+			addLine(args.join(" "),8);
+		}
+		public function error(...args):void{
+			addLine(args.join(" "),10);
+		}
+		public function logch(channel:*, ...args):void{
+			ch(channel, args.join(" "),1);
+		}
+		public function messagech(channel:*, ...args):void{
+			ch(channel, args.join(" "),3);
+		}
+		public function debugch(channel:*, ...args):void{
+			ch(channel, args.join(" "),6);
+		}
+		public function warningch(channel:*, ...args):void{
+			ch(channel, args.join(" "),8);
+		}
+		public function errorch(channel:*, ...args):void{
+			ch(channel, args.join(" "),10);
+		}
+		
+		
 		public function set filterText(str:String):void{
 			_filterText = str;
 			if(str){

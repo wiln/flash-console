@@ -54,15 +54,33 @@ package {
 			C.add("This is a message (priority 5)", 5);
 			C.add("This is a default log level (priority 2)", 2);
 			C.add("This is totally a dummy (priority 0)", 0);
-			
-			C.setRollerCaptureKey("c");
 			//
 			C.ch("myChannel", "Hello my Channel");
 			C.ch("myChannel", "Hello important message at my channel", 10);
-
+			
+			//
+			//
+			// Convenience logging... infinite arguments
+			C.log("Log", "with multiple", "arguments");
+			C.message("Message", "with multiple", "arguments");
+			C.debug("Debug", "with multiple", "arguments");
+			C.warning("Warning", "with multiple", "arguments");
+			C.error("Error", "with multiple", "arguments");
+			//
+			// Convenience logging with channel... infinite arguments
+			C.logch("myChannel", "Log", "with multiple", "arguments");
+			C.messagech("myChannel", "Message", "with multiple", "arguments");
+			C.debugch("myChannel", "Debug", "with multiple", "arguments");
+			C.warningch("myChannel", "Warning", "with multiple", "arguments");
+			C.errorch("myChannel", "Error", "with multiple", "arguments");		
+			
+			
+			
 			// if you want to use command line, please type /help 
 			// in command line at the bottom for examples
 
+			C.setRollerCaptureKey("c");
+			
 			// garbage collection monitor
 			var aSprite:Sprite = new Sprite();
 			C.watch(aSprite, "aSprite");
