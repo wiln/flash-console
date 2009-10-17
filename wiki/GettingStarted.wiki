@@ -94,3 +94,5 @@ C.enabled = false;
 // disable always on top (default is on)
 // when disabled console will stop from keeping it self at the top of the display list
 // this can sometimes fix some problems if you need to manage the display list
+C.alwaysOnTop = false;
+}}}
