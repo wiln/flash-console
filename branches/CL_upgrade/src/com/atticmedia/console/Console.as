@@ -58,9 +58,11 @@ package com.atticmedia.console {
 		public static const VERSION:Number = 2.1;
 		public static const VERSION_STAGE:String = "beta";
 		
-		// you can change this if you need BEFORE starting remote / remoting
-		public static var REMOTE_CONN_NAME:String = "ConsoleRemote2";
-		public static var CLIENT_CONN_NAME:String = "ConsoleClient2";
+		// You can change this if you don't want to use default channel
+		// Other remotes with different remoting channel won't be able to connect your flash.
+		// Start with _ to work in any domain + platform (air/swf - local / network)
+		// Change BEFORE starting remote / remoting
+		public static var REMOTING_CONN_NAME:String = "_Console";
 		
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "filtered";
@@ -188,7 +190,7 @@ package com.atticmedia.console {
 			var sCon:LocalConnection = new LocalConnection();
 			try{
 				sCon.allowInsecureDomain("*");
-				sCon.connect(REMOTE_CONN_NAME);
+				sCon.connect(REMOTING_CONN_NAME+Remoting.REMOTE_PREFIX);
 			}catch(error:Error){
 				return true;
 			}
