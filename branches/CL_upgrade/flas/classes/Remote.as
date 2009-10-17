@@ -1,4 +1,4 @@
-/*
+﻿/*
 * 
 * Copyright (c) 2008-2009 Lu Aye Oo
 * 
@@ -22,7 +22,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.samples {
+package {
 	
 
 	import com.atticmedia.console.*;

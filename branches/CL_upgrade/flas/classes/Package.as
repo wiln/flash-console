@@ -22,7 +22,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.samples {
+package {
 	import flash.display.MovieClip;
 	import com.atticmedia.console.C;
 	
