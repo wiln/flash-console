@@ -27,7 +27,7 @@ package {
 	import com.atticmedia.console.C;
 	
 	// This class is for exporting to swc from flash.
-	public class Package extends MovieClip{
+	public class SWCPackage extends MovieClip{
 		public var _C:C;
 	}
 }
