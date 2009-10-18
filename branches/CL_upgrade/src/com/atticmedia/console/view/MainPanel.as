@@ -98,6 +98,7 @@ package com.atticmedia.console.view {
 			_traceField.multiline = true;
 			_traceField.styleSheet = style.css;
 			_traceField.y = 12;
+			_traceField.addEventListener(Event.SCROLL, onTraceScroll, false, 0, true);
 			addChild(_traceField);
 			//
 			_menuField = new TextField();
@@ -265,6 +266,9 @@ package com.atticmedia.console.view {
 		//
 		//
 		//
+		private function onTraceScroll(e:Event):void{
+			updateMenu();
+		}
 		public function updateMenu(instant:Boolean = false):void{
 			if(instant){
 				_updateMenu();
@@ -339,10 +343,8 @@ package com.atticmedia.console.view {
 			stopDrag();
 			if(e.text == "scrollUp"){
 				_traceField.scrollV -= 3;
-				updateMenu();
 			}else if(e.text == "scrollDown"){
 				_traceField.scrollV += 3;
-				updateMenu();
 			}else if(e.text == "pause"){
 				if(master.paused){
 					master.paused = false;

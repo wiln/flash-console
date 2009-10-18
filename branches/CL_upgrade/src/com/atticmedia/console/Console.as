@@ -23,6 +23,8 @@
 * 
 */
 package com.atticmedia.console {
+	import flash.display.DisplayObject;	
+	
 	import com.atticmedia.console.view.RollerPanel;	
 	import com.atticmedia.console.core.CommandLine;
 	import com.atticmedia.console.core.LogLineVO;
@@ -80,6 +82,7 @@ package com.atticmedia.console {
 		public var maxLines:int = 500;
 		public var prefixChannelNames:Boolean = true;
 		public var alwaysOnTop:Boolean = true;
+		public var moveTopAttempts:int = 50;
 		public var maxRepeats:Number = 75;
 		public var remoteDelay:int = 20;
 		public var defaultChannel:String = "traces";
@@ -97,6 +100,7 @@ package com.atticmedia.console {
 		private var _previousTime:Number;
 		private var _traceCall:Function = trace;
 		private var _rollerCaptureKey:String;
+		private var _needToMoveTop:Boolean;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -142,13 +146,18 @@ package com.atticmedia.console {
 				cl.base = root;
 			}
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
+			parent.addEventListener(Event.ADDED, onParentDisplayAdded, false, 0, true);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyUpHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
+			parent.removeEventListener(Event.ADDED, onParentDisplayAdded);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyUpHandler);
+		}
+		private function onParentDisplayAdded(e:Event):void{
+			if((e.target as DisplayObject).parent == parent) _needToMoveTop = true;
 		}
 		private function onStageMouseLeave(e:Event):void{
 			panels.tooltip(null);
@@ -367,7 +376,6 @@ package com.atticmedia.console {
 				report("Resumed",-1);
 			}
 			_isPaused = newV;
-			panels.mainPanel.updateMenu(true);
 			panels.mainPanel.refresh();
 		}
 		//
@@ -406,12 +414,14 @@ package com.atticmedia.console {
 			}
 			var time:int = getTimer();
 			_mspf = time-_previousTime;
-
 			_previousTime = time;
-			if(alwaysOnTop && parent &&  parent.getChildIndex(this) < (parent.numChildren-1)){
+			
+			if(_needToMoveTop && alwaysOnTop && moveTopAttempts>0){
+				_needToMoveTop = false;
+				moveTopAttempts--;
 				parent.setChildIndex(this,(parent.numChildren-1));
 				if(!quiet){
-					report("Attempted to move console on top (alwaysOnTop enabled)",-1);
+					report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
 				}
 			}
 			if( _isRepeating ){
@@ -420,11 +430,13 @@ package com.atticmedia.console {
 					_isRepeating = false;
 				}
 			}
-			if(!_isPaused && visible){
+			if(!_isPaused){
 				var arr:Array = mm.update();
 				if(arr.length>0){
 					report("GARBAGE COLLECTED "+arr.length+" item(s): "+arr.join(", "),10);
 				}
+			}
+			if(visible){
 				panels.mainPanel.update(!_isPaused && _linesChanged);
 				if(_linesChanged) {
 					var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;

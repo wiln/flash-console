@@ -225,7 +225,7 @@ package com.atticmedia.console.view {
 					if(doff>0){
 						if((_tooltipField.y - doff)>(_master.mouseY+15)){
 							_tooltipField.y -= doff;
-						}else if(txtRect.y>panRect.bottom){
+						}else if(panRect.y<(_master.mouseY-24) && txtRect.y>panRect.bottom){
 							_tooltipField.y = _master.mouseY-_tooltipField.height-15;
 						}
 					}

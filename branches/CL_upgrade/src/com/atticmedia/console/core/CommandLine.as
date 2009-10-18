@@ -116,14 +116,24 @@ package com.atticmedia.console.core {
 			if(isclean){
 				_values = [];
 			}
-			// STRIP strings out - '...' and "..." wihle ignoring \' \" inside.
-			// First, empty strings "",''
-			str = replaceValues(str, /('')|("")/g, castBlankStr);
-			// Second, strings with stuff in it "...",'...', but can't do replaceValues because matching string got extra first char
-			var strReg:RegExp = /([^\\]'(.*?[^\\])')|([^\\]"(.*?[^\\])")/g;
+			// STRIP empty strings "",''
+			var matchstring:String;
+			var strReg:RegExp = /('')|("")/g;
 			var result:Object = strReg.exec(str);
 			while(result != null){
-				var matchstring:String = result[0];
+				var ind:int = result["index"];
+				matchstring = result[0];
+				str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, ind, ind+matchstring.length);
+				_values.push(new Value("", "", matchstring));
+				strReg.lastIndex = ind+1;
+				result = strReg.exec(str);
+			}
+			// STRIP strings - '...' and "..." wihle ignoring \' \" inside.
+			// have to do again after empty string strip because matching string got extra first char
+			strReg = /([^\\]'(.*?[^\\])')|([^\\]"(.*?[^\\])")/g;
+			result = strReg.exec(str);
+			while(result != null){
+				matchstring = result[0];
 				var substring:String = result[2]?result[2]:result[4]?result[4]:"";
 				var ind2:int = result["index"]+matchstring.indexOf(substring);
 				strReg.lastIndex = ind2+1;
@@ -134,42 +144,21 @@ package com.atticmedia.console.core {
 			}
 			// All strings will have replaced by ^0, ^1, etc
 			//
-			// Cast Classes...
-			// TODO: maybe do an automatic detection on the fly
-			str = replaceValues(str, /\*(.*?)\*/g, castClass);
-			//
 			// Run each line
 			var v:* = null;
 			var lineBreaks:Array = str.split(/\s*;\s*/);
 			for each(var line:String in lineBreaks){
-				v = runLine(line);
+				if(line.length){
+					v = runLine(line);
+				}
 			}
 			if(isclean){
 				_values = null;
 			}
 			return v;
 		}
-		private function replaceValues(str:String, strReg:RegExp, casting:Object):String{
-			var result:Object = strReg.exec(str);
-			while(result != null){
-				var ind:int = result["index"];
-				var matchstring:String = result[0];
-				str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, ind, ind+matchstring.length);
-				var v:Object = casting(matchstring);
-				_values.push(new Value(v, v, matchstring));
-				strReg.lastIndex = ind+1;
-				result = strReg.exec(str);
-			}
-			return str;
-		}
-		private function castBlankStr(...args):String{
-			return "";
-		}
-		private function castClass(str:String):Object{
-			return getDefinitionByName(str.slice(1,str.length-1));
-		}
-		// *com.atticmedia.console.C*.instance.visible
-		// *com.atticmedia.console.C*.instance.addGraph('test',stage,'mouseX')
+		// com.atticmedia.console.C.instance.visible
+		// com.atticmedia.console.C.instance.addGraph('test',stage,'mouseX')
 		// test('simple stuff. what ya think?');
 		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
 		// this.getChildAt(0); 
@@ -177,7 +166,7 @@ package com.atticmedia.console.core {
 		// third(second(first('console'))).final(0).alpha;
 		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
 		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
-		// *com.atticmedia.console.C*.add('Hey how are you?');
+		// com.atticmedia.console.C.add('Hey how are you?');
 		// $f = this;
 		private function runLine(line:String):*{
 			try{
@@ -186,7 +175,7 @@ package com.atticmedia.console.core {
 				var v:Value = execChunk(majorParts[0]);
 				for(var i:int = 1;i<majorParts.length;i++){
 					var vtoset:Value = execChunk(majorParts[i]);
-					report("Target base = "+vtoset.base + " prop = "+vtoset.prop);
+					//report("Target base = "+vtoset.base + " prop = "+vtoset.prop);
 					vtoset.base[vtoset.prop] = v.value;
 					report("<b>SET</b> "+getQualifiedClassName(vtoset.base)+"."+vtoset.prop+" = <b>"+v.value+"</b>", -2);
 				}
@@ -225,12 +214,12 @@ package com.atticmedia.console.core {
 					var inside:String = line.substring(indOpen+1, indClose);
 					line = Utils.replaceByIndexes(line, VALUE_CONST+_values.length, indOpen+1, indClose);
 					var params:Array = inside.split(",");
+					_values.push(new Value(params));
 					for(var X:String in params){
 						params[X] = execNest(params[X].replace(/\s*(.+)\s*/,"$1")).value;
 					}
-					report("^"+_values.length+" stores params ["+params+"]");
-					_values.push(new Value(params));
-					report(line);
+					//report("^"+_values.length+" stores params ["+params+"]");
+					//report(line);
 				}
 				indOpen = line.lastIndexOf("(", indOpen-1);
 			}
@@ -241,12 +230,35 @@ package com.atticmedia.console.core {
 			
 			var reg:RegExp = /\.|\(/g;
 			var result:Object = reg.exec(str);
-			
 			if(result==null || !isNaN(Number(str))){
 				return execValue(str, null);
 			}
-			// NESTED...
-			// TODO: AUTOMATICALLY detect classes in packages rather than using *...* 
+			// AUTOMATICALLY detect classes in packages rather than using *...* 
+			var firstparts:Array = str.split("(")[0].split(".");
+			if(firstparts.length>0){
+				while(firstparts.length){
+					var classstr:String = firstparts.join(".");
+					try{
+						var def:* = getDefinitionByName(classstr);
+						var havemore:Boolean = str.length>classstr.length;
+						//report(classstr+" is a class "+def);
+						str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, 0, classstr.length);
+						_values.push(new Value(def, def, classstr));
+						if(havemore){
+							reg.lastIndex = 0;
+							result = reg.exec(str);
+						}else{
+							return execValue(str, null);
+						}
+						break;
+					}catch(e:Error){
+						firstparts.pop();
+					}
+				}
+			}
+			//
+			// dot syntex and simple function steps
+			//
 			var previndex:int = 0;
 			while(result != null){
 				var index:int = result.index;
@@ -256,7 +268,7 @@ package com.atticmedia.console.core {
 				var newv:Value = execValue(basestr, v.base);
 				var newbase:* = newv.value;
 				v.base = newv.base;
-				report("scope = "+newbase+"  isFun:"+isFun);
+				//report("scope = "+newbase+"  isFun:"+isFun);
 				if(isFun){
 					var closeindex:int = str.indexOf(")", index);
 					var paramstr:String = str.substring(index+1, closeindex);
@@ -264,7 +276,7 @@ package com.atticmedia.console.core {
 					if(paramstr){
 						params = execValue(paramstr).value;
 					}
-					report("params = "+params.length+" - ["+ params+"]");
+					//report("params = "+params.length+" - ["+ params+"]");
 					v.value = (newbase as Function).apply(v.base, params);
 					v.base = v.value;
 					index = closeindex+1;
@@ -306,6 +318,7 @@ package com.atticmedia.console.core {
 				v.value = Number(str);
 			}else if(str.indexOf(VALUE_CONST)==0){
 				var vv:Value = _values[str.substring(VALUE_CONST.length)];
+				//report(VALUE_CONST+str.substring(VALUE_CONST.length)+" = " +vv);
 				v.base = vv.base;
 				v.value = vv.value;
 			}else if(str.charAt(0) == "$"){
@@ -321,7 +334,7 @@ package com.atticmedia.console.core {
 			}else{
 				v.value = v.base[str];
 			}
-			report("value: "+str+" = "+getQualifiedClassName(v.value)+" - "+v.value+" base:"+v.base);
+			//report("value: "+str+" = "+getQualifiedClassName(v.value)+" - "+v.value+" base:"+v.base);
 			return v;
 		}
 		private function doCommand(str:String):void{
