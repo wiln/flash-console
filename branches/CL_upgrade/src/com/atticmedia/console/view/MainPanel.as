@@ -393,7 +393,9 @@ package com.atticmedia.console.view {
 				var str:String = "/remap "+e.text.substring(5);
 				master.runCommand(str);
 			}else if(e.text.substring(0,6) == "sclip_"){
-				master.cl.reMap(e.text.substring(6), stage);
+				//var str:String = "/remap 0|"+e.text.substring(6);
+				master.runCommand("/remap 0"+Console.MAPPING_SPLITTER+e.text.substring(6));
+				//master.cl.reMap(e.text.substring(6), stage);
 			}
 			_menuField.setSelection(0, 0);
 			e.stopPropagation();

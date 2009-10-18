@@ -46,7 +46,7 @@ package com.atticmedia.console.core {
 		private var _returned:*;
 		private var _returned2:*;
 		private var _mapBases:WeakObject;
-		private var _mapBaseIndex:uint;
+		private var _mapBaseIndex:uint = 1;
 		private var _reserved:Array;
 		private var _values:Array;
 		
@@ -585,19 +585,22 @@ package com.atticmedia.console.core {
 			var pathArr:Array = path.split(Console.MAPPING_SPLITTER);
 			if(!mc){
 				var first:String = pathArr.shift();
-				mc = _mapBases[first];
+				if(first == "0"){
+					mc = _master.stage;
+				}else{
+					mc = _mapBases[first];
+				}
 			}
 			var child:DisplayObject = mc as DisplayObject;
 			try{
-				if(path.length>0){
-					for each(var ind:String in pathArr){
-						child = mc.getChildByName(ind);
-						if(child is DisplayObjectContainer){
-							mc = child as DisplayObjectContainer;;
-						}else{
-							// assume it reached to end since there can no longer be a child
-							break;
-						}
+				for each(var nn:String in pathArr){
+					if(!nn) break;
+					child = mc.getChildByName(nn);
+					if(child is DisplayObjectContainer){
+						mc = child as DisplayObjectContainer;;
+					}else{
+						// assume it reached to end since there can no longer be a child
+						break;
 					}
 				}
 				doReturn(child);
