@@ -31,7 +31,7 @@ Features include: priorities, channels, FPS display, memory/garbage collection m
 
 
 ===2.12===
-  * Major discovery with untrusted sandboxing in Remoting. Now shows a warning and how to work around the sandbox.
+  * Major discovery with untrusted local sandboxing in Remoting. Now shows a warning and how to work around the sandbox.
 
 
 ===2.11===
