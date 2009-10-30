@@ -6,7 +6,7 @@
 
 ==Flash Console==
 
-  * Version: 2.11 (Oct 2009)
+  * Version: 2.12 (Oct 2009)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo
 
