@@ -32,6 +32,7 @@ Features include: priorities, channels, FPS display, memory/garbage collection m
 ===2.11===
   * You can now create new instances in commandLine. for example `new flash.display.Sprite()`
   * Added `commandLinePermission` - security feature to disallow changing Security sensitive settings through commandLine.
+  * Improved `inspect`
   * Minor fix on commandLine bug.
   * New Icon by Nick Holiday
 
