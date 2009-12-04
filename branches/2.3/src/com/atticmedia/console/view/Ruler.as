@@ -28,7 +28,7 @@ package com.atticmedia.console.view {
 	import flash.display.Shape;	
 	
 	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.Utils;
+	import com.atticmedia.console.utils.Utils;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;

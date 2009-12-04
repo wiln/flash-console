@@ -22,7 +22,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.core {
+package com.atticmedia.console.utils {
 	import flash.utils.getQualifiedClassName;
 	import flash.display.Graphics;	
 	import flash.geom.Point;	

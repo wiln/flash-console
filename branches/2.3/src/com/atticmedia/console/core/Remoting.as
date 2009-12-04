@@ -55,7 +55,7 @@ package com.atticmedia.console.core {
 			_master = m;
 			_logsend = logsend;
 		}
-		public function addLineQueue(line:LogLineVO):void{
+		public function addLineQueue(line:LogLine):void{
 			if(!_loggedIn) return;
 			_remoteLinesQueue.push(line);
 			var maxlines:int = _master.maxLines;

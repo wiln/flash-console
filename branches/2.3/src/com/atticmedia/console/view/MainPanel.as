@@ -30,7 +30,7 @@ package com.atticmedia.console.view {
 	import flash.system.Security;
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.core.CommandLine;
-	import com.atticmedia.console.core.LogLineVO;
+	import com.atticmedia.console.core.LogLine;
 	import com.atticmedia.console.events.TextFieldRollOver;
 	
 	import flash.display.Shape;
@@ -284,7 +284,7 @@ package com.atticmedia.console.view {
 		}
 		private function updateFull():void{
 			var str:String = "";
-			for each (var line:LogLineVO in _lines ){
+			for each (var line:LogLine in _lines ){
 				if(master.lineShouldShow(line)){
 					str += makeLine(line);
 				}
@@ -310,7 +310,7 @@ package com.atticmedia.console.view {
 			var numLines:int = _lines.length;
 			var lines:Array = new Array();
 			for(var i:int=numLines-1;i>=0;i--){
-				var line:LogLineVO = _lines[i];
+				var line:LogLine = _lines[i];
 				if(master.lineShouldShow(line)){
 					linesLeft--;
 					lines.push(makeLine(line));
@@ -325,7 +325,7 @@ package com.atticmedia.console.view {
 			_lockScrollUpdate = false;
 			updateScroller();
 		}
-		private function makeLine(line:LogLineVO):String{
+		private function makeLine(line:LogLine):String{
 			var str:String = "";
 			var txt:String = line.text;
 			if(master.prefixChannelNames && (master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0 || master.viewingChannels.length>1) && line.c != Console.DEFAULT_CHANNEL){

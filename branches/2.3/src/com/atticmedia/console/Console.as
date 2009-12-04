@@ -26,10 +26,10 @@ package com.atticmedia.console {
 	import flash.display.DisplayObjectContainer;
 
 	import com.atticmedia.console.core.CommandLine;
-	import com.atticmedia.console.core.LogLineVO;
+	import com.atticmedia.console.core.LogLine;
 	import com.atticmedia.console.core.MemoryMonitor;
 	import com.atticmedia.console.core.Remoting;
-	import com.atticmedia.console.core.Utils;
+	import com.atticmedia.console.utils.Utils;
 	import com.atticmedia.console.view.ChannelsPanel;
 	import com.atticmedia.console.view.FPSPanel;
 	import com.atticmedia.console.view.MainPanel;
@@ -595,7 +595,7 @@ package com.atticmedia.console {
 			if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
 			}
-			var line:LogLineVO = new LogLineVO(txt,channel,priority, isRepeating, skipSafe);
+			var line:LogLine = new LogLine(txt,channel,priority, isRepeating, skipSafe);
 			if(isRepeat){
 				_lines.pop();
 				_lines.push(line);
@@ -613,7 +613,7 @@ package com.atticmedia.console {
 				remoter.addLineQueue(line);
 			}
 		}
-		public function lineShouldShow(line:LogLineVO):Boolean{
+		public function lineShouldShow(line:LogLine):Boolean{
 			return (
 				(
 					_viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0

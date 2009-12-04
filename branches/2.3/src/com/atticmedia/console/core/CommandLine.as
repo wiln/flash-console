@@ -23,6 +23,8 @@
 * 
 */
 package com.atticmedia.console.core {
+	import com.atticmedia.console.utils.Utils;
+	import com.atticmedia.console.utils.WeakObject;
 	import com.atticmedia.console.Console;
 
 	import flash.display.DisplayObject;

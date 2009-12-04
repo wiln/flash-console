@@ -24,7 +24,7 @@
 */
 package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.Utils;
+	import com.atticmedia.console.utils.Utils;
 	import com.atticmedia.console.events.TextFieldRollOver;
 
 	import flash.display.DisplayObject;

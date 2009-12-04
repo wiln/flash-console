@@ -24,7 +24,7 @@
 */
 package com.atticmedia.console.view {
 	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.Utils;
+	import com.atticmedia.console.utils.Utils;
 	import com.atticmedia.console.events.TextFieldRollOver;
 	
 	import flash.display.Shape;
@@ -328,7 +328,7 @@ package com.atticmedia.console.view {
 	}
 }
 
-import com.atticmedia.console.core.WeakRef;
+import com.atticmedia.console.utils.WeakRef;
 
 class Interest{
 	private var _ref:WeakRef;
