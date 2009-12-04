@@ -23,22 +23,26 @@
 * 
 */
 package com.atticmedia.console.core {
-	import com.atticmedia.console.utils.ChainItem;
-
-	public class LogLine extends ChainItem{
+	
+	public class Log{
 		public var text:String;
 		public var c:String;
 		public var p:int;
-		public var time:int;
 		public var r:Boolean;
 		public var s:Boolean;
-		public function LogLine(t:String, ch:String, pr:int, repeating:Boolean = false, skipSafe:Boolean = false, ti:int = 0){
+		//
+		public var next:Log;
+		public var prev:Log;
+		//
+		public function Log(t:String, ch:String, pr:int, repeating:Boolean = false, skipSafe:Boolean = false){
 			text = t;
 			c = ch;
 			p = pr;
-			time = ti;
 			r = repeating;
 			s = skipSafe;
+		}
+		public function toObject():Object{
+			return {text:text, c:c, p:p, r:r, s:s};
 		}
 		public function toString():String{
 			return "["+c+"] " + text;

@@ -39,7 +39,32 @@ package com.atticmedia.console{
 	import flash.display.Sprite;
 
 	public class Console extends Sprite {
-		public function Console() {
-		}
+		
+		public static const VERSION:Number = 2.2;
+		public static const VERSION_STAGE:String = "";
+		//
+		public static const NAME:String = "Console";
+		public static const PANEL_MAIN:String = "mainPanel";
+		public static const PANEL_CHANNELS:String = "channelsPanel";
+		public static const PANEL_FPS:String = "fpsPanel";
+		public static const PANEL_MEMORY:String = "memoryPanel";
+		public static const PANEL_ROLLER:String = "rollerPanel";
+		
+		public static var REMOTING_CONN_NAME:String = "_Console";
+		//
+		public static const CONSOLE_CHANNEL:String = "C";
+		public static const FILTERED_CHANNEL:String = "~";
+		public static const GLOBAL_CHANNEL:String = " * ";
+		public static const DEFAULT_CHANNEL:String = "-";
+		//
+		public static const LOG_LEVEL:uint = 1;
+		public static const INFO_LEVEL:uint = 3;
+		public static const DEBUG_LEVEL:uint = 6;
+		public static const WARN_LEVEL:uint = 8;
+		public static const ERROR_LEVEL:uint = 10;
+		//
+		public static const FPS_MAX_LAG_FRAMES:uint = 25;
+		public static const MAPPING_SPLITTER:String = "|";
+		
 	}
 }

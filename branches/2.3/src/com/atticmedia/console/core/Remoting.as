@@ -55,9 +55,9 @@ package com.atticmedia.console.core {
 			_master = m;
 			_logsend = logsend;
 		}
-		public function addLineQueue(line:LogLine):void{
+		public function addLineQueue(line:Log):void{
 			if(!_loggedIn) return;
-			_remoteLinesQueue.push(line);
+			_remoteLinesQueue.push(line.toObject());
 			var maxlines:int = _master.maxLines;
 			if(_remoteLinesQueue.length > maxlines && maxlines > 0 ){
 				_remoteLinesQueue.splice(0,1);
@@ -120,7 +120,7 @@ package com.atticmedia.console.core {
 					_isRemoting = true;
 					_loggedIn = _master.checkLogin("");
 					if(_loggedIn){
-						_remoteLinesQueue = _master.getAllLines();
+						_remoteLinesQueue = _master.getLogsAsObjects();
 						send("loginSuccess");
 					}else{
 						send("requestLogin");
@@ -213,7 +213,7 @@ package com.atticmedia.console.core {
 				// once logged in, next login attempts will always be success
 				if(_loggedIn || _master.checkLogin(pass)){
 					_loggedIn = true;
-					_remoteLinesQueue = _master.getAllLines();
+					_remoteLinesQueue = _master.getLogsAsObjects();
 					send("loginSuccess");
 				}else{
 					send("loginFail");

@@ -24,13 +24,15 @@
 */
 
 package com.atticmedia.console.view {
+	import com.atticmedia.console.core.Logs;	
+	
 	import flash.display.Sprite;
 	import flash.geom.ColorTransform;
 	import flash.system.SecurityPanel;
 	import flash.system.Security;
 	import com.atticmedia.console.Console;
 	import com.atticmedia.console.core.CommandLine;
-	import com.atticmedia.console.core.LogLine;
+	import com.atticmedia.console.core.Log;
 	import com.atticmedia.console.events.TextFieldRollOver;
 	
 	import flash.display.Shape;
@@ -88,7 +90,7 @@ package com.atticmedia.console.view {
 		private var _scrolldir:int;
 		
 		private var _channels:Array;
-		private var _lines:Array;
+		private var _lines:Logs;
 		private var _commandsHistory:Array = [];
 		private var _commandsInd:int;
 		
@@ -98,7 +100,7 @@ package com.atticmedia.console.view {
 		private var _atBottom:Boolean = true;
 		private var _enteringLogin:Boolean;
 		
-		public function MainPanel(m:Console, lines:Array, channels:Array) {
+		public function MainPanel(m:Console, lines:Logs, channels:Array) {
 			super(m);
 			
 			_canUseTrace = (Capabilities.playerType=="External"||Capabilities.isDebugger);
@@ -284,10 +286,12 @@ package com.atticmedia.console.view {
 		}
 		private function updateFull():void{
 			var str:String = "";
-			for each (var line:LogLine in _lines ){
+			var line:Log = _lines.first;
+			while(line){
 				if(master.lineShouldShow(line)){
 					str += makeLine(line);
 				}
+				line = line.next;
 			}
 			_lockScrollUpdate = true;
 			_traceField.htmlText = str;
@@ -306,11 +310,10 @@ package com.atticmedia.console.view {
 			updateMenu();
 		}
 		private function updateBottom():void{
-			var linesLeft:int = Math.round(_traceField.height/10);
-			var numLines:int = _lines.length;
 			var lines:Array = new Array();
-			for(var i:int=numLines-1;i>=0;i--){
-				var line:LogLine = _lines[i];
+			var linesLeft:int = Math.round(_traceField.height/10);
+			var line:Log = _lines.last;
+			while(line){
 				if(master.lineShouldShow(line)){
 					linesLeft--;
 					lines.push(makeLine(line));
@@ -318,6 +321,7 @@ package com.atticmedia.console.view {
 						break;
 					}
 				}
+				line = line.prev;
 			}
 			_lockScrollUpdate = true;
 			_traceField.htmlText = lines.reverse().join("");
@@ -325,7 +329,7 @@ package com.atticmedia.console.view {
 			_lockScrollUpdate = false;
 			updateScroller();
 		}
-		private function makeLine(line:LogLine):String{
+		private function makeLine(line:Log):String{
 			var str:String = "";
 			var txt:String = line.text;
 			if(master.prefixChannelNames && (master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0 || master.viewingChannels.length>1) && line.c != Console.DEFAULT_CHANNEL){

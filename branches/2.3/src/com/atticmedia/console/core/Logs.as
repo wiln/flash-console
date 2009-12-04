@@ -22,46 +22,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.utils {
-	
-	public class Chain{
+package com.atticmedia.console.core {
+	public class Logs{
 		
-		public var first:ChainItem;
-		public var last:ChainItem;
+		public var first:Log;
+		public var last:Log;
 		
 		private var _length:uint;
 		
-		public function Chain() {
-			
-		}
 		public function clear():void{
 			first = null;
 			last = null;
 			_length = 0;
 		}
+		
 		public function get length():uint{
 			return _length;
 		}
 		// add to the last of chain
-		public function push(v:ChainItem):void{
-			if(last) {
+		public function push(v:Log):void{
+			if(last==null) {
+				first = v;
+			}else{
 				last.next = v;
 				v.prev = last;
-			}else{
-				first = v;
 			}
 			last = v;
-			_length++;
-		}
-		// add to the front of chain
-		public function unshift(v:ChainItem):void{
-			if(first) {
-				first.prev = v;
-				v.next = first;
-			}else{
-				last = v;
-			}
-			first = v;
 			_length++;
 		}
 		// remove last item of chain
@@ -72,17 +58,12 @@ package com.atticmedia.console.utils {
 			}
 		}
 		// remove first item of chain
-		public function shift():void{
-			if(first) {
+		public function shift(count:uint = 1):void{
+			while(first && count>0){
 				first = first.next;
+				count--;
 				_length--;
 			}
-		}
-		// remove the item
-		public function remove(v:ChainItem):void{
-			if(v.prev) v.prev.next = v.next;
-			if(v.next) v.next.prev = v.prev;
-			_length--;
 		}
 	}
 }

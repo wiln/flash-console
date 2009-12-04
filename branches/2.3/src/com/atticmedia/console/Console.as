@@ -23,10 +23,12 @@
 * 
 */
 package com.atticmedia.console {
+	import com.atticmedia.console.core.Logs;	
+	
 	import flash.display.DisplayObjectContainer;
 
 	import com.atticmedia.console.core.CommandLine;
-	import com.atticmedia.console.core.LogLine;
+	import com.atticmedia.console.core.Log;
 	import com.atticmedia.console.core.MemoryMonitor;
 	import com.atticmedia.console.core.Remoting;
 	import com.atticmedia.console.utils.Utils;
@@ -49,8 +51,8 @@ package com.atticmedia.console {
 
 	public class Console extends Sprite {
 
-		public static const VERSION:Number = 2.2;
-		public static const VERSION_STAGE:String = "";
+		public static const VERSION:Number = 2.3;
+		public static const VERSION_STAGE:String = "alpha";
 		//
 		public static const NAME:String = "Console";
 		public static const PANEL_MAIN:String = "mainPanel";
@@ -117,7 +119,7 @@ package com.atticmedia.console {
 		private var _isRepeating:Boolean;
 		private var _priority:int;
 		private var _repeated:int;
-		private var _lines:Array = [];
+		private var _lines:Logs;
 		private var _lineAdded:Boolean;
 		
 		/**
@@ -134,6 +136,7 @@ package com.atticmedia.console {
 			_remotingPassword = pass;
 			tabChildren = false; // Tabbing is not supported
 			//
+			_lines = new Logs();
 			cl = new CommandLine(this);
 			remoter = new Remoting(this, remoteLogSend);
 			mm = new MemoryMonitor();
@@ -496,11 +499,7 @@ package com.atticmedia.console {
 			var lines:Array = obj[0];
 			for each( var line:Object in lines){
 				if(line){
-					var p:int = line["p"]?line["p"]:5;
-					var channel:String = line["c"]?line["c"]:"";
-					var r:Boolean = line["r"];
-					var safe:Boolean = line["s"];
-					addLine(line["text"],p,channel,r,safe);
+					addLine(line.text,line.p,line.c,line.r,line.s);
 				}
 			}
 			var remoteMSPFs:Array = obj[1];
@@ -595,15 +594,18 @@ package com.atticmedia.console {
 			if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
 			}
-			var line:LogLine = new LogLine(txt,channel,priority, isRepeating, skipSafe);
+			var line:Log = new Log(txt,channel,priority, isRepeating, skipSafe);
 			if(isRepeat){
 				_lines.pop();
 				_lines.push(line);
 			}else{
 				_repeated = 0;
 				_lines.push(line);
-				if(_lines.length > maxLines && maxLines > 0 ){
-					_lines.splice(0,1);
+				if(maxLines > 0 ){
+					var off:int = _lines.length - maxLines;
+					if(off > 0){
+						_lines.shift(off);
+					}
 				}
 			}
 			_lineAdded = true;
@@ -613,7 +615,7 @@ package com.atticmedia.console {
 				remoter.addLineQueue(line);
 			}
 		}
-		public function lineShouldShow(line:LogLine):Boolean{
+		public function lineShouldShow(line:Log):Boolean{
 			return (
 				(
 					_viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0
@@ -720,7 +722,7 @@ package com.atticmedia.console {
 		public function errorch(channel:*, ...args):void{
 			ch(channel, joinArgs(args), ERROR_LEVEL);
 		}
-		private function joinArgs(args:Array):String{
+		public function joinArgs(args:Array):String{
 			for(var X:String in args){
 				if(args[X] is XML || args[X] is XMLList){
 					args[X] = args[X].toXMLString();
@@ -753,18 +755,31 @@ package com.atticmedia.console {
 				var ind:int = _channels.indexOf(channel);
 				if(ind>=0) _channels.splice(ind,1);
 			}else{
-				_lines.splice(0);
+				_lines.clear();
 				_channels.splice(0);
 				_channels.push(GLOBAL_CHANNEL, DEFAULT_CHANNEL);
 			}
 			panels.mainPanel.updateToBottom();
 			panels.updateMenu();
 		}
-		public function getAllLines():Array{
-			return _lines.concat();
+		public function getLogsAsObjects():Array{
+			var a:Array = [];
+			var line:Log = _lines.first;
+			while(line){
+				a.push(line.toObject());
+				line = line.next;
+			}
+			return a;
 		}
 		public function getAllLog(splitter:String = "\n"):String{
-			return _lines.join(splitter);
+			//return _lines.join(splitter);
+			var str:String = "";
+			var line:Log = _lines.first;
+			while(line){
+				str += line.toString()+(line.next?splitter:"");
+				line = line.next;
+			}
+			return str;
 		}
 	}
 }
