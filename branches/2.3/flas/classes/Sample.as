@@ -34,19 +34,19 @@ package {
 		
 		private var _spamcount:int;
 		
-		private var _ch:CChannel = new CChannel('chan');
+		private var _ch:Ch = new Ch('chan');
 		
 		public function Sample() {
 			//
 			// SET UP
 			//C.start(this, "", 2);
 			C.startOnStage(this, "`"); 
-			C.remotingPassword = null;
 			// "`" - change for password. This will start hidden
+			C.remotingPassword = null;
 			C.visible = true; // show console, because having password hides console.
 			//C.tracing = true; // trace on flash's normal trace
 			C.commandLine = true; // enable command line
-			//C.commandLinePermission = 1; // WIP
+			
 			C.width = 600;
 			C.height = 200;
 			C.maxLines = 2000;

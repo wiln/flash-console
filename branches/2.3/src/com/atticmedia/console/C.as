@@ -185,9 +185,9 @@ package com.atticmedia.console {
 		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than C.maxRepeats)
 		 * 
 		 */
-		public static function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
+		public static function ch(channel:*, str:*, priority:Number = 2, isRepeating:Boolean = false):void{
 			if(_console){
-				_console.ch(channel,newLine,priority, isRepeating);
+				_console.ch(channel,str, priority, isRepeating);
 			}
 		}
 		/**

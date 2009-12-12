@@ -33,7 +33,7 @@ Features include: priorities, channels, FPS display, memory/garbage collection m
 
 
 ===2.3===
-  * memoryMonitor and fpsMonitor setters are not Boolean (used to be int)
+  * memoryMonitor and fpsMonitor setters are now Boolean (used to be int)
   * Added CChannel functionality where you can create instances of console channel.
   * Performace increase in terms of log lines management.
 
