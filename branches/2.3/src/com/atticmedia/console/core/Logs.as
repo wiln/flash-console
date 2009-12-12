@@ -1,4 +1,4 @@
-/*
+﻿/*
 * 
 * Copyright (c) 2008-2009 Lu Aye Oo
 * 
@@ -59,11 +59,18 @@ package com.atticmedia.console.core {
 		}
 		// remove first item of chain
 		public function shift(count:uint = 1):void{
-			while(first && count>0){
+			while(first != null && count>0){
 				first = first.next;
 				count--;
 				_length--;
 			}
+		}
+		public function remove(log:Log):void{
+			if(first == log) first = log.next;
+			if(last == log) last = log.prev;
+			if(log.next != null) log.next.prev = log.prev;
+			if(log.prev != null) log.prev.next = log.next;
+			_length--;
 		}
 	}
 }

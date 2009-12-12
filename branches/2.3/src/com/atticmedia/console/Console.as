@@ -747,10 +747,12 @@ package com.atticmedia.console {
 		}
 		public function clear(channel:String = null):void{
 			if(channel){
-				for(var i:int=(_lines.length-1);i>=0;i--){
-					if(_lines[i] && _lines[i].c == channel){
-						delete _lines[i];
+				var line:Log = _lines.first;
+				while(line){
+					if(line.c == channel){
+						_lines.remove(line);
 					}
+					line = line.next;
 				}
 				var ind:int = _channels.indexOf(channel);
 				if(ind>=0) _channels.splice(ind,1);
