@@ -34,6 +34,8 @@ package {
 		
 		private var _spamcount:int;
 		
+		private var _ch:CChannel = new CChannel('chan');
+		
 		public function Sample() {
 			//
 			// SET UP
@@ -48,7 +50,7 @@ package {
 			C.width = 600;
 			C.height = 200;
 			C.maxLines = 2000;
-			C.fpsMonitor = 1;
+			C.fpsMonitor = true;
 			C.remoting = true;
 			
 			TextField(txtPriority).restrict = "0-9";
@@ -57,7 +59,6 @@ package {
 			setUpButton(btnAdd1, "Add");
 			setUpButton(btnAdd2, "Add");
 			setUpButton(btnSpam, "Spam");
-			
 			
 			//
 			//

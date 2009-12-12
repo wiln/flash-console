@@ -295,18 +295,18 @@ package com.atticmedia.console {
 			}
 		}
 		//
-		public function get fpsMonitor():int{
+		public function get fpsMonitor():Boolean{
 			return panels.fpsMonitor;
 		}
-		public function set fpsMonitor(n:int):void{
-			panels.fpsMonitor = n;
+		public function set fpsMonitor(b:Boolean):void{
+			panels.fpsMonitor = b;
 		}
 		//
-		public function get memoryMonitor():int{
+		public function get memoryMonitor():Boolean{
 			return panels.memoryMonitor;
 		}
-		public function set memoryMonitor(n:int):void{
-			panels.memoryMonitor = n;
+		public function set memoryMonitor(b:Boolean):void{
+			panels.memoryMonitor = b;
 		}
 		//
 		public function watch(o:Object,n:String = null):String{

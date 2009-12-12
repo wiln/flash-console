@@ -506,20 +506,20 @@ package com.atticmedia.console {
 		/**
 		 * Start/stop FPS monitor graph.
 		 */
-		public static function set fpsMonitor(v:int):void{
+		public static function set fpsMonitor(v:Boolean):void{
 			setter("fpsMonitor", v);
 		}
-		public static function get fpsMonitor():int{
-			return getter("fpsMonitor") as int;
+		public static function get fpsMonitor():Boolean{
+			return getter("fpsMonitor") as Boolean;
 		}
 		/**
 		 * Start/stop Memory monitor graph.
 		 */
-		public static function set memoryMonitor(v:int):void{
+		public static function set memoryMonitor(v:Boolean):void{
 			setter("memoryMonitor", v);
 		}
-		public static function get memoryMonitor():int{
-			return getter("memoryMonitor") as int;
+		public static function get memoryMonitor():Boolean{
+			return getter("memoryMonitor") as Boolean;
 		}
 		/**
 		 * Start/stop Display Roller.

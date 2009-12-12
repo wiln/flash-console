@@ -584,7 +584,7 @@ package com.atticmedia.console.view {
 			}else if(e.text == "channels"){
 				master.channelsPanel = !master.channelsPanel;
 			}else if(e.text == "fps"){
-				master.fpsMonitor = master.fpsMonitor>0?0:1;
+				master.fpsMonitor = !master.fpsMonitor;
 			}else if(e.text == "priority"){
 				if(master.priority<10){
 					master.priority++;
@@ -592,7 +592,7 @@ package com.atticmedia.console.view {
 					master.priority = 0;
 				}
 			}else if(e.text == "mm"){
-				master.memoryMonitor = master.memoryMonitor>0?0:1;
+				master.memoryMonitor = !master.memoryMonitor;
 			}else if(e.text == "roller"){
 				master.displayRoller = !master.displayRoller;
 			}else if(e.text == "ruler"){

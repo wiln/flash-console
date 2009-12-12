@@ -1,4 +1,4 @@
-/*
+﻿/*
 * 
 * Copyright (c) 2008-2009 Lu Aye Oo
 * 
@@ -137,20 +137,18 @@ package com.atticmedia.console.view {
 		//
 		//
 		//
-		public function get fpsMonitor():int{
-			var fps:FPSPanel = getPanel(Console.PANEL_FPS) as FPSPanel;
-			if(!fps) return 0;
-			return 1;
+		public function get fpsMonitor():Boolean{
+			return (getPanel(Console.PANEL_FPS) as FPSPanel)!=null;
 		}
-		public function set fpsMonitor(n:int):void{
-			if(fpsMonitor != n){
-				if(n == 0){
-					removePanel(Console.PANEL_FPS);
-				}else if(n > 0){
+		public function set fpsMonitor(b:Boolean):void{
+			if(fpsMonitor != b){
+				if(b){
 					var fps:FPSPanel = new FPSPanel(_master);
 					fps.x = _mainPanel.x+_mainPanel.width-160;
 					fps.y = _mainPanel.y+15;
 					addPanel(fps);
+				}else {
+					removePanel(Console.PANEL_FPS);
 				}
 				_mainPanel.updateMenu();
 			}
@@ -158,20 +156,18 @@ package com.atticmedia.console.view {
 		//
 		//
 		//
-		public function get memoryMonitor():int{
-			var mp:MemoryPanel = getPanel(Console.PANEL_MEMORY) as MemoryPanel;
-			if(!mp) return 0;
-			return 1;
+		public function get memoryMonitor():Boolean{
+			return (getPanel(Console.PANEL_MEMORY) as MemoryPanel)!=null;
 		}
-		public function set memoryMonitor(n:int):void{
-			if(memoryMonitor != n){
-				if(n == 0){
-					removePanel(Console.PANEL_MEMORY);
-				}else if(n > 0){
+		public function set memoryMonitor(b:Boolean):void{
+			if(memoryMonitor != b){
+				if(b){
 					var mp:MemoryPanel = new MemoryPanel(_master);
 					mp.x = _mainPanel.x+_mainPanel.width-80;
 					mp.y = _mainPanel.y+15;
 					addPanel(mp);
+				}else {
+					removePanel(Console.PANEL_MEMORY);
 				}
 				_mainPanel.updateMenu();
 			}

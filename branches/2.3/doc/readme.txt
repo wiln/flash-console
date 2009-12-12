@@ -32,6 +32,13 @@ Features include: priorities, channels, FPS display, memory/garbage collection m
 == Change Log ==
 
 
+===2.3===
+  * memoryMonitor and fpsMonitor setters are not Boolean (used to be int)
+  * Added CChannel functionality where you can create instances of console channel.
+  * Performace increase in terms of log lines management.
+
+
+
 ===2.2===
   * Remote console now ask for password (older remotes will fail to work with new console clients)
   * commandline no longer have permission levels - just enable or disable.
