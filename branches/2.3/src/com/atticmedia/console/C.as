@@ -331,11 +331,11 @@ package com.atticmedia.console {
 		 * Enable/Disable logging and graphs in Console.
 		 * Does not record logs or graphs while disabled.
 		 */
-		public static function set enabled(v:Boolean):void{
-			setter("enabled",v);
-		}
 		public static function get enabled():Boolean{
 			return getter("enabled") as Boolean;
+		}
+		public static function set enabled(v:Boolean):void{
+			setter("enabled",v);
 		}
 		//
 		// Logging settings
@@ -433,11 +433,11 @@ package com.atticmedia.console {
 		 * </p>
 		 * @see #traceCall()
 		 */
-		public static function set tracing(v:Boolean):void{
-			setter("tracing",v);
-		}
 		public static function get tracing():Boolean{
 			return getter("tracing") as Boolean;
+		}
+		public static function set tracing(v:Boolean):void{
+			setter("tracing",v);
 		}
 		/**
 		 * Accessor for channels to call trace.
@@ -448,11 +448,11 @@ package com.atticmedia.console {
 		 * </p>
 		 * @see #tracing
 		 */
-		public static function set tracingChannels(v:Array):void{
-			setter("tracingChannels",v);
-		}
 		public static function get tracingChannels():Array{
 			return getter("tracingChannels") as Array;
+		}
+		public static function set tracingChannels(v:Array):void{
+			setter("tracingChannels",v);
 		}
 		/**
 		 * Accessor for minimum priority required to call trace.
@@ -462,11 +462,11 @@ package com.atticmedia.console {
 		 * </p>
 		 * @see #tracing
 		 */
-		public static function set tracingPriority(v:int):void{
-			setter("tracingPriority",v);
-		}
 		public static function get tracingPriority():int{
 			return getter("tracingChannels") as int;
+		}
+		public static function set tracingPriority(v:int):void{
+			setter("tracingPriority",v);
 		}
 		/**
 		 * Assign custom trace function.
@@ -479,11 +479,11 @@ package com.atticmedia.console {
 		 * @return Current trace function, default is flash's build in trace.
 		 * 
 		 */
-		public static function set traceCall(f:Function):void{
-			setter("traceCall",f);
-		}
 		public static function get traceCall():Function{
 			return getter("traceCall") as Function;
+		}
+		public static function set traceCall(f:Function):void{
+			setter("traceCall",f);
 		}
 		//
 		// Panel settings
@@ -506,29 +506,29 @@ package com.atticmedia.console {
 		/**
 		 * Start/stop FPS monitor graph.
 		 */
-		public static function set fpsMonitor(v:Boolean):void{
-			setter("fpsMonitor", v);
-		}
 		public static function get fpsMonitor():Boolean{
 			return getter("fpsMonitor") as Boolean;
+		}
+		public static function set fpsMonitor(v:Boolean):void{
+			setter("fpsMonitor", v);
 		}
 		/**
 		 * Start/stop Memory monitor graph.
 		 */
-		public static function set memoryMonitor(v:Boolean):void{
-			setter("memoryMonitor", v);
-		}
 		public static function get memoryMonitor():Boolean{
 			return getter("memoryMonitor") as Boolean;
+		}
+		public static function set memoryMonitor(v:Boolean):void{
+			setter("memoryMonitor", v);
 		}
 		/**
 		 * Start/stop Display Roller.
 		 */
-		public static function set displayRoller(v:Boolean):void{
-			setter("displayRoller", v);
-		}
 		public static function get displayRoller():Boolean{
 			return getter("displayRoller") as Boolean;
+		}
+		public static function set displayRoller(v:Boolean):void{
+			setter("displayRoller", v);
 		}
 		/**
 		 * Determine if Console should hide the mouse cursor when using Ruler tool.
@@ -537,11 +537,11 @@ package com.atticmedia.console {
 		 * Default: true
 		 * </p>
 		 */
-		public static function set rulerHidesMouse(v:Boolean):void{
-			setter("rulerHidesMouse",v);
-		}
 		public static function get rulerHidesMouse():Boolean{
 			return getter("rulerHidesMouse") as Boolean;
+		}
+		public static function set rulerHidesMouse(v:Boolean):void{
+			setter("rulerHidesMouse",v);
 		}
 		/**
 		 * width of main console panel
@@ -596,11 +596,11 @@ package com.atticmedia.console {
 		 * Default: false;
 		 * </p>
 		 */
-		public static function set quiet(v:Boolean):void{
-			setter("quiet",v);
-		}
 		public static function get quiet():Boolean{
 			return getter("quiet") as Boolean;
+		}
+		public static function set quiet(v:Boolean):void{
+			setter("quiet",v);
 		}
 		/**
 		 * Accessor for keeping Console on top of display list.
@@ -619,11 +619,11 @@ package com.atticmedia.console {
 		 * they could be jumping layers as they fight for the top layer.
 		 * </p>
 		 */
-		public static function set alwaysOnTop(v:Boolean):void{
-			setter("alwaysOnTop",v);
-		}
 		public static function get alwaysOnTop():Boolean{
 			return getter("alwaysOnTop") as Boolean;
+		}
+		public static function set alwaysOnTop(v:Boolean):void{
+			setter("alwaysOnTop",v);
 		}
 		//
 		// Remoting
@@ -695,28 +695,25 @@ package com.atticmedia.console {
 		 * CommandLine UI's visibility.
 		 * CommandLine will still be avaviable to use through code.
 		 */
-		public static function set commandLine (v:Boolean):void{
-			setter("commandLine",v);
-		}
 		public static function get commandLine ():Boolean{
 			return getter("commandLine") as Boolean;
 		}
+		public static function set commandLine (v:Boolean):void{
+			setter("commandLine",v);
+		}
 		/**
-		 * Command line security permission level. default: 1
+		 * Command line usage allowance
 		 * <p>
 		 * CommandLine is a big security hole for your code and flash. It is a very good
-		 * practice to either completely disable it or have it on medium security after development phase.
+		 * practice to disable it after development phase.
 		 * On the other hand having it on full access will let you debug the code easier.
-		 * level 0: disable command line
-		 * level 1: read/write properties and methods only. No exe/write access to flash.system.Security
-		 * level 2: full access.
 		 * </p>
 		 */
+		public static function get commandLineAllowed ():Boolean{
+			return getter("commandLineAllowed") as Boolean;
+		}
 		public static function set commandLineAllowed (b:Boolean):void{
 			setter("commandLineAllowed",b);
-		}
-		public static function get commandLinePermission ():Boolean{
-			return getter("commandLineAllowed") as Boolean;
 		}
 		/**
 		 * Command line base.
@@ -923,7 +920,7 @@ package com.atticmedia.console {
 			}
 		}
 		/**
-		 * Console already exists
+		 * Console already exists?
 		 * @return true if console is already running
 		 * 
 		 */
