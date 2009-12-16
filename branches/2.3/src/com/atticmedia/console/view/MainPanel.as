@@ -75,6 +75,8 @@ package com.atticmedia.console.view {
 				scope:"Current scope::(CommandLine)"
 		};
 		
+		public var externalLinks:Array = [];
+		
 		private var _traceField:TextField;
 		private var _menuField:TextField;
 		private var _commandPrefx:TextField;
@@ -504,6 +506,9 @@ package com.atticmedia.console.view {
 				str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
 			}
 			str += " ¦</b>";
+			for each(var link:String in externalLinks){
+				str += " <a href=\"event:external_"+link+"\">"+link+"</a>";
+			}
 			if(_canUseTrace){
 				str += doActive(" <a href=\"event:trace\">T</a>", master.tracing);
 			}

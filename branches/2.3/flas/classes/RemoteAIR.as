@@ -53,6 +53,7 @@ package {
 			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_DRAGGING, moveHandle);
 			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_SCALING, scaleHandle);
 			console.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
+			console.panels.mainPanel.externalLinks.push("S");
 			console.filters = [new GlowFilter(0, 0.7, 5, 5)];
 			//
 			stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -80,8 +81,6 @@ package {
 		private function onStageResize(e : Event = null):void {
 			C.width = stage.stageWidth-20;
 			C.height = stage.stageHeight-20;
-			
-			
 		}
 	}
 }

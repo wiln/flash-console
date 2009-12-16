@@ -34,6 +34,7 @@ package com.atticmedia.console {
 		
 		public function Ch(n:String = null, c:Console = null){
 			name = n;
+			// allowed to pass in Console here incase you want to use a different console instance from whats used in C
 			_c = c?c:C;
 		}
 		public function add(str:*, priority:Number = 2, isRepeating:Boolean = false):void{
@@ -54,6 +55,8 @@ package com.atticmedia.console {
 		public function error(...args):void{
 			_c.errorch.apply(null, [name].concat(args));
 		}
+		/*
+		not worth using...
 		public function set tracing(v:Boolean):void{
 			var chs:Array = _c.tracingChannels;
 			var i:int = chs.indexOf(name);
@@ -74,7 +77,7 @@ package com.atticmedia.console {
 			var i:int = chs.indexOf(name);
 			if(i<0) return false;
 			return true;
-		}
+		}*/
 		public function clear():void{
 			_c.clear(name);
 		}
