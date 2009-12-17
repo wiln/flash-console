@@ -39,7 +39,7 @@ package com.luaye.console.view {
 		
 		public static const STARTED_DRAGGING:String = "startedDragging";
 		public static const STARTED_SCALING:String = "startedScaling";
-		public static const CLOSED:String = "closed";
+		//public static const CLOSED:String = "closed";
 		
 		private var _snaps:Array;
 		private var _dragOffset:Point;
@@ -83,7 +83,7 @@ package com.luaye.console.view {
 			if(parent){
 				parent.removeChild(this);
 			}
-			dispatchEvent(new Event(CLOSED));
+			//dispatchEvent(new Event(CLOSED));
 		}
 		//
 		// SIZE

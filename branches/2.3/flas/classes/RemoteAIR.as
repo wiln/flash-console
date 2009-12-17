@@ -23,11 +23,9 @@
 * 
 */
 package {
-	import com.luaye.console.C;
 	import com.luaye.console.Console;
 	import com.luaye.console.view.AbstractPanel;
-
-	import flash.display.DisplayObject;
+	
 	import flash.display.MovieClip;
 	import flash.display.NativeWindowDisplayState;
 	import flash.display.NativeWindowResize;
@@ -39,33 +37,37 @@ package {
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
 	import flash.filters.GlowFilter;
+	import flash.text.TextField;		
 
 	public class RemoteAIR extends MovieClip {
-
+		
+		private var _c:Console;
+		
 		public function RemoteAIR() {
 			
 			stage.nativeWindow.alwaysInFront = true;
 			
-			C.start(this, "", 951);
-			C.maxLines = 2000;
-			C.visible = true;
-			C.remote = true;
-			C.commandLine = true;
-			C.x = 10;
-			C.y = 10;
-			var console:Console = C.instance;
+			//C.start(this, "", 951);
+			_c = new Console(null, 951);
+			addChild(_c);
+			_c.maxLines = 2000;
+			_c.visible = true;
+			_c.remote = true;
+			_c.commandLine = true;
+			_c.x = 10;
+			_c.y = 10;
 			
-			var menu:DisplayObject = console.panels.mainPanel.getChildByName("menuField") as DisplayObject;
+			var menu:TextField = _c.panels.mainPanel.getChildByName("menuField") as TextField;
 			menu.doubleClickEnabled = true;
 			menu.addEventListener(MouseEvent.DOUBLE_CLICK, ondouble);
-			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_DRAGGING, moveHandle);
-			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_SCALING, scaleHandle);
-			console.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
-			console.filters = [new GlowFilter(0, 0.7, 5, 5)];
+			_c.panels.mainPanel.addEventListener(AbstractPanel.STARTED_DRAGGING, moveHandle);
+			_c.panels.mainPanel.addEventListener(AbstractPanel.STARTED_SCALING, scaleHandle);
+			//_c.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
+			_c.filters = [new GlowFilter(0, 0.7, 5, 5)];
 			//
-			console.panels.mainPanel.externalLinks.push("S");
-			console.panels.mainPanel.externalRollOver = onMenuRollOver;
-			console.panels.mainPanel.externalClick = onMenuClick;
+			_c.panels.mainPanel.addMenuKey("Sa");
+			_c.panels.mainPanel.topMenuRollOver = onMenuRollOver;
+			_c.panels.mainPanel.topMenuClick = onMenuClick;
 			//
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
@@ -74,29 +76,47 @@ package {
 		}
 		private function onMenuRollOver(key:String):String{
 			switch (key){
-				case "S":
+				case "Sa":
 					return "Save to file";
+				case "close":
+					return "Close";
 			}
 			return "";
 		}
-		private function onMenuClick(key:String):void{
-			if(key == "S"){
+		private function onMenuClick(key:String):Boolean{
+			if(key == "Sa"){
 				var docsDir:File = File.documentsDirectory;
 				try{
 				    docsDir.browseForSave("Save As");
 				    docsDir.addEventListener(Event.SELECT, saveData);
 				}catch (err:Error){
-				    C.error("Failed:", err.message);
+				    _c.error("Failed:", err.message);
 				}
+				return true;
+			}else if(key == "close"){
+				stage.nativeWindow.close();
+				return true;
 			}
+			return false;
 		}
 		private	function saveData(e:Event):void{
-			var newFile:File = e.target as File;
-			var str:String = C.getAllLog(File.lineEnding);
-			var stream:FileStream = new FileStream();
-			stream.open(newFile, FileMode.WRITE);
-			stream.writeUTFBytes(str);
-			stream.close();
+				var newFile:File = e.target as File;
+				var url:String = newFile.url;
+				var ind:int = url.lastIndexOf(".");
+				if(!newFile.exists && ind<0){
+					newFile.url = url+".txt";
+				}
+				var str:String = _c.getAllLog(File.lineEnding);
+				var stream:FileStream = new FileStream();
+			try{
+				stream.open(newFile, FileMode.WRITE);
+				stream.writeUTFBytes(str);
+				stream.close();
+				_c.report("Saved log to "+newFile.url, -2);
+			}catch(e:Error){
+				// maybe read-only , etc
+				_c.report("There was a problem saving the log to "+newFile.url+"\n"+e, 10);
+			}
 		}
 		private function ondouble(e:Event):void {
 			if(stage.nativeWindow.displayState != NativeWindowDisplayState.MAXIMIZED){
@@ -109,15 +129,12 @@ package {
 			stage.nativeWindow.startMove();
 		}
 		private function scaleHandle(e:Event):void {
-			C.instance.panels.mainPanel.stopScaling();
+			_c.panels.mainPanel.stopScaling();
 			stage.nativeWindow.startResize(NativeWindowResize.BOTTOM_RIGHT);
 		}
-		private function closeHandle(e:Event):void {
-			stage.nativeWindow.close();
-		}
 		private function onStageResize(e : Event = null):void {
-			C.width = stage.stageWidth-20;
-			C.height = stage.stageHeight-20;
+			_c.width = stage.stageWidth-20;
+			_c.height = stage.stageHeight-20;
 		}
 	}
 }

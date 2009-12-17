@@ -24,6 +24,8 @@
 */
 
 package com.luaye.console.view {
+	import flash.system.System;	
+	
 	import com.luaye.console.Console;
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Log;
@@ -56,6 +58,7 @@ package com.luaye.console.view {
 				roller:"Display Roller::Map the display list under your mouse",
 				ruler:"Screen Ruler::Measure the distance and angle between two points on screen.",
 				command:"Command Line",
+				copy:"Copy to clipboard",
 				clear:"Clear log",
 				trace:"Trace",
 				pause:"Pause logging",
@@ -74,9 +77,10 @@ package com.luaye.console.view {
 				scope:"Current scope::(CommandLine)"
 		};
 		
-		public var externalLinks:Array = [];
-		public var externalRollOver:Function;
-		public var externalClick:Function;
+		// these are used for adding extended functionality such as from RemoteAIR
+		private var _extraMenuKeys:Array = [];
+		public var topMenuClick:Function;
+		public var topMenuRollOver:Function;
 		
 		private var _traceField:TextField;
 		private var _menuField:TextField;
@@ -199,7 +203,10 @@ package com.luaye.console.view {
 			
 			master.cl.addEventListener(CommandLine.CHANGED_SCOPE, onUpdateCommandLineScope, false, 0, true);
 		}
-		
+		public function addMenuKey(key:String):void{
+			_extraMenuKeys.push(key);
+			_needUpdateMenu = true;
+		}
 
 		private function stageAddedHandle(e:Event=null):void{
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
@@ -507,12 +514,13 @@ package com.luaye.console.view {
 				str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
 			}
 			str += " ¦</b>";
-			for each(var link:String in externalLinks){
-				str += " <a href=\"event:external_"+link+"\">"+link+"</a>";
+			for each(var link:String in _extraMenuKeys){
+				str += " <a href=\"event:"+link+"\">"+link+"</a>";
 			}
 			if(_canUseTrace){
 				str += doActive(" <a href=\"event:trace\">T</a>", master.tracing);
 			}
+			str += " <a href=\"event:copy\">Cc</a>";
 			str += " <a href=\"event:priority\">P"+master.priority+"</a>";
 			str += doActive(" <a href=\"event:pause\">P</a>", master.paused);
 			str += " <a href=\"event:clear\">C</a> <a href=\"event:close\">X</a>";
@@ -543,6 +551,13 @@ package com.luaye.console.view {
 		public function onMenuRollOver(e:TextFieldRollOver, src:AbstractPanel = null):void{
 			if(src==null) src = this;
 			var txt:String = e.url?e.url.replace("event:",""):"";
+			if(topMenuRollOver!=null) {
+				var t:String = topMenuRollOver(txt);
+				if(t) {
+					master.panels.tooltip(t, src);
+					return;
+				}
+			}
 			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
 				txt = TOOLTIPS["viewall"];
 			}else if(txt == "channel_"+Console.DEFAULT_CHANNEL) {
@@ -558,10 +573,10 @@ package com.luaye.console.view {
 					txt = TOOLTIPS["resume"];
 				else
 					txt = TOOLTIPS["pause"];
+			}else if(txt == "copy"){
+				txt = TOOLTIPS["copy"];
 			}else if(txt == "close" && src == this){
 				txt = TOOLTIPS["closemain"];
-			}else if(txt.indexOf("external_")==0 && externalRollOver!=null){
-				txt = externalRollOver(txt.substring(9));
 			}else{
 				txt = TOOLTIPS[txt];
 			}
@@ -570,6 +585,7 @@ package com.luaye.console.view {
 		private function linkHandler(e:TextEvent):void{
 			_menuField.setSelection(0, 0);
 			stopDrag();
+			if(topMenuClick!=null && topMenuClick(e.text)) return;
 			if(e.text == "pause"){
 				if(master.paused){
 					master.paused = false;
@@ -588,7 +604,7 @@ package com.luaye.console.view {
 			}else if(e.text == "close"){
 				master.panels.tooltip();
 				visible = false;
-				dispatchEvent(new Event(AbstractPanel.CLOSED));
+				//dispatchEvent(new Event(AbstractPanel.CLOSED));
 			}else if(e.text == "channels"){
 				master.channelsPanel = !master.channelsPanel;
 			}else if(e.text == "fps"){
@@ -608,6 +624,9 @@ package com.luaye.console.view {
 				master.panels.startRuler();
 			}else if(e.text == "command"){
 				commandLine = !commandLine;
+			}else if(e.text == "copy") {
+				System.setClipboard(master.getAllLog());
+				master.report("Copied all log to clipboard.", -2);
 			}else if(e.text == "clear"){
 				master.clear();
 			}else if(e.text == "settings"){
@@ -622,8 +641,6 @@ package com.luaye.console.view {
 				//var str:String = "/remap 0|"+e.text.substring(6);
 				master.runCommand("/remap 0"+Console.MAPPING_SPLITTER+e.text.substring(6));
 				//master.cl.reMap(e.text.substring(6), stage);
-			}else if(e.text.substring(0,9) == "external_" && externalClick!=null){
-				externalClick(e.text.substring(9));
 			}
 			_menuField.setSelection(0, 0);
 			e.stopPropagation();
