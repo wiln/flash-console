@@ -35,7 +35,7 @@ If C.tracing is set to true, you will get traces in your flash authoring.
 Another use is when you have finished development and no longer need Console. 
 Replacing the real console's C class with this one will save you some size (~35kb) on the final SWF.
 */
-package com.atticmedia.console{
+package com.luaye.console{
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.geom.Rectangle;
@@ -156,15 +156,15 @@ package com.atticmedia.console{
 		}
 		public static function setPanelArea(panelname:String, rect:Rectangle):void {
 		}
-		public static function set fpsMonitor(v:int):void {
+		public static function set fpsMonitor(v:Boolean):void {
 		}
-		public static function get fpsMonitor():int {
-			return 0;
+		public static function get fpsMonitor():Boolean {
+			return false;
 		}
-		public static function set memoryMonitor(v:int):void {
+		public static function set memoryMonitor(v:Boolean):void {
 		}
-		public static function get memoryMonitor():int {
-			return 0;
+		public static function get memoryMonitor():Boolean {
+			return false;
 		}
 		public static function set displayRoller(v:Boolean):void {
 		}
@@ -237,7 +237,7 @@ package com.atticmedia.console{
 		}
 		public static function set commandLineAllowed(b:Boolean):void {
 		}
-		public static function get commandLinePermission():Boolean {
+		public static function get commandLineAllowed():Boolean {
 			return false;
 		}
 		public static function get commandBase():Object {

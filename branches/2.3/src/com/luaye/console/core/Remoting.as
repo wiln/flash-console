@@ -23,14 +23,13 @@
 * 
 */
 package com.luaye.console.core {
-	import flash.system.Security;
-
 	import com.luaye.console.Console;
 
 	import flash.events.EventDispatcher;
 	import flash.events.SecurityErrorEvent;
 	import flash.events.StatusEvent;
 	import flash.net.LocalConnection;
+	import flash.system.Security;
 
 	public class Remoting extends EventDispatcher{
 		

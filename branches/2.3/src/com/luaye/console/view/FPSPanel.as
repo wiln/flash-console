@@ -24,7 +24,7 @@
 */
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import com.atticmedia.console.view.GraphingPanel;
+	import com.luaye.console.view.GraphingPanel;
 	
 	import flash.events.Event;
 

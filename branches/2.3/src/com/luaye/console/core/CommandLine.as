@@ -23,9 +23,9 @@
 * 
 */
 package com.luaye.console.core {
+	import com.luaye.console.Console;
 	import com.luaye.console.utils.Utils;
 	import com.luaye.console.utils.WeakObject;
-	import com.luaye.console.Console;
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
@@ -155,8 +155,8 @@ package com.luaye.console.core {
 			}
 			return v;
 		}
-		// com.atticmedia.console.C.instance.visible
-		// com.atticmedia.console.C.instance.addGraph('test',stage,'mouseX')
+		// com.luaye.console.C.instance.visible
+		// com.luaye.console.C.instance.addGraph('test',stage,'mouseX')
 		// test('simple stuff. what ya think?');
 		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
 		// this.getChildAt(0); 
@@ -164,7 +164,7 @@ package com.luaye.console.core {
 		// third(second(first('console'))).final(0).alpha;
 		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
 		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
-		// com.atticmedia.console.C.add('Hey how are you?');
+		// com.luaye.console.C.add('Hey how are you?');
 		//
 		private function runLine(line:String):*{
 			try{

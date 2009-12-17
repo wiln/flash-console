@@ -24,10 +24,13 @@
 */
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import comimport com.luaye.console.utils.Utils;com.attiimport com.luaye.console.events.TextFieldRollOver;ash.display.Shape;
+	import com.luaye.console.events.TextFieldRollOver;
+	import com.luaye.console.utils.Utils;
+
+	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.events.TextEvent;
-	import flash.text.TextField;		
+	import flash.text.TextField;
 
 	public class GraphingPanel extends AbstractPanel {
 		private var _interests:Array = [];
@@ -325,7 +328,9 @@ package com.luaye.console.view {
 	}
 }
 
-import comimport com.luaye.console.utils.WeakRef;Interest{
+import com.luaye.console.utils.WeakRef;
+
+class Interest{
 	private var _ref:WeakRef;
 	public var prop:String;
 	public var col:Number;

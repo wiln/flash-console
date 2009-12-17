@@ -23,12 +23,12 @@
 * 
 */
 package com.luaye.console.view {
-	import flash.display.BlendMode;	
-	import flash.ui.Mouse;	
-	import flash.display.Shape;	
-	
 	import com.luaye.console.Console;
-	import comimport com.luaye.console.utils.Utils;rt flash.display.Sprite;
+	import com.luaye.console.utils.Utils;
+
+	import flash.display.BlendMode;
+	import flash.display.Shape;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
@@ -36,7 +36,8 @@ package com.luaye.console.view {
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
-	import flash.text.TextFormatAlign;		
+	import flash.text.TextFormatAlign;
+	import flash.ui.Mouse;
 
 	public class Ruler extends Sprite{
 		public static const EXIT:String = "exit";

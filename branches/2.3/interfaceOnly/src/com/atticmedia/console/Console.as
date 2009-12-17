@@ -35,7 +35,7 @@ If C.tracing is set to true, you will get traces in your flash authoring.
 Another use is when you have finished development and no longer need Console. 
 Replacing the real console's C class with this one will save you some size (~35kb) on the final SWF.
 */
-package com.atticmedia.console{
+package com.luaye.console{
 	import flash.display.Sprite;
 
 	public class Console extends Sprite {

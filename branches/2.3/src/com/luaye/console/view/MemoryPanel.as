@@ -25,10 +25,10 @@
 
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import comimport com.luaye.console.events.TextFieldRollOver;com.atticmedia.console.view.GraphingPanel;
-	
+	import com.luaye.console.events.TextFieldRollOver;
+
 	import flash.events.Event;
-	import flash.events.TextEvent;	
+	import flash.events.TextEvent;
 
 	public class MemoryPanel extends GraphingPanel {
 		

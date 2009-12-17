@@ -24,23 +24,27 @@
 */
 
 package com.luaye.console.view {
-	imporimport com.luaye.console.core.CommandLine;
-	import flash.display.Sprite;
-	import flash.geom.ColorTransform;
-	import flash.system.SecurityPanel;
-	import flash.system.Security;
 	import com.luaye.console.Console;
-	import comimport mx.logging.Log;comimport com.luaye.console.core.Logs;comimport com.luaye.console.events.TextFieldRollOver;rt flash.display.Shape;
+	import com.luaye.console.core.CommandLine;
+	import com.luaye.console.core.Log;
+	import com.luaye.console.core.Logs;
+	import com.luaye.console.events.TextFieldRollOver;
+
+	import flash.display.Shape;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TextEvent;
+	import flash.geom.ColorTransform;
 	import flash.geom.Rectangle;
 	import flash.system.Capabilities;
+	import flash.system.Security;
+	import flash.system.SecurityPanel;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFieldType;
-	import flash.ui.Keyboard;		
+	import flash.ui.Keyboard;
 
 	public class MainPanel extends AbstractPanel {
 		

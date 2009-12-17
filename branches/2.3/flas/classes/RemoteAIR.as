@@ -23,15 +23,21 @@
 * 
 */
 package {
+	import com.luaye.console.C;
 	import com.luaye.console.Console;
+	import com.luaye.console.view.AbstractPanel;
+
+	import flash.display.DisplayObject;
+	import flash.display.MovieClip;
+	import flash.display.NativeWindowDisplayState;
+	import flash.display.NativeWindowResize;
+	import flash.display.StageAlign;
+	import flash.display.StageScaleMode;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.filesystem.File;
 	import flash.filesystem.FileMode;
 	import flash.filesystem.FileStream;
-	import flash.filesystem.File;
-
-import com.luaye.console.view.AbstractPanel; com.atticmedia.console.view.*;
-
-	import flash.display.*;
-	import flash.events.*;
 	import flash.filters.GlowFilter;
 
 	public class RemoteAIR extends MovieClip {

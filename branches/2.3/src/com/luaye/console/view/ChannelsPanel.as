@@ -24,9 +24,11 @@
 */
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import comimport com.luaye.console.events.TextFieldRollOver;rt flash.events.TextEvent;
+	import com.luaye.console.events.TextFieldRollOver;
+
+	import flash.events.TextEvent;
 	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;	
+	import flash.text.TextFieldAutoSize;
 
 	public class ChannelsPanel extends AbstractPanel{
 		

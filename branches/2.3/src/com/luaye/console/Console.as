@@ -23,10 +23,21 @@
 * 
 */
 package com.luaye.console {
-	imporimport com.luaye.console.core.MemoryMonitor;
-	import flash.display.DisplayObjectContainer;
+	import com.luaye.console.core.CommandLine;
+	import com.luaye.console.core.Log;
+	import com.luaye.console.core.Logs;
+	import com.luaye.console.core.MemoryMonitor;
+	import com.luaye.console.core.Remoting;
+	import com.luaye.console.utils.Utils;
+	import com.luaye.console.view.ChannelsPanel;
+	import com.luaye.console.view.FPSPanel;
+	import com.luaye.console.view.MainPanel;
+	import com.luaye.console.view.PanelsManager;
+	import com.luaye.console.view.RollerPanel;
+	import com.luaye.console.view.Style;
 
-	imporimport com.luaye.console.core.Logs;porimport com.luaye.console.core.CommandLine;porimport com.luaye.console.core.Remoting;porimport mx.logging.Log;porimport com.luaye.console.utils.Utils;porimport com.luaye.console.view.MainPanel;porimport com.luaye.console.view.FPSPanel;porimport com.luaye.console.view.PanelsManager;porimport com.luaye.console.view.Style;porimport com.luaye.console.view.ChannelsPanel;porimport com.luaye.console.view.RollerPanel;import flash.display.DisplayObject;
+	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
@@ -114,7 +125,7 @@ package com.luaye.console {
 		 * Using Console through C will also make sure you can remove console in a later date
 		 * by simply removing C.start() or C.startOnStage()
 		 * 
-		 * @see com.atticmedia.console.C
+		 * @see com.luaye.console.C
 		 * @see http://code.google.com/p/flash-console/
 		 */
 		public function Console(pass:String = "", uiset:int = 1) {

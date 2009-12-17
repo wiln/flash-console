@@ -24,15 +24,16 @@
 */
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import com.atticmedia.console.view.Style;
-	import comimport com.luaye.console.events.TextFieldRollOver;rt flash.display.DisplayObject;
+	import com.luaye.console.events.TextFieldRollOver;
+
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;		
+	import flash.text.TextFieldAutoSize;
 
 	public class AbstractPanel extends Sprite {
 		

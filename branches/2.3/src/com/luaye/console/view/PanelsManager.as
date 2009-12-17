@@ -24,12 +24,11 @@
 */
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import com.atticmedia.console.view.AbstractPanel;
-	
+
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
-	import flash.text.TextFieldAutoSize;		
+	import flash.text.TextFieldAutoSize;
 
 	public class PanelsManager{
 		

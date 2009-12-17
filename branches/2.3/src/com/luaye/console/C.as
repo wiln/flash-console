@@ -25,7 +25,7 @@
 
 	BASIC USAGE:
 		
-		import com.atticmedia.console.*;
+		import com.luaye.console.*;
 		C.start(this); // this = preferably the root or stage
 		
 		// OR  C.start(this,"debug");
@@ -78,7 +78,7 @@ package com.luaye.console {
 	import flash.system.Capabilities;
 
 	/**
-	 * C is a static / singleton adapter for Console (com.atticmedia.console.Console).
+	 * C is a static / singleton adapter for Console (com.luaye.console.Console).
 	 * In a later date when Console is no longer needed, remove C.start(..) or C.startOnStage(..) 
 	 * and the rest of console related codes will stop executing to save memory and performance.
 	 * @author  Lu Aye Oo

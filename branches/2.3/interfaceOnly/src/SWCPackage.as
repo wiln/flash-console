@@ -24,7 +24,7 @@
 */
 package {
 	import flash.display.MovieClip;
-	import com.atticmedia.console.C;
+	import com.luaye.console.C;
 	
 	// This class is for exporting to swc from flash.
 	public class SWCPackage extends MovieClip{

@@ -24,7 +24,10 @@
 */
 package com.luaye.console.view {
 	import com.luaye.console.Console;
-	import comimport com.luaye.console.utils.Utils;com.attiimport com.luaye.console.events.TextFieldRollOver;sh.display.DisplayObject;
+	import com.luaye.console.events.TextFieldRollOver;
+	import com.luaye.console.utils.Utils;
+
+	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;
 	import flash.events.Event;

@@ -22,11 +22,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.luaye.console.core {
+package com.luaye.console.core {	
 	import flash.events.EventDispatcher;
 	import flash.system.System;
 	import flash.utils.Dictionary;
-	import flash.utils.getTimer;		
+	import flash.utils.getTimer;
 
 	public class MemoryMonitor extends EventDispatcher{
 		
