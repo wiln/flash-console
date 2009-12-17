@@ -22,8 +22,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.view {
-	import com.atticmedia.console.Console;
+package com.luaye.console.view {
+	import com.luaye.console.Console;
 	import com.atticmedia.console.view.GraphingPanel;
 	
 	import flash.events.Event;

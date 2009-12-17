@@ -69,7 +69,7 @@
 		C.remoting = true; // (default: false) set to broadcast traces to LocalConnection
 		C.isRemote = true; // (default: false) set to recieve broadcasts from LocalConnection remote
 */
-package com.atticmedia.console {
+package com.luaye.console {
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;

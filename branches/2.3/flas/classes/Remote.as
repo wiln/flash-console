@@ -25,7 +25,7 @@
 package {
 	
 
-	import com.atticmedia.console.*;
+	import com.luaye.console.C;
 
 	import flash.display.*;
 	import flash.events.*;

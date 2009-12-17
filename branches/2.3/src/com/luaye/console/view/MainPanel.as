@@ -23,19 +23,14 @@
 * 
 */
 
-package com.atticmedia.console.view {
-	import com.atticmedia.console.core.Logs;	
-	
+package com.luaye.console.view {
+	imporimport com.luaye.console.core.CommandLine;
 	import flash.display.Sprite;
 	import flash.geom.ColorTransform;
 	import flash.system.SecurityPanel;
 	import flash.system.Security;
-	import com.atticmedia.console.Console;
-	import com.atticmedia.console.core.CommandLine;
-	import com.atticmedia.console.core.Log;
-	import com.atticmedia.console.events.TextFieldRollOver;
-	
-	import flash.display.Shape;
+	import com.luaye.console.Console;
+	import comimport mx.logging.Log;comimport com.luaye.console.core.Logs;comimport com.luaye.console.events.TextFieldRollOver;rt flash.display.Shape;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -76,6 +71,8 @@ package com.atticmedia.console.view {
 		};
 		
 		public var externalLinks:Array = [];
+		public var externalRollOver:Function;
+		public var externalClick:Function;
 		
 		private var _traceField:TextField;
 		private var _menuField:TextField;
@@ -244,7 +241,7 @@ package com.atticmedia.console.view {
 			_enteringLogin = on;
 		}
 		public function update(changed:Boolean):void{
-			if(visible){
+			//if(visible){
 				if(_bottomLine.alpha>0){
 					_bottomLine.alpha -= 0.25;
 				}
@@ -261,7 +258,7 @@ package com.atticmedia.console.view {
 					_needUpdateMenu = false;
 					_updateMenu();
 				}
-			}
+			//}
 		}
 		public function updateToBottom():void{
 			_atBottom = true;
@@ -559,6 +556,8 @@ package com.atticmedia.console.view {
 					txt = TOOLTIPS["pause"];
 			}else if(txt == "close" && src == this){
 				txt = TOOLTIPS["closemain"];
+			}else if(txt.indexOf("external_")==0 && externalRollOver!=null){
+				txt = externalRollOver(txt.substring(9));
 			}else{
 				txt = TOOLTIPS[txt];
 			}
@@ -619,6 +618,8 @@ package com.atticmedia.console.view {
 				//var str:String = "/remap 0|"+e.text.substring(6);
 				master.runCommand("/remap 0"+Console.MAPPING_SPLITTER+e.text.substring(6));
 				//master.cl.reMap(e.text.substring(6), stage);
+			}else if(e.text.substring(0,9) == "external_" && externalClick!=null){
+				externalClick(e.text.substring(9));
 			}
 			_menuField.setSelection(0, 0);
 			e.stopPropagation();

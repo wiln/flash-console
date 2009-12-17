@@ -23,10 +23,9 @@
 * 
 */
 
-package com.atticmedia.console.view {
-	import com.atticmedia.console.Console;
-	import com.atticmedia.console.events.TextFieldRollOver;
-	import com.atticmedia.console.view.GraphingPanel;
+package com.luaye.console.view {
+	import com.luaye.console.Console;
+	import comimport com.luaye.console.events.TextFieldRollOver;com.atticmedia.console.view.GraphingPanel;
 	
 	import flash.events.Event;
 	import flash.events.TextEvent;	

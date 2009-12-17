@@ -22,15 +22,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.view {
+package com.luaye.console.view {
 	import flash.display.BlendMode;	
 	import flash.ui.Mouse;	
 	import flash.display.Shape;	
 	
-	import com.atticmedia.console.Console;
-	import com.atticmedia.console.utils.Utils;
-	
-	import flash.display.Sprite;
+	import com.luaye.console.Console;
+	import comimport com.luaye.console.utils.Utils;rt flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;

@@ -23,10 +23,12 @@
 * 
 */
 package {
+	import com.luaye.console.Console;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
+	import flash.filesystem.File;
 
-
-	import com.atticmedia.console.*;
-	import com.atticmedia.console.view.*;
+import com.luaye.console.view.AbstractPanel; com.atticmedia.console.view.*;
 
 	import flash.display.*;
 	import flash.events.*;
@@ -53,13 +55,42 @@ package {
 			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_DRAGGING, moveHandle);
 			console.panels.mainPanel.addEventListener(AbstractPanel.STARTED_SCALING, scaleHandle);
 			console.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
-			console.panels.mainPanel.externalLinks.push("S");
 			console.filters = [new GlowFilter(0, 0.7, 5, 5)];
+			//
+			console.panels.mainPanel.externalLinks.push("S");
+			console.panels.mainPanel.externalRollOver = onMenuRollOver;
+			console.panels.mainPanel.externalClick = onMenuClick;
 			//
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			stage.addEventListener(Event.RESIZE, onStageResize);
 			onStageResize();
+		}
+		private function onMenuRollOver(key:String):String{
+			switch (key){
+				case "S":
+					return "Save to file";
+			}
+			return "";
+		}
+		private function onMenuClick(key:String):void{
+			if(key == "S"){
+				var docsDir:File = File.documentsDirectory;
+				try{
+				    docsDir.browseForSave("Save As");
+				    docsDir.addEventListener(Event.SELECT, saveData);
+				}catch (err:Error){
+				    C.error("Failed:", err.message);
+				}
+			}
+		}
+		private	function saveData(e:Event):void{
+			var newFile:File = e.target as File;
+			var str:String = C.getAllLog(File.lineEnding);
+			var stream:FileStream = new FileStream();
+			stream.open(newFile, FileMode.WRITE);
+			stream.writeUTFBytes(str);
+			stream.close();
 		}
 		private function ondouble(e:Event):void {
 			if(stage.nativeWindow.displayState != NativeWindowDisplayState.MAXIMIZED){

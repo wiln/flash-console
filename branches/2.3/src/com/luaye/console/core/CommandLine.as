@@ -22,10 +22,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.core {
-	import com.atticmedia.console.utils.Utils;
-	import com.atticmedia.console.utils.WeakObject;
-	import com.atticmedia.console.Console;
+package com.luaye.console.core {
+	import com.luaye.console.utils.Utils;
+	import com.luaye.console.utils.WeakObject;
+	import com.luaye.console.Console;
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;

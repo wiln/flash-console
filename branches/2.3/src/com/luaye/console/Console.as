@@ -22,24 +22,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console {
-	import com.atticmedia.console.core.Logs;	
-	
+package com.luaye.console {
+	imporimport com.luaye.console.core.MemoryMonitor;
 	import flash.display.DisplayObjectContainer;
 
-	import com.atticmedia.console.core.CommandLine;
-	import com.atticmedia.console.core.Log;
-	import com.atticmedia.console.core.MemoryMonitor;
-	import com.atticmedia.console.core.Remoting;
-	import com.atticmedia.console.utils.Utils;
-	import com.atticmedia.console.view.ChannelsPanel;
-	import com.atticmedia.console.view.FPSPanel;
-	import com.atticmedia.console.view.MainPanel;
-	import com.atticmedia.console.view.PanelsManager;
-	import com.atticmedia.console.view.RollerPanel;
-	import com.atticmedia.console.view.Style;
-
-	import flash.display.DisplayObject;
+	imporimport com.luaye.console.core.Logs;porimport com.luaye.console.core.CommandLine;porimport com.luaye.console.core.Remoting;porimport mx.logging.Log;porimport com.luaye.console.utils.Utils;porimport com.luaye.console.view.MainPanel;porimport com.luaye.console.view.FPSPanel;porimport com.luaye.console.view.PanelsManager;porimport com.luaye.console.view.Style;porimport com.luaye.console.view.ChannelsPanel;porimport com.luaye.console.view.RollerPanel;import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
@@ -778,7 +765,7 @@ package com.atticmedia.console {
 			var str:String = "";
 			var line:Log = _lines.first;
 			while(line){
-				str += line.toString()+(line.next?splitter:"");
+				str += (line.toString()+(line.next?splitter:""));
 				line = line.next;
 			}
 			return str;

@@ -22,7 +22,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.view {
+package com.luaye.console.view {
 	import flash.text.TextFormat;	
 	import flash.text.StyleSheet;		
 

@@ -22,12 +22,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.view {
-	import com.atticmedia.console.Console;
-	import com.atticmedia.console.utils.Utils;
-	import com.atticmedia.console.events.TextFieldRollOver;
-	
-	import flash.display.Shape;
+package com.luaye.console.view {
+	import com.luaye.console.Console;
+	import comimport com.luaye.console.utils.Utils;com.attiimport com.luaye.console.events.TextFieldRollOver;ash.display.Shape;
 	import flash.events.Event;
 	import flash.events.TextEvent;
 	import flash.text.TextField;		
@@ -328,9 +325,7 @@ package com.atticmedia.console.view {
 	}
 }
 
-import com.atticmedia.console.utils.WeakRef;
-
-class Interest{
+import comimport com.luaye.console.utils.WeakRef;Interest{
 	private var _ref:WeakRef;
 	public var prop:String;
 	public var col:Number;

@@ -22,11 +22,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.view {
-	import com.atticmedia.console.Console;
-	import com.atticmedia.console.events.TextFieldRollOver;
-	
-	import flash.events.TextEvent;
+package com.luaye.console.view {
+	import com.luaye.console.Console;
+	import comimport com.luaye.console.events.TextFieldRollOver;rt flash.events.TextEvent;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;	
 

@@ -22,10 +22,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.core {
+package com.luaye.console.core {
 	import flash.system.Security;
 
-	import com.atticmedia.console.Console;
+	import com.luaye.console.Console;
 
 	import flash.events.EventDispatcher;
 	import flash.events.SecurityErrorEvent;

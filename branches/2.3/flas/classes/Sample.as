@@ -23,12 +23,13 @@
 * 
 */
 package {
+	import com.luaye.console.C;
 	import flash.geom.Rectangle;	
 	import flash.utils.*;	
 	import flash.events.MouseEvent;	
 	import flash.display.*;
 	import flash.text.*;
-	import com.atticmedia.console.*;
+	import com.luaye.console.Ch;
 
 	public dynamic class Sample extends MovieClip{
 		

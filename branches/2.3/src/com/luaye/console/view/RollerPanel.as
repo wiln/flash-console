@@ -22,12 +22,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.atticmedia.console.view {
-	import com.atticmedia.console.Console;
-	import com.atticmedia.console.utils.Utils;
-	import com.atticmedia.console.events.TextFieldRollOver;
-
-	import flash.display.DisplayObject;
+package com.luaye.console.view {
+	import com.luaye.console.Console;
+	import comimport com.luaye.console.utils.Utils;com.attiimport com.luaye.console.events.TextFieldRollOver;sh.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;
 	import flash.events.Event;

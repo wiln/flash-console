@@ -23,7 +23,7 @@
 * 
 */
 
-package com.atticmedia.console {
+package com.luaye.console {
 	/**
 	 * @author Lu
 	 */
