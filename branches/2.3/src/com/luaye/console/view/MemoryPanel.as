@@ -59,7 +59,12 @@ package com.luaye.console.view {
 			return false;
 		}
 		public override function updateKeyText():void{
-			keyTxt.htmlText =  "<r><s>"+getCurrentOf(0).toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
+			var mem:Number = getCurrentOf(0);
+			if(mem>0){
+				keyTxt.htmlText =  "<r><s>"+mem.toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
+			}else{
+				keyTxt.htmlText = "<r><s><y>no mem input</y> <menu><a href=\"event:close\">X</a></menu></s></r>";
+			}
 		}
 		protected override function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){

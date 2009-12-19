@@ -61,8 +61,8 @@ package com.luaye.console.view {
 				copy:"Copy to clipboard",
 				clear:"Clear log",
 				trace:"Trace",
-				pause:"Pause logging",
-				resume:"Resume logging",
+				pause:"Pause updates",
+				resume:"Resume updates",
 				priority:"Priority filter",
 				channels:"Expand channels",
 				close:"Close",
@@ -626,7 +626,7 @@ package com.luaye.console.view {
 				commandLine = !commandLine;
 			}else if(e.text == "copy") {
 				System.setClipboard(master.getAllLog());
-				master.report("Copied all log to clipboard.", -2);
+				master.report("Copied log to clipboard.", -1);
 			}else if(e.text == "clear"){
 				master.clear();
 			}else if(e.text == "settings"){

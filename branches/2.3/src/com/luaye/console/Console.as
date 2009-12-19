@@ -452,7 +452,7 @@ package com.luaye.console {
 			}
 		}
 		public function get fps():Number{
-			return 1000/mspf;
+			return 1000/_mspf;
 		}
 		public function get mspf():Number{
 			return _mspf;

@@ -34,11 +34,11 @@ package com.luaye.console.view {
 
 	public class GraphingPanel extends AbstractPanel {
 		private var _interests:Array = [];
-		private var _history:Array = [];
 		private var _updatedFrame:uint = 0;
 		private var _drawnFrame:uint = 0;
 		private var _needRedraw:Boolean;
 		private var _isRunning:Boolean;
+		protected var _history:Array = [];
 		//
 		protected var fixed:Boolean;
 		protected var graph:Shape;
@@ -102,7 +102,6 @@ package com.luaye.console.view {
 			}
 			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
 			if(key == null) key = prop;
-			//_interests.push([obj, prop, col, key, NaN]);
 			_interests.push(new Interest(obj, prop, col, key));
 			updateKeyText();
 			//
@@ -263,8 +262,6 @@ package com.luaye.console.view {
 			var diffGraph:Number = highest-lowest;
 			var numInterests:int = _interests.length;
 			var len:int = _history.length;
-			var firstpass:Boolean = true;
-			//var marks:Array = [];
 			for(var j:int = 0;j<numInterests;j++){
 				var interest:Interest = _interests[j];
 				var first:Boolean = true;
@@ -280,13 +277,7 @@ package com.luaye.console.view {
 					if(Y>H)Y=H;
 					graph.graphics[(first?"moveTo":"lineTo")]((W-i), Y);
 					first = false;
-					//if(firstpass){
-					//	if(values.length>numInterests){
-					//		marks.push(i);
-					//	}
-					//}
 				}
-				firstpass = false;
 				if(averaging>0 && diffGraph){
 					Y = ((interest.avg-lowest)/diffGraph)*H;
 					if(!inverse) Y = H-Y;
@@ -297,11 +288,6 @@ package com.luaye.console.view {
 					graph.graphics.lineTo(W, Y);
 				}
 			}
-			/*for each(var mark:int in marks){
-				graph.graphics.lineStyle(1,0xFFCC00, 0.4);
-				graph.graphics.moveTo(W-mark, 0);
-				graph.graphics.lineTo(W-mark, H);
-			}*/
 			(inverse?highTxt:lowTxt).text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
 			(inverse?lowTxt:highTxt).text = isNaN(highest)?"":"<s>"+highest+"</s>";
 		}
@@ -346,12 +332,3 @@ class Interest{
 		return _ref.reference;
 	}
 }
-/*class Mark{
-	public var position:int;
-	public var col:Number;
-	public var val:Number;
-	public function Mark(color:Number, value:Number):void{
-		col = color;
-		val = value;
-	}
-}*/

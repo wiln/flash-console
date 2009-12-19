@@ -65,7 +65,7 @@ package {
 			//_c.panels.mainPanel.addEventListener(AbstractPanel.CLOSED, closeHandle);
 			_c.filters = [new GlowFilter(0, 0.7, 5, 5)];
 			//
-			_c.panels.mainPanel.addMenuKey("Sa");
+			_c.panels.mainPanel.addMenuKey("Sf");
 			_c.panels.mainPanel.topMenuRollOver = onMenuRollOver;
 			_c.panels.mainPanel.topMenuClick = onMenuClick;
 			//
@@ -76,7 +76,7 @@ package {
 		}
 		private function onMenuRollOver(key:String):String{
 			switch (key){
-				case "Sa":
+				case "Sf":
 					return "Save to file";
 				case "close":
 					return "Close";
@@ -84,10 +84,10 @@ package {
 			return "";
 		}
 		private function onMenuClick(key:String):Boolean{
-			if(key == "Sa"){
+			if(key == "Sf"){
 				var docsDir:File = File.documentsDirectory;
 				try{
-				    docsDir.browseForSave("Save As");
+				    docsDir.browseForSave("Save Log As");
 				    docsDir.addEventListener(Event.SELECT, saveData);
 				}catch (err:Error){
 				    _c.error("Failed:", err.message);
@@ -100,22 +100,25 @@ package {
 			return false;
 		}
 		private	function saveData(e:Event):void{
-				var newFile:File = e.target as File;
-				var url:String = newFile.url;
-				var ind:int = url.lastIndexOf(".");
-				if(!newFile.exists && ind<0){
-					newFile.url = url+".txt";
+				var file:File = e.target as File;
+				if(!file.exists){
+					var path:String = file.nativePath;
+					var dot:int = path.lastIndexOf(".");
+					var separator:int = path.lastIndexOf(File.separator);
+					if(dot<0 || separator > dot){
+						file.nativePath = path+".txt";
+					}
 				}
 				var str:String = _c.getAllLog(File.lineEnding);
 				var stream:FileStream = new FileStream();
 			try{
-				stream.open(newFile, FileMode.WRITE);
+				stream.open(file, FileMode.WRITE);
 				stream.writeUTFBytes(str);
 				stream.close();
-				_c.report("Saved log to "+newFile.url, -2);
+				_c.report("Saved log to "+file.nativePath, -1);
 			}catch(e:Error){
 				// maybe read-only , etc
-				_c.report("There was a problem saving the log to "+newFile.url+"\n"+e, 10);
+				_c.report("There was a problem saving the log to "+file.nativePath+"\n"+e, 10);
 			}
 		}
 		private function ondouble(e:Event):void {
