@@ -70,11 +70,12 @@ package com.luaye.console {
 		public static const GLOBAL_CHANNEL:String = " * ";
 		public static const DEFAULT_CHANNEL:String = "-";
 		//
-		public static const LOG_LEVEL:uint = 1;
-		public static const INFO_LEVEL:uint = 3;
+		public static const LOG_LEVEL:uint = 2;
+		public static const INFO_LEVEL:uint = 4;
 		public static const DEBUG_LEVEL:uint = 6;
 		public static const WARN_LEVEL:uint = 8;
 		public static const ERROR_LEVEL:uint = 10;
+		public static const FATAL_LEVEL:uint = 100;
 		//
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		public static const MAPPING_SPLITTER:String = "|";
@@ -417,7 +418,7 @@ package com.luaye.console {
 			_mspf = time-_previousTime;
 			_previousTime = time;
 			
-			if(_needToMoveTop && alwaysOnTop && moveTopAttempts>0){
+			if(_needToMoveTop && alwaysOnTop && moveTopAttempts>0  && parent){
 				_needToMoveTop = false;
 				moveTopAttempts--;
 				parent.setChildIndex(this,(parent.numChildren-1));
@@ -705,6 +706,9 @@ package com.luaye.console {
 		public function error(...args):void{
 			addLine(joinArgs(args), ERROR_LEVEL);
 		}
+		public function fatal(...args):void{
+			addLine(joinArgs(args), FATAL_LEVEL);
+		}
 		public function logch(channel:*, ...args):void{
 			ch(channel, joinArgs(args), LOG_LEVEL);
 		}
@@ -719,6 +723,9 @@ package com.luaye.console {
 		}
 		public function errorch(channel:*, ...args):void{
 			ch(channel, joinArgs(args), ERROR_LEVEL);
+		}
+		public function fatalch(channel:*, ...args):void{
+			ch(channel, joinArgs(args), FATAL_LEVEL);
 		}
 		public function joinArgs(args:Array):String{
 			for(var X:String in args){

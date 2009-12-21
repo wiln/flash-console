@@ -87,7 +87,8 @@ package com.luaye.console.view {
 			css.setStyle("p7",{color:'#FFAAAA', display:'inline'});
 			css.setStyle("p8",{color:'#FF7777', display:'inline'});
 			css.setStyle("p9",{color:'#FF2222', display:'inline'});
-			css.setStyle("p10",{color:'#FF2222', fontWeight:'bold', display:'inline'});
+			css.setStyle("p10",{color:'#FF2222', display:'inline'});
+			css.setStyle("p100",{color:'#FF0000', fontWeight:'bold', display:'inline'});
 			css.setStyle("p-1",{color:'#0099CC', display:'inline'});
 			css.setStyle("p-2",{color:'#FF8800', display:'inline'});
 		}
@@ -124,7 +125,8 @@ package com.luaye.console.view {
 			css.setStyle("p7",{color:'#990000', display:'inline'});
 			css.setStyle("p8",{color:'#BB0000', display:'inline'});
 			css.setStyle("p9",{color:'#DD0000', display:'inline'});
-			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold', display:'inline'});
+			css.setStyle("p10",{color:'#FF0000', display:'inline'});
+			css.setStyle("p100",{color:'#FF0000', fontWeight:'bold', display:'inline'});
 			css.setStyle("p-1",{color:'#0099CC', display:'inline'});
 			css.setStyle("p-2",{color:'#FF6600', display:'inline'});
 		}

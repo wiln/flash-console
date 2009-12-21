@@ -69,13 +69,15 @@ package {
 			C.debug("Debug", "with infinite", "arguments");
 			C.warn("Warning", "with infinite", "arguments");
 			C.error("Error", "with infinite", "arguments");
+			C.fatal("Fatal", "with infinite", "arguments");
 			//
 			// Convenience logging with channel... infinite arguments
 			C.logch("myChannel", "Log", "at myChannel");
 			C.infoch("myChannel", "Info", "at myChannel");
 			C.debugch("myChannel", "Debug", "at myChannel");
 			C.warnch("myChannel", "Warning", "at myChannel");
-			C.errorch("myChannel", "Error", "at myChannel");		
+			C.errorch("myChannel", "Error", "at myChannel");
+			C.fatalch("myChannel", "Fatal", "at myChannel");
 			
 			/*
 			// Advanced logging with higher priortiy and repeative trace

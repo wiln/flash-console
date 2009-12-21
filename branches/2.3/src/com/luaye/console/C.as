@@ -72,10 +72,8 @@
 package com.luaye.console {
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
-	import flash.system.Capabilities;
 
 	/**
 	 * C is a static / singleton adapter for Console (com.luaye.console.Console).
@@ -92,7 +90,6 @@ package com.luaye.console {
 		private static const ERROR_EXISTS:String = "[CONSOLE] already exists. Will keep using the previously created console. If you want to create a fresh 1, C.remove() first.";
 		
 		private static var _console:Console;
-		private static var _disallowBrowser:uint;
 		
 		/**
 		 * Do not construct.
@@ -118,17 +115,14 @@ package com.luaye.console {
 		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Set C.visible = ture to unhide at start.
 		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
-		 * @param  If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
-		 * 			If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 */
-		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
+		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1):void{
 			if(_console){
 				trace(ERROR_EXISTS);
 			}else{
-				if(canRunWithBrowserSetup(mc.stage, disallowBrowser)){
-					_console = new Console(pass, skin);
-					mc.addChild(_console);
-				}
+				_console = new Console(pass, skin);
+				// if no parent display, console will always be hidden, but using C.remoting is still possible so its not the end.
+				if(mc!=null) mc.addChild(_console);
 			}
 		}
 		/**
@@ -148,15 +142,15 @@ package com.luaye.console {
 		 * 			If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 * 			
 		 */
-		public static function startOnStage(mc:DisplayObject, pass:String = "", skin:int= 1, disallowBrowser:uint = 0):void{
+		public static function startOnStage(mc:DisplayObject, pass:String = "", skin:int= 1):void{
 			if(_console){
 				trace(ERROR_EXISTS);
-			}else if(mc.stage){
-				start(mc.stage, pass, skin, disallowBrowser);
+			}else if(mc !=null && mc.stage !=null ){
+				start(mc.stage, pass, skin);
 			}else{
 			 	_console = new Console(pass, skin);
-			 	_disallowBrowser = disallowBrowser;
-				mc.addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
+			 	// if no parent display, console will always be hidden, but using C.remoting is still possible so its not the end.
+				if(mc) mc.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
 			}
 		}
 		//
@@ -246,6 +240,17 @@ package com.luaye.console {
 			}
 		}
 		/**
+		 * Add log line as fatal level
+		 * Allows multiple arguments for convenience use.
+		 *
+		 * @param String to be logged, any type can be passed and will be converted to string
+		 */
+		public static function fatal(...args):void{
+			if(_console){
+				_console.fatal.apply(null, args);
+			}
+		}
+		/**
 		 * Add log line with priority 1 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
@@ -303,6 +308,18 @@ package com.luaye.console {
 		public static function errorch(channel:*, ...args):void{
 			if(_console){
 				_console.errorch.apply(null, [channel].concat(args));
+			}
+		}
+		/**
+		 * Add line as fatal level to channel
+		 * Allows multiple arguments for convenience use.
+		 *
+		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param String to be logged, any type can be passed and will be converted to string
+		 */
+		public static function fatalch(channel:*, ...args):void{
+			if(_console){
+				_console.fatalch.apply(null, [channel].concat(args));
 			}
 		}
 		/**
@@ -929,18 +946,14 @@ package com.luaye.console {
 			return e;
 		}
 		//
-		private static function stageAddedHandle(e:Event):void{
+		private static function addedToStageHandle(e:Event):void{
 			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
-			mc.removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
-			if(_console && !_console.parent){
-				if(canRunWithBrowserSetup(mc.stage, _disallowBrowser)){
-					mc.stage.addChild(_console);
-				}else{
-					_console = null;
-				}
+			mc.removeEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
+			if(_console && !_console.parent != null){
+				mc.stage.addChild(_console);
 			}
 		}
-		private static function canRunWithBrowserSetup(s:Stage, setup:uint):Boolean{
+		/*private static function canRunWithBrowserSetup(s:Stage, setup:uint):Boolean{
 			if(setup>0 && s && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
 				var flashVars:Object = s.loaderInfo.parameters;
 				if(flashVars["allowConsole"] != "true" && (setup == 1 || (setup == 2 && !Console.remoteIsRunning)) ){
@@ -948,7 +961,7 @@ package com.luaye.console {
 				}
 			}
 			return true;
-		}
+		}*/
 		private static function getter(str:String):*{
 			if(_console)return _console[str];
 			else return null;

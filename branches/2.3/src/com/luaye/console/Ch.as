@@ -55,6 +55,9 @@ package com.luaye.console {
 		public function error(...args):void{
 			_c.errorch.apply(null, [name].concat(args));
 		}
+		public function fatal(...args):void{
+			_c.fatalch.apply(null, [name].concat(args));
+		}
 		/*
 		not worth using...
 		public function set tracing(v:Boolean):void{
