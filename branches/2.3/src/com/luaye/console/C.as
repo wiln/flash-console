@@ -327,7 +327,7 @@ package com.luaye.console {
 		 */
 		public static function remove():void{
 			if(_console){
-				if(_console.parent){
+				if(_console.parent != null){
 					_console.parent.removeChild(_console);
 				}
 				_console.destroy();
@@ -719,7 +719,7 @@ package com.luaye.console {
 			setter("commandLine",v);
 		}
 		/**
-		 * Command line usage allowance
+		 * Command line usage allowance.
 		 * <p>
 		 * CommandLine is a big security hole for your code and flash. It is a very good
 		 * practice to disable it after development phase.
@@ -949,7 +949,7 @@ package com.luaye.console {
 		private static function addedToStageHandle(e:Event):void{
 			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
 			mc.removeEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
-			if(_console && !_console.parent != null){
+			if(_console && _console.parent == null){
 				mc.stage.addChild(_console);
 			}
 		}

@@ -81,6 +81,10 @@ package com.luaye.console {
 			if(i<0) return false;
 			return true;
 		}*/
+		
+		/**
+		 * Clear channel
+		 */
 		public function clear():void{
 			_c.clear(name);
 		}
