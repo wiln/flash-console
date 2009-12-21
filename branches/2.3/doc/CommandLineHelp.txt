@@ -1,10 +1,7 @@
-You can find a copy of this file at project wiki:
-http://code.google.com/p/flash-console/w/list
-
-
+#labels Featured,Phase-Implementation
 =Command Line: help and tutorial=
 
-==This document applies to v2.1 or above only==
+==This document applies to v2.3 or above only==
 
 *This example includes referenecs to sample flash swf provided in the download. You can go to an online version at: [http://www.luaye.com/flash_console/]*
 

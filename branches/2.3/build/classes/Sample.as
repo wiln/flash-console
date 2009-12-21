@@ -62,35 +62,35 @@ package {
 			setUpButton(btnSpam, "Spam");
 			
 			//
+			// basic logging
 			//
-			// Convenience logging... infinite arguments
-			C.log("Log", "with infinite", "arguments");
-			C.info("Message", "with infinite", "arguments");
-			C.debug("Debug", "with infinite", "arguments");
-			C.warn("Warning", "with infinite", "arguments");
-			C.error("Error", "with infinite", "arguments");
-			C.fatal("Fatal", "with infinite", "arguments");
+			C.info("Hello world.");
+			C.log("A log message for console.", "optionally there", "can be", "multiple arguments.");
+			C.debug("A debug level log.");
+			C.warn("This is a warning log.");
+			C.error("This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
 			//
-			// Convenience logging with channel... infinite arguments
-			C.logch("myChannel", "Log", "at myChannel");
-			C.infoch("myChannel", "Info", "at myChannel");
-			C.debugch("myChannel", "Debug", "at myChannel");
-			C.warnch("myChannel", "Warning", "at myChannel");
-			C.errorch("myChannel", "Error", "at myChannel");
-			C.fatalch("myChannel", "Fatal", "at myChannel");
-			
-			/*
-			// Advanced logging with higher priortiy and repeative trace
-			C.add("This is an important error alert! (priority 10)", 10);
-			C.add("This is a less important error alert. (priority 9)", 9);
-			C.add("This is a warning! (priority 8)", 8);
-			C.add("This is a message (priority 5)", 5);
-			C.add("This is a default log level (priority 2)", 2);
-			C.add("This is totally a dummy (priority 0)", 0);
+			// basic channel logging
 			//
-			C.ch("myChannel", "Hello my Channel");
-			C.ch("myChannel", "Hello important message at my channel", 10);
-			*/
+			C.infoch("myChannel", "Hello myChannel.");
+			C.logch("myChannel", "A log message at myChannel.", "optionally there", "can be", "multiple arguments.");
+			C.debugch("myChannel", "A debug level log.");
+			C.warnch("myChannel", "This is a warning log.");
+			C.errorch("myChannel", "This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
+			//
+			// advanced logging
+			//
+			C.add("My advanced log in priority 7.", 7);
+			C.add("My advanced log in priority 2, 1 (no repeats)", 2, true);
+			C.add("My advanced log in priority 2, 2 (no repeats)", 2, true);
+			C.add("My advanced log in priority 2, 2 (no repeats)", 2, true);
+			//
+			// Advanced channel logging
+			//
+			C.ch("chn", "Advanced log in priority 7.", 7);
+			C.ch("chn", "Advanced log in priority 3, 1 (no repeats)", 3, true);
+			C.ch("chn", "Advanced log in priority 3, 2 (no repeats)", 3, true);
+			C.ch("chn", "Advanced log in priority 3, 3 (no repeats)", 3, true);
 			
 			// if you want to use command line, please type /help 
 			// in command line at the bottom for examples
