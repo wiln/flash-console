@@ -250,7 +250,7 @@ OK... I think that's enough of play around. In the tutorial I have demonstrated 
 As command line can let user do almost any execution, this is a very bad security risk for deployment. Examples of security risk:
   * commandLine user can study your code interface and potentially find security weak points or hack the workings of the application (such as cheating in a game).
   * You can directly allow domains by calling `flash.system.Security.allowDomain('*')` - Although this can be a very useful way to test security sandbox issues, this also defeats the point of flash security.
-  * You can load external swf files in with application domain set to current flash domain - which again defetats the point of flash security sandbox.
+  * You can load external swf files in with application domain set to current flash domain - which again defeats the point of flash security sandbox.
 
 How to increase security.
   * It is likely very useful to have Console running during beta or even final deployment. However it is highly recommended that you either have a long password to Console OR disable commandLine.

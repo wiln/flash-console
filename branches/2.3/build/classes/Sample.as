@@ -35,7 +35,7 @@ package {
 		
 		private var _spamcount:int;
 		
-		private var _ch:Ch = new Ch('chan');
+		//private var _ch:Ch = new Ch('chan');
 		
 		public function Sample() {
 			//
