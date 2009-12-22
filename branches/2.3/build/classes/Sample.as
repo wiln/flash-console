@@ -40,7 +40,6 @@ package {
 		public function Sample() {
 			//
 			// SET UP
-			//C.start(this, "", 2);
 			C.startOnStage(this, "`"); 
 			// "`" - change for password. This will start hidden
 			C.remotingPassword = null;
@@ -48,8 +47,8 @@ package {
 			//C.tracing = true; // trace on flash's normal trace
 			C.commandLine = true; // enable command line
 			
-			C.width = 600;
-			C.height = 200;
+			C.width = 640;
+			C.height = 220;
 			C.maxLines = 2000;
 			C.fpsMonitor = true;
 			C.remoting = true;
@@ -83,7 +82,7 @@ package {
 			C.add("My advanced log in priority 7.", 7);
 			C.add("My advanced log in priority 2, 1 (no repeats)", 2, true);
 			C.add("My advanced log in priority 2, 2 (no repeats)", 2, true);
-			C.add("My advanced log in priority 2, 2 (no repeats)", 2, true);
+			C.add("My advanced log in priority 2, 3 (no repeats)", 2, true);
 			//
 			// Advanced channel logging
 			//
@@ -92,24 +91,28 @@ package {
 			C.ch("chn", "Advanced log in priority 3, 2 (no repeats)", 3, true);
 			C.ch("chn", "Advanced log in priority 3, 3 (no repeats)", 3, true);
 			
-			// if you want to use command line, please type /help 
-			// in command line at the bottom for examples
-
+			//
+			// DEMO
+			//
+			
+			//
+			// Set key to capture display map, - only works when DisplayRoller (RL) is active.
 			C.setRollerCaptureKey("c");
 			
+			//
 			// garbage collection monitor
 			var aSprite:Sprite = new Sprite();
 			C.watch(aSprite, "aSprite");
 			C.store("sprite", aSprite);
 			aSprite = null;
-			// it will probably never get collected in this example
+			// it will probably won't get garbage collected straight away,
 			// but if you have debugger version of flash player installed,
 			// you can open memory monitor (M) and then press G in that panel to force garbage collect
 			
+			//
 			//Add graph show the mouse X/Y positions
 			C.addGraph("mouse", this,"mouseX", 0xff3333,"mouseX");
-			C.addGraph("mouse", this,"mouseY", 0x3333ff,"Y", new Rectangle(340,210,80,80), true);
-			//C.fixGraphRange("mouse", 100,300);
+			C.addGraph("mouse", this,"mouseY", 0x3333ff,"Y", new Rectangle(340,225,80,80), true);
 			
 		}
 		private function setUpButton(btn:MovieClip, t:String):void{

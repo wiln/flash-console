@@ -138,8 +138,6 @@ package com.luaye.console {
 		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Set C.visible = ture to unhide at start.
 		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
-		 * @param  If set to 1, console will not start if run on browser, except if there is flashVar allowConsole=true passed in.
-		 * 			If set to 2, optoin 1 apples except it still runs if there is Console remote running.
 		 * 			
 		 */
 		public static function startOnStage(mc:DisplayObject, pass:String = "", skin:int= 1):void{
