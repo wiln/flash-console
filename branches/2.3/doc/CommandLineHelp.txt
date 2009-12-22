@@ -9,10 +9,10 @@
   * To start commandliine: `C.commandline = true` in source OR in console interface you can click on *CL* in top menu.
   * Command line appear as a text field at the bottom of the console window.
   * It uses the same syntax as actionscript - Except that you can only do 1 simple line of code at a time.
-  * As there is only one line at a time, CommandLine have to rely on 'scoping'. i.e, the scope changes everytime there is new object returned. - your next line of code will be applied to that new scope object.
+  * As there is only one line at a time, CommandLine have to rely on 'scoping'. i.e, the scope changes every time there is new object returned. - your next line of code will be applied to that new scope object.
   * The class name of current scope is displayed on the left of command line. 
   * Special commands start with / - to signify that it is commandLine specific.
-  * Stored varables in commandline can be accessed by prefixing with $ sign. For example $C will always return Console instance.
+  * Stored variables in commandline can be accessed by prefixing with $ sign. For example $C will always return Console instance.
 
 === Example Uses ===
   * We have developed a game that users are able to go to different parts of an island collecting items, keys and unlocking each part of the island. Testing and fixing different parts of the island for bugs would be a pain if you have to go through all stages from start every time you re-launch the game (or recompile to change the start place). With Console, we are able to just type which section we want to go to in command line like: `$goto('red31')` We can even give our selves items without picking them up by calling a command like: `$give('bluekey1')` with these simple commands we are able to let betatesters go to different parts of the island with different item combinations without needing to start the game all over again.
@@ -30,7 +30,7 @@
 ==== Basics ====
   * For this tutorial, we will use the sample flash provided in download or found online at: http://www.luaye.com/flash_console/. 
   * The document class file is located at build/classes/Sample.as
-  * For clearer view of the tutorial, it is recommended to close the FPS monitor by pressing the X at the top right cornor of the mini panel.
+  * For clearer view of the tutorial, it is recommended to close the FPS monitor by pressing the X at the top right corner of the mini panel.
 
   * Command line starts with its parent display as the first scope (by default). You should see 'Stage' on the left of commandLine at the moment, meaning the stage is your current scope. If you write:
 {{{
@@ -67,7 +67,7 @@ getChildByName('root1')
 }}} 
   * You should see that the scope name on the left of commandLine is now changed to 'Sample'.
   * You can also tell from the '+' sign on the line '[C] + Returned Sample ...' - this means the scope have changed.
-  * Note that you can not write 'this.root1' in this case beacause Stage is not a dynamic class... (but the document class Sample is)
+  * Note that you can not write 'this.root1' in this case because Stage is not a dynamic class... (but the document class Sample is)
   * If you do /inspect again you should get slightly different results this time.
 {{{
 /inspect
@@ -98,7 +98,7 @@ getChildByName('mcBunny')
 play()
 }}}
   * Ok.. I know its just a crappy blink, I'll ask for a proper one later...
-  * Just for the purpose of demostrating, if you want to go back to the previous scope, you can type:
+  * Just for the purpose of demonstration, if you want to go back to the previous scope, you can type:
 {{{
 //
 }}} 
@@ -106,12 +106,12 @@ play()
 {{{
 name
 }}}
-  * You should see that it is infact the clip 'mcBunny'.
+  * You should see that it is the clip 'mcBunny'.
   * For easy access to the bunny clip from console you can save it into command line's variables.
 {{{
 /store bunny
 }}}
-  * This way, whereever your scope is, you can refer to this clip by typing $bunny.
+  * This way, where ever your scope is, you can refer to this clip by typing $bunny.
   * like wise, your base command line scope (Stage in this example) is automatically saved as $base.
   * Storing is not only limited to displays, you can store anything, including class references, functions, etc..
   * In source code, you can use `C.store(<name>, <object>)` to store variables to Console.
@@ -119,8 +119,8 @@ name
 {{{
 $base
 }}}
-  * for demostration purposes, what about move the mcBunny clip around... 
-  * remember your scope is stage at the moment so refering to bunny clip is requried here.
+  * for demonstration purposes, what about move the mcBunny clip around... 
+  * remember your scope is stage at the moment so referring to bunny clip is required here.
 {{{
 $bunny.x = 100;
 $bunny.y = 100
@@ -148,7 +148,7 @@ $bunny.removeEventListener('enterFrame', $C.log)
 }}}
 Potentially, this means you can re-assign your event listeners on the fly.
 
-IMPORTANT: This example only show you how to minipulate properties of a display object. 
+IMPORTANT: This example only show you how to manipulate properties of a display object. 
 It is not limited to displays, it can access and execute ANY object/class. 
 (You only see me changing displays here because its more visual) 
 
@@ -175,11 +175,11 @@ flash.ui.Mouse.show()
 ==== New instance ====
   * If you have read the GettingStarted document, you would know that com.luaye.console.C is mearly an adaptor/manager for a com.luaye.console.Console instance.
   * What about make your own Console instance from inside commandLine and manage it? - for demonstration purposes ofc...
-  * Now to do this, you would need to make a new instance of Console. The thing about Console is it avoids strong referencing (including saved varables) to make sure it has minimal impact on the client's enviroment. The problem is if you make new instances from within commandLine they are weak references too, so they can become null at any time. You need to declare to commandLine that it needs to hold on to instances... In source code you can write C.strongRef = true, OR in commandLine:
+  * Now to do this, you would need to make a new instance of Console. The thing about Console is it avoids strong referencing (including saved variables) to make sure it has minimal impact on the client's environment. The problem is if you make new instances from within commandLine they are weak references too, so they can become null at any time. You need to declare to commandLine that it needs to hold on to instances... In source code you can write C.strongRef = true, OR in commandLine:
 {{{
 /strong true
 }}}
-  * Now you may safely create a new Console instace without losing reference.
+  * Now you may safely create a new Console instance without losing reference.
   * Note that you need to use the full class path (because there is no room for 'import' in a single line).
 {{{
 new com.luaye.console.Console()
@@ -193,7 +193,7 @@ new com.luaye.console.Console()
 {{{
 $base.addChild($myC)
 }}}
-  * OH NO, can't you see??? If you can't maybe you need to drag you console down abit, (hold and drag at top of console).
+  * OH NO, can't you see??? If you can't maybe you need to drag you console down a bit, (hold and drag at top of console).
   * The new console will be below the main console, because the main console have set 'alwaysOnTop' set to true, it will fight for it to be at the top.
   * Move the new console down so that you can see both:
 {{{
@@ -228,7 +228,7 @@ OK... I think that's enough of play around. In the tutorial I have demonstrated 
 
 === Notes ===
   * You can do nested calls. such as, $base.getChildByName('root1').mcBunny.getChildByName($bunny.getChildAt(0).name); - etc, etc... 
-  * You can execute multiple lines of code in one go by seperating with ; - however the scope can change after each line excution so you will need to write accordingly.
+  * You can execute multiple lines of code in one go by separating with ; - however the scope can change after each line execution so you will need to write accordingly.
 
 
   * `/filter (text)` = filter/search logs for matching text
