@@ -257,7 +257,8 @@ It is not limited to displays, it can access and execute ANY object/class.
 
 == Security ==
 
-As command line can let user do almost any execution, it is a very bad security risk for deployment. Examples of security risk:
+As command line can let user do almost any execution, it is a very big security risk for deployment. It is as if you are letting any user of your commandLine to code in your flash. 
+Examples of security risk:
   * commandLine user can study your code interface - by using `/inspectfull` on your saved commandLine variables OR through stage display list - and potentially find security weak points or hack the workings of the application (examples: cheat scores in a game, pretend to be different user in an account based application)
   * You can directly allow domains by calling `flash.system.Security.allowDomain('*')` - Although this can be a very continent way to test security sandbox issues, it also defeat the point of flash security.
   * You can load external swf files in with application domain set to current flash domain - which again defeat the point of flash security sandbox.
