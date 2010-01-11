@@ -1,7 +1,7 @@
 #summary CommandLine cheats
 
 
-Some pre-written command line code that I sometimes use...
+Some useful command line code...
 
 
 ==Log key presses==
