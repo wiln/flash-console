@@ -5,6 +5,6 @@ Some pre-written command line code that I sometimes use...
 
 
 ==Log key presses==
-$base.stage.addEventListener(flash.events.KeyboardEvent.KEY_DOWN, $C.log)
+`$base.stage.addEventListener(flash.events.KeyboardEvent.KEY_DOWN, $C.log)`
 
 Key presses while focused on command line will be ignored as it has `Event .stopPropagation()` applied.
