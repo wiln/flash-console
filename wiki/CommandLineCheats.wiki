@@ -8,7 +8,7 @@ Some useful command line code...
 
 (replace `5` with your own choice...
 
-`$base.stage.frameRate = 5)`
+`$base.stage.frameRate = 5`
 
 
 ==Log key presses==
