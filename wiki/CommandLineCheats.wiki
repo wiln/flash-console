@@ -8,3 +8,8 @@ Some useful command line code...
 `$base.stage.addEventListener(flash.events.KeyboardEvent.KEY_DOWN, $C.log)`
 
 Key presses while focused on command line will be ignored as it has `Event .stopPropagation()` applied.
+
+
+==Copy to clipboard==
+(replace `$model.toString()` with a variable/string you want to save)
+`flash.system.System.setClipboard($model.toString())`
