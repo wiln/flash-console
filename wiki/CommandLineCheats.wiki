@@ -4,6 +4,12 @@
 Some useful command line code...
 
 
+==Reduce frame rate==
+
+(replace `5` with your own choice...
+`$base.stage.frameRate = 5)`
+
+
 ==Log key presses==
 `$base.stage.addEventListener(flash.events.KeyboardEvent.KEY_DOWN, $C.log)`
 
