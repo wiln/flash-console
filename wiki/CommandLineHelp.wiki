@@ -1,7 +1,7 @@
 #labels Featured,Phase-Implementation
 =Command Line: help and tutorial=
 
-==This document applies to v2.3 or above only==
+==This document applies to v2.31 or above only==
 
 == Introduction ==
   * Command line lets you execute ActionScript3 code during run-time (on the fly)...
@@ -181,25 +181,23 @@ flash.ui.Mouse.show()
 === New instance ===
   * If you have read the GettingStarted document, you would know that com.luaye.console.C is mearly an adaptor/manager for a com.luaye.console.Console instance.
   * What about make your own Console instance from inside commandLine and manage it? - for demonstration purposes ofc...
-  * Now to do this, you would need to make a new instance of Console. The thing about Console is it avoids strong referencing (including saved variables) to make sure it has minimal impact on the client's environment. The problem is if you make new instances from within commandLine they are weak references too, so they can become null at any time. You need to declare to commandLine that it needs to hold on to instances... In source code you can write `C.strongRef = true`, OR in commandLine:
-{{{
-/strong true
-}}}
-  * Now you may safely create a new Console instance without losing reference.
   * Note that you need to use the full class path (because there is no room for 'import' in a single line).
 {{{
 new com.luaye.console.Console()
 }}}
   * No password param passed here to make sure its visible to start with :)
-  * Now save it as a variable, NOTE that you can't save it as C, because C is reserved value for your current Console.
+  * Now save it as a variable using strong referencing... NOTE: you can't save it as C, because C is reserved value for your current Console.
 {{{
-/save myC
+/storestrong myC
 }}}
-  * Its not visible yet because it needs a parent display, so why not put it on stage...
+  * The reason to use `savestrong` here is because Console (by default) only store outside references as a weak reference to make sure it has minimal impact on the client's environment (unless `C.strongRef` is set).
+  * Exceptional to this, CommandLine caches your last 2 console returns as strong references to make sure it doesn't get garbage collected before you can do anything with it.
+
+  * Console is not visible yet because it needs a parent display, so why not put it on stage...
 {{{
 $base.addChild($myC)
 }}}
-  * OH NO, can't you see??? If you can't maybe you need to drag you console down a bit, (hold and drag at top of console).
+  * OH NO, can't you see??? If you can't maybe you need to drag your console down a bit, (hold and drag at top of console).
   * The new console will be below the main console, because the main console have set 'alwaysOnTop' set to true, it will fight for it to be at the top.
   * Move the new console down so that you can see both:
 {{{
