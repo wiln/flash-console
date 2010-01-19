@@ -19,9 +19,9 @@ Key presses while focused on command line will be ignored as it has `Event .stop
 
 ==Copy to clipboard==
 
-(replace `$model.toString()` with a variable/string you want to save)
+(replace `$returned` with a variable/string you want to save)
 
-`flash.system.System.setClipboard($model.toString())`
+`flash.system.System.setClipboard($returned)`
 
 
 
