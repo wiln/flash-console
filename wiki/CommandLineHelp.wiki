@@ -197,14 +197,13 @@ new com.luaye.console.Console()
 {{{
 $base.addChild($myC)
 }}}
-  * OH NO, can't you see??? If you can't maybe you need to drag your console down a bit, (hold and drag at top of console).
-  * The new console will be below the main console, because the main console have set 'alwaysOnTop' set to true, it will fight for it to be at the top.
+  * You might not be able to see the new console properly as it will be below the main console. - the main console have 'alwaysOnTop' set to true, it will fight for it to be at the top.
   * Move the new console down so that you can see both:
 {{{
 $myC.y = 310;
 }}}
   * Now that's a nightmare you got not 1 but 2 bloody annoying consoles!
-  * Ok so now this is your own console, managed by you, through another console's command line... Why not try the normal console methods:
+  * Ok, so now this is your own console, managed by you, through another console's command line... Why not try the normal console methods:
 {{{
 $myC.log('Testing one two three');
 $myC.fpsMonitor = true;
@@ -226,7 +225,7 @@ OK... I think that's enough of play around. In the tutorial I have demonstrated 
   * use display mapper command
   * get / set properties of an object
   * access static classes
-  * change to strong referencing
+  * save as weak/strong references
   * create new instances
 
 
@@ -240,11 +239,11 @@ It is not limited to displays, it can access and execute ANY object/class.
   * You can execute multiple lines of code in one go by separating with ; - however the scope can change after each line execution so you will need to write accordingly.
 
 
-  * `/filter (text)` = filter/search logs for matching text
+  * `/filter <text>` = filter/search logs for matching text
   * `//` = return to previous scope
   * `/base` = return to base scope (same as typing $base)
-  * `/store (name)` = store current scope to that name (weak reference). To call back: `$(name)`
-  * `/storestrong (name)` = store current scope to that name using strong referencing (to make sure it doesn't get garbage collected). To call back: `$(name)`
+  * `/store <name>` = store current scope to that name (weak reference). To call back: `$<name>`
+  * `/storestrong <name>` = store current scope to that name using strong referencing (to make sure it doesn't get garbage collected). To call back: `$<name>`
   * `/stored` = list all stored variables
   * `/inspect` = get detailed info of your current scope.
   * `/inspectfull` = get more detailed info of your current scope.
