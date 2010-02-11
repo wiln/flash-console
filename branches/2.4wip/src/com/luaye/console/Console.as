@@ -23,6 +23,8 @@
 * 
 */
 package com.luaye.console {
+	import flash.text.StyleSheet;
+
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Log;
 	import com.luaye.console.core.Logs;
@@ -78,6 +80,7 @@ package com.luaye.console {
 		public static const MAPPING_SPLITTER:String = "|";
 		//
 		public var style:ConsoleStyle;
+		public var css:StyleSheet;
 		public var panels:PanelsManager;
 		public var cl:CommandLine;
 		private var mm:MemoryMonitor;
@@ -137,6 +140,7 @@ package com.luaye.console {
 			remoter = new Remoting(this, remoteLogSend);
 			mm = new MemoryMonitor();
 			style = skin?skin:new ConsoleStyle();
+			css = style.generateCSS();
 			panels = new PanelsManager(this, _lines, _channels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy bug fixing!</b>", -2);

@@ -50,8 +50,8 @@ package com.luaye.console.view {
 			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
 			_tooltipField.multiline = true;
 			_tooltipField.background = true;
-			_tooltipField.backgroundColor = _master.style.panelBackgroundColor;
-			_tooltipField.styleSheet = _master.style.css;
+			_tooltipField.backgroundColor = _master.style.backgroundColor;
+			_tooltipField.styleSheet = _master.css;
 			_tooltipField.mouseEnabled = false;
 			_mainPanel = new MainPanel(master, lines, channels);
 			addPanel(_mainPanel);

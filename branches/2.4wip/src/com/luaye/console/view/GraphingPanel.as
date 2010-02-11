@@ -60,20 +60,20 @@ package com.luaye.console.view {
 			lowTxt = new TextField();
 			lowTxt.name = "lowestField";
 			lowTxt.mouseEnabled = false;
-			lowTxt.styleSheet = style.css;
+			lowTxt.styleSheet = m.css;
 			lowTxt.height = 14;
 			addChild(lowTxt);
 			highTxt = new TextField();
 			highTxt.name = "highestField";
 			highTxt.mouseEnabled = false;
-			highTxt.styleSheet = style.css;
+			highTxt.styleSheet = m.css;
 			highTxt.height = 14;
 			highTxt.y = 6;
 			addChild(highTxt);
 			//
 			keyTxt = new TextField();
 			keyTxt.name = "menuField";
-			keyTxt.styleSheet = style.css;
+			keyTxt.styleSheet = m.css;
 			keyTxt.height = 16;
 			keyTxt.y = -3;
 			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);

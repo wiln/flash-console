@@ -28,16 +28,22 @@ package com.luaye.console {
 	public class ConsoleStyle {
 		
 		
+		public var backgroundColor:int;
+		public var backgroundAlpha:Number = 0.8;
+		public var scalerColor:Number = 0x990000;
+		public var commandLineColor:Number = 0x10AA00;
+		public var bottomLineColor:Number = 0xFF0000;
+		//
 		public var traceFont:String = "Verdana";
 		public var traceFontSize:int = 11;
 		public var menuFont:String = "Arial";
 		public var fontSizeMedium:int = 12;
 		public var fontSizeSmall:int = 10;
 		//
+		public var highColor:int = 0xFFFFFF;
+		public var lowColor:int = 0xC0C0C0;
 		public var menuColor:int = 0xFF8800;
 		public var menuHighlightColor:int = 0xDD5500;
-		public var inputColor:int = 0xFFFFFF;
-		public var lowColor:int = 0xCCCCCC;
 		public var channelsColor:int = 0xFFFFFF;
 		public var channelColor:int = 0x0099CC;
 		public var tooltipColor:int = 0xDD5500;
@@ -55,33 +61,23 @@ package com.luaye.console {
 		public var priority10:int = 0xFF2222;
 		public var priorityC1:int = 0x0099CC;
 		public var priorityC2:int = 0xFF8800;
-		
-		
-		public var panelBackgroundColor:int;
-		public var panelBackgroundAlpha:Number = 0.8;
-		public var panelScalerColor:Number = 0x880000;
-		public var commandLineColor:Number = 0x10AA00;
-		public var bottomLineColor:Number = 0xFF0000;
-		private var _css:StyleSheet = new StyleSheet();
-				
-		public function ConsoleStyle(uiset:int = 1) {
-			preset1();
+		//
+		//
+		//
+		public function ConsoleStyle() {
+			big();
 		}
-		public function get css():StyleSheet{
-			return _css;
-		}
-		public function preset1():void{
-			//
+		
+		public function generateCSS():StyleSheet{
+			var css:StyleSheet = new StyleSheet();
 			css.setStyle("r",{textAlign:'right', display:'inline'});
-			css.setStyle("w",{color:'#FFFFFF', fontFamily:menuFont, fontSize:fontSizeMedium, display:'inline'});
-			css.setStyle("s",{color:'#CCCCCC', fontFamily:menuFont, fontSize:'10', display:'inline'});
-			css.setStyle("hi",{color:'#DD5500', display:'inline'});
-			css.setStyle("ro",{color:'#DD5500', fontFamily:menuFont, fontSize:'11', display:'inline'});
-			css.setStyle("roBold",{color:'#EE6611', fontWeight:'bold'});
-			css.setStyle("menu",{color:'#FF8800', display:'inline'});
-			css.setStyle("chs",{color:'#FFFFFF', fontSize:fontSizeMedium, leading:'2', display:'inline'});
-			css.setStyle("ch",{color:'#0099CC', display:'inline'});
-			css.setStyle("tooltip",{color:'#DD5500',fontFamily:menuFont, textAlign:'center'});
+			css.setStyle("w",{color:hesh(highColor), fontFamily:menuFont, fontSize:fontSizeMedium, display:'inline'});
+			css.setStyle("s",{color:hesh(lowColor), fontFamily:menuFont, fontSize:fontSizeSmall, display:'inline'});
+			css.setStyle("hi",{color:hesh(menuHighlightColor), display:'inline'});
+			css.setStyle("menu",{color:hesh(menuColor), display:'inline'});
+			css.setStyle("chs",{color:hesh(channelsColor), fontSize:fontSizeMedium, leading:'2', display:'inline'});
+			css.setStyle("ch",{color:hesh(channelColor), display:'inline'});
+			css.setStyle("tooltip",{color:hesh(tooltipColor),fontFamily:menuFont, textAlign:'center'});
 			//
 			css.setStyle("p",{fontFamily:traceFont, fontSize:traceFontSize});
 			css.setStyle("p0",{color:hesh(priority0), display:'inline'});
@@ -97,59 +93,52 @@ package com.luaye.console {
 			css.setStyle("p10",{color:hesh(priority10), fontWeight:'bold', display:'inline'});
 			css.setStyle("p-1",{color:hesh(priorityC1), display:'inline'});
 			css.setStyle("p-2",{color:hesh(priorityC2), display:'inline'});
+			return css;
 		}
-		private function hesh(n:Number):String{
-			return "#"+n.toString(16);
-		}
+		private function hesh(n:Number):String{return "#"+n.toString(16);}
 		
 		public function preset2():void{
-			panelBackgroundColor = 0xFFFFFF;
-			panelScalerColor = 0xFF0000;
+			backgroundColor = 0xFFFFFF;
+			scalerColor = 0xFF3333;
 			commandLineColor = 0x66CC00;
 			bottomLineColor = 0xFF0000;
-			panelBackgroundAlpha = 0.8;
 			//
-			css.setStyle("r",{textAlign:'right', display:'inline'});
-			css.setStyle("w",{color:'#000000', fontFamily:'Arial', fontSize:'12', display:'inline'});
-			css.setStyle("s",{color:'#333333', fontFamily:'Arial', fontSize:'10', display:'inline'});
-			css.setStyle("y",{color:'#881100', display:'inline'});
-			css.setStyle("ro",{color:'#661100', fontFamily:'Arial', fontSize:'11', display:'inline'});
-			css.setStyle("roBold",{color:'#AA4400', fontWeight:'bold'});
-			css.setStyle("menu",{color:'#CC1100', display:'inline'});
-			css.setStyle("chs",{color:'#000000', fontSize:'11', leading:'2', display:'inline'});
-			css.setStyle("ch",{color:'#0066AA', display:'inline'});
-			css.setStyle("tooltip",{color:'#AA3300',fontFamily:'Arial', textAlign:'center'});
+			highColor = 0x000000;
+			lowColor = 0x333333;
+			menuColor = 0xCC1100;
+			menuHighlightColor = 0x881100;
+			channelsColor = 0x000000;
+			channelColor = 0x0066AA;
+			tooltipColor = 0xAA3300;
 			//
-			css.setStyle("p",{fontFamily:'Verdana', fontSize:'11'});
-			css.setStyle("l1",{color:'#0099CC'});
-			css.setStyle("l2",{color:'#FF8800'});
-			//css.setStyle("p0",{color:'#666666', display:'inline'});
-			css.setStyle("p0",{color:'#339033', display:'inline'});
-			css.setStyle("p1",{color:'#227722', display:'inline'});
-			css.setStyle("p2",{color:'#115511', display:'inline'});
-			css.setStyle("p3",{color:'#003300', display:'inline'});
-			css.setStyle("p4",{color:'#000000', display:'inline'});
-			css.setStyle("p5",{color:'#660000', display:'inline'});
-			css.setStyle("p6",{color:'#990000', display:'inline'});
-			css.setStyle("p7",{color:'#BB0000', display:'inline'});
-			css.setStyle("p8",{color:'#DD0000', display:'inline'});
-			css.setStyle("p9",{color:'#FF0000', display:'inline'});
-			css.setStyle("p10",{color:'#FF0000', fontWeight:'bold', display:'inline'});
-			css.setStyle("p-1",{color:'#0099CC', display:'inline'});
-			css.setStyle("p-2",{color:'#FF6600', display:'inline'});
+			priority0 = 0x44A044;
+			priority1 = 0x339033;
+			priority2 = 0x227722;
+			priority3 = 0x115511;
+			priority4 = 0x003300;
+			priority5 = 0x000000;
+			priority6 = 0x660000;
+			priority7 = 0x990000;
+			priority8 = 0xBB0000;
+			priority9 = 0xDD0000;
+			priority10 = 0xDD0000;
+			priorityC1 = 0x0099CC;
+			priorityC2 = 0xFF6600;
 		}
-		public function preset3():void{
-			preset1();
-			panelBackgroundAlpha = 1;
+		public function big():void{
+			backgroundAlpha = 1;
+			traceFontSize = 16;
+			fontSizeMedium = 18;
+			fontSizeSmall = 14;
 		}
 		public function preset4():void{
 			preset2();
-			panelBackgroundAlpha = 1;
+			backgroundAlpha = 1;
 		}
 		public function preset951():void{
 			// USED BY AIR Remote
-			preset1();
-			panelBackgroundAlpha = 0.55;
+			//preset1();
+			backgroundAlpha = 0.55;
 		}
 	}
 }

@@ -78,7 +78,7 @@ package com.luaye.console.view {
 			bg.scale9Grid = grid;
 		}
 		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = -1, a:Number = -1, rounding:int = 10):void{
-			drawBG(col>=0?col:style.panelBackgroundColor, a>=0?a:style.panelBackgroundAlpha, rounding);
+			drawBG(col>=0?col:style.backgroundColor, a>=0?a:style.backgroundAlpha, rounding);
 			scalable = resizable;
 			width = w;
 			height = h;
@@ -174,7 +174,7 @@ package com.luaye.console.view {
 			if(b && !scaler){
 				scaler = new Sprite();
 				scaler.name = "scaler";
-				scaler.graphics.beginFill(style.panelScalerColor, style.panelBackgroundAlpha);
+				scaler.graphics.beginFill(style.scalerColor, style.backgroundAlpha);
 	            scaler.graphics.lineTo(-10, 0);
 	            scaler.graphics.lineTo(0, -10);
 	            scaler.graphics.endFill();
@@ -233,8 +233,8 @@ package com.luaye.console.view {
 		//
 		private function formatText(txt:TextField):void{
             txt.background = true;
-            txt.backgroundColor = style.panelBackgroundColor;
-			txt.styleSheet = style.css;
+            txt.backgroundColor = style.backgroundColor;
+			txt.styleSheet = master.css;
 			txt.mouseEnabled = false;
 		}
 		private function returnSnappedFor(X:Number,Y:Number):Point{

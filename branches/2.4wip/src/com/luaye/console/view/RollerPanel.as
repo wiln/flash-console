@@ -49,7 +49,7 @@ package com.luaye.console.view {
 			_txtField.name = "rollerprints";
 			_txtField.multiline = true;
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
-			_txtField.styleSheet = style.css;
+			_txtField.styleSheet = m.css;
 			_txtField.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			registerRollOverTextField(_txtField);
 			_txtField.addEventListener(AbstractPanel.TEXT_LINK, onMenuRollOver, false, 0, true);
@@ -76,7 +76,7 @@ package com.luaye.console.view {
 				close();
 				return;
 			}
-			_txtField.htmlText = "<ro>"+getMapString()+"</ro>";
+			_txtField.htmlText = "<s>"+getMapString()+"</s>";
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
 			_txtField.setSelection(0, 0);
 			width = _txtField.width+4;
@@ -116,11 +116,11 @@ package com.luaye.console.view {
 							}
 						}else{
 							if(obj == stg){
-								str +=  "<menu> <a href=\"event:close\"><b>X</b></a></menu> <i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]<br/>";
+								str +=  "<menu> <a href=\"event:close\"><b>X</b></a></menu> <p1><i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]</p1><br/>";
 							}else if(i == len-1){
-								str +=  "<roBold>"+obj.name+"("+Utils.shortClassName(obj)+")</roBold>";
+								str +=  "<p5>"+obj.name+"("+Utils.shortClassName(obj)+")</p5><br/>";
 							}else {
-								str +=  "<i>"+obj.name+"("+Utils.shortClassName(obj)+")</i><br/>";
+								str +=  "<p2>"+obj.name+"("+Utils.shortClassName(obj)+"))</p2><br/>";
 							}
 						}
 					}

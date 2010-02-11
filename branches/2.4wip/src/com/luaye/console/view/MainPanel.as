@@ -123,14 +123,14 @@ package com.luaye.console.view {
 			_traceField.wordWrap = true;
 			_traceField.background  = false;
 			_traceField.multiline = true;
-			_traceField.styleSheet = style.css;
+			_traceField.styleSheet = m.css;
 			_traceField.y = 12;
 			_traceField.addEventListener(Event.SCROLL, onTraceScroll, false, 0, true);
 			addChild(_traceField);
 			//
 			_menuField = new TextField();
 			_menuField.name = "menuField";
-			_menuField.styleSheet = style.css;
+			_menuField.styleSheet = m.css;
 			_menuField.height = 18;
 			_menuField.y = -2;
 			registerRollOverTextField(_menuField);
@@ -144,7 +144,7 @@ package com.luaye.console.view {
 			_commandBackground.scale9Grid = new Rectangle(9, 9, 80, 1);
 			addChild(_commandBackground);
 			//
-			var tf:TextFormat = new TextFormat(style.menuFont, style.fontSizeMedium, style.inputColor);
+			var tf:TextFormat = new TextFormat(style.menuFont, style.fontSizeMedium, style.highColor);
 			_commandField = new TextField();
 			_commandField.name = "commandField";
 			_commandField.type  = TextFieldType.INPUT;
@@ -183,7 +183,7 @@ package com.luaye.console.view {
 			//
 			_scroller = new Sprite();
 			_scroller.name = "scroller";
-			_scroller.graphics.beginFill(style.panelScalerColor, 1);
+			_scroller.graphics.beginFill(style.scalerColor, 1);
 			_scroller.graphics.drawRect(-5, 0, 5, 30);
 			_scroller.graphics.beginFill(0, 0);
 			_scroller.graphics.drawRect(-10, 0, 10, 30);
@@ -479,10 +479,10 @@ package com.luaye.console.view {
 			//
 			var sbh:Number = (_bottomLine.y-(_commandField.visible?0:10))-_scrollbar.y;
 			_scrollbar.graphics.clear();
-			_scrollbar.graphics.beginFill(style.panelScalerColor, 0.7);
+			_scrollbar.graphics.beginFill(style.scalerColor, 0.7);
 			_scrollbar.graphics.drawRect(-5, 0, 5, 5);
 			_scrollbar.graphics.drawRect(-5, sbh-5, 5, 5);
-			_scrollbar.graphics.beginFill(style.panelScalerColor, 0.25);
+			_scrollbar.graphics.beginFill(style.scalerColor, 0.25);
 			_scrollbar.graphics.drawRect(-5, 5, 5, sbh-10);
 			_scrollbar.graphics.endFill();
 			//

@@ -45,7 +45,7 @@ package com.luaye.console.view {
 			_txtField.width = 160;
 			_txtField.multiline = true;
 			_txtField.autoSize = TextFieldAutoSize.LEFT;
-			_txtField.styleSheet = style.css;
+			_txtField.styleSheet = m.css;
 			_txtField.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			registerRollOverTextField(_txtField);
 			_txtField.addEventListener(AbstractPanel.TEXT_LINK, onMenuRollOver, false, 0, true);
