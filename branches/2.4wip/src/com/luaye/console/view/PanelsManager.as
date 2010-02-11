@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console.view {
+	import com.luaye.console.core.Logs;
 	import com.luaye.console.Console;
 
 	import flash.events.Event;
@@ -38,11 +39,13 @@ package com.luaye.console.view {
 		private var _master:Console;
 		private var _mainPanel:MainPanel;
 		private var _ruler:Ruler;
+		private var _channels:Array;
 		
 		private var _tooltipField:TextField;
 		
-		public function PanelsManager(master:Console, mp:MainPanel) {
+		public function PanelsManager(master:Console, lines:Logs, channels:Array) {
 			_master = master;
+			_channels = channels;
 			_tooltipField = new TextField();
 			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
 			_tooltipField.multiline = true;
@@ -50,7 +53,7 @@ package com.luaye.console.view {
 			_tooltipField.backgroundColor = _master.style.panelBackgroundColor;
 			_tooltipField.styleSheet = _master.style.css;
 			_tooltipField.mouseEnabled = false;
-			_mainPanel = mp;
+			_mainPanel = new MainPanel(master, lines, channels);
 			addPanel(_mainPanel);
 		}
 		public function addPanel(panel:AbstractPanel):void{
@@ -100,18 +103,18 @@ package com.luaye.console.view {
 					chpanel.x = _mainPanel.x+_mainPanel.width-332;
 					chpanel.y = _mainPanel.y-2;
 					addPanel(chpanel);
+					chpanel.start(_channels);
+					updateMenu();
 				}else {
 					removePanel(Console.PANEL_CHANNELS);
-					updateMenu();
 				}
+				updateMenu();
 			}
 		}
 		public function updateMenu():void{
 			_mainPanel.updateMenu();
 			var chpanel:ChannelsPanel = getPanel(Console.PANEL_CHANNELS) as ChannelsPanel;
-			if(chpanel){
-				chpanel.update();
-			}
+			if(chpanel) chpanel.update();
 		}
 		//
 		//

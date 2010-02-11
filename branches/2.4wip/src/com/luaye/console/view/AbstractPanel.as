@@ -23,6 +23,8 @@
 * 
 */
 package com.luaye.console.view {
+	import com.luaye.console.ConsoleStyle;
+
 	import flash.events.TextEvent;
 
 	import com.luaye.console.Console;
@@ -50,7 +52,7 @@ package com.luaye.console.view {
 		private var _resizeTxt:TextField;
 		
 		protected var master:Console;
-		protected var style:Style;
+		protected var style:ConsoleStyle;
 		protected var bg:Sprite;
 		protected var scaler:Sprite;
 		protected var minimumWidth:int = 18;

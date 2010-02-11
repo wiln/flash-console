@@ -24,6 +24,7 @@
 */
 
 package com.luaye.console.view {
+	import flash.text.TextFormat;
 	import flash.system.System;	
 	
 	import com.luaye.console.Console;
@@ -143,6 +144,7 @@ package com.luaye.console.view {
 			_commandBackground.scale9Grid = new Rectangle(9, 9, 80, 1);
 			addChild(_commandBackground);
 			//
+			var tf:TextFormat = new TextFormat(style.menuFont, style.fontSizeMedium, style.inputColor);
 			_commandField = new TextField();
 			_commandField.name = "commandField";
 			_commandField.type  = TextFieldType.INPUT;
@@ -150,16 +152,17 @@ package com.luaye.console.view {
 			_commandField.height = 18;
 			_commandField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
 			_commandField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
-			_commandField.defaultTextFormat = style.textFormat;
+			_commandField.defaultTextFormat = tf;
 			addChild(_commandField);
 			
+			tf.color = style.commandLineColor;
 			_commandPrefx = new TextField();
 			_commandPrefx.name = "commandPrefx";
 			_commandPrefx.type  = TextFieldType.DYNAMIC;
 			_commandPrefx.x = 2;
 			_commandPrefx.height = 18;
 			_commandPrefx.selectable = false;
-			_commandPrefx.styleSheet = style.css;
+			_commandPrefx.defaultTextFormat = tf;
 			_commandPrefx.text = " ";
 			_commandPrefx.addEventListener(MouseEvent.MOUSE_DOWN, onCmdPrefMouseDown, false, 0, true);
 			_commandPrefx.addEventListener(MouseEvent.MOUSE_MOVE, onCmdPrefRollOverOut, false, 0, true);
@@ -499,7 +502,7 @@ package com.luaye.console.view {
 		}
 		private function _updateMenu():void{
 			var str:String = "<r><w>";
-			if(!master.channelsPanel){
+			if(!master.panels.channelsPanel){
 				str += getChannelsLink(true);
 			}
 			str += "<menu>[ <b>";
@@ -544,7 +547,7 @@ package com.luaye.console.view {
 			return str;
 		}
 		private function doActive(str:String, b:Boolean):String{
-			if(b) return "<y>"+str+"</y>";
+			if(b) return "<hi>"+str+"</hi>";
 			return str;
 		}
 		public function onMenuRollOver(e:TextEvent, src:AbstractPanel = null):void{
@@ -605,7 +608,7 @@ package com.luaye.console.view {
 				visible = false;
 				//dispatchEvent(new Event(AbstractPanel.CLOSED));
 			}else if(e.text == "channels"){
-				master.channelsPanel = !master.channelsPanel;
+				master.panels.channelsPanel = !master.panels.channelsPanel;
 			}else if(e.text == "fps"){
 				master.fpsMonitor = !master.fpsMonitor;
 			}else if(e.text == "priority"){
@@ -668,10 +671,7 @@ package com.luaye.console.view {
 			e.stopPropagation();
 		}
 		private function commandKeyUp(e:KeyboardEvent):void{
-			if(!master.enabled){
-				return;
-			}
-			if( e.keyCode == 13){
+			if( e.keyCode == Keyboard.ENTER){
 				if(_enteringLogin){
 					master.sendLogin(_commandField.text);
 					_commandField.text = "";
@@ -686,7 +686,9 @@ package com.luaye.console.view {
 						_commandsHistory.splice(20);
 					}
 				}
-			}else if( e.keyCode == 38 ){
+			}if( e.keyCode == Keyboard.ESCAPE){
+				if(stage) stage.focus = null;
+			}else if( e.keyCode == Keyboard.UP){
 				// if its back key for first time, store the current key
 				if(_commandField.text && _commandsInd<0){
 					_commandsHistory.unshift(_commandField.text);
@@ -700,7 +702,7 @@ package com.luaye.console.view {
 					_commandsInd = _commandsHistory.length;
 					_commandField.text = "";
 				}
-			}else if( e.keyCode == 40){
+			}else if( e.keyCode == Keyboard.DOWN){
 				if(_commandsInd>0){
 					_commandsInd--;
 					_commandField.text = _commandsHistory[_commandsInd];
@@ -721,7 +723,7 @@ package com.luaye.console.view {
 				requestLogin(false);
 			}
 			_commandPrefx.autoSize = TextFieldAutoSize.LEFT;
-			_commandPrefx.htmlText = "<w><p1>"+str+":</p1></w>";
+			_commandPrefx.text = str;
 			var w:Number = width-48;
 			if(_commandPrefx.width > 120 || _commandPrefx.width > w){
 				_commandPrefx.autoSize = TextFieldAutoSize.NONE;

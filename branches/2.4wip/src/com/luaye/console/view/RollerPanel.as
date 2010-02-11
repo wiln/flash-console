@@ -58,7 +58,12 @@ package com.luaye.console.view {
 		}
 		public function start(base:DisplayObjectContainer):void{
 			_base = base;
-			addEventListener(Event.ENTER_FRAME, _onFrame, false, 0, true);
+			addEventListener(Event.ENTER_FRAME, _onFrame);
+			addEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
+		}
+		private function removeListeners(e:Event=null):void{
+			removeEventListener(Event.ENTER_FRAME, _onFrame);
+			removeEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
 		}
 		public function capture():String{
 			return getMapString(true);
@@ -133,7 +138,7 @@ package com.luaye.console.view {
 			return arr.reverse().join(Console.MAPPING_SPLITTER);
 		}
 		public override function close():void {
-			removeEventListener(Event.ENTER_FRAME, _onFrame);
+			removeListeners();
 			_base = null;
 			super.close();
 			master.panels.updateMenu(); // should be black boxed :/

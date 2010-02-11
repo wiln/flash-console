@@ -116,7 +116,7 @@ package com.luaye.console {
 		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
 		 */
-		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:int= 1):void{
+		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:ConsoleStyle = null):void{
 			if(_console){
 				trace(ERROR_EXISTS);
 			}else{
@@ -140,7 +140,7 @@ package com.luaye.console {
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
 		 * 			
 		 */
-		public static function startOnStage(mc:DisplayObject, pass:String = "", skin:int= 1):void{
+		public static function startOnStage(mc:DisplayObject, pass:String = "", skin:ConsoleStyle = null):void{
 			if(_console){
 				trace(ERROR_EXISTS);
 			}else if(mc !=null && mc.stage !=null ){
@@ -341,16 +341,6 @@ package com.luaye.console {
 		}
 		public static function set paused(v:Boolean):void{
 			setter("paused",v);
-		}
-		/**
-		 * Enable/Disable logging and graphs in Console.
-		 * Does not record logs or graphs while disabled.
-		 */
-		public static function get enabled():Boolean{
-			return getter("enabled") as Boolean;
-		}
-		public static function set enabled(v:Boolean):void{
-			setter("enabled",v);
 		}
 		//
 		// Logging settings

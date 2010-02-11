@@ -74,7 +74,7 @@ package com.luaye.console.view {
 		protected function linkHandler(e:TextEvent):void{
 			_txtField.setSelection(0, 0);
 			if(e.text == "close"){
-				master.channelsPanel = false;
+				master.panels.channelsPanel = false;
 			}else if(e.text.substring(0,8) == "channel_"){
 				master.panels.mainPanel.onChannelPressed(e.text.substring(8));
 			}

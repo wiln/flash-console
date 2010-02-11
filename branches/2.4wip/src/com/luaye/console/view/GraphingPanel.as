@@ -128,10 +128,15 @@ package com.luaye.console.view {
 			_isRunning = true;
 			// Note that if it has already started, it won't add another listener on top.
 			addEventListener(Event.ENTER_FRAME, onFrame, false, 0, true);
+			addEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
 		}
 		public function stop():void {
 			_isRunning = false;
+			removeListeners();
+		}
+		private function removeListeners(e:Event=null):void{
 			removeEventListener(Event.ENTER_FRAME, onFrame);
+			removeEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
 		}
 		public function get numInterests():int{
 			return _interests.length;
@@ -201,7 +206,7 @@ package com.luaye.console.view {
 		//
 		//
 		protected function onFrame(e:Event):Boolean{
-			var ok:Boolean = (master.visible && master.enabled && !master.paused);
+			var ok:Boolean = (master.visible && !master.paused);
 			if(ok) {
 				updateData();
 			}

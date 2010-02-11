@@ -31,12 +31,9 @@ package com.luaye.console {
 	import com.luaye.console.utils.Utils;
 	import com.luaye.console.view.ChannelsPanel;
 	import com.luaye.console.view.FPSPanel;
-	import com.luaye.console.view.MainPanel;
 	import com.luaye.console.view.PanelsManager;
 	import com.luaye.console.view.RollerPanel;
-	import com.luaye.console.view.Style;
 
-	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -49,8 +46,8 @@ package com.luaye.console {
 
 	public class Console extends Sprite {
 
-		public static const VERSION:Number = 2.31;
-		public static const VERSION_STAGE:String = "";
+		public static const VERSION:Number = 2.4;
+		public static const VERSION_STAGE:String = "WIP";
 		//
 		public static const NAME:String = "Console";
 		public static const PANEL_MAIN:String = "mainPanel";
@@ -70,17 +67,17 @@ package com.luaye.console {
 		public static const GLOBAL_CHANNEL:String = " * ";
 		public static const DEFAULT_CHANNEL:String = "-";
 		//
-		public static const LOG_LEVEL:uint = 2;
-		public static const INFO_LEVEL:uint = 4;
-		public static const DEBUG_LEVEL:uint = 6;
-		public static const WARN_LEVEL:uint = 8;
-		public static const ERROR_LEVEL:uint = 10;
-		public static const FATAL_LEVEL:uint = 100;
+		public static const LOG_LEVEL:uint = 1;
+		public static const INFO_LEVEL:uint = 3;
+		public static const DEBUG_LEVEL:uint = 5;
+		public static const WARN_LEVEL:uint = 7;
+		public static const ERROR_LEVEL:uint = 9;
+		public static const FATAL_LEVEL:uint = 10;
 		//
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		public static const MAPPING_SPLITTER:String = "|";
 		//
-		public var style:Style;
+		public var style:ConsoleStyle;
 		public var panels:PanelsManager;
 		public var cl:CommandLine;
 		private var mm:MemoryMonitor;
@@ -97,7 +94,6 @@ package com.luaye.console {
 		public var rulerHidesMouse:Boolean = true;
 		//
 		private var _isPaused:Boolean;
-		private var _enabled:Boolean = true;
 		private var _password:String;
 		private var _passwordIndex:int;
 		private var _remotingPassword:String = "";
@@ -108,7 +104,6 @@ package com.luaye.console {
 		private var _previousTime:Number;
 		private var _traceCall:Function = trace;
 		private var _rollerCaptureKey:String;
-		private var _needToMoveTop:Boolean;
 		private var _commandLineAllowed:Boolean = true;
 		private var _strongRef:Boolean;
 		
@@ -126,52 +121,50 @@ package com.luaye.console {
 		 * Using Console through C will also make sure you can remove console in a later date
 		 * by simply removing C.start() or C.startOnStage()
 		 * 
+		 * 
 		 * @see com.luaye.console.C
 		 * @see http://code.google.com/p/flash-console/
 		 */
-		public function Console(pass:String = "", uiset:int = 1) {
+		public function Console(pass:String = "", skin:ConsoleStyle = null) {
 			name = NAME;
 			if(pass == null) pass = "";
-			_password = pass;
-			_remotingPassword = pass;
 			tabChildren = false; // Tabbing is not supported
+			_password = pass;
+			_remotingPassword = pass; // can change later using 'remotingPassword'.
 			//
 			_lines = new Logs();
 			cl = new CommandLine(this);
 			remoter = new Remoting(this, remoteLogSend);
 			mm = new MemoryMonitor();
-			style = new Style(uiset);
-			panels = new PanelsManager(this, new MainPanel(this, _lines, _channels));
+			style = skin?skin:new ConsoleStyle();
+			panels = new PanelsManager(this, _lines, _channels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy bug fixing!</b>", -2);
-			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
-			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
+			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			if(_password) visible = false;
 		}
 		private function stageAddedHandle(e:Event=null):void{
-			if(cl.base == null){
-				cl.base = parent;
-			}
-			addEventListener(Event.ENTER_FRAME, _onEnterFrame, false, 0, true);
-			parent.addEventListener(Event.ADDED, onParentDisplayAdded, false, 0, true);
+			if(cl.base == null) cl.base = parent;
+			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
+			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
+			//
+			addEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyUpHandler, false, 0, true);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
+			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
+			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
+			//
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
-			parent.removeEventListener(Event.ADDED, onParentDisplayAdded);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
-			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyUpHandler);
-		}
-		private function onParentDisplayAdded(e:Event):void{
-			if((e.target as DisplayObject).parent == parent) _needToMoveTop = true;
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
 		private function onStageMouseLeave(e:Event):void{
 			panels.tooltip(null);
 		}
-		private function keyUpHandler(e:KeyboardEvent):void{
-			if(!_enabled) return;
-			if(e.keyLocation == 0){
+		private function keyDownHandler(e:KeyboardEvent):void{
+			//if(e.keyLocation == 0){
 				var char:String = String.fromCharCode(e.charCode);
 				if(char == _password.substring(_passwordIndex,_passwordIndex+1)){
 					_passwordIndex++;
@@ -179,9 +172,7 @@ package com.luaye.console {
 						_passwordIndex = 0;
 						if(visible && !panels.mainPanel.visible){
 							panels.mainPanel.visible = true;
-						}else{
-							visible = !visible;
-						}
+						}else visible = !visible;
 					}
 				}else{
 					_passwordIndex = 0;
@@ -191,16 +182,14 @@ package com.luaye.console {
 						bind[0].apply(this, bind[1]);
 					}
 				}
-			}
+			//}
 		}
 		public function destroy():void{
-			enabled = false;
 			remoter.close();
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
+			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
+			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			cl.destory();
-			if(stage){
-				stageRemovedHandle();
-			}
 		}
 		public static function get remoteIsRunning():Boolean{
 			var sCon:LocalConnection = new LocalConnection();
@@ -262,11 +251,6 @@ package com.luaye.console {
 		}
 		public function set channelsPanel(b:Boolean):void{
 			panels.channelsPanel = b;
-			if(b){
-				var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
-				chPanel.start(_channels);
-			}
-			panels.updateMenu();
 		}
 		//
 		public function get displayRoller():Boolean{
@@ -344,20 +328,6 @@ package com.luaye.console {
 		public function inspect(obj:Object, detail:Boolean = true):void{
 			cl.inspect(obj,detail);
 		}
-		public function set enabled(newB:Boolean):void{
-			if(_enabled == newB) return;
-			if(_enabled && !newB){
-				report("Disabled",10);
-			}
-			var pre:Boolean = _enabled;
-			_enabled = newB;
-			if(!pre && newB){
-				report("Enabled",-1);
-			}
-		}
-		public function get enabled():Boolean{
-			return _enabled;
-		}
 		public function get paused():Boolean{
 			return _isPaused;
 		}
@@ -402,17 +372,13 @@ package com.luaye.console {
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			if(!_enabled){
-				return;
-			}
 			var time:int = getTimer();
 			_mspf = time-_previousTime;
 			_previousTime = time;
 			
-			if(_needToMoveTop && alwaysOnTop && moveTopAttempts>0  && parent){
-				_needToMoveTop = false;
+			if(alwaysOnTop && moveTopAttempts>0 && parent && parent.getChildAt(parent.numChildren-1) != this){
 				moveTopAttempts--;
-				parent.setChildIndex(this,(parent.numChildren-1));
+				parent.addChild(this);
 				if(!quiet){
 					report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
 				}
@@ -564,9 +530,6 @@ package com.luaye.console {
 			addLine(obj, priority, CONSOLE_CHANNEL, false, skipSafe);
 		}
 		private function addLine(obj:*,priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false):void{
-			if(!_enabled){
-				return;
-			}
 			var isRepeat:Boolean = (isRepeating && _isRepeating);
 			var txt:String = (obj is XML || obj is XMLList)?obj.toXMLString():String(obj);
 			if(!channel || channel == GLOBAL_CHANNEL){
