@@ -14,7 +14,7 @@
 		</svn>
 	 -->
 	
-	<property name="TEMP_DIR" value="temp2" />
+	<property name="TEMP_DIR" value="temp" />
 	
 	<target name="package">
 		<delete dir="${TEMP_DIR}"/>
@@ -28,5 +28,6 @@
 		<zip destfile="package.zip">
 			<fileset dir="./${TEMP_DIR}"/>
 		</zip>
+		<delete dir="${TEMP_DIR}"/>
 	</target>
 </project>
