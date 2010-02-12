@@ -118,8 +118,8 @@ package {
 			
 			//
 			//Add graph show the mouse X/Y positions
-			C.addGraph("mouse", this,"(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x33CC33,"sine");
-			C.addGraph("mouse", this,"mouseX", 0xff3333,"mouseX");
+			C.addGraph("mouse", this,"(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x33CC33,"sine"); // Sine wave graph, very expensive way to graph but it works :)
+			C.addGraph("mouse", this,"mouseX", 0xff3333,"X");
 			C.addGraph("mouse", this,"mouseY", 0x3333ff,"Y", new Rectangle(340,225,80,80), true);
 			
 		}

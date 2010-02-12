@@ -1,0 +1,32 @@
+<project name="Console" default="package" basedir=".">
+	<!-- <property file="build.properties" />
+	<property name="FLEX_HOME" value=""/>
+	<taskdef resource="svntask.properties"/>
+	<taskdef resource="flexTasks.tasks" />
+	 -->
+	<!--
+	make folder
+	export files to folder
+	zip file
+	delete folder
+		<svn username="" password="">
+			<export srcPath="https://flash-console.googlecode.com/svn/branches/2.4wip" destPath="temp"/>
+		</svn>
+	 -->
+	
+	<property name="TEMP_DIR" value="temp2" />
+	
+	<target name="package">
+		<delete dir="${TEMP_DIR}"/>
+		<mkdir dir="${TEMP_DIR}"/>
+		<copy todir="${TEMP_DIR}">
+			<fileset dir="${basedir}">
+				<exclude name=".svn"/>
+				<exclude name="${TEMP_DIR}"/>
+			</fileset>
+		</copy>
+		<zip destfile="package.zip">
+			<fileset dir="./${TEMP_DIR}"/>
+		</zip>
+	</target>
+</project>

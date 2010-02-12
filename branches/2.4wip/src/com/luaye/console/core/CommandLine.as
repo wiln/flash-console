@@ -40,6 +40,7 @@ package com.luaye.console.core {
 		
 		private var _saved:WeakObject;
 		
+		// TODO: prev scope should be weak.
 		private var _scope:*;
 		private var _prevScope:*;
 		
