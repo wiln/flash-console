@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console.view {
+	import com.luaye.console.core.CommandExec;
 	import com.luaye.console.Console;
 	import com.luaye.console.utils.Utils;
 
@@ -109,7 +110,7 @@ package com.luaye.console.view {
 		public function remove(obj:Object = null, prop:String = null):void{
 			for(var X:String in _interests){
 				var interest:Interest = _interests[X];
-				if(interest && (interest.obj == null || interest.obj == obj) && (interest.prop == null || interest.prop == prop)){
+				if(interest && (interest.obj == null || interest.obj == obj) && (prop == null || interest.prop == prop)){
 					_interests.splice(int(X), 1);
 				}
 			}
@@ -223,7 +224,7 @@ package com.luaye.console.view {
 			for each(var interest:Interest in _interests){
 				var obj:Object = interest.obj;
 				if(obj){
-					var v:Number = obj[interest.prop];
+					var v:Number = interest.useExec?CommandExec.Exec(obj, interest.prop):obj[interest.prop];
 					if(isNaN(v)){
 						v = 0;
 					}else{
@@ -244,7 +245,7 @@ package com.luaye.console.view {
 						if(v < lowest) lowest = v;
 					}
 				}else{
-					remove(obj, interest.prop);
+					remove(obj);
 				}
 			}
 			_history.push(values);
@@ -327,11 +328,13 @@ class Interest{
 	public var col:Number;
 	public var key:String;
 	public var avg:Number;
+	public var useExec:Boolean;
 	public function Interest(object:Object, property:String, color:Number, keystr:String):void{
 		_ref = new WeakRef(object);
 		prop = property;
 		col = color;
 		key = keystr;
+		useExec = prop.search(/[^\w\d]/) >= 0;
 	}
 	public function get obj():Object{
 		return _ref.reference;

@@ -43,8 +43,8 @@ package {
 			// SET UP
 			
 			var style:ConsoleStyle = new ConsoleStyle();
-			style.big();
-			style.whiteBase();
+			//style.big();
+			//style.whiteBase();
 			
 			C.startOnStage(this, "`", style); 
 			// "`" - change for password. This will start hidden
@@ -118,6 +118,7 @@ package {
 			
 			//
 			//Add graph show the mouse X/Y positions
+			C.addGraph("mouse", this,"(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x33CC33,"sine");
 			C.addGraph("mouse", this,"mouseX", 0xff3333,"mouseX");
 			C.addGraph("mouse", this,"mouseY", 0x3333ff,"Y", new Rectangle(340,225,80,80), true);
 			

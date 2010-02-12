@@ -140,7 +140,7 @@ package com.luaye.console {
 			remoter = new Remoting(this, remoteLogSend);
 			mm = new MemoryMonitor();
 			style = skin?skin:new ConsoleStyle();
-			css = style.generateCSS();
+			css = ConsoleStyle.generateCSS(style);
 			panels = new PanelsManager(this, _lines, _channels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy bug fixing!</b>", -2);

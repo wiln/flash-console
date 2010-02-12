@@ -119,17 +119,17 @@ package com.luaye.console.view {
 							if(obj == stg){
 								str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";
 							}else if(i == len-1){
-								str +=  "<p5><a href='event:sclip_"+mapUpward(obj)+"'>"+obj.name+"("+Utils.shortClassName(obj)+")</a></p5><br/>";
+								str +=  "<p5><a href='event:sclip_"+mapUpward(obj)+"'>"+obj.name+" ("+Utils.shortClassName(obj)+")</a></p5><br/>";
 							}else {
-								str +=  "<p2><a href='event:sclip_"+mapUpward(obj)+"'><i>"+obj.name+"("+Utils.shortClassName(obj)+")</i></a></p2><br/>";
+								str +=  "<p2><a href='event:sclip_"+mapUpward(obj)+"'><i>"+obj.name+" ("+Utils.shortClassName(obj)+")</i></a></p2><br/>";
 							}
 						}else{
 							if(obj == stg){
 								str +=  "<p1><i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]</p1><br/>";
 							}else if(i == len-1){
-								str +=  "<p5>"+obj.name+"("+Utils.shortClassName(obj)+")</p5><br/>";
+								str +=  "<p5>"+obj.name+" ("+Utils.shortClassName(obj)+")</p5><br/>";
 							}else {
-								str +=  "<p2>"+obj.name+"("+Utils.shortClassName(obj)+")</p2><br/>";
+								str +=  "<p2>"+obj.name+" ("+Utils.shortClassName(obj)+")</p2><br/>";
 							}
 						}
 					}

@@ -197,6 +197,8 @@ package com.luaye.console.core {
 				if(props.length){
 					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
 				}
+			}
+			if (viewAll && obj is DisplayObject) {
 				var theParent:DisplayObjectContainer = mc.parent;
 				if (theParent) {
 					props = ["("+theParent.getChildIndex(mc)+")"];
