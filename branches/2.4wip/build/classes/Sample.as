@@ -43,7 +43,8 @@ package {
 			// SET UP
 			
 			var style:ConsoleStyle = new ConsoleStyle();
-			//style.big();
+			style.big();
+			style.whiteBase();
 			
 			C.startOnStage(this, "`", style); 
 			// "`" - change for password. This will start hidden
@@ -57,6 +58,7 @@ package {
 			C.maxLines = 2000;
 			C.fpsMonitor = true;
 			C.remoting = true;
+			C.displayRoller = true;
 			
 			TextField(txtPriority).restrict = "0-9";
 			TextField(txtPriority2).restrict = "0-9";

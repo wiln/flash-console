@@ -170,6 +170,7 @@ package com.luaye.console {
 		private function keyDownHandler(e:KeyboardEvent):void{
 			//if(e.keyLocation == 0){
 				var char:String = String.fromCharCode(e.charCode);
+				if(!char) return;
 				if(char == _password.substring(_passwordIndex,_passwordIndex+1)){
 					_passwordIndex++;
 					if(_passwordIndex >= _password.length){
@@ -180,7 +181,7 @@ package com.luaye.console {
 					}
 				}else{
 					_passwordIndex = 0;
-					var key:String = char.toLowerCase()+(e.ctrlKey?"0":"1")+(e.altKey?"0":"1")+(e.shiftKey?"0":"1");
+					var key:String = char.toLowerCase()+(e.ctrlKey?"1":"0")+(e.altKey?"1":"0")+(e.shiftKey?"1":"0");
 					if(_keyBinds[key]){
 						var bind:Array = _keyBinds[key];
 						bind[0].apply(this, bind[1]);
@@ -241,7 +242,7 @@ package com.luaye.console {
 			}
 		}
 		private function getKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):String{
-			return char.toLowerCase()+(ctrl?"0":"1")+(alt?"0":"1")+(shift?"0":"1");
+			return char.toLowerCase()+(ctrl?"1":"0")+(alt?"1":"0")+(shift?"1":"0");
 		}
 		public function setPanelArea(panelname:String, rect:Rectangle):void{
 			panels.setPanelArea(panelname, rect);
@@ -266,15 +267,19 @@ package com.luaye.console {
 		public function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
 			if(_rollerCaptureKey){
 				bindByKey(_rollerCaptureKey, null);
+				_rollerCaptureKey = null;
 			}
 			if(char && char.length==1){
-				_rollerCaptureKey = getKey(char, ctrl, alt, shift);
+				_rollerCaptureKey = getKey(char.toLowerCase(), ctrl, alt, shift);
 				bindByKey(_rollerCaptureKey, onRollerCaptureKey);
 			}
 		}
+		public function get rollerCaptureKey():String{
+			return _rollerCaptureKey;
+		}
 		private function onRollerCaptureKey():void{
 			if(displayRoller){
-				report("Display Roller Capture:"+RollerPanel(panels.getPanel(PANEL_ROLLER)).capture(), -1);
+				report("Display Roller Capture:<br/>"+RollerPanel(panels.getPanel(PANEL_ROLLER)).capture(), -1);
 			}
 		}
 		//

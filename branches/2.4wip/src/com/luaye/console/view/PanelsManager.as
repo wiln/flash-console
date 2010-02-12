@@ -126,7 +126,7 @@ package com.luaye.console.view {
 			if(displayRoller != n){
 				if(n){
 					var roller:RollerPanel = new RollerPanel(_master);
-					roller.x = _mainPanel.x+_mainPanel.width-160;
+					roller.x = _mainPanel.x+_mainPanel.width-180;
 					roller.y = _mainPanel.y+55;
 					addPanel(roller);
 					roller.start(_master);

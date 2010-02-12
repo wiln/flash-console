@@ -65,7 +65,7 @@ package com.luaye.console {
 		public function ConsoleStyle() {
 			
 		}
-		public function white():void{
+		public function whiteBase():void{
 			backgroundColor = 0xFFFFFF;
 			controlColor = 0xFF3333;
 			commandLineColor = 0x66CC00;
@@ -93,11 +93,26 @@ package com.luaye.console {
 			priorityC2 = 0xFF6600;
 		}
 		public function big():void{
-			traceFontSize = 16;
-			menuFontSize = 18;
+			traceFontSize = 12;
+			menuFontSize = 14;
 		}
 		public function opaque():void{
 			backgroundAlpha = 1;
+		}
+		public function blackAndWhiteTrace():void{
+			priority0 = 0x808080;
+			priority1 = 0x888888;
+			priority2 = 0x999999;
+			priority3 = 0x9F9F9F;
+			priority4 = 0xAAAAAA;
+			priority5 = 0xAAAAAA;
+			priority6 = 0xCCCCCC;
+			priority7 = 0xCCCCCC;
+			priority8 = 0xDDDDDD;
+			priority9 = 0xFFFFFF;
+			priority10 = 0xFFFFFF;
+			priorityC1 = 0xBBC0CC;
+			priorityC2 = 0xFFEEDD;
 		}
 		
 		//
