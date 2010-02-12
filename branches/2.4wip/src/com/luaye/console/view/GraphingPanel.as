@@ -61,20 +61,20 @@ package com.luaye.console.view {
 			lowTxt.name = "lowestField";
 			lowTxt.mouseEnabled = false;
 			lowTxt.styleSheet = m.css;
-			lowTxt.height = 14;
+			lowTxt.height = master.style.menuFontSize+2;
 			addChild(lowTxt);
 			highTxt = new TextField();
 			highTxt.name = "highestField";
 			highTxt.mouseEnabled = false;
 			highTxt.styleSheet = m.css;
-			highTxt.height = 14;
-			highTxt.y = 6;
+			highTxt.height = master.style.menuFontSize+2;
+			highTxt.y = master.style.menuFontSize-4;
 			addChild(highTxt);
 			//
 			keyTxt = new TextField();
 			keyTxt.name = "menuField";
 			keyTxt.styleSheet = m.css;
-			keyTxt.height = 16;
+			keyTxt.height = m.style.menuFontSize+4;
 			keyTxt.y = -3;
 			keyTxt.addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			registerRollOverTextField(keyTxt);
@@ -84,7 +84,7 @@ package com.luaye.console.view {
 			//
 			graph = new Shape();
 			graph.name = "graph";
-			graph.y = 10;
+			graph.y = m.style.menuFontSize;
 			addChild(graph);
 			//
 			init(W?W:100,H?H:80,resizable);
@@ -180,7 +180,7 @@ package com.luaye.console.view {
 		}
 		override public function set height(n:Number):void{
 			super.height = n;
-			lowTxt.y = n-13;
+			lowTxt.y = n-master.style.menuFontSize;
 			_needRedraw = true;
 		}
 		override public function set width(n:Number):void{
@@ -302,6 +302,7 @@ package com.luaye.console.view {
 			}
 			str +=  " | <menu><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></s></r>";
 			keyTxt.htmlText = str;
+			keyTxt.scrollH = keyTxt.maxScrollH;
 		}
 		protected function linkHandler(e:TextEvent):void{
 			TextField(e.currentTarget).setSelection(0, 0);

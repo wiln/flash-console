@@ -64,6 +64,7 @@ package com.luaye.console.view {
 			}else{
 				keyTxt.htmlText = "<r><s>no mem input <menu><a href=\"event:close\">X</a></menu></s></r>";
 			}
+			keyTxt.scrollH = keyTxt.maxScrollH;
 		}
 		protected override function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){

@@ -26,82 +26,49 @@ package com.luaye.console {
 	import flash.text.StyleSheet;
 
 	public class ConsoleStyle {
-		
-		
-		public var backgroundColor:int;
-		public var backgroundAlpha:Number = 0.8;
-		public var scalerColor:Number = 0x990000;
-		public var commandLineColor:Number = 0x10AA00;
-		public var bottomLineColor:Number = 0xFF0000;
 		//
-		public var traceFont:String = "Verdana";
-		public var traceFontSize:int = 11;
-		public var menuFont:String = "Arial";
-		public var fontSizeMedium:int = 12;
-		public var fontSizeSmall:int = 10;
+		public var backgroundColor:int; // panel backround color
+		public var backgroundAlpha:Number = 0.8; // panel background alpha
+		public var controlColor:Number = 0x990000; // Scroll bar, scaler, etc. some gets alpha applied
+		public var commandLineColor:Number = 0x10AA00; // command line background and text color, background gets alpha so it is less visible.
 		//
-		public var highColor:int = 0xFFFFFF;
-		public var lowColor:int = 0xC0C0C0;
-		public var menuColor:int = 0xFF8800;
-		public var menuHighlightColor:int = 0xDD5500;
-		public var channelsColor:int = 0xFFFFFF;
-		public var channelColor:int = 0x0099CC;
-		public var tooltipColor:int = 0xDD5500;
+		public var menuFont:String = "Arial"; // font for menus and almost all others
+		public var menuFontSize:int = 12; // Font size for menus and almost all others
+		public var traceFont:String = "Verdana"; // Font for trace field
+		public var traceFontSize:int = 11; // Font size for trace field
 		//
-		public var priority0:int = 0x336633;
-		public var priority1:int = 0x33AA33;
-		public var priority2:int = 0x77D077;
-		public var priority3:int = 0xAAEEAA;
-		public var priority4:int = 0xD6FFD6;
-		public var priority5:int = 0xE6E6E6;
-		public var priority6:int = 0xFFD6D6;
-		public var priority7:int = 0xFFAAAA;
-		public var priority8:int = 0xFF7777;
-		public var priority9:int = 0xFF2222;
-		public var priority10:int = 0xFF2222;
-		public var priorityC1:int = 0x0099CC;
-		public var priorityC2:int = 0xFF8800;
+		public var highColor:uint = 0xFFFFFF; // Font color for high priority text, such as user input.
+		public var lowColor:uint = 0xC0C0C0; // Font color for less important / smaller text
+		public var menuColor:uint = 0xFF8800; // Font color for menu
+		public var menuHighlightColor:uint = 0xDD5500; // Font color for highlighted menu
+		public var channelsColor:uint = 0xFFFFFF; // Font color for channel names
+		public var channelColor:uint = 0x0099CC; // Font color for current channel name
+		public var tooltipColor:uint = 0xDD5500; // Font color for tool tips
 		//
+		// To find out which level assigns to which type of log, e.g. C.log, C.info, etc...
+		// see Console.LOG_LEVEL, Console.INFO_LEVEL, Console.DEBUG_LEVEL, Console.WARN_LEVEL, etc
+		public var priority0:uint = 0x336633; // color of priority level 0
+		public var priority1:uint = 0x33AA33; // level 1
+		public var priority2:uint = 0x77D077; // 2
+		public var priority3:uint = 0xAAEEAA;
+		public var priority4:uint = 0xD6FFD6;
+		public var priority5:uint = 0xE6E6E6;
+		public var priority6:uint = 0xFFD6D6;
+		public var priority7:uint = 0xFFAAAA;
+		public var priority8:uint = 0xFF7777;
+		public var priority9:uint = 0xFF2222;
+		public var priority10:uint = 0xFF2222; // priority 10, also gets a bold
+		public var priorityC1:uint = 0x0099CC; // priority -1, designed to use by Console only, but you can also pass in that pirority
+		public var priorityC2:uint = 0xFF8800; // priority -2, designed to use by Console only, but you can also pass in that pirority
 		//
 		//
 		public function ConsoleStyle() {
-			big();
+			
 		}
-		
-		public function generateCSS():StyleSheet{
-			var css:StyleSheet = new StyleSheet();
-			css.setStyle("r",{textAlign:'right', display:'inline'});
-			css.setStyle("w",{color:hesh(highColor), fontFamily:menuFont, fontSize:fontSizeMedium, display:'inline'});
-			css.setStyle("s",{color:hesh(lowColor), fontFamily:menuFont, fontSize:fontSizeSmall, display:'inline'});
-			css.setStyle("hi",{color:hesh(menuHighlightColor), display:'inline'});
-			css.setStyle("menu",{color:hesh(menuColor), display:'inline'});
-			css.setStyle("chs",{color:hesh(channelsColor), fontSize:fontSizeMedium, leading:'2', display:'inline'});
-			css.setStyle("ch",{color:hesh(channelColor), display:'inline'});
-			css.setStyle("tooltip",{color:hesh(tooltipColor),fontFamily:menuFont, textAlign:'center'});
-			//
-			css.setStyle("p",{fontFamily:traceFont, fontSize:traceFontSize});
-			css.setStyle("p0",{color:hesh(priority0), display:'inline'});
-			css.setStyle("p1",{color:hesh(priority1), display:'inline'});
-			css.setStyle("p2",{color:hesh(priority2), display:'inline'});
-			css.setStyle("p3",{color:hesh(priority3), display:'inline'});
-			css.setStyle("p4",{color:hesh(priority4), display:'inline'});
-			css.setStyle("p5",{color:hesh(priority5), display:'inline'});
-			css.setStyle("p6",{color:hesh(priority6), display:'inline'});
-			css.setStyle("p7",{color:hesh(priority7), display:'inline'});
-			css.setStyle("p8",{color:hesh(priority8), display:'inline'});
-			css.setStyle("p9",{color:hesh(priority9), display:'inline'});
-			css.setStyle("p10",{color:hesh(priority10), fontWeight:'bold', display:'inline'});
-			css.setStyle("p-1",{color:hesh(priorityC1), display:'inline'});
-			css.setStyle("p-2",{color:hesh(priorityC2), display:'inline'});
-			return css;
-		}
-		private function hesh(n:Number):String{return "#"+n.toString(16);}
-		
-		public function preset2():void{
+		public function white():void{
 			backgroundColor = 0xFFFFFF;
-			scalerColor = 0xFF3333;
+			controlColor = 0xFF3333;
 			commandLineColor = 0x66CC00;
-			bottomLineColor = 0xFF0000;
 			//
 			highColor = 0x000000;
 			lowColor = 0x333333;
@@ -126,19 +93,42 @@ package com.luaye.console {
 			priorityC2 = 0xFF6600;
 		}
 		public function big():void{
-			backgroundAlpha = 1;
 			traceFontSize = 16;
-			fontSizeMedium = 18;
-			fontSizeSmall = 14;
+			menuFontSize = 18;
 		}
-		public function preset4():void{
-			preset2();
+		public function opaque():void{
 			backgroundAlpha = 1;
 		}
-		public function preset951():void{
-			// USED BY AIR Remote
-			//preset1();
-			backgroundAlpha = 0.55;
+		
+		//
+		// Used by console at init.
+		//
+		public function generateCSS():StyleSheet{
+			var css:StyleSheet = new StyleSheet();
+			css.setStyle("r",{textAlign:'right', display:'inline'});
+			css.setStyle("w",{color:hesh(highColor), fontFamily:menuFont, fontSize:menuFontSize, display:'inline'});
+			css.setStyle("s",{color:hesh(lowColor), fontFamily:menuFont, fontSize:menuFontSize-2, display:'inline'});
+			css.setStyle("hi",{color:hesh(menuHighlightColor), display:'inline'});
+			css.setStyle("menu",{color:hesh(menuColor), display:'inline'});
+			css.setStyle("chs",{color:hesh(channelsColor), fontSize:menuFontSize, leading:'2', display:'inline'});
+			css.setStyle("ch",{color:hesh(channelColor), display:'inline'});
+			css.setStyle("tooltip",{color:hesh(tooltipColor),fontFamily:menuFont,fontSize:menuFontSize, textAlign:'center'});
+			css.setStyle("p",{fontFamily:traceFont, fontSize:traceFontSize});
+			css.setStyle("p0",{color:hesh(priority0), display:'inline'});
+			css.setStyle("p1",{color:hesh(priority1), display:'inline'});
+			css.setStyle("p2",{color:hesh(priority2), display:'inline'});
+			css.setStyle("p3",{color:hesh(priority3), display:'inline'});
+			css.setStyle("p4",{color:hesh(priority4), display:'inline'});
+			css.setStyle("p5",{color:hesh(priority5), display:'inline'});
+			css.setStyle("p6",{color:hesh(priority6), display:'inline'});
+			css.setStyle("p7",{color:hesh(priority7), display:'inline'});
+			css.setStyle("p8",{color:hesh(priority8), display:'inline'});
+			css.setStyle("p9",{color:hesh(priority9), display:'inline'});
+			css.setStyle("p10",{color:hesh(priority10), fontWeight:'bold', display:'inline'});
+			css.setStyle("p-1",{color:hesh(priorityC1), display:'inline'});
+			css.setStyle("p-2",{color:hesh(priorityC2), display:'inline'});
+			return css;
 		}
+		private function hesh(n:Number):String{return "#"+n.toString(16);}
 	}
 }

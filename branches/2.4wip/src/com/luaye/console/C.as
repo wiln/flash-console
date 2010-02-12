@@ -116,11 +116,11 @@ package com.luaye.console {
 		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
 		 */
-		public static function start(mc:DisplayObjectContainer, pass:String = "", skin:ConsoleStyle = null):void{
+		public static function start(mc:DisplayObjectContainer, pass:String = "", style:ConsoleStyle = null):void{
 			if(_console){
 				trace(ERROR_EXISTS);
 			}else{
-				_console = new Console(pass, skin);
+				_console = new Console(pass, style);
 				// if no parent display, console will always be hidden, but using C.remoting is still possible so its not the end.
 				if(mc!=null) mc.addChild(_console);
 			}
@@ -140,13 +140,13 @@ package com.luaye.console {
 		 * @param  Skin preset number to use. 1 = black base, 2 = white base
 		 * 			
 		 */
-		public static function startOnStage(mc:DisplayObject, pass:String = "", skin:ConsoleStyle = null):void{
+		public static function startOnStage(mc:DisplayObject, pass:String = "", style:ConsoleStyle = null):void{
 			if(_console){
 				trace(ERROR_EXISTS);
 			}else if(mc !=null && mc.stage !=null ){
-				start(mc.stage, pass, skin);
+				start(mc.stage, pass, style);
 			}else{
-			 	_console = new Console(pass, skin);
+			 	_console = new Console(pass, style);
 			 	// if no parent display, console will always be hidden, but using C.remoting is still possible so its not the end.
 				if(mc!=null) mc.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
 			}

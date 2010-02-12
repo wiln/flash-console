@@ -109,9 +109,8 @@ package com.luaye.console.view {
 		
 		public function MainPanel(m:Console, lines:Logs, channels:Array) {
 			super(m);
-			
 			_canUseTrace = (Capabilities.playerType=="External"||Capabilities.isDebugger);
-			
+			var fsize:int = m.style.menuFontSize;
 			_channels = channels;
 			_lines = lines;
 			name = Console.PANEL_MAIN;
@@ -124,14 +123,14 @@ package com.luaye.console.view {
 			_traceField.background  = false;
 			_traceField.multiline = true;
 			_traceField.styleSheet = m.css;
-			_traceField.y = 12;
+			_traceField.y = fsize;
 			_traceField.addEventListener(Event.SCROLL, onTraceScroll, false, 0, true);
 			addChild(_traceField);
 			//
 			_menuField = new TextField();
 			_menuField.name = "menuField";
 			_menuField.styleSheet = m.css;
-			_menuField.height = 18;
+			_menuField.height = fsize+6;
 			_menuField.y = -2;
 			registerRollOverTextField(_menuField);
 			_menuField.addEventListener(AbstractPanel.TEXT_LINK, onMenuRollOver, false, 0, true);
@@ -140,16 +139,16 @@ package com.luaye.console.view {
 			_commandBackground = new Shape();
 			_commandBackground.name = "commandBackground";
 			_commandBackground.graphics.beginFill(style.commandLineColor, 0.1);
-			_commandBackground.graphics.drawRoundRect(0, 0, 100, 18,12,12);
+			_commandBackground.graphics.drawRoundRect(0, 0, 100, 18,fsize,fsize);
 			_commandBackground.scale9Grid = new Rectangle(9, 9, 80, 1);
 			addChild(_commandBackground);
 			//
-			var tf:TextFormat = new TextFormat(style.menuFont, style.fontSizeMedium, style.highColor);
+			var tf:TextFormat = new TextFormat(style.menuFont, style.menuFontSize, style.highColor);
 			_commandField = new TextField();
 			_commandField.name = "commandField";
 			_commandField.type  = TextFieldType.INPUT;
 			_commandField.x = 40;
-			_commandField.height = 18;
+			_commandField.height = fsize+6;
 			_commandField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
 			_commandField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
 			_commandField.defaultTextFormat = tf;
@@ -160,7 +159,7 @@ package com.luaye.console.view {
 			_commandPrefx.name = "commandPrefx";
 			_commandPrefx.type  = TextFieldType.DYNAMIC;
 			_commandPrefx.x = 2;
-			_commandPrefx.height = 18;
+			_commandPrefx.height = fsize+6;
 			_commandPrefx.selectable = false;
 			_commandPrefx.defaultTextFormat = tf;
 			_commandPrefx.text = " ";
@@ -178,12 +177,12 @@ package com.luaye.console.view {
 			_scrollbar.name = "scrollbar";
 			_scrollbar.buttonMode = true;
 			_scrollbar.addEventListener(MouseEvent.MOUSE_DOWN, onScrollbarDown, false, 0, true);
-			_scrollbar.y = 16;
+			_scrollbar.y = fsize+4;
 			addChild(_scrollbar);
 			//
 			_scroller = new Sprite();
 			_scroller.name = "scroller";
-			_scroller.graphics.beginFill(style.scalerColor, 1);
+			_scroller.graphics.beginFill(style.controlColor, 1);
 			_scroller.graphics.drawRect(-5, 0, 5, 30);
 			_scroller.graphics.beginFill(0, 0);
 			_scroller.graphics.drawRect(-10, 0, 10, 30);
@@ -242,7 +241,7 @@ package com.luaye.console.view {
 				master.report("//", -2);
 				master.report("// <b>Enter remoting password</b> in CommandLine below...", -2);
 				updateCLScope("Password");
-				ct.color = style.bottomLineColor;
+				ct.color = style.controlColor;
 				_commandBackground.transform.colorTransform = ct;
 				_traceField.transform.colorTransform = new ColorTransform(0.7,0.7,0.7);
 			}else{
@@ -390,19 +389,20 @@ package com.luaye.console.view {
 				_updateTraces();
 				_scroller.y = Y;
 			}
-			_scroller.startDrag(false, new Rectangle(_scroller.x,21, 0, (scrollerMaxY-21)));
+			var bound:Number = master.style.menuFontSize+8;
+			_scroller.startDrag(false, new Rectangle(_scroller.x,bound, 0, (scrollerMaxY-bound)));
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onScrollerMove, false, 0, true);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onScrollerUp, false, 0, true);
 		}
 		private function onScrollerMove(e:MouseEvent):void{
-			var minY:Number = 21;
+			var minY:Number = master.style.menuFontSize+8;
 			var per:Number = (_scroller.y-minY)/(scrollerMaxY-minY);
 			_lockScrollUpdate = true;
 			_traceField.scrollV = Math.round((per*(_traceField.maxScrollV-1))+1);
 			_lockScrollUpdate = false;
 		}
 		private function get scrollerMaxY():Number{
-			return _bottomLine.y-_scroller.height-(_commandField.visible?5:15);
+			return _bottomLine.y-_scroller.height-(_commandField.visible?5:(master.style.menuFontSize+5));
 		}
 		private function onScrollerUp(e:MouseEvent):void{
 			_scroller.stopDrag();
@@ -445,7 +445,7 @@ package com.luaye.console.view {
 			_commandBackground.width = n;
 			
 			_bottomLine.graphics.clear();
-			_bottomLine.graphics.lineStyle(1, style.bottomLineColor);
+			_bottomLine.graphics.lineStyle(1, style.controlColor);
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
 			_scroller.x = n;
@@ -468,10 +468,11 @@ package com.luaye.console.view {
 				registerDragger(_traceField, !minimize);
 				_isMinimised = minimize;
 			}
+			var fsize:int = master.style.menuFontSize;
 			_menuField.visible = !minimize;
-			_traceField.y = minimize?0:12;
-			_traceField.height = n-(_commandField.visible?16:0)-(minimize?0:12);
-			var cmdy:Number = n-18;
+			_traceField.y = minimize?0:fsize;
+			_traceField.height = n-(_commandField.visible?(fsize+4):0)-(minimize?0:fsize);
+			var cmdy:Number = n-(fsize+6);
 			_commandField.y = cmdy;
 			_commandPrefx.y = cmdy;
 			_commandBackground.y = cmdy;
@@ -479,10 +480,10 @@ package com.luaye.console.view {
 			//
 			var sbh:Number = (_bottomLine.y-(_commandField.visible?0:10))-_scrollbar.y;
 			_scrollbar.graphics.clear();
-			_scrollbar.graphics.beginFill(style.scalerColor, 0.7);
+			_scrollbar.graphics.beginFill(style.controlColor, 0.7);
 			_scrollbar.graphics.drawRect(-5, 0, 5, 5);
 			_scrollbar.graphics.drawRect(-5, sbh-5, 5, 5);
-			_scrollbar.graphics.beginFill(style.scalerColor, 0.25);
+			_scrollbar.graphics.beginFill(style.controlColor, 0.25);
 			_scrollbar.graphics.drawRect(-5, 5, 5, sbh-10);
 			_scrollbar.graphics.endFill();
 			//

@@ -116,7 +116,7 @@ package com.luaye.console.view {
 		public function registerSnaps(X:Array, Y:Array):void{
 			_snaps = [X,Y];
 		}
-		protected function registerDragger(mc:DisplayObject, dereg:Boolean = false):void{
+		public function registerDragger(mc:DisplayObject, dereg:Boolean = false):void{
 			if(dereg){
 				mc.removeEventListener(MouseEvent.MOUSE_DOWN, onDraggerMouseDown);
 			}else{
@@ -174,7 +174,7 @@ package com.luaye.console.view {
 			if(b && !scaler){
 				scaler = new Sprite();
 				scaler.name = "scaler";
-				scaler.graphics.beginFill(style.scalerColor, style.backgroundAlpha);
+				scaler.graphics.beginFill(style.controlColor, style.backgroundAlpha);
 	            scaler.graphics.lineTo(-10, 0);
 	            scaler.graphics.lineTo(0, -10);
 	            scaler.graphics.endFill();

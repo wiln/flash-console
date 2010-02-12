@@ -57,6 +57,7 @@ package com.luaye.console.view {
 			}else{
 				keyTxt.htmlText = "<r><s>no fps input <menu><a href=\"event:close\">X</a></menu></s></r>";
 			}
+			keyTxt.scrollH = keyTxt.maxScrollH;
 		}
 		public function get current():Number{
 			if(isNaN(_cachedCurrent))

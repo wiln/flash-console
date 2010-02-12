@@ -23,6 +23,7 @@
 * 
 */
 package {
+	import com.luaye.console.ConsoleStyle;
 	import com.luaye.console.C;
 	import flash.geom.Rectangle;	
 	import flash.utils.*;	
@@ -40,7 +41,11 @@ package {
 		public function Sample() {
 			//
 			// SET UP
-			C.startOnStage(this, "`"); 
+			
+			var style:ConsoleStyle = new ConsoleStyle();
+			//style.big();
+			
+			C.startOnStage(this, "`", style); 
 			// "`" - change for password. This will start hidden
 			C.remotingPassword = null;
 			C.visible = true; // show console, because having password hides console.
