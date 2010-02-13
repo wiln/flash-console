@@ -1,33 +1,63 @@
-<project name="Console" default="package" basedir=".">
-	<!-- <property file="build.properties" />
-	<property name="FLEX_HOME" value=""/>
-	<taskdef resource="svntask.properties"/>
-	<taskdef resource="flexTasks.tasks" />
-	 -->
-	<!--
-	make folder
-	export files to folder
-	zip file
-	delete folder
-		<svn username="" password="">
-			<export srcPath="https://flash-console.googlecode.com/svn/branches/2.4wip" destPath="temp"/>
-		</svn>
-	 -->
+<project name="Console" basedir=".">
 	
 	<property name="TEMP_DIR" value="temp" />
+	<property name="TEMP_WIKI_DIR" value="tempwiki" />
+	<property name="SVN_ANT_PATH" value="D:/Program Files (x86)/eclipse/svnant/lib" />
+	<property name="PROJECT_WIKI" value="..\wiki" />
 	
-	<target name="package">
+	
+	<path id= "svnant.classpath" >
+	<fileset dir= "${SVN_ANT_PATH}" >
+         <include name= "*.jar" />
+	</fileset>
+	</path>
+	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+	
+	<!--
+		- svn export trunk to temp/
+		- delete temp/build.xml
+		- zip temp/
+		- delete temp/ and temp2/
+	-->
+	<target name="zip">
 		<delete dir="${TEMP_DIR}"/>
-		<mkdir dir="${TEMP_DIR}"/>
-		<copy todir="${TEMP_DIR}">
-			<fileset dir="${basedir}">
-				<exclude name=".svn"/>
-				<exclude name="${TEMP_DIR}"/>
-			</fileset>
-		</copy>
-		<zip destfile="package.zip">
-			<fileset dir="./${TEMP_DIR}"/>
+		<svn>
+			<export srcPath="${basedir}" destPath="${TEMP_DIR}"/>
+		</svn>
+		<delete file="${TEMP_DIR}/build.xml"/>
+		<zip destfile="console.zip">
+			<fileset dir="${basedir}/${TEMP_DIR}"/>
 		</zip>
 		<delete dir="${TEMP_DIR}"/>
+	</target>
+	
+	
+	<!--
+		- svn export trunk to temp/
+		- delete temp/build.xml
+		- svn export wiki to temp2/
+		- move files from temp2 to temp/doc/ and rename *.wiki to *.txt
+		- zip temp/
+		- delete temp/ and temp2/
+	-->
+	<target name="updateWikiAndZip">
+		<delete dir="${TEMP_DIR}"/>
+		<delete dir="${TEMP_WIKI_DIR}"/>
+		<svn>
+			<export srcPath="${basedir}" destPath="${TEMP_DIR}"/>
+		</svn>
+		<delete file="${TEMP_DIR}/build.xml"/>
+		<svn>
+			<export srcPath="${PROJECT_WIKI}" destPath="${TEMP_WIKI_DIR}"/>
+		</svn>
+		<move todir="${TEMP_DIR}/doc" includeemptydirs="false">
+    		<fileset dir="${TEMP_WIKI_DIR}"/>
+			<mapper type="glob" from="*.wiki" to="*.txt"/>
+		</move>
+		<zip destfile="console.zip">
+			<fileset dir="${basedir}/${TEMP_DIR}"/>
+		</zip>
+		<delete dir="${TEMP_DIR}"/>
+		<delete dir="${TEMP_WIKI_DIR}"/>
 	</target>
 </project>

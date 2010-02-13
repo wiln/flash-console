@@ -194,7 +194,7 @@ package com.luaye.console.view {
 				if(rect.height>0)
 					graph.height = rect.height;
 			}
-			graph.inverse = inverse;
+			if(inverse) graph.inverse = true; // one way setting
 			graph.add(obj,prop,col, key);
 			addPanel(graph);
 		}
