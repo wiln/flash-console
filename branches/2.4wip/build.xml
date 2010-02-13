@@ -33,6 +33,24 @@
 	
 	
 	<!--
+		- svn export wiki to ./tempwiki
+		- move files from temp2 to ./doc and rename *.wiki to *.txt
+		- delete ./tempwiki
+	-->
+	<target name="updateWiki">
+		<delete dir="${TEMP_WIKI_DIR}"/>
+		<svn>
+			<export srcPath="${PROJECT_WIKI}" destPath="${TEMP_WIKI_DIR}"/>
+		</svn>
+		<move todir="${basedir}/doc" includeemptydirs="false">
+    		<fileset dir="${TEMP_WIKI_DIR}"/>
+			<mapper type="glob" from="*.wiki" to="*.txt"/>
+		</move>
+		<delete dir="${TEMP_WIKI_DIR}"/>
+	</target>
+	
+	
+	<!--
 		- svn export trunk to temp/
 		- delete temp/build.xml
 		- svn export wiki to temp2/

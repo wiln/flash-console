@@ -221,10 +221,11 @@ package com.luaye.console.view {
 			if(_updatedFrame < updateEvery) return;
 			_updatedFrame= 0;
 			var values:Array = [];
+			var v:Number;
 			for each(var interest:Interest in _interests){
-				var obj:Object = interest.obj;
-				if(obj){
-					var v:Number = interest.useExec?CommandExec.Exec(obj, interest.prop):obj[interest.prop];
+				try{
+					var obj:Object = interest.obj;
+					v = interest.useExec?CommandExec.Exec(obj, interest.prop):obj[interest.prop];
 					if(isNaN(v)){
 						v = 0;
 					}else{
@@ -244,8 +245,8 @@ package com.luaye.console.view {
 						if(v > highest) highest = v;
 						if(v < lowest) lowest = v;
 					}
-				}else{
-					remove(obj);
+				}catch(e:Error){
+					remove(obj, interest.prop);
 				}
 			}
 			_history.push(values);
@@ -293,8 +294,8 @@ package com.luaye.console.view {
 					graph.graphics.lineTo(W, Y);
 				}
 			}
-			(inverse?highTxt:lowTxt).text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
-			(inverse?lowTxt:highTxt).text = isNaN(highest)?"":"<s>"+highest+"</s>";
+			(inverse?highTxt:lowTxt).text = isNaN(lowest)?"":"<s>"+lowest.toPrecision(5)+"</s>";
+			(inverse?lowTxt:highTxt).text = isNaN(highest)?"":"<s>"+highest.toPrecision(5)+"</s>";
 		}
 		public function updateKeyText():void{
 			var str:String = "<r><s>";

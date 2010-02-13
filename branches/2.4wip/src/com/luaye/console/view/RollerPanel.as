@@ -165,7 +165,7 @@ package com.luaye.console.view {
 					if(key.charAt(2) == "1") txt+="+alt";
 					if(key.charAt(3) == "1") txt+="+shift";
 				}else{
-					txt = "Set key";
+					txt = "Assign key";
 				}
 			}else if(txt == "cancel"){
 				txt = "Cancel assign key";
