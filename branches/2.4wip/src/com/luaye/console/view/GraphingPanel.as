@@ -23,6 +23,8 @@
 * 
 */
 package com.luaye.console.view {
+	import flash.display.Graphics;
+
 	import com.luaye.console.core.CommandExec;
 	import com.luaye.console.Console;
 	import com.luaye.console.utils.Utils;
@@ -41,6 +43,7 @@ package com.luaye.console.view {
 		protected var _history:Array = [];
 		//
 		protected var fixed:Boolean;
+		protected var underlay:Shape;
 		protected var graph:Shape;
 		protected var lowTxt:TextField;
 		protected var highTxt:TextField;
@@ -51,6 +54,7 @@ package com.luaye.console.view {
 		public var lowest:Number;
 		public var highest:Number;
 		public var averaging:uint;
+		public var startOffset:int = 6;
 		public var inverse:Boolean;
 		//
 		public function GraphingPanel(m:Console, W:int = 0, H:int = 0, resizable:Boolean = true) {
@@ -83,6 +87,9 @@ package com.luaye.console.view {
 			registerDragger(keyTxt); // so that we can still drag from textfield
 			addChild(keyTxt);
 			//
+			underlay = new Shape();
+			addChild(underlay);
+			//
 			graph = new Shape();
 			graph.name = "graph";
 			graph.y = m.style.menuFontSize;
@@ -95,14 +102,20 @@ package com.luaye.console.view {
 			return Math.random();
 		}
 		public function add(obj:Object, prop:String, col:Number = -1, key:String=null):void{
-			var cur:Number = obj[prop];
-			if(!isNaN(cur)){
-				if(isNaN(lowest)) lowest = cur;
-				if(isNaN(highest)) highest = cur;
-			}
 			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
 			if(key == null) key = prop;
-			_interests.push(new Interest(obj, prop, col, key));
+			var i:Interest = new Interest(obj, prop, col, key);
+			var cur:Number;
+			try{
+				cur = i.getValue();
+				if(!isNaN(cur)){
+					if(isNaN(lowest)) lowest = cur;
+					if(isNaN(highest)) highest = cur;
+				}
+			}catch(e:Error){
+				
+			}
+			_interests.push(i);
 			updateKeyText();
 			//
 			start();
@@ -183,17 +196,22 @@ package com.luaye.console.view {
 			super.height = n;
 			lowTxt.y = n-master.style.menuFontSize;
 			_needRedraw = true;
+			
+			var g:Graphics = underlay.graphics;
+			g.clear();
+			g.lineStyle(1,master.style.controlColor, 0.6);
+			g.moveTo(0, graph.y);
+			g.lineTo(width-startOffset, graph.y);
+			g.lineTo(width-startOffset, n);
 		}
 		override public function set width(n:Number):void{
 			super.width = n;
 			lowTxt.width = n;
 			highTxt.width = n;
 			keyTxt.width = n;
-			graphics.clear();
-			graphics.lineStyle(1,0xAAAAAA, 1);
-			graphics.moveTo(0, graph.y);
-			graphics.lineTo(n, graph.y);
+			keyTxt.scrollH = keyTxt.maxScrollH;
 			_needRedraw = true;
+			
 		}
 		protected function getCurrentOf(i:int):Number{
 			var values:Array = _history[_history.length-1];
@@ -224,8 +242,7 @@ package com.luaye.console.view {
 			var v:Number;
 			for each(var interest:Interest in _interests){
 				try{
-					var obj:Object = interest.obj;
-					v = interest.useExec?CommandExec.Exec(obj, interest.prop):obj[interest.prop];
+					v = interest.getValue();
 					if(isNaN(v)){
 						v = 0;
 					}else{
@@ -246,7 +263,7 @@ package com.luaye.console.view {
 						if(v < lowest) lowest = v;
 					}
 				}catch(e:Error){
-					remove(obj, interest.prop);
+					remove(interest.obj, interest.prop);
 				}
 			}
 			_history.push(values);
@@ -262,7 +279,7 @@ package com.luaye.console.view {
 			if(!_needRedraw && _drawnFrame < drawEvery) return;
 			_needRedraw = false;
 			_drawnFrame= 0;
-			var W:Number = width;
+			var W:Number = width-startOffset;
 			var H:Number = height-graph.y;
 			graph.graphics.clear();
 			var diffGraph:Number = highest-lowest;
@@ -281,7 +298,12 @@ package com.luaye.console.view {
 					if(!inverse) Y = H-Y;
 					if(Y<0)Y=0;
 					if(Y>H)Y=H;
-					graph.graphics[(first?"moveTo":"lineTo")]((W-i), Y);
+					if(first){
+						graph.graphics.moveTo(width, Y);
+						graph.graphics.lineTo((W-i), Y);
+					}else{
+						graph.graphics.lineTo((W-i), Y);
+					}
 					first = false;
 				}
 				if(averaging>0 && diffGraph){
@@ -294,8 +316,8 @@ package com.luaye.console.view {
 					graph.graphics.lineTo(W, Y);
 				}
 			}
-			(inverse?highTxt:lowTxt).text = isNaN(lowest)?"":"<s>"+lowest.toPrecision(5)+"</s>";
-			(inverse?lowTxt:highTxt).text = isNaN(highest)?"":"<s>"+highest.toPrecision(5)+"</s>";
+			(inverse?highTxt:lowTxt).text = isNaN(lowest)?"":"<s>"+lowest+"</s>";
+			(inverse?lowTxt:highTxt).text = isNaN(highest)?"":"<s>"+highest+"</s>";
 		}
 		public function updateKeyText():void{
 			var str:String = "<r><s>";
@@ -321,6 +343,7 @@ package com.luaye.console.view {
 	}
 }
 
+import com.luaye.console.core.CommandExec;
 import com.luaye.console.utils.WeakRef;
 
 class Interest{
@@ -329,13 +352,16 @@ class Interest{
 	public var col:Number;
 	public var key:String;
 	public var avg:Number;
-	public var useExec:Boolean;
+	private var useExec:Boolean;
 	public function Interest(object:Object, property:String, color:Number, keystr:String):void{
 		_ref = new WeakRef(object);
 		prop = property;
 		col = color;
 		key = keystr;
 		useExec = prop.search(/[^\w\d]/) >= 0;
+	}
+	public function getValue():Number{
+		return useExec?CommandExec.Exec(obj, prop):obj[prop];
 	}
 	public function get obj():Object{
 		return _ref.reference;

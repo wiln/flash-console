@@ -322,7 +322,7 @@ package com.luaye.console.view {
 		}
 		private function updateBottom():void{
 			var lines:Array = new Array();
-			var linesLeft:int = Math.round(_traceField.height/10);
+			var linesLeft:int = Math.round(_traceField.height/master.style.traceFontSize);
 			var line:Log = _lines.last;
 			while(line){
 				if(master.lineShouldShow(line)){
