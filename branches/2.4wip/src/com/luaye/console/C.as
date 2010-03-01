@@ -355,18 +355,6 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Accessor for currently viewing channel.
-		 * <p>
-		 * Set to null or empty string to view all channels (global channel).
-		 * </p>
-		 */
-		public static function get viewingChannel():String{
-			return getter("viewingChannel") as String;
-		}
-		public static function set viewingChannel(v:String):void{
-			setter("viewingChannel",v);
-		}
-		/**
 		 * Accessor for currently viewing channels.
 		 * <p>
 		 * Set to null or empty array to view all channels (global channel).
@@ -468,7 +456,7 @@ package com.luaye.console {
 		 * @see #tracing
 		 */
 		public static function get tracingPriority():int{
-			return getter("tracingChannels") as int;
+			return getter("tracingPriority") as int;
 		}
 		public static function set tracingPriority(v:int):void{
 			setter("tracingPriority",v);

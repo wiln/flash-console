@@ -33,17 +33,21 @@ package com.luaye.console.core {
 		private static const VALUE_CONST:String = "#";
 		
 		private var _saved:Object;
-		
 		private var _reserved:Array;
-		private var _values:Array = [];
+		private var _values:Array;
 		private var _scope:*;
-		
-		public var returns:Array = [];
+		private var _returns:Array;
+		private var _running:Boolean;
 		
 		public static function Exec(scope:Object, str:String, saved:Object = null, reserved:Array = null):*{
 			var e:CommandExec = new CommandExec();
+			return e.exec(scope, str, saved, reserved).pop();
+		}
+		public static function Execs(scope:Object, str:String, saved:Object = null, reserved:Array = null):Array{
+			var e:CommandExec = new CommandExec();
 			return e.exec(scope, str, saved, reserved);
 		}
+		
 		// com.luaye.console.C.instance.visible
 		// com.luaye.console.C.instance.addGraph('test',stage,'mouseX')
 		// test('simple stuff. what ya think?');
@@ -54,25 +58,35 @@ package com.luaye.console.core {
 		// getChildByName(String('Console')).getChildByName('message').alpha = 0.5;
 		// getChildByName(String('Console').abcd().asdf).getChildByName('message').alpha = 0.5;
 		// com.luaye.console.C.add('Hey how are you?');
-		public function exec(s:*, str:String, saved:Object = null, reserved:Array = null):* {
+		public function exec(s:*, str:String, saved:Object = null, reserved:Array = null):Array{
+			if(_running) throw new Error("CommandExec.exec() is already runnnig. Does not support loop backs.");
+			_running = true;
 			_scope = s;
 			_saved = saved;
+			_values = [];
+			_returns = [];
 			if(!_saved) _saved = new Object();
 			_reserved = reserved;
 			if(!_reserved) _reserved = [];
-			var v:*;
 			try{
-				v = _exec(str);
+				_exec(str);
 			}catch (e:Error){
-				// just so that we can clean up after cleaning...
+				reset();
 				throw e;
 			}
-			_scope = null;
+			var a:Array = _returns;
+			reset();
+			return a;
+		}
+		private function reset():void{
 			_saved = null;
 			_reserved = null;
-			return v;
+			_values = null;
+			_scope = null;
+			_returns = [];
+			_running = false;
 		}
-		private function _exec(str:String):* {
+		private function _exec(str:String):void{
 			//
 			// STRIP strings - '...', "...", '', "", while ignoring \' \" etc inside.
 			var strReg:RegExp = /('(.*?)[^\\]')|("(.*?)[^\\]")|''|""/;
@@ -95,14 +109,12 @@ package com.luaye.console.core {
 			}
 			//
 			// Run each line
-			var v:* = null;
 			var lineBreaks:Array = str.split(/\s*;\s*/);
 			for each(var line:String in lineBreaks){
 				if(line.length){
-					v = execNest(line);
+					execNest(line);
 				}
 			}
-			return v;
 		}
 		//
 		// Nested strip
@@ -157,7 +169,7 @@ package com.luaye.console.core {
 			}
 			var v:* = execOperations(line).value;
 			
-			returns.push(v);
+			_returns.push(v);
 			if(v != null){
 				_saved["returned"] = v;
 				var typ:String = typeof(v);

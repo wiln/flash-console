@@ -157,6 +157,7 @@ package com.luaye.console {
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
+			if(cl.base == parent) cl.base = null;
 			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			//
@@ -168,26 +169,24 @@ package com.luaye.console {
 			panels.tooltip(null);
 		}
 		private function keyDownHandler(e:KeyboardEvent):void{
-			//if(e.keyLocation == 0){
-				var char:String = String.fromCharCode(e.charCode);
-				if(!char) return;
-				if(char == _password.substring(_passwordIndex,_passwordIndex+1)){
-					_passwordIndex++;
-					if(_passwordIndex >= _password.length){
-						_passwordIndex = 0;
-						if(visible && !panels.mainPanel.visible){
-							panels.mainPanel.visible = true;
-						}else visible = !visible;
-					}
-				}else{
+			var char:String = String.fromCharCode(e.charCode);
+			if(!char) return;
+			if(char == _password.substring(_passwordIndex,_passwordIndex+1)){
+				_passwordIndex++;
+				if(_passwordIndex >= _password.length){
 					_passwordIndex = 0;
-					var key:String = char.toLowerCase()+(e.ctrlKey?"1":"0")+(e.altKey?"1":"0")+(e.shiftKey?"1":"0");
-					if(_keyBinds[key]){
-						var bind:Array = _keyBinds[key];
-						bind[0].apply(this, bind[1]);
-					}
+					if(visible && !panels.mainPanel.visible){
+						panels.mainPanel.visible = true;
+					}else visible = !visible;
 				}
-			//}
+			}else{
+				_passwordIndex = 0;
+				var key:String = char.toLowerCase()+(e.ctrlKey?"1":"0")+(e.altKey?"1":"0")+(e.shiftKey?"1":"0");
+				if(_keyBinds[key]){
+					var bind:Array = _keyBinds[key];
+					bind[0].apply(this, bind[1]);
+				}
+			}
 		}
 		public function destroy():void{
 			remoter.close();
@@ -195,17 +194,6 @@ package com.luaye.console {
 			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			cl.destory();
-		}
-		public static function get remoteIsRunning():Boolean{
-			var sCon:LocalConnection = new LocalConnection();
-			try{
-				sCon.allowInsecureDomain("*");
-				sCon.connect(REMOTING_CONN_NAME+Remoting.REMOTE_PREFIX);
-			}catch(error:Error){
-				return true;
-			}
-			sCon.close();
-			return false;
 		}
 		public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			if(obj == null) {
@@ -342,11 +330,8 @@ package com.luaye.console {
 		}
 		public function set paused(newV:Boolean):void{
 			if(_isPaused == newV) return;
-			if(newV){
-				report("Paused", 10);
-			}else{
-				report("Resumed", -1);
-			}
+			if(newV) report("Paused", 10);
+			else report("Resumed", -1);
 			_isPaused = newV;
 			panels.mainPanel.setPaused(newV);
 		}
@@ -494,20 +479,15 @@ package com.luaye.console {
 		//
 		//
 		//
-		public function set viewingChannel(str:String):void{
-			if(str) viewingChannels = [str];
-			else viewingChannels = [GLOBAL_CHANNEL];
-		}
-		public function get viewingChannel():String{
-			return _viewingChannels.join(",");
-		}
 		public function get viewingChannels():Array{
 			return _viewingChannels.concat();
 		}
 		public function set viewingChannels(a:Array):void{
 			_viewingChannels.splice(0);
-			if(a && a.length) _viewingChannels.push.apply(this, a);
-			else _viewingChannels.push(GLOBAL_CHANNEL);
+			if(a && a.length) {
+				if(a.indexOf(GLOBAL_CHANNEL)>=0) a = [GLOBAL_CHANNEL];
+				_viewingChannels.push.apply(this, a);
+			} else _viewingChannels.push(GLOBAL_CHANNEL);
 			panels.mainPanel.updateToBottom();
 			panels.updateMenu();
 		}
@@ -580,7 +560,7 @@ package com.luaye.console {
 		public function lineShouldShow(line:Log):Boolean{
 			return (
 				(
-					_viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0
+					_viewingChannels[0] == Console.GLOBAL_CHANNEL
 			 		|| _viewingChannels.indexOf(line.c)>=0 
 			 		|| (_filterText && _viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 && line.text.toLowerCase().indexOf(_filterText.toLowerCase())>=0 )
 			 	) 
@@ -611,7 +591,7 @@ package com.luaye.console {
 		}
 		public function set commandLineAllowed (v:Boolean):void{
 			_commandLineAllowed = v;
-			if(v==0 && commandLine){
+			if(!v && commandLine){
 				commandLine = false;
 			}
 		}
@@ -706,7 +686,7 @@ package com.luaye.console {
 				_channels.splice(1,0,FILTERED_CHANNEL);
 				addLine("Filtering ["+str+"]", 10,FILTERED_CHANNEL);
 				viewingChannels = [FILTERED_CHANNEL];
-			}else if(viewingChannel == FILTERED_CHANNEL){
+			}else if(_viewingChannels.length == 1 && _viewingChannels[0] == FILTERED_CHANNEL){
 				viewingChannels = [GLOBAL_CHANNEL];
 			}
 		}
@@ -750,6 +730,17 @@ package com.luaye.console {
 				line = line.next;
 			}
 			return str;
+		}
+		public static function get remoteIsRunning():Boolean{
+			var sCon:LocalConnection = new LocalConnection();
+			try{
+				sCon.allowInsecureDomain("*");
+				sCon.connect(REMOTING_CONN_NAME+Remoting.REMOTE_PREFIX);
+			}catch(error:Error){
+				return true;
+			}
+			sCon.close();
+			return false;
 		}
 	}
 }

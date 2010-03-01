@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console.core {
+	import com.luaye.console.utils.WeakRef;
 	import com.luaye.console.Console;
 	import com.luaye.console.utils.Utils;
 	import com.luaye.console.utils.WeakObject;
@@ -42,7 +43,7 @@ package com.luaye.console.core {
 		
 		// TODO: prev scope should be weak.
 		private var _scope:*;
-		private var _prevScope:*;
+		private var _prevScope:WeakRef;
 		
 		private var _master:Console;
 		private var _tools:CommandTools;
@@ -51,6 +52,7 @@ package com.luaye.console.core {
 			_master = m;
 			_tools = new CommandTools(report);
 			_saved = new WeakObject();
+			_prevScope = new WeakRef(m);
 			_scope = m;
 			_saved.set("C", m);
 		}
@@ -58,6 +60,7 @@ package com.luaye.console.core {
 			if (base) {
 				report("Set new commandLine base from "+base+ " to "+ obj, 10);
 			}else{
+				_prevScope.reference = _scope;
 				_scope = obj;
 				dispatchEvent(new Event(CHANGED_SCOPE));
 			}
@@ -101,9 +104,10 @@ package com.luaye.console.core {
 				if(str.charAt(0) == "/"){
 					execCommand(str);
 				}else{
-					var e:CommandExec = new CommandExec();
-					v = e.exec(_scope, str, _saved, RESERVED_SAVES);
-					for each(var r in e.returns) doReturn(r);
+					var a:Array = CommandExec.Execs(_scope, str, _saved, RESERVED_SAVES);
+					for each(v in a) {
+						doReturn(v);
+					}
 				}
 			}catch(e:Error){
 				reportError(e);
@@ -174,7 +178,7 @@ package com.luaye.console.core {
 					report("Empty", 10);
 				}
 			} else if (cmd == "/") {
-				doReturn(_prevScope?_prevScope:base);
+				doReturn(_prevScope.reference?_prevScope.reference:base);
 			} else if (cmd == "scope") {
 				doReturn(_saved["returned"], true);
 			} else if (cmd == "base") {
@@ -185,12 +189,12 @@ package com.luaye.console.core {
 		}
 		private function doReturn(returned:*, force:Boolean = false):void{
 			var newb:Boolean = false;
-			var typ:String = typeof(returned);
 			if(returned != null){
+				var typ:String = typeof(returned);
 				_saved.set("returned", returned, true);
 				if(returned !== _scope && (force || typ == "object" || typ=="xml")){
 					newb = true;
-					_prevScope = _scope;
+					_prevScope.reference = _scope;
 					_scope = returned;
 					dispatchEvent(new Event(CHANGED_SCOPE));
 				}

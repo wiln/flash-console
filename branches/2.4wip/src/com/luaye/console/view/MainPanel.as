@@ -650,7 +650,7 @@ package com.luaye.console.view {
 		}
 		public function onChannelPressed(chn:String):void{
 			var current:Array = master.viewingChannels.concat();
-			if(_shift && master.viewingChannel != Console.GLOBAL_CHANNEL && chn != Console.GLOBAL_CHANNEL){
+			if(_shift && master.viewingChannels[0] != Console.GLOBAL_CHANNEL && chn != Console.GLOBAL_CHANNEL){
 				var ind:int = current.indexOf(chn);
 				if(ind>=0){
 					current.splice(ind,1);
@@ -662,7 +662,7 @@ package com.luaye.console.view {
 				}
 				master.viewingChannels = current;
 			}else{
-				master.viewingChannel = chn;
+				master.viewingChannels = [chn];
 			}
 		}
 		//

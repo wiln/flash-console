@@ -34,6 +34,7 @@ http://code.google.com/p/flash-console/issues/
 == Change Log ==
 
 ===2.31===
+  * viewingChannel no longer used. now only using viewingChannels
   * Added support for additional commandline operations, such as + - & | ^ += ,etc
   * CommandLine should now try to execute `AS3` namespaced methods such as ones in XML (E4X) 
   * Added commandLine syntax such as /savestrong /scope. type /help in commandline for info.

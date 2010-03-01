@@ -115,6 +115,10 @@ package com.luaye.console {
 			priorityC2 = 0xFFEEDD;
 		}
 		
+		
+		
+		
+		
 		//
 		// Used by console at init.
 		//

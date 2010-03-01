@@ -54,7 +54,7 @@ package com.luaye.console.view {
 		public var lowest:Number;
 		public var highest:Number;
 		public var averaging:uint;
-		public var startOffset:int = 6;
+		public var startOffset:int = 5;
 		public var inverse:Boolean;
 		//
 		public function GraphingPanel(m:Console, W:int = 0, H:int = 0, resizable:Boolean = true) {
