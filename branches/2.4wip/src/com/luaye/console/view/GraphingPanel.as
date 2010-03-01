@@ -121,10 +121,11 @@ package com.luaye.console.view {
 			start();
 		}
 		public function remove(obj:Object = null, prop:String = null):void{
-			for(var X:String in _interests){
-				var interest:Interest = _interests[X];
-				if(interest && (interest.obj == null || interest.obj == obj) && (prop == null || interest.prop == prop)){
-					_interests.splice(int(X), 1);
+			var all:Boolean = (obj==null&&prop==null);
+			for(var i:int = _interests.length-1;i>=0;i--){
+				var interest:Interest = _interests[i];
+				if(all || (interest && (obj == null || interest.obj == obj) && (prop == null || interest.prop == prop))){
+					_interests.splice(i, 1);
 				}
 			}
 			if(_interests.length==0){
