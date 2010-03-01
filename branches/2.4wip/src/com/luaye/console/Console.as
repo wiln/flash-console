@@ -23,6 +23,9 @@
 * 
 */
 package com.luaye.console {
+	import com.luaye.console.core.UserData;
+
+	import flash.net.SharedObject;
 	import flash.text.StyleSheet;
 
 	import com.luaye.console.core.CommandLine;
@@ -63,6 +66,9 @@ package com.luaye.console {
 		// Start with _ to work in any domain + platform (air/swf - local / network)
 		// Change BEFORE starting remote / remoting
 		public static var REMOTING_CONN_NAME:String = "_Console";
+		// You can change this if you want to use different Shared data
+		// Change BEFORE starting console.
+		public static var SharedObjectName:String = "com/luaye/Console/UserData";
 		//
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "~";
@@ -83,6 +89,7 @@ package com.luaye.console {
 		public var css:StyleSheet;
 		public var panels:PanelsManager;
 		public var cl:CommandLine;
+		public var ud:UserData;
 		private var mm:MemoryMonitor;
 		private var remoter:Remoting;
 		//
@@ -102,6 +109,7 @@ package com.luaye.console {
 		private var _remotingPassword:String = "";
 		private var _tracing:Boolean = false;
 		private var _filterText:String;
+		private var _filterRegExp:RegExp;
 		private var _keyBinds:Object = {};
 		private var _mspf:Number;
 		private var _previousTime:Number;
@@ -136,6 +144,7 @@ package com.luaye.console {
 			_remotingPassword = pass; // can change later using 'remotingPassword'.
 			//
 			_lines = new Logs();
+			ud = new UserData(SharedObjectName,"/");
 			cl = new CommandLine(this);
 			remoter = new Remoting(this, remoteLogSend);
 			mm = new MemoryMonitor();
@@ -563,6 +572,7 @@ package com.luaye.console {
 					_viewingChannels[0] == Console.GLOBAL_CHANNEL
 			 		|| _viewingChannels.indexOf(line.c)>=0 
 			 		|| (_filterText && _viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 && line.text.toLowerCase().indexOf(_filterText.toLowerCase())>=0 )
+			 		|| (_filterRegExp && _viewingChannels.indexOf(Console.FILTERED_CHANNEL)>=0 && line.text.search(_filterRegExp)>=0 )
 			 	) 
 			 	&& ( _priority <= 0 || line.p >= _priority)
 			);
@@ -682,6 +692,7 @@ package com.luaye.console {
 		public function set filterText(str:String):void{
 			_filterText = str;
 			if(str){
+				_filterRegExp = null;
 				clear(FILTERED_CHANNEL);
 				_channels.splice(1,0,FILTERED_CHANNEL);
 				addLine("Filtering ["+str+"]", 10,FILTERED_CHANNEL);
@@ -691,8 +702,22 @@ package com.luaye.console {
 			}
 		}
 		public function get filterText():String{
-			return _filterText;
+			return _filterText?_filterText:(_filterRegExp?String(_filterRegExp):null);
 		}
+		//
+		public function set filterRegExp(exp:RegExp):void{
+			_filterRegExp = exp;
+			if(exp){
+				_filterText = null;
+				clear(FILTERED_CHANNEL);
+				_channels.splice(1,0,FILTERED_CHANNEL);
+				addLine("Filtering RegExp ["+exp+"]", 10,FILTERED_CHANNEL);
+				viewingChannels = [FILTERED_CHANNEL];
+			}else if(_viewingChannels.length == 1 && _viewingChannels[0] == FILTERED_CHANNEL){
+				viewingChannels = [GLOBAL_CHANNEL];
+			}
+		}
+		//
 		public function clear(channel:String = null):void{
 			if(channel){
 				var line:Log = _lines.first;
@@ -709,7 +734,7 @@ package com.luaye.console {
 				_channels.splice(0);
 				_channels.push(GLOBAL_CHANNEL, DEFAULT_CHANNEL);
 			}
-			panels.mainPanel.updateToBottom();
+			if(!_isPaused) panels.mainPanel.updateToBottom();
 			panels.updateMenu();
 		}
 		public function getLogsAsObjects():Array{

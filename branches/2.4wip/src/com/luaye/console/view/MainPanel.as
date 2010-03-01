@@ -99,7 +99,7 @@ package com.luaye.console.view {
 		private var _channels:Array;
 		private var _lines:Logs;
 		private var _commandsHistory:Array = [];
-		private var _commandsInd:int;
+		private var _commandsInd:int = -1;
 		
 		private var _needUpdateMenu:Boolean;
 		private var _needUpdateTrace:Boolean;
@@ -113,6 +113,9 @@ package com.luaye.console.view {
 			var fsize:int = m.style.menuFontSize;
 			_channels = channels;
 			_lines = lines;
+			_commandsHistory = m.ud.commandLineHistory;
+			
+			
 			name = Console.PANEL_MAIN;
 			minimumWidth = 50;
 			minimumHeight = 18;
@@ -678,14 +681,21 @@ package com.luaye.console.view {
 					_commandField.text = "";
 					requestLogin(false);
 				}else{
-					master.runCommand(_commandField.text);
-					_commandsHistory.unshift(_commandField.text);
+					var txt:String = _commandField.text;
+					master.runCommand(txt);
+					var i:int = _commandsHistory.indexOf(txt);
+					while(i>=0){
+						_commandsHistory.splice(i,1);
+						i = _commandsHistory.indexOf(txt);
+					}
+					_commandsHistory.unshift(txt);
 					_commandsInd = -1;
 					_commandField.text = "";
 					// maximum 20 commands history
 					if(_commandsHistory.length>20){
 						_commandsHistory.splice(20);
 					}
+					master.ud.commandLineHistoryChanged();
 				}
 			}if( e.keyCode == Keyboard.ESCAPE){
 				if(stage) stage.focus = null;

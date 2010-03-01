@@ -163,7 +163,9 @@ package com.luaye.console.core {
 				}
 				report("Found "+sii+" item(s), "+sii2+" empty (or garbage collected).", -1);
 			} else if (cmd == "filter" || cmd == "search") {
-				_master.filterText = str.substring(8);
+				_master.filterText = param;
+			} else if (cmd == "filterexp" || cmd == "searchexp") {
+				_master.filterRegExp = new RegExp(param, "i");
 			} else if (cmd == "inspect" || cmd == "inspectfull") {
 				if (_scope) {
 					var viewAll:Boolean = (cmd == "inspectfull")? true: false;

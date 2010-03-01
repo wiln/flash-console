@@ -30,6 +30,22 @@ package com.luaye.console.core {
 
 	public class CommandExec {
 		
+		
+		
+		
+		public static function Exec(scope:Object, str:String, saved:Object = null, reserved:Array = null):*{
+			var e:CommandExec = new CommandExec();
+			return e.exec(scope, str, saved, reserved).pop();
+		}
+		
+		
+		public static function Execs(scope:Object, str:String, saved:Object = null, reserved:Array = null):Array{
+			var e:CommandExec = new CommandExec();
+			return e.exec(scope, str, saved, reserved);
+		}
+		
+		
+		
 		private static const VALUE_CONST:String = "#";
 		
 		private var _saved:Object;
@@ -39,14 +55,6 @@ package com.luaye.console.core {
 		private var _returns:Array;
 		private var _running:Boolean;
 		
-		public static function Exec(scope:Object, str:String, saved:Object = null, reserved:Array = null):*{
-			var e:CommandExec = new CommandExec();
-			return e.exec(scope, str, saved, reserved).pop();
-		}
-		public static function Execs(scope:Object, str:String, saved:Object = null, reserved:Array = null):Array{
-			var e:CommandExec = new CommandExec();
-			return e.exec(scope, str, saved, reserved);
-		}
 		
 		// com.luaye.console.C.instance.visible
 		// com.luaye.console.C.instance.addGraph('test',stage,'mouseX')
