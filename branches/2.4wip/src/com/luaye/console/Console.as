@@ -66,7 +66,7 @@ package com.luaye.console {
 		// Start with _ to work in any domain + platform (air/swf - local / network)
 		// Change BEFORE starting remote / remoting
 		public static var REMOTING_CONN_NAME:String = "_Console";
-		// You can change this if you want to use different Shared data
+		// You can change this if you want to use different Shared data. set to null to avoid using.
 		// Change BEFORE starting console.
 		public static var SharedObjectName:String = "com/luaye/Console/UserData";
 		//

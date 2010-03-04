@@ -9,15 +9,16 @@ package com.luaye.console.core {
 		private static const COMMANDLINE_HISTORY_KEY:String = "clhistory";
 		
 		private var _so:SharedObject;
-		private var _data:Object;
+		private var _data:Object = {};
 		
 		public function UserData(name:String, localPath:String = null){
-			try{
-				_so = SharedObject.getLocal(name, localPath);
-				_data = _so.data;
-			}catch(e:Error){
-				_so = null;
-				_data = {};
+			if(name){
+				try{
+					_so = SharedObject.getLocal(name, localPath);
+					_data = _so.data;
+				}catch(e:Error){
+					
+				}
 			}
 		}
 		
