@@ -23,7 +23,6 @@
 * 
 */
 package com.luaye.console.view {
-	import com.luaye.console.core.Logs;
 	import com.luaye.console.Console;
 
 	import flash.events.Event;

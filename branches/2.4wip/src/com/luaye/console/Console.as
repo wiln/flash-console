@@ -47,6 +47,12 @@ package com.luaye.console {
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 
+	/**
+	 * Console is the main class. 
+	 * Please see com.luaye.console.C for documentation as it shares the same properties and methods structure.
+	 * @see http://code.google.com/p/flash-console/
+	 * @see com.luaye.console.C
+	 */
 	public class Console extends Sprite {
 
 		public static const VERSION:Number = 2.4;

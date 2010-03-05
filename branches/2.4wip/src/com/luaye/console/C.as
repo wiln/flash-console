@@ -80,7 +80,7 @@ package com.luaye.console {
 	 * In a later date when Console is no longer needed, remove C.start(..) or C.startOnStage(..) 
 	 * and the rest of console related codes will stop executing to save memory and performance.
 	 * @author  Lu Aye Oo
-	 * @version 2.2
+	 * @version 2.4
 	 * @see http://code.google.com/p/flash-console/
 	 * @see #start()
 	 * @see #startOnStage()

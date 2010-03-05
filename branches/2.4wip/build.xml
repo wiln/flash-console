@@ -58,7 +58,9 @@
         <mkdir dir="${asdoc.target.dir}" />
 		<exec executable="${asdoc.exe}" failonerror="true">
             <arg line="-output '${asdoc.target.dir}'" />
-			<arg line="-doc-sources '${src.path}'" />
+			<arg line="-source-path '${src.path}'" />
+			<arg line="-doc-classes com.luaye.console.C com.luaye.console.Console com.luaye.console.ConsoleStyle com.luaye.console.Ch" />
+			<arg line="-exclude-dependencies" />
 			<arg line="-main-title 'Flash-Console v${src.version}'" />
             <arg line="-window-title 'Flash-Console v${src.version}'" />
             <arg line="-footer 'Flash-Console v${src.version}'" />
