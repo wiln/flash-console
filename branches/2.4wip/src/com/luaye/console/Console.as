@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console {
+	import com.luaye.console.view.MainPanel;
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Log;
 	import com.luaye.console.core.Logs;
@@ -58,18 +59,9 @@ package com.luaye.console {
 		public static const PANEL_MEMORY:String = "memoryPanel";
 		public static const PANEL_ROLLER:String = "rollerPanel";
 		//
-		// You can change this if you don't want to use default channel
-		// Other remotes with different remoting channel won't be able to connect your flash.
-		// Start with _ to work in any domain + platform (air/swf - local / network)
-		// Change BEFORE starting remote / remoting
-		public static var REMOTING_CONN_NAME:String = "_Console";
-		// You can change this if you want to use different Shared data. set to null to avoid using.
-		// Change BEFORE starting console.
-		public static var SharedObjectName:String = "com/luaye/Console/UserData";
-		//
+		public static const GLOBAL_CHANNEL:String = " * ";
 		public static const CONSOLE_CHANNEL:String = "C";
 		public static const FILTERED_CHANNEL:String = "~";
-		public static const GLOBAL_CHANNEL:String = " * ";
 		public static const DEFAULT_CHANNEL:String = "-";
 		//
 		public static const LOG_LEVEL:uint = 1;
@@ -82,13 +74,22 @@ package com.luaye.console {
 		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		public static const MAPPING_SPLITTER:String = "|";
 		//
+		// You can change this if you don't want to use default channel
+		// Other remotes with different remoting channel won't be able to connect your flash.
+		// Start with _ to work in any domain + platform (air/swf - local / network)
+		// Change BEFORE starting remote / remoting
+		public static var RemotingConnectionName:String = "_Console";
+		// You can change this if you want to use different Shared data. set to null to avoid using.
+		// Change BEFORE starting console.
+		public static var SharedObjectName:String = "com/luaye/Console/UserData";
+		//
 		public var style:ConsoleStyle;
 		public var css:StyleSheet;
 		public var panels:PanelsManager;
 		public var cl:CommandLine;
 		public var ud:UserData;
-		private var mm:MemoryMonitor;
-		private var remoter:Remoting;
+		private var _mm:MemoryMonitor;
+		private var _remoter:Remoting;
 		//
 		public var quiet:Boolean;
 		public var maxLines:int = 1000;
@@ -103,7 +104,6 @@ package com.luaye.console {
 		private var _isPaused:Boolean;
 		private var _password:String;
 		private var _passwordIndex:int;
-		private var _remotingPassword:String = "";
 		private var _tracing:Boolean = false;
 		private var _filterText:String;
 		private var _filterRegExp:RegExp;
@@ -138,21 +138,24 @@ package com.luaye.console {
 			if(pass == null) pass = "";
 			tabChildren = false; // Tabbing is not supported
 			_password = pass;
-			_remotingPassword = pass; // can change later using 'remotingPassword'.
 			//
 			_lines = new Logs();
 			ud = new UserData(SharedObjectName,"/");
 			cl = new CommandLine(this);
-			remoter = new Remoting(this, remoteLogSend);
-			mm = new MemoryMonitor();
+			_remoter = new Remoting(this, remoteLogSend, pass);
+			//
+			// VIEW setup
 			style = skin?skin:new ConsoleStyle();
 			generateCSS();
-			panels = new PanelsManager(this, _lines, _channels, _viewingChannels);
+			var mainPanel:MainPanel = new MainPanel(this, _lines, _channels, _viewingChannels);
+			mainPanel.addEventListener(Event.CONNECT, onMainPanelConnectRequest, false, 0, true);
+			panels = new PanelsManager(this, mainPanel, _channels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy bug fixing!</b>", -2);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			if(_password) visible = false;
 		}
+
 		private function stageAddedHandle(e:Event=null):void{
 			if(cl.base == null) cl.base = parent;
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
@@ -195,16 +198,12 @@ package com.luaye.console {
 			}
 		}
 		public function destroy():void{
-			remoter.close();
+			_remoter.close();
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			cl.destory();
 		}
-		
-		//
-		// Used by console at init.
-		//
 		private function generateCSS():void{
 			css = new StyleSheet();
 			with(style){
@@ -271,13 +270,13 @@ package com.luaye.console {
 		private function getKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):String{
 			return char.toLowerCase()+(ctrl?"1":"0")+(alt?"1":"0")+(shift?"1":"0");
 		}
-		public function setPanelArea(panelname:String, rect:Rectangle):void{
-			panels.setPanelArea(panelname, rect);
-		}
 		//
 		// Panel settings
 		// basically passing through to panels manager to save lines
 		//
+		public function setPanelArea(panelname:String, rect:Rectangle):void{
+			panels.setPanelArea(panelname, rect);
+		}
 		public function get channelsPanel():Boolean{
 			return panels.channelsPanel;
 		}
@@ -327,24 +326,25 @@ package com.luaye.console {
 		public function watch(o:Object,n:String = null):String{
 			var className:String = getQualifiedClassName(o);
 			if(!n) n = className+"@"+getTimer();
-			var nn:String = mm.watch(o,n);
+			if(!_mm) _mm = new MemoryMonitor();
+			var nn:String = _mm.watch(o,n);
 			if(!quiet)
 				report("Watching <b>"+className+"</b> as <p5>"+ nn +"</p5>.",-1);
 			return nn;
 		}
 		public function unwatch(n:String):void{
-			mm.unwatch(n);
+			if(_mm) _mm.unwatch(n);
 		}
 		public function gc():void{
 			if(remote){
 				try{
 					report("Sending garbage collection request to client",-1);
-					remoter.send("gc");
+					_remoter.send("gc");
 				}catch(e:Error){
 					report(e,10);
 				}
 			}else{
-				var ok:Boolean = mm.gc();
+				var ok:Boolean = MemoryMonitor.Gc();
 				var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
 				report(str,(ok?-1:10));
 			}
@@ -409,7 +409,7 @@ package com.luaye.console {
 			_mspf = time-_previousTime;
 			_previousTime = time;
 			
-			if(alwaysOnTop && moveTopAttempts>0 && parent && parent.getChildAt(parent.numChildren-1) != this){
+			if(alwaysOnTop && parent && parent.getChildAt(parent.numChildren-1) != this && moveTopAttempts>0){
 				moveTopAttempts--;
 				parent.addChild(this);
 				if(!quiet){
@@ -422,24 +422,23 @@ package com.luaye.console {
 					_isRepeating = false;
 				}
 			}
-			if(!_isPaused){
-				var arr:Array = mm.update();
+			if(!_isPaused && _mm!=null){
+				var arr:Array = _mm.update();
 				if(arr.length>0){
 					report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
+					if(!_mm.haveItemsWatching) _mm = null;
 				}
 			}
 			if(visible){
 				panels.mainPanel.update(!_isPaused && _lineAdded);
 				if(_lineAdded) {
 					var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
-					if(chPanel){
-						chPanel.update();
-					}
+					if(chPanel) chPanel.update();
 					_lineAdded = false;
 				}
 			}
-			if(remoter.remoting){
-				remoter.update(_mspf, stage?stage.frameRate:0);
+			if(_remoter.remoting){
+				_remoter.update(_mspf, stage?stage.frameRate:0);
 			}
 		}
 		public function get fps():Number{
@@ -449,32 +448,29 @@ package com.luaye.console {
 			return _mspf;
 		}
 		public function get currentMemory():uint {
-			return remoter.isRemote?remoter.remoteMem:System.totalMemory;
+			return _remoter.isRemote?_remoter.remoteMem:System.totalMemory;
 		}
 		//
 		// REMOTING
 		//
 		public function get remoting():Boolean{
-			return remoter.remoting;
+			return _remoter.remoting;
 		}
 		public function set remoting(newV:Boolean):void{
-			remoter.remoting = newV;
+			_remoter.remoting = newV;
 		}
 		public function get remote():Boolean{
-			return remoter.isRemote;
+			return _remoter.isRemote;
 		}
 		public function set remote(newV:Boolean):void{
-			remoter.isRemote = newV;
+			_remoter.isRemote = newV;
 			panels.updateMenu();
 		}
-		public function sendLogin(pass:String):void{
-			remoter.login(pass);
-		}
-		public function checkLogin(pass:String):Boolean{
-			return (!_remotingPassword || _remotingPassword == pass);
-		}
 		public function set remotingPassword(str:String):void{
-			_remotingPassword = str;
+			_remoter.remotingPassword = str;
+		}
+		private function onMainPanelConnectRequest(e:Event) : void {
+			_remoter.login(MainPanel(e.currentTarget).commandLineText);
 		}
 		//
 		// this is sent from client for remote...
@@ -483,7 +479,7 @@ package com.luaye.console {
 		// obj[2] = client's current memory usage
 		// obj[3] = client's command line scope - string
 		private function remoteLogSend(obj:Array):void{
-			if(!remoter.isRemote || !obj) return;
+			if(!_remoter.isRemote || !obj) return;
 			var lines:Array = obj[0];
 			for each( var line:Object in lines){
 				if(line){
@@ -508,7 +504,7 @@ package com.luaye.console {
 					fpsp.drawGraph();
 				}
 			}
-			remoter.remoteMem = obj[2];
+			_remoter.remoteMem = obj[2];
 			if(obj[3]){ 
 				// older clients don't send CL scope
 				panels.mainPanel.updateCLScope(obj[3]);
@@ -524,7 +520,6 @@ package com.luaye.console {
 			_viewingChannels.splice(0);
 			if(a && a.length) {
 				if(a.indexOf(GLOBAL_CHANNEL)>=0) a = [GLOBAL_CHANNEL];
-				//_viewingChannels.push.apply(this, a);
 				for each(var item:Object in a) _viewingChannels.push(item is Ch?(Ch(item).name):String(item));
 			} else _viewingChannels.push(GLOBAL_CHANNEL);
 			panels.mainPanel.updateToBottom();
@@ -595,8 +590,8 @@ package com.luaye.console {
 			_lineAdded = true;
 			_isRepeating = isRepeating;
 			
-			if(remoter.remoting){
-				remoter.addLineQueue(line);
+			if(_remoter.remoting){
+				_remoter.addLineQueue(line);
 			}
 		}
 		public function lineShouldShow(line:Log):Boolean{
@@ -648,10 +643,10 @@ package com.luaye.console {
 			return cl.base;
 		}
 		public function runCommand(line:String):*{
-			if(remoter.isRemote){
+			if(_remoter.isRemote){
 				report("Run command at remote: "+line,-2);
 				try{
-					remoter.send("runCommand", line);
+					_remoter.send("runCommand", line);
 				}catch(err:Error){
 					report("Command could not be sent to client: " + err, 10);
 				}
@@ -791,7 +786,7 @@ package com.luaye.console {
 			var sCon:LocalConnection = new LocalConnection();
 			try{
 				sCon.allowInsecureDomain("*");
-				sCon.connect(REMOTING_CONN_NAME+Remoting.REMOTE_PREFIX);
+				sCon.connect(RemotingConnectionName+Remoting.REMOTE_PREFIX);
 			}catch(error:Error){
 				return true;
 			}

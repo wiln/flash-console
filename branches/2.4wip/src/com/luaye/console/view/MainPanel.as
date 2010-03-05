@@ -258,24 +258,22 @@ package com.luaye.console.view {
 			_enteringLogin = on;
 		}
 		public function update(changed:Boolean):void{
-			//if(visible){
-				if(_bottomLine.alpha>0){
-					_bottomLine.alpha -= 0.25;
-				}
-				if(changed){
-					_bottomLine.alpha = 1;
-					_needUpdateMenu = true;
-					_needUpdateTrace = true;
-				}
-				if(_needUpdateTrace){
-					_needUpdateTrace = false;
-					_updateTraces(true);
-				}
-				if(_needUpdateMenu){
-					_needUpdateMenu = false;
-					_updateMenu();
-				}
-			//}
+			if(_bottomLine.alpha>0){
+				_bottomLine.alpha -= 0.25;
+			}
+			if(changed){
+				_bottomLine.alpha = 1;
+				_needUpdateMenu = true;
+				_needUpdateTrace = true;
+			}
+			if(_needUpdateTrace){
+				_needUpdateTrace = false;
+				_updateTraces(true);
+			}
+			if(_needUpdateMenu){
+				_needUpdateMenu = false;
+				_updateMenu();
+			}
 		}
 		public function updateToBottom():void{
 			_atBottom = true;
@@ -679,7 +677,7 @@ package com.luaye.console.view {
 		private function commandKeyUp(e:KeyboardEvent):void{
 			if( e.keyCode == Keyboard.ENTER){
 				if(_enteringLogin){
-					master.sendLogin(_commandField.text);
+					dispatchEvent(new Event(Event.CONNECT));
 					_commandField.text = "";
 					requestLogin(false);
 				}else{
@@ -729,6 +727,9 @@ package com.luaye.console.view {
 		}
 		private function onUpdateCommandLineScope(e:Event=null):void{
 			if(!master.remote) updateCLScope(master.cl.scopeString);
+		}
+		public function get commandLineText():String{
+			return _commandField.text;
 		}
 		public function updateCLScope(str:String):void{
 			if(_enteringLogin) {

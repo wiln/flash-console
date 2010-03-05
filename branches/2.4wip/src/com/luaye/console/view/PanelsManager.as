@@ -43,8 +43,9 @@ package com.luaye.console.view {
 		
 		private var _tooltipField:TextField;
 		
-		public function PanelsManager(master:Console, lines:Logs, channels:Array, chanviews:Array) {
+		public function PanelsManager(master:Console, mp:MainPanel, channels:Array) {
 			_master = master;
+			_mainPanel = mp;
 			_channels = channels;
 			_tooltipField = new TextField();
 			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
@@ -53,7 +54,6 @@ package com.luaye.console.view {
 			_tooltipField.backgroundColor = _master.style.backgroundColor;
 			_tooltipField.styleSheet = _master.css;
 			_tooltipField.mouseEnabled = false;
-			_mainPanel = new MainPanel(master, lines, channels, chanviews);
 			addPanel(_mainPanel);
 		}
 		public function addPanel(panel:AbstractPanel):void{
