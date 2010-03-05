@@ -29,7 +29,7 @@ package com.luaye.console {
 	 */
 	public class Ch {
 		
-		private var _c:*; // because it could be Console or C
+		private var _c:*; // because it could be Console or C. This is the cheapest way I think...
 		private var _name:String;
 		
 		public function Ch(n:String = null, c:Console = null){

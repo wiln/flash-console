@@ -59,14 +59,6 @@ package {
 			C.fpsMonitor = true;
 			C.remoting = true;
 			C.displayRoller = true;
-			
-			TextField(txtPriority).restrict = "0-9";
-			TextField(txtPriority2).restrict = "0-9";
-			setUpButton(btnInterval, "Start interval");
-			setUpButton(btnAdd1, "Add");
-			setUpButton(btnAdd2, "Add");
-			setUpButton(btnSpam, "Spam");
-			
 			//
 			// BASICS
 			//
@@ -128,6 +120,21 @@ package {
 			// it probably won't get garbage collected straight away,
 			// but if you have debugger version of flash player installed,
 			// you can open memory monitor (M) and then press G in that panel to force garbage collect
+			
+			
+			//
+			// End of console related sample
+			//
+			setupUI();
+		}
+		private function setupUI():void{
+			TextField(txtPriority).restrict = "0-9";
+			TextField(txtPriority2).restrict = "0-9";
+			setUpButton(btnInterval, "Start interval");
+			setUpButton(btnAdd1, "Add");
+			setUpButton(btnAdd2, "Add");
+			setUpButton(btnSpam, "Spam");
+			
 		}
 		private function setUpButton(btn:MovieClip, t:String):void{
 			btn.stop();
