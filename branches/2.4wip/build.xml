@@ -1,15 +1,10 @@
 <project name="Console" basedir=".">
+	<property file="local.properties"/>
 	
-	<property name="TEMP_DIR" value="temp" />
-	<property name="TEMP_WIKI_DIR" value="tempwiki" />
-	<property name="SVN_ANT_PATH" value="D:/Program Files (x86)/eclipse/svnant/lib" />
-	<property name="PROJECT_WIKI" value="..\wiki" />
-	
-	
-	<path id= "svnant.classpath" >
-	<fileset dir= "${SVN_ANT_PATH}" >
-         <include name= "*.jar" />
-	</fileset>
+	<path id="svnant.classpath" >
+		<fileset dir="${svnant.path}" >
+	         <include name= "*.jar" />
+		</fileset>
 	</path>
 	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
 	
@@ -20,15 +15,16 @@
 		- delete temp/ and temp2/
 	-->
 	<target name="zip">
-		<delete dir="${TEMP_DIR}"/>
+		<delete dir="${temp.dir}"/>
 		<svn>
-			<export srcPath="${basedir}" destPath="${TEMP_DIR}"/>
+			<export srcPath="${basedir}" destPath="${temp.dir}"/>
 		</svn>
-		<delete file="${TEMP_DIR}/build.xml"/>
-		<zip destfile="console.zip">
-			<fileset dir="${basedir}/${TEMP_DIR}"/>
+		<delete file="${temp.dir}/build.xml"/>
+		<delete file="${temp.dir}/local.properties"/>
+		<zip destfile="console${src.version}.zip">
+			<fileset dir="${basedir}/${temp.dir}"/>
 		</zip>
-		<delete dir="${TEMP_DIR}"/>
+		<delete dir="${temp.dir}"/>
 	</target>
 	
 	
@@ -38,15 +34,15 @@
 		- delete ./tempwiki
 	-->
 	<target name="updateWiki">
-		<delete dir="${TEMP_WIKI_DIR}"/>
+		<delete dir="${temp.wikidir}"/>
 		<svn>
-			<export srcPath="${PROJECT_WIKI}" destPath="${TEMP_WIKI_DIR}"/>
+			<export srcPath="${wiki.dir}" destPath="${temp.wikidir}"/>
 		</svn>
 		<move todir="${basedir}/doc" includeemptydirs="false">
-    		<fileset dir="${TEMP_WIKI_DIR}"/>
+    		<fileset dir="${temp.wikidir}"/>
 			<mapper type="glob" from="*.wiki" to="*.txt"/>
 		</move>
-		<delete dir="${TEMP_WIKI_DIR}"/>
+		<delete dir="${temp.wikidir}"/>
 	</target>
 	
 	
@@ -59,23 +55,37 @@
 		- delete temp/ and temp2/
 	-->
 	<target name="updateWikiAndZip">
-		<delete dir="${TEMP_DIR}"/>
-		<delete dir="${TEMP_WIKI_DIR}"/>
+		<delete dir="${temp.dir}"/>
+		<delete dir="${temp.wikidir}"/>
 		<svn>
-			<export srcPath="${basedir}" destPath="${TEMP_DIR}"/>
+			<export srcPath="${basedir}" destPath="${temp.dir}"/>
 		</svn>
-		<delete file="${TEMP_DIR}/build.xml"/>
+		<delete file="${temp.dir}/build.xml"/>
 		<svn>
-			<export srcPath="${PROJECT_WIKI}" destPath="${TEMP_WIKI_DIR}"/>
+			<export srcPath="${wiki.dir}" destPath="${temp.wikidir}"/>
 		</svn>
-		<move todir="${TEMP_DIR}/doc" includeemptydirs="false">
-    		<fileset dir="${TEMP_WIKI_DIR}"/>
+		<move todir="${temp.dir}/doc" includeemptydirs="false">
+    		<fileset dir="${temp.wikidir}"/>
 			<mapper type="glob" from="*.wiki" to="*.txt"/>
 		</move>
 		<zip destfile="console.zip">
-			<fileset dir="${basedir}/${TEMP_DIR}"/>
+			<fileset dir="${basedir}/${temp.dir}"/>
 		</zip>
-		<delete dir="${TEMP_DIR}"/>
-		<delete dir="${TEMP_WIKI_DIR}"/>
+		<delete dir="${temp.dir}"/>
+		<delete dir="${temp.wikidir}"/>
+	</target>
+	
+	<target name="compileASDoc">
+        <delete dir="${asdoc.target.dir}" failOnError="false" includeEmptyDirs="true" />
+        <mkdir dir="${asdoc.target.dir}" />
+		<echo>ASDoc Compiling...</echo>
+		<exec executable="${asdoc.exe}" failonerror="true">
+            <arg line="-output '${asdoc.target.dir}'" />
+			<arg line="-doc-sources '${src.path}'" />
+			<arg line="-main-title 'Flash-Console ${src.version}'" />
+            <arg line="-window-title 'Flash-Console ${src.version}'" />
+            <arg line="-footer '$Flash-Console ${src.version}'" />
+		</exec>
+		<echo>ASDoc Compiled</echo>
 	</target>
 </project>

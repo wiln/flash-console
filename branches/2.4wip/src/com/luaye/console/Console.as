@@ -23,16 +23,12 @@
 * 
 */
 package com.luaye.console {
-	import com.luaye.console.core.UserData;
-
-	import flash.net.SharedObject;
-	import flash.text.StyleSheet;
-
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Log;
 	import com.luaye.console.core.Logs;
 	import com.luaye.console.core.MemoryMonitor;
 	import com.luaye.console.core.Remoting;
+	import com.luaye.console.core.UserData;
 	import com.luaye.console.utils.Utils;
 	import com.luaye.console.view.ChannelsPanel;
 	import com.luaye.console.view.FPSPanel;
@@ -46,6 +42,7 @@ package com.luaye.console {
 	import flash.geom.Rectangle;
 	import flash.net.LocalConnection;
 	import flash.system.System;
+	import flash.text.StyleSheet;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 
@@ -149,7 +146,7 @@ package com.luaye.console {
 			remoter = new Remoting(this, remoteLogSend);
 			mm = new MemoryMonitor();
 			style = skin?skin:new ConsoleStyle();
-			css = ConsoleStyle.generateCSS(style);
+			generateCSS();
 			panels = new PanelsManager(this, _lines, _channels, _viewingChannels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy bug fixing!</b>", -2);
@@ -204,6 +201,39 @@ package com.luaye.console {
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			cl.destory();
 		}
+		
+		//
+		// Used by console at init.
+		//
+		private function generateCSS():void{
+			css = new StyleSheet();
+			with(style){
+				css.setStyle("r",{textAlign:'right', display:'inline'});
+				css.setStyle("w",{color:hesh(highColor), fontFamily:menuFont, fontSize:menuFontSize, display:'inline'});
+				css.setStyle("s",{color:hesh(lowColor), fontFamily:menuFont, fontSize:menuFontSize-2, display:'inline'});
+				css.setStyle("hi",{color:hesh(menuHighlightColor), display:'inline'});
+				css.setStyle("menu",{color:hesh(menuColor), display:'inline'});
+				css.setStyle("chs",{color:hesh(channelsColor), fontSize:menuFontSize, leading:'2', display:'inline'});
+				css.setStyle("ch",{color:hesh(channelColor), display:'inline'});
+				css.setStyle("tooltip",{color:hesh(tooltipColor),fontFamily:menuFont,fontSize:menuFontSize, textAlign:'center'});
+				css.setStyle("p",{fontFamily:traceFont, fontSize:traceFontSize});
+				css.setStyle("p0",{color:hesh(priority0), display:'inline'});
+				css.setStyle("p1",{color:hesh(priority1), display:'inline'});
+				css.setStyle("p2",{color:hesh(priority2), display:'inline'});
+				css.setStyle("p3",{color:hesh(priority3), display:'inline'});
+				css.setStyle("p4",{color:hesh(priority4), display:'inline'});
+				css.setStyle("p5",{color:hesh(priority5), display:'inline'});
+				css.setStyle("p6",{color:hesh(priority6), display:'inline'});
+				css.setStyle("p7",{color:hesh(priority7), display:'inline'});
+				css.setStyle("p8",{color:hesh(priority8), display:'inline'});
+				css.setStyle("p9",{color:hesh(priority9), display:'inline'});
+				css.setStyle("p10",{color:hesh(priority10), fontWeight:'bold', display:'inline'});
+				css.setStyle("p-1",{color:hesh(priorityC1), display:'inline'});
+				css.setStyle("p-2",{color:hesh(priorityC2), display:'inline'});
+			}
+		}
+		private function hesh(n:Number):String{return "#"+n.toString(16);}
+		
 		public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			if(obj == null) {
 				report("ERROR: Graph ["+n+"] received a null object to graph property ["+prop+"].", 10);

@@ -42,13 +42,11 @@ package {
 			//
 			// SET UP
 			
-			var style:ConsoleStyle = new ConsoleStyle();
-			//style.big();
-			//style.whiteBase();
+			var style:ConsoleStyle = new ConsoleStyle(); // optional.
+			//style.big(); // BIG text
+			//style.whiteBase(); // Black on white
 			
-			C.startOnStage(this, "`", style); 
-			// "`" - change for password. This will start hidden
-			C.remotingPassword = null;
+			C.startOnStage(this, "`", style); // "`" - change for password. This will start hidden
 			C.visible = true; // show console, because having password hides console.
 			//C.tracing = true; // trace on flash's normal trace
 			C.commandLine = true; // enable command line
@@ -59,6 +57,7 @@ package {
 			C.fpsMonitor = true;
 			C.remoting = true;
 			C.displayRoller = true;
+			C.remotingPassword = null; // Just so that remote don't ask for password
 			//
 			// BASICS
 			//
@@ -67,14 +66,15 @@ package {
 			C.debug("A debug level log.");
 			C.warn("This is a warning log.");
 			C.error("This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
+			C.fatal("This is a fatal error log.", "with high visibility");
 			//
 			// basic channel logging
 			//
 			C.infoch("myChannel", "Hello myChannel.");
 			C.logch("myChannel", "A log message at myChannel.", "optionally there", "can be", "multiple arguments.");
-			C.debugch("myChannel", "A debug level log.");
-			C.warnch("myChannel", "This is a warning log.");
-			C.errorch("myChannel", "This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
+			//C.debugch("myChannel", "A debug level log.");
+			//C.warnch("myChannel", "This is a warning log.");
+			//C.errorch("myChannel", "This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
 			//
 			// instanced channel
 			//
@@ -112,10 +112,9 @@ package {
 			
 			//
 			//
-			// garbage collection monitor
+			// Garbage collection monitor
 			var aSprite:Sprite = new Sprite();
 			C.watch(aSprite, "aSprite");
-			C.store("sprite", aSprite);
 			aSprite = null;
 			// it probably won't get garbage collected straight away,
 			// but if you have debugger version of flash player installed,
@@ -134,7 +133,6 @@ package {
 			setUpButton(btnAdd1, "Add");
 			setUpButton(btnAdd2, "Add");
 			setUpButton(btnSpam, "Spam");
-			
 		}
 		private function setUpButton(btn:MovieClip, t:String):void{
 			btn.stop();
