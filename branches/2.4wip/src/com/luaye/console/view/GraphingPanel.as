@@ -23,12 +23,10 @@
 * 
 */
 package com.luaye.console.view {
-	import flash.display.Graphics;
-
-	import com.luaye.console.core.CommandExec;
 	import com.luaye.console.Console;
 	import com.luaye.console.utils.Utils;
 
+	import flash.display.Graphics;
 	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.events.TextEvent;

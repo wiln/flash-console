@@ -44,10 +44,7 @@ package com.luaye.console.core {
 			return e.exec(scope, str, saved, reserved);
 		}
 		
-		
-		
 		private static const VALUE_CONST:String = "#";
-		
 		private var _saved:Object;
 		private var _reserved:Array;
 		private var _values:Array;
@@ -55,11 +52,11 @@ package com.luaye.console.core {
 		private var _returns:Array;
 		private var _running:Boolean;
 		
-		
+		// TEST CASES...
 		// com.luaye.console.C.instance.visible
 		// com.luaye.console.C.instance.addGraph('test',stage,'mouseX')
-		// test('simple stuff. what ya think?');
-		// test('He\'s cool! (not really)','',"yet 'another string', what ya think?");
+		// trace('simple stuff. what ya think?');
+		// trace('He\'s cool! (not really)','',"yet 'another string', what ya think?");
 		// this.getChildAt(0); 
 		// stage.addChild(root.addChild(this.getChildAt(0)));
 		// third(second(first('console'))).final(0).alpha;
@@ -97,7 +94,8 @@ package com.luaye.console.core {
 		private function _exec(str:String):void{
 			//
 			// STRIP strings - '...', "...", '', "", while ignoring \' \" etc inside.
-			var strReg:RegExp = /('(.*?)[^\\]')|("(.*?)[^\\]")|''|""/;
+			
+			var strReg:RegExp = /''|""|('(.*?)[^\\]')|("(.*?)[^\\]")/;
 			var result:Object = strReg.exec(str);
 			while(result != null){
 				var match:String = result[0];
@@ -105,9 +103,9 @@ package com.luaye.console.core {
 				var start:int = match.indexOf(quote);
 				var end:int = match.lastIndexOf(quote);
 				var string:String = match.substring(start+1,end).replace(/\\(.)/g, "$1");
-				//debug(VALUE_CONST+_values.length+" = "+string, 2, false);
-				//debug(str);
+				//trace(VALUE_CONST+_values.length+" = "+string);
 				str = tempValue(str,new Value(string), result.index+start, result.index+end+1);
+				//trace(str);
 				result = strReg.exec(str);
 			}
 			//
@@ -159,19 +157,19 @@ package com.luaye.console.core {
 					}
 					if(isfun){
 						var params:Array = inside.split(",");
+						//trace("#"+_values.length+" stores function params ["+params+"]");
 						line = tempValue(line,new Value(params), indOpen+1, indClose);
-						//debug("^"+_values.length+" stores function params ["+params+"]");
 						for(var X:String in params){
 							params[X] = execOperations(ignoreWhite(params[X])).value;
 						}
 					}else{
-						var groupv:* = new Value(groupv);
+						var groupv:Value = new Value(groupv);
+						//trace("#"+_values.length+" stores group value for "+inside);
 						line = tempValue(line,groupv, indOpen, indClose+1);
-						//debug("^"+_values.length+" stores group value for "+inside);
-						groupv.value = execOperations(ignoreWhite(inside)).value;
+						groupv.setValue(execOperations(ignoreWhite(inside)).value);
 					}
 					
-					//debug(line);
+					//trace(line);
 				}
 				indOpen = line.lastIndexOf("(", indOpen-1);
 			}
@@ -188,6 +186,7 @@ package com.luaye.console.core {
 			return v;
 		}
 		private function tempValue(str:String,v:*, indOpen:int, indClose:int):String{
+			//trace("tempValue", VALUE_CONST+_values.length, " = "+str);
 			str = Utils.replaceByIndexes(str, VALUE_CONST+_values.length, indOpen, indClose);
 			_values.push(v);
 			return str;
@@ -219,7 +218,7 @@ package com.luaye.console.core {
 					}
 				}
 			}
-			//debug("execOperations: "+seq);
+			//trace("execOperations: "+seq);
 			// EXEC values in sequence fisrt
 			var len:int = seq.length;
 			for(var i:int = 0;i<len;i+=2){
@@ -232,9 +231,10 @@ package com.luaye.console.core {
 			for(i = 1;i<len;i+=2){
 				op = seq[i];
 				if(op.replace(setter,"")!=""){
-					res = operate(seq[i-1].value, op, seq[i+1].value);
+					res = operate(seq[i-1], op, seq[i+1]);
 					//debug("operate: "+seq[i-1].value, op, seq[i+1].value, "=", res);
-					seq[i-1].value = res;
+					var sv:Value = Value(seq[i-1]);
+					sv.setValue(res);
 					seq.splice(i,2);
 					i-=2;
 					len-=2;
@@ -246,14 +246,11 @@ package com.luaye.console.core {
 			for(i = 1;i<len;i+=2){
 				op = seq[i];
 				if(op.replace(setter,"")==""){
-					v = seq[i+1];
+					v = seq[i-1];
+					var subject:Value = seq[i+1];
 					if(op.length>1) op = op.substring(0,op.length-1);
-					res = operate(v.value, op, seq[i-1].value);
-					//debug("operate setter: "+v.prop, v.value, op, seq[i-1].value, "=", res);
-					v.value = res;
-					if(v.base!=null) {
-						v.base[v.prop] = v.value;
-					}
+					res = operate(subject, op, v);
+					subject.setValue(res);
 				}
 			}
 			return v;
@@ -264,7 +261,7 @@ package com.luaye.console.core {
 		// includes class path detection and 'new' operation
 		//
 		private function execSimple(str:String):Value{
-			var v:Value = new Value();
+			var v:Value = new Value(_scope);
 			//debug('execStrip: '+str);
 			//
 			// if it is 'new' operation
@@ -275,14 +272,14 @@ package com.luaye.console.core {
 					newstr = str.substring(0, defclose+1);
 				}
 				var newobj:* = makeNew(newstr.substring(4));
-				str = tempValue(str, new Value(newobj,newobj, newstr), 0, newstr.length);
+				str = tempValue(str, new Value(newobj), 0, newstr.length);
 			}
 			//
 			//
 			var reg:RegExp = /\.|\(/g;
 			var result:Object = reg.exec(str);
 			if(result==null || !isNaN(Number(str))){
-				return execValue(str, null);
+				return execValue(str, _scope);
 			}
 			//
 			// AUTOMATICALLY detect classes in packages
@@ -293,8 +290,9 @@ package com.luaye.console.core {
 					try{
 						var def:* = getDefinitionByName(ignoreWhite(classstr));
 						var havemore:Boolean = str.length>classstr.length;
-						//debug(classstr+" is a class.");
-						str = tempValue(str, new Value(def, def, classstr), 0, classstr.length);
+						//trace(classstr+" is a definition:", def);
+						str = tempValue(str, new Value(def), 0, classstr.length);
+						//trace(str);
 						if(havemore){
 							reg.lastIndex = 0;
 							result = reg.exec(str);
@@ -310,16 +308,16 @@ package com.luaye.console.core {
 			//
 			// dot syntex and simple function steps
 			var previndex:int = 0;
+			//trace("str = "+str);
 			while(result != null){
 				var index:int = result.index;
 				var isFun:Boolean = str.charAt(index)=="(";
 				var basestr:String = ignoreWhite(str.substring(previndex, index));
-				//debug("scopestr = "+basestr+ " v.base = "+v.base);
-				var newv:Value = execValue(basestr, v.base);
-				var newbase:* = newv.value;
-				v.base = newv.base;
-				//debug("scope = "+newbase+"  isFun:"+isFun);
+				//trace("scopestr = "+basestr+ " v.base = "+v.value);
+				var newv:Value = execValue(basestr, v.value);
+				//trace("scope = "+newv.value+"  isFun:"+isFun);
 				if(isFun){
+					var newbase:* = newv.value;
 					var closeindex:int = str.indexOf(")", index);
 					var paramstr:String = str.substring(index+1, closeindex);
 					paramstr = paramstr.replace(/\s/g,"");
@@ -346,20 +344,21 @@ package com.luaye.console.core {
 							throw new Error(basestr+" is not a function.");
 						}
 					}
-					v.value = (newbase as Function).apply(v.base, params);
-					v.base = v.value;
+					//trace("Apply function:", newbase, v.base, params);
+					v.base = (newbase as Function).apply(v.value, params);
+					v.prop = null;
+					//trace("Function return:", v.base);
 					index = closeindex+1;
 				}else{
-					v.value = newbase;
+					v = newv;
 				}
-				v.prop = basestr;
 				previndex = index+1;
 				reg.lastIndex = index+1;
 				result = reg.exec(str);
 				if(result != null){
-					v.base = v.value;
+					//v.base = v.value;
 				}else if(index+1 < str.length){
-					v.base = v.value;
+					//v.base = v.value;
 					reg.lastIndex = str.length;
 					result = {index:str.length};
 				}
@@ -370,113 +369,106 @@ package com.luaye.console.core {
 		// single values such as string, int, null, $a, ^1 and Classes without package.
 		//
 		private function execValue(str:String, base:* = null):Value{
-			var nobase:Boolean = base?false:true;
-			var v:Value = new Value(null, base, str);
-			base = base?base:_scope;
-			if(nobase && (!base || !base.hasOwnProperty(str))){
+			var v:Value = new Value();
+			if(!base || !base.hasOwnProperty(str)){
 				if (str == "true") {
-					v.value = true;
+					v.base = true;
 				}else if (str == "false") {
-					v.value = false;
+					v.base = false;
 				}else if (str == "this") {
 					v.base = _scope;
-					v.value = _scope;
 				}else if (str == "null") {
-					v.value = null;
+					v.base = null;
 				}else if (str == "NaN") {
-					v.value = NaN;
+					v.base = NaN;
 				}else if (str == "Infinity") {
-					v.value = Infinity;
+					v.base = Infinity;
 				}else if (str == "undefined") {
-					v.value = undefined;
+					v.base = undefined;
 				}else if (!isNaN(Number(str))) {
-					v.value = Number(str);
+					v.base = Number(str);
 				}else if(str.indexOf(VALUE_CONST)==0){
 					var vv:Value = _values[str.substring(VALUE_CONST.length)];
-					//debug(VALUE_CONST+str.substring(VALUE_CONST.length)+" = " +vv);
-					v.base = vv.base;
-					v.value = vv.value;
+					//trace(VALUE_CONST+str.substring(VALUE_CONST.length)+" = " +vv);
+					v.base = vv.value;
 				}else if(str.charAt(0) == "$"){
 					var key:String = str.substring(1);
-					v.value = _saved[key];
 					if(_reserved.indexOf(key)<0){
-						if(v.value == null){
-							_saved[key] = v.value;
-						}
 						v.base = _saved;
 						v.prop = key;
+					}else{
+						v.base = _saved[key];
 					}
 				}else{
 					try{
-						v.value = getDefinitionByName(str);
-						v.base = v.value;
+						v.base = getDefinitionByName(str);
 					}catch(e:Error){
 						v.base = base;
-						v.value = base?base[str]:null;
+						v.prop = str;
 					}
 				}
 			}else{
 				v.base = base;
-				v.value = base?base[str]:null;
+				v.prop = str;
 			}
 			//debug("value: "+str+" = "+getQualifiedClassName(v.value)+" - "+v.value+" base:"+v.base);
 			return v;
 		}
 		// * typed cause it could be String +  OR comparison such as || or &&
-		private function operate(v1:*, op:String, v2:*):*{
+		private function operate(v1:Value, op:String, v2:Value):*{
 			switch (op){
 				case "=":
-					return v2;
+					return v2.value;
 				case "+":
-					return v1+v2;
+					return v1.value+v2.value;
 				case "-":
-					return v1-v2;
+					return v1.value-v2.value;
 				case "*":
-					return v1*v2;
+					return v1.value*v2.value;
 				case "/":
-					return v1/v2;
+					return v1.value/v2.value;
 				case "%":
-					return v1%v2;
+					return v1.value%v2.value;
 				case "^":
-					return v1^v2;
+					return v1.value^v2.value;
 				case "&":
-					return v1&v2;
+					return v1.value&v2.value;
 				case ">>":
-					return v1>>v2;
+					return v1.value>>v2.value;
 				case ">>>":
-					return v1>>>v2;
+					return v1.value>>>v2.value;
 				case "<<":
-					return v1<<v2;
+					return v1.value<<v2.value;
 				case "~":
-					return ~v2;
+					return ~v2.value;
 				case "|":
-					return v1|v2;
+					return v1.value|v2.value;
 				case "!":
-					return !v2;
+					return !v2.value;
 				case ">":
-					return v1>v2;
+					return v1.value>v2.value;
 				case ">=":
-					return v1>=v2;
+					return v1.value>=v2.value;
 				case "<":
-					return v1<v2;
+					return v1.value<v2.value;
 				case "<=":
-					return v1<=v2;
+					return v1.value<=v2.value;
 				case "||":
-					return v1||v2;
+					return v1.value||v2.value;
 				case "&&":
-					return v1&&v2;
+					return v1.value&&v2.value;
 				case "is":
-					return v1 is v2;
+					return v1.value is v2.value;
 				case "typeof":
-					return typeof v2;
+					return typeof v2.value;
 				case "==":
-					return v1==v2;
+					return v1.value==v2.value;
 				case "===":
-					return v1===v2;
+					return v1.value===v2.value;
 				case "!=":
-					return v1!=v2;
+					return v1.value!=v2.value;
 				case "!==":
-					return v1!==v2;
+					return v1.value!==v2.value;
 			}
 		}
 		//
@@ -551,7 +543,7 @@ package com.luaye.console.core {
 			return str;
 		}
 		//private function debug(...args):void{
-		//	_master.report(_master.joinArgs(args), 2, false);
+		//	master.report(_master.joinArgs(args), 2, false);
 		//}
 	}
 }
@@ -559,13 +551,20 @@ class Value{
 	// TODO: potentially, we can have value only for 'non-reference', and have a boolen to tell if its a reference or value
 	
 	// this is a class to remember the base object and property name that holds the value...
-	public var base:Object;
+	public var base:*;
 	public var prop:String;
-	public var value:*;
+	//private var value:*;
 	
-	public function Value(v:* = null, b:Object = null, p:String = null):void{
+	public function Value(b:Object = null, p:String = null):void{
 		base = b;
 		prop = p;
-		value = v;
+		//value = v;
+	}
+	public function get value():*{
+		return prop?base[prop]:base;
+	}
+	public function setValue(v:*):void{
+		if(prop) base[prop] = v;
+		else base = v;
 	}
 }

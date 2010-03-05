@@ -49,7 +49,7 @@ package com.luaye.console {
 	public class Console extends Sprite {
 
 		public static const VERSION:Number = 2.4;
-		public static const VERSION_STAGE:String = "WIP";
+		public static const VERSION_STAGE:String = "beta";
 		//
 		public static const NAME:String = "Console";
 		public static const PANEL_MAIN:String = "mainPanel";
@@ -475,7 +475,6 @@ package com.luaye.console {
 		}
 		public function set remotingPassword(str:String):void{
 			_remotingPassword = str;
-			remoter.login(str);
 		}
 		//
 		// this is sent from client for remote...
