@@ -26,24 +26,68 @@ package com.luaye.console {
 	import flash.text.StyleSheet;
 
 	public class ConsoleStyle {
+		/**
+		 *  Panels backround color
+		 */
+		public var backgroundColor:int;
+		/**
+		 *  Panels background alpha
+		 */
+		public var backgroundAlpha:Number = 0.85;
+		/**
+		 *  Color of scroll bar, scaler, etc. Some gets alpha applied
+		 */
+		public var controlColor:Number = 0x990000;
+		/**
+		 *  Command line background and text color, background gets alpha so it is less visible.
+		 */
+		public var commandLineColor:Number = 0x10AA00;
+		
+		/**
+		 *  Font for menus and almost all others
+		 */
+		public var menuFont:String = "Arial";
+		/**
+		 *  Default font size
+		 */
+		public var menuFontSize:int = 12;
+		/**
+		 *  Font for trace field
+		 */
+		public var traceFont:String = "Verdana";
+		/**
+		 *  Font size for trace field
+		 */
+		public var traceFontSize:int = 11;
 		//
-		public var backgroundColor:int; // panel backround color
-		public var backgroundAlpha:Number = 0.85; // panel background alpha
-		public var controlColor:Number = 0x990000; // Scroll bar, scaler, etc. some gets alpha applied
-		public var commandLineColor:Number = 0x10AA00; // command line background and text color, background gets alpha so it is less visible.
-		//
-		public var menuFont:String = "Arial"; // font for menus and almost all others
-		public var menuFontSize:int = 12; // Font size for menus and almost all others
-		public var traceFont:String = "Verdana"; // Font for trace field
-		public var traceFontSize:int = 11; // Font size for trace field
-		//
-		public var highColor:uint = 0xFFFFFF; // Font color for high priority text, such as user input.
-		public var lowColor:uint = 0xC0C0C0; // Font color for less important / smaller text
-		public var menuColor:uint = 0xFF8800; // Font color for menu
-		public var menuHighlightColor:uint = 0xDD5500; // Font color for highlighted menu
-		public var channelsColor:uint = 0xFFFFFF; // Font color for channel names
-		public var channelColor:uint = 0x0099CC; // Font color for current channel name
-		public var tooltipColor:uint = 0xDD5500; // Font color for tool tips
+		/**
+		 * Font color for high priority text, such as user input.
+		 */
+		public var highColor:uint = 0xFFFFFF;
+		/**
+		 * Font color for less important / smaller text
+		 */
+		public var lowColor:uint = 0xC0C0C0; 
+		/**
+		 * Font color for menu
+		 */
+		public var menuColor:uint = 0xFF8800;
+		/**
+		 * Font color for highlighted menu
+		 */
+		public var menuHighlightColor:uint = 0xDD5500; 
+		/**
+		 * Font color for channel names
+		 */
+		public var channelsColor:uint = 0xFFFFFF;
+		/**
+		 * Font color for current channel name
+		 */
+		public var channelColor:uint = 0x0099CC;
+		/**
+		 * Font color for tool tips
+		 */
+		public var tooltipColor:uint = 0xDD5500;
 		//
 		// To find out which level assigns to which type of log, e.g. C.log, C.info, etc...
 		// see Console.LOG_LEVEL, Console.INFO_LEVEL, Console.DEBUG_LEVEL, Console.WARN_LEVEL, etc
@@ -62,9 +106,15 @@ package com.luaye.console {
 		public var priorityC2:uint = 0xFF8800; // priority -2, designed to use by Console only, but you can also pass in that pirority
 		//
 		//
+		/**
+		 * Construct ConsoleStyle. Starts with default black based style.
+		 */
 		public function ConsoleStyle() {
 			
 		}
+		/**
+		 * Use white base pre configuration
+		 */
 		public function whiteBase():void{
 			backgroundColor = 0xFFFFFF;
 			controlColor = 0xFF3333;
@@ -92,13 +142,22 @@ package com.luaye.console {
 			priorityC1 = 0x0099CC;
 			priorityC2 = 0xFF6600;
 		}
+		/**
+		 * Use bigger font size
+		 */
 		public function big():void{
 			traceFontSize = 12;
 			menuFontSize = 14;
 		}
+		/**
+		 * Use opaque background
+		 */
 		public function opaque():void{
 			backgroundAlpha = 1;
 		}
+		/**
+		 * Use black and white traces
+		 */
 		public function blackAndWhiteTrace():void{
 			priority0 = 0x808080;
 			priority1 = 0x888888;

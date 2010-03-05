@@ -32,6 +32,12 @@ package com.luaye.console {
 		private var _c:*; // because it could be Console or C. This is the cheapest way I think...
 		private var _name:String;
 		
+		/**
+		 * Construct channel instance
+		 *
+		 * @param String Name of channel
+		 * @param String (optional) instance of Console, leave blank to use C.
+		 */
 		public function Ch(n:String = null, c:Console = null){
 			_name = n;
 			// allowed to pass in Console here incase you want to use a different console instance from whats used in C
