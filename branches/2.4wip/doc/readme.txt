@@ -34,7 +34,7 @@ http://code.google.com/p/flash-console/issues/
 == Change Log ==
 
 ===2.4===
-  * Added ConsoleStyle where you can pass in at start to define console styles
+  * Added ConsoleStyle which you can pass in at start to define console styles
   * /filterexp regular expression text filtering
   * viewingChannel no longer used. now only using viewingChannels
   * Graphing param can now be a command line string

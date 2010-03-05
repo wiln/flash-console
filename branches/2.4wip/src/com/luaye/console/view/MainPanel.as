@@ -97,6 +97,7 @@ package com.luaye.console.view {
 		private var _scrolldir:int;
 		
 		private var _channels:Array;
+		private var _viewingChannels:Array;
 		private var _lines:Logs;
 		private var _commandsHistory:Array = [];
 		private var _commandsInd:int = -1;
@@ -107,11 +108,12 @@ package com.luaye.console.view {
 		private var _atBottom:Boolean = true;
 		private var _enteringLogin:Boolean;
 		
-		public function MainPanel(m:Console, lines:Logs, channels:Array) {
+		public function MainPanel(m:Console, lines:Logs, channels:Array, chanviews:Array) {
 			super(m);
 			_canUseTrace = (Capabilities.playerType=="External"||Capabilities.isDebugger);
 			var fsize:int = m.style.menuFontSize;
 			_channels = channels;
+			_viewingChannels = chanviews;
 			_lines = lines;
 			_commandsHistory = m.ud.commandLineHistory;
 			
@@ -346,7 +348,7 @@ package com.luaye.console.view {
 		private function makeLine(line:Log):String{
 			var str:String = "";
 			var txt:String = line.text;
-			if(master.prefixChannelNames && (master.viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0 || master.viewingChannels.length>1) && line.c != Console.DEFAULT_CHANNEL){
+			if(master.prefixChannelNames && (_viewingChannels.indexOf(Console.GLOBAL_CHANNEL)>=0 || _viewingChannels.length>1) && line.c != Console.DEFAULT_CHANNEL){
 				txt = "[<a href=\"event:channel_"+line.c+"\">"+line.c+"</a>] "+txt;
 			}
 			var ptag:String = "p"+line.p;
@@ -541,7 +543,7 @@ package com.luaye.console.view {
 			if(limited && len>CHANNELS_IN_MENU) len = CHANNELS_IN_MENU;
 			for(var ci:int = 0; ci<len;  ci++){
 				var channel:String = _channels[ci];
-				var channelTxt:String = (master.viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
+				var channelTxt:String = (_viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
 				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
 			if(limited){
@@ -652,8 +654,8 @@ package com.luaye.console.view {
 			e.stopPropagation();
 		}
 		public function onChannelPressed(chn:String):void{
-			var current:Array = master.viewingChannels.concat();
-			if(_shift && master.viewingChannels[0] != Console.GLOBAL_CHANNEL && chn != Console.GLOBAL_CHANNEL){
+			var current:Array = _viewingChannels.concat();
+			if(_shift && _viewingChannels[0] != Console.GLOBAL_CHANNEL && chn != Console.GLOBAL_CHANNEL){
 				var ind:int = current.indexOf(chn);
 				if(ind>=0){
 					current.splice(ind,1);

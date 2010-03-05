@@ -150,7 +150,7 @@ package com.luaye.console {
 			mm = new MemoryMonitor();
 			style = skin?skin:new ConsoleStyle();
 			css = ConsoleStyle.generateCSS(style);
-			panels = new PanelsManager(this, _lines, _channels);
+			panels = new PanelsManager(this, _lines, _channels, _viewingChannels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy bug fixing!</b>", -2);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
@@ -495,16 +495,20 @@ package com.luaye.console {
 			_viewingChannels.splice(0);
 			if(a && a.length) {
 				if(a.indexOf(GLOBAL_CHANNEL)>=0) a = [GLOBAL_CHANNEL];
-				_viewingChannels.push.apply(this, a);
+				//_viewingChannels.push.apply(this, a);
+				for each(var item:Object in a) _viewingChannels.push(item is Ch?(Ch(item).name):String(item));
 			} else _viewingChannels.push(GLOBAL_CHANNEL);
 			panels.mainPanel.updateToBottom();
 			panels.updateMenu();
 		}
-		public function set tracingChannels(newVar:Array):void{
-			_tracingChannels = newVar?newVar.concat():[];
+		public function set tracingChannels(a:Array):void{
+			_tracingChannels.splice(0);
+			if(a){
+				for each(var item:Object in a) _tracingChannels.push(item is Ch?(Ch(item).name):String(item));
+			}
 		}
 		public function get tracingChannels():Array{
-			return _tracingChannels;
+			return _tracingChannels.concat();
 		}
 		//
 		public function get tracing():Boolean{
@@ -682,9 +686,8 @@ package com.luaye.console {
 		}
 		public function joinArgs(args:Array):String{
 			for(var X:String in args){
-				if(args[X] is XML || args[X] is XMLList){
-					args[X] = args[X].toXMLString();
-				}
+				// XML.toString() doesn't print all if its single node. Therefore need to convert them with toXMLString().
+				if(args[X] is XML || args[X] is XMLList) args[X] = args[X].toXMLString();
 			}
 			return args.join(" ");
 		}
@@ -747,7 +750,6 @@ package com.luaye.console {
 			return a;
 		}
 		public function getAllLog(splitter:String = "\n"):String{
-			//return _lines.join(splitter);
 			var str:String = "";
 			var line:Log = _lines.first;
 			while(line){

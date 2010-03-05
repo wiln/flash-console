@@ -205,7 +205,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line with priority 6
+		 * Add log line with priority 5
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param String to be logged, any type can be passed and will be converted to string
@@ -216,7 +216,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line with priority 8
+		 * Add log line with priority 7
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param String to be logged, any type can be passed and will be converted to string
@@ -227,7 +227,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line with priority 10
+		 * Add log line with priority 9
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param String to be logged, any type can be passed and will be converted to string
@@ -238,7 +238,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line as fatal level
+		 * Add log line with priority 10
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param String to be logged, any type can be passed and will be converted to string
@@ -273,7 +273,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line with priority 6 to channel
+		 * Add log line with priority 5 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
@@ -285,7 +285,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line with priority 8 to channel
+		 * Add log line with priority 7 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
@@ -297,7 +297,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add log line with priority 10 to channel
+		 * Add log line with priority 9 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
@@ -309,7 +309,7 @@ package com.luaye.console {
 			}
 		}
 		/**
-		 * Add line as fatal level to channel
+		 * Add log line with priority 10 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
 		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
