@@ -1,10 +1,16 @@
 <project name="Console" basedir=".">
+
+	<property file="local.properties"/>
+	
 	<property name="src.version" value="2.4"/>
 	<property name="src.path" value="${basedir}/src"/>
 	<property name="asdoc.target.dir" value="${basedir}/asdoc"/>
 	<property name="doc.dir" value="${basedir}/doc"/>
-	
-	<property file="local.properties"/>
+	<property name="asdoc.exe" value="${FLEX_HOME}/bin/asdoc.exe"/>
+	<property name="flex.ant" value="${FLEX_HOME}/ant/lib/flexTasks.jar"/>
+	<property name="wiki.dir" value="../wiki"/>
+	<property name="temp.dir" value="${basedir}/temp"/>
+
 	
 	<path id="svnant.classpath" >
 		<fileset dir="${svnant.path}" >
@@ -71,7 +77,7 @@
 	
 	<!--
 	
-	This does not export the icons, which makes it unsable in CS3...
+	This does not export the icons, which makes it unusable in CS3...
 	<target name="buildSWC">
 	        <compc output="${basedir}/bin/swc.swc"  include-classes="com.luaye.console.C">
 	            <source-path path-element="${src.path}"/>
