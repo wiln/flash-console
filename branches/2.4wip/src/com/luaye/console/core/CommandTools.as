@@ -339,7 +339,6 @@ package com.luaye.console.core {
 			report("/inspect = get info of your current scope.",5);
 			report("/inspectfull = get more detailed info of your current scope.",5);
 			report("/map = get the display list map starting from your current scope",5);
-			report("/strong true = turn on strong referencing for future references.",5);
 			report("/string = return the param of this command as a string. This is useful if you want to paste a block of text to use in commandline.",5);
 			report("Press up/down arrow keys to recall previous commands",2);
 			report("__Examples:",10);

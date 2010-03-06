@@ -283,7 +283,7 @@ package com.luaye.console.core {
 			}
 			//
 			// AUTOMATICALLY detect classes in packages
-			var firstparts:Array = str.split("(")[0].split(".");
+			var firstparts:Array = String(str.split("(")[0]).split(".");
 			if(firstparts.length>0){
 				while(firstparts.length){
 					var classstr:String = firstparts.join(".");

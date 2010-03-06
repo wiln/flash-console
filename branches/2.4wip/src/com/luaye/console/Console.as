@@ -119,7 +119,6 @@ package com.luaye.console {
 		private var _traceCall:Function = trace;
 		private var _rollerCaptureKey:String;
 		private var _commandLineAllowed:Boolean = true;
-		private var _strongRef:Boolean;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL, DEFAULT_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -199,7 +198,7 @@ package com.luaye.console {
 				var key:String = char.toLowerCase()+(e.ctrlKey?"1":"0")+(e.altKey?"1":"0")+(e.shiftKey?"1":"0");
 				if(_keyBinds[key]){
 					var bind:Array = _keyBinds[key];
-					bind[0].apply(this, bind[1]);
+					(bind[0] as Function).apply(this, bind[1]);
 				}
 			}
 		}
@@ -334,8 +333,7 @@ package com.luaye.console {
 			if(!n) n = className+"@"+getTimer();
 			if(!_mm) _mm = new MemoryMonitor();
 			var nn:String = _mm.watch(o,n);
-			if(!quiet)
-				report("Watching <b>"+className+"</b> as <p5>"+ nn +"</p5>.",-1);
+			if(!quiet) report("Watching <b>"+className+"</b> as <p5>"+ nn +"</p5>.",-1);
 			return nn;
 		}
 		public function unwatch(n:String):void{
@@ -360,12 +358,6 @@ package com.luaye.console {
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			cl.map(base, maxstep);
-		}
-		public function get strongRef():Boolean{
-			return _strongRef;
-		}
-		public function set strongRef(b:Boolean):void{
-			_strongRef= b;
 		}
 		public function inspect(obj:Object, detail:Boolean = true):void{
 			cl.inspect(obj,detail);

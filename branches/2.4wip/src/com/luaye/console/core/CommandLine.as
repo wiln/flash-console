@@ -64,7 +64,7 @@ package com.luaye.console.core {
 				_scope = obj;
 				dispatchEvent(new Event(CHANGED_SCOPE));
 			}
-			_saved.set("base", obj, _master.strongRef);
+			_saved.set("base", obj);
 		}
 		public function get base():Object {
 			return _saved.get("base");
@@ -77,7 +77,7 @@ package com.luaye.console.core {
 		public function store(n:String, obj:Object, strong:Boolean = false):void {
 			// if it is a function it needs to be strong reference atm, 
 			// otherwise it fails if the function passed is from a dynamic class/instance
-			strong = (strong || _master.strongRef || obj is Function);
+			strong = (strong || obj is Function);
 			n = n.replace(/[^\w]*/g, "");
 			if(RESERVED_SAVES.indexOf(n)>=0){
 				report("ERROR: The name ["+n+"] is reserved",10);
@@ -124,18 +124,6 @@ package com.luaye.console.core {
 			} else if (cmd == "remap") {
 				// this is a special case... no user will be able to do this command
 				doReturn(_tools.reMap(param, _master.stage));
-			} else if (cmd == "strong") {
-				if(param == "true"){
-					_master.strongRef = true;
-					report("Now using STRONG referencing.", 10);
-				}else if (param == "false"){
-					_master.strongRef = false;
-					report("Now using WEAK referencing.", 10);
-				}else if(_master.strongRef){
-					report("Using STRONG referencing. '/strong false' to use weak", -2);
-				}else{
-					report("Using WEAK referencing. '/strong true' to use strong", -2);
-				}
 			} else if (cmd == "save" || cmd == "store" || cmd == "savestrong" || cmd == "storestrong") {
 				if (_scope) {
 					param = param.replace(/[^\w]/g, "");

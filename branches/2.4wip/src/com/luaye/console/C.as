@@ -257,7 +257,7 @@ package com.luaye.console {
 		 */
 		public static function logch(channel:*, ...args):void{
 			if(_console){
-				_console.logch.apply(null, [channel].concat(args));
+				_console.logch.apply(null, concat(channel, args));
 			}
 		}
 		/**
@@ -269,7 +269,7 @@ package com.luaye.console {
 		 */
 		public static function infoch(channel:*, ...args):void{
 			if(_console){
-				_console.infoch.apply(null, [channel].concat(args));
+				_console.infoch.apply(null, concat(channel, args));
 			}
 		}
 		/**
@@ -281,7 +281,7 @@ package com.luaye.console {
 		 */
 		public static function debugch(channel:*, ...args):void{
 			if(_console){
-				_console.debugch.apply(null, [channel].concat(args));
+				_console.debugch.apply(null, concat(channel, args));
 			}
 		}
 		/**
@@ -293,7 +293,7 @@ package com.luaye.console {
 		 */
 		public static function warnch(channel:*, ...args):void{
 			if(_console){
-				_console.warnch.apply(null, [channel].concat(args));
+				_console.warnch.apply(null, concat(channel, args));
 			}
 		}
 		/**
@@ -305,7 +305,7 @@ package com.luaye.console {
 		 */
 		public static function errorch(channel:*, ...args):void{
 			if(_console){
-				_console.errorch.apply(null, [channel].concat(args));
+				_console.errorch.apply(null, concat(channel, args));
 			}
 		}
 		/**
@@ -317,8 +317,11 @@ package com.luaye.console {
 		 */
 		public static function fatalch(channel:*, ...args):void{
 			if(_console){
-				_console.fatalch.apply(null, [channel].concat(args));
+				_console.fatalch.apply(null, concat(channel, args));
 			}
+		}
+		private static function concat(o:*, args:Array):Array{
+			return [o].concat(args);
 		}
 		/**
 		 * Remove console from it's parent display and clean up
@@ -718,21 +721,6 @@ package com.luaye.console {
 		}
 		public static function set commandBase(v:Object):void{
 			setter("commandBase",v);
-		}
-		/**
-		 * Accessor for using strong referencing in CommandLine.
-		 * Default is false; Which means all outside references Console store are weak referenced,
-		 * allowing them to be garbage collected when required.
-		 * 
-		 * @param  new value
-		 * @return Current strong referencing setting
-		 * 
-		 */
-		public static function get strongRef():Boolean{
-			return getter("strongRef") as Boolean;
-		}
-		public static function set strongRef(v:Boolean):void{
-			setter("strongRef",v);
 		}
 		/**
 		 * Store a reference in Console for use in CommandLine.

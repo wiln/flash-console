@@ -45,7 +45,7 @@ package com.luaye.console.utils {
 		}
 		public function get(n:String):Object{
 			if(_dir[n]){
-				return _dir[n].reference;
+				return WeakRef(_dir[n]).reference;
 			}
 			return null;
 		}
