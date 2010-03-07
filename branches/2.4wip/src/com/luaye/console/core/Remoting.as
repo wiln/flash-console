@@ -58,6 +58,7 @@ package com.luaye.console.core {
 		}
 		public function set remotingPassword(str:String):void{
 			_remotingPassword = str;
+			if(!str) login();
 		}
 		public function addLineQueue(line:Log):void{
 			if(!_loggedIn) return;

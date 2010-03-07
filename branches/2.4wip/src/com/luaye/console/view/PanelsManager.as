@@ -209,6 +209,9 @@ package com.luaye.console.view {
 				graph.remove(obj, prop);
 			}
 		}
+		public function updateGraphs(a:Array):void{
+			
+		}
 		//
 		//
 		//

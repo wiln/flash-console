@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console {
+	import com.luaye.console.core.Graphing;
 	import com.luaye.console.view.MainPanel;
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Log;
@@ -94,6 +95,7 @@ package com.luaye.console {
 		public var panels:PanelsManager;
 		public var cl:CommandLine;
 		public var ud:UserData;
+		public var graphing:Graphing;
 		private var _mm:MemoryMonitor;
 		private var _remoter:Remoting;
 		//
@@ -147,6 +149,7 @@ package com.luaye.console {
 			_lines = new Logs();
 			ud = new UserData(SharedObjectName,"/");
 			cl = new CommandLine(this);
+			graphing = new Graphing();
 			_remoter = new Remoting(this, remoteLogSend, pass);
 			//
 			// VIEW setup
@@ -243,12 +246,15 @@ package com.luaye.console {
 				report("ERROR: Graph ["+n+"] received a null object to graph property ["+prop+"].", 10);
 				return;
 			}
+			graphing.add(n,obj,prop,col,key,rect,inverse);
 			panels.addGraph(n,obj,prop,col,key,rect,inverse);
 		}
 		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
+			graphing.fixRange(n, min, max);
 			panels.fixGraphRange(n, min, max);
 		}
 		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
+			graphing.remove(n, obj, prop);
 			panels.removeGraph(n, obj, prop);
 		}
 		//
@@ -318,6 +324,7 @@ package com.luaye.console {
 			return panels.fpsMonitor;
 		}
 		public function set fpsMonitor(b:Boolean):void{
+			graphing.fpsMonitor = b;
 			panels.fpsMonitor = b;
 		}
 		//
@@ -325,6 +332,7 @@ package com.luaye.console {
 			return panels.memoryMonitor;
 		}
 		public function set memoryMonitor(b:Boolean):void{
+			graphing.memoryMonitor = b;
 			panels.memoryMonitor = b;
 		}
 		//
@@ -427,7 +435,9 @@ package com.luaye.console {
 					if(!_mm.haveItemsWatching) _mm = null;
 				}
 			}
+			graphing.update();
 			if(visible){
+				panels.updateGraphs(graphing.fetch());
 				panels.mainPanel.update(!_isPaused && _lineAdded);
 				if(_lineAdded) {
 					var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
