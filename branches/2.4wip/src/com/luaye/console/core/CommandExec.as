@@ -31,13 +31,10 @@ package com.luaye.console.core {
 	public class CommandExec {
 		
 		
-		
-		
 		public static function Exec(scope:Object, str:String, saved:Object = null, reserved:Array = null):*{
 			var e:CommandExec = new CommandExec();
 			return e.exec(scope, str, saved, reserved).pop();
 		}
-		
 		
 		public static function Execs(scope:Object, str:String, saved:Object = null, reserved:Array = null):Array{
 			var e:CommandExec = new CommandExec();

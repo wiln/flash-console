@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console.view {
+	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.Console;
 
 	import flash.events.Event;
@@ -73,6 +74,13 @@ package com.luaye.console.view {
 		}
 		public function getPanel(n:String):AbstractPanel{
 			return _master.getChildByName(n) as AbstractPanel;
+		}
+		public function update(graphs:Array, changed:Boolean):void{
+			for each(var group:GraphGroup in graphs){
+				trace(group.name , group.interests.length, group.interests[0].values);
+			}
+			//
+			_mainPanel.update(changed);
 		}
 		public function get mainPanel():MainPanel{
 			return _mainPanel;

@@ -162,6 +162,10 @@ package com.luaye.console {
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy coding!</b>", -2);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			if(_password) visible = false;
+			
+			// must have enterFrame here because user can start without a parent display and use remoting.
+			addEventListener(Event.ENTER_FRAME, _onEnterFrame);
+			
 		}
 
 		private function stageAddedHandle(e:Event=null):void{
@@ -169,7 +173,6 @@ package com.luaye.console {
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			//
-			addEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
 		}
@@ -178,7 +181,6 @@ package com.luaye.console {
 			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			//
-			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
@@ -415,13 +417,6 @@ package com.luaye.console {
 			_mspf = time-_previousTime;
 			_previousTime = time;
 			
-			if(alwaysOnTop && parent && parent.getChildAt(parent.numChildren-1) != this && moveTopAttempts>0){
-				moveTopAttempts--;
-				parent.addChild(this);
-				if(!quiet){
-					report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
-				}
-			}
 			if( _isRepeating ){
 				_repeated++;
 				if(_repeated > maxRepeats && maxRepeats >= 0){
@@ -435,10 +430,17 @@ package com.luaye.console {
 					if(!_mm.haveItemsWatching) _mm = null;
 				}
 			}
-			graphing.update();
-			if(visible){
-				panels.updateGraphs(graphing.fetch());
-				panels.mainPanel.update(!_isPaused && _lineAdded);
+			var graphList:Array = graphing.update(false, stage?stage.frameRate:0);
+			// VIEW UPDATES ONLY
+			if(visible && parent!=null){
+				if(alwaysOnTop && parent.getChildAt(parent.numChildren-1) != this && moveTopAttempts>0){
+					moveTopAttempts--;
+					parent.addChild(this);
+					if(!quiet){
+						report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
+					}
+				}
+				panels.update(graphList, !_isPaused && _lineAdded);
 				if(_lineAdded) {
 					var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
 					if(chPanel) chPanel.update();

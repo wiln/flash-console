@@ -33,13 +33,13 @@ package com.luaye.console.core {
 
 	public class Graphing {
 		
+		private var _groups:Array = [];
 		private var _map:Object = {};
-		private var _fpsMonitor:Boolean;
-		private var _memoryMonitor:Boolean;
 		
-		private var _mspfs:Array = [];
-		private var _previousTime:Number;
-		private var _mem:Array = [];
+		private var _fpsGroup:GraphGroup;
+		private var _memGroup:GraphGroup;
+		
+		private var _previousTime:Number = -1;
 		
 		public function Graphing(){
 			
@@ -47,145 +47,117 @@ package com.luaye.console.core {
 		// WINDOW name lowest highest averaging inverse
 		// GRAPH key color values
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			var group:Group = _map[n];
+			var group:GraphGroup = _map[n];
 			if(!group) {
-				group = new Group();
+				group = new GraphGroup(n);
 				_map[n] = group;
+				_groups.push(group);
 			}
 			if(rect) group.rect = rect;
 			if(inverse) group.inverse = inverse;
-			var interest:Interest = new Interest(obj, prop, col, key);
+			var interest:GraphInterest = new GraphInterest(key, col);
+			interest.setObject(obj, prop);
 			group.interests.push(interest);
 		}
 
 		public function fixRange(n:String, low:Number = NaN, high:Number = NaN):void{
-			var group:Group = _map[n];
+			var group:GraphGroup = _map[n];
 			if(!group) return;
 			group.lowest = low;
 			group.highest = high;
 		}
 		public function remove(n:String, obj:Object = null, prop:String = null):void{
-			var group:Group = _map[n];
+			var group:GraphGroup = _map[n];
 			if(!group) return;
-			if(obj==null&&prop==null){
-				delete _map[n];
+			if(obj==null&&prop==null){	
+				removeGroup(n);
 			}else{
 				var interests:Array = group.interests;
 				for(var i:int = interests.length-1;i>=0;i--){
-					var interest:Interest = interests[i];
+					var interest:GraphInterest = interests[i];
 					if((obj == null || interest.obj == obj) && (prop == null || interest.prop == prop)){
 						interests.splice(i, 1);
 					}
 				}
 				if(interests.length==0){
-					delete _map[n];
+					removeGroup(n);
 				}
 			}
 		}
+		private function removeGroup(n:String):void{
+			var g:GraphGroup = _map[n];
+			var index:int = _groups.indexOf(g);
+			if(index>=0) _groups.splice(index, 1);
+			delete _map[n];
+		}
 		public function get fpsMonitor():Boolean{
-			return _fpsMonitor;
+			return _fpsGroup!=null;
 		}
 		public function set fpsMonitor(b:Boolean):void{
-			_fpsMonitor = b;
+			if(b != fpsMonitor){
+				if(b) _fpsGroup = addSpecialGroup(GraphGroup.TYPE_FPS);
+				else{
+					_previousTime = -1;
+					var index:int = _groups.indexOf(_fpsGroup);
+					if(index>=0) _groups.splice(index, 1);
+				}
+			}
 		}
 		//
 		public function get memoryMonitor():Boolean{
-			return _memoryMonitor;
+			return _memGroup!=null;
 		}
 		public function set memoryMonitor(b:Boolean):void{
-			_memoryMonitor = b;
+			if(b != memoryMonitor){
+				if(b) _memGroup = addSpecialGroup(GraphGroup.TYPE_MEM);
+				else{
+					var index:int = _groups.indexOf(_memGroup);
+					if(index>=0) _groups.splice(index, 1);
+				}
+			}
 		}
-		public function update(stack:Boolean = false):void{
-			if(_fpsMonitor){
-				var time:int = getTimer();
-				var mspf:Number = time-_previousTime;
-				if(stack) _mspfs.push(mspf);
-				else _mspfs = [mspf];
-			}
-			if(_memoryMonitor){
-				var mem:uint = System.totalMemory;
-				if(stack) _mem.push(mem);
-				else _mem = [mem];
-			}
-			for(var X:String in _map){
-				var group:Group = _map[X];
-				for each(var interest:Interest in group.interests){
-					try{
-						var v:Number = interest.getValue();
+		private function addSpecialGroup(type:int):GraphGroup{
+			var group:GraphGroup = new GraphGroup("special");
+			group.type = type;
+			_groups.push(group);
+			var graph:GraphInterest = new GraphInterest();
+			group.interests.push(graph);
+			return group;
+		}
+		public function update(stack:Boolean = false, fps:Number = 0):Array{
+			var interest:GraphInterest;
+			var v:Number;
+			for each(var group:GraphGroup in _groups){
+				if(group.type == GraphGroup.TYPE_FPS){
+					group.highest = fps;
+					interest = group.interests[0];
+					var time:int = getTimer();
+					if(_previousTime >= 0){
+						var mspf:Number = time-_previousTime;
+						v = 1000/mspf;
 						if(stack) interest.values.push(v);
 						else interest.values = [v];
-					}catch(e:Error){
-						remove(X, interest.obj, interest.prop);
+					}
+					_previousTime = time;
+				}else if(group.type == GraphGroup.TYPE_MEM){
+					interest = group.interests[0];
+					v = System.totalMemory;
+					if(stack) interest.values.push(v);
+					else interest.values = [v];
+				}else{
+					for each(interest in group.interests){
+						try{
+							v = interest.getValue();
+							if(stack) interest.values.push(v);
+							else interest.values = [v];
+						}catch(e:Error){
+							// TODO: Maybe report in console of the error and removal.
+							remove(group.name, interest.obj, interest.prop);
+						}
 					}
 				}
 			}
+			return _groups;
 		}
-		public function fetch():Array{
-			var result:Array = [];
-			var gi:GraphInterest;
-			if(_fpsMonitor){
-				gi = new GraphInterest();
-				gi.key = GraphInterest.KEY_FPS;
-				gi.values = _mspfs;
-				result.push(gi);
-			}
-			if(_memoryMonitor){
-				gi = new GraphInterest();
-				gi.key = GraphInterest.KEY_MEM;
-				gi.values = _mem;
-				result.push(gi);
-			}
-			for(var X:String in _map){
-				var group:Group = _map[X];
-				var gg:GraphGroup = new GraphGroup(X);
-				gg.inverse = group.inverse;
-				gg.lowest = group.lowest;
-				gg.highest = group.highest;
-				result.push(gg);
-				var gis:Array = gg.interests;
-				for each(var interest:Interest in group.interests){
-					gi = new GraphInterest();
-					gis.push(gi);
-					gi.key = interest.key;
-					gi.col = interest.col;
-					gi.values = interest.values;
-				}
-			}
-			return result;
-		}
-	}
-}
-
-import flash.geom.Rectangle;
-class Group{
-	public var interests:Array = [];
-	public var rect:Rectangle;
-	public var inverse:Boolean;
-	public var lowest:Number;
-	public var highest:Number;
-}
-import com.luaye.console.core.CommandExec;
-import com.luaye.console.utils.WeakRef;
-
-class Interest{
-	private var _ref:WeakRef;
-	public var prop:String;
-	public var col:Number;
-	public var key:String;
-	public var avg:Number;
-	private var useExec:Boolean;
-	public var values:Array = [];
-	public function Interest(object:Object, property:String, color:Number, keystr:String):void{
-		_ref = new WeakRef(object);
-		prop = property;
-		col = color;
-		key = keystr;
-		useExec = prop.search(/[^\w\d]/) >= 0;
-	}
-	public function getValue():Number{
-		return useExec?CommandExec.Exec(obj, prop):obj[prop];
-	}
-	public function get obj():Object{
-		return _ref.reference;
 	}
 }
