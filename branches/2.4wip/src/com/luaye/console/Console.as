@@ -84,7 +84,8 @@ package com.luaye.console {
 		public static var RemotingConnectionName:String = "_Console";
 		// You can change this if you want to use different Shared data. set to null to avoid using.
 		// Change BEFORE starting console.
-		public static var SharedObjectName:String = "com/luaye/Console/UserData";
+		public static var SharedObjectName:String = "com/luaye/console/UserData";
+		public static var SharedObjectPath:String = "/";
 		//
 		public var style:ConsoleStyle;
 		public var css:StyleSheet;
@@ -141,7 +142,7 @@ package com.luaye.console {
 			_password = pass;
 			//
 			_lines = new Logs();
-			ud = new UserData(SharedObjectName,"/");
+			ud = new UserData(SharedObjectName, SharedObjectPath);
 			cl = new CommandLine(this);
 			graphing = new Graphing(report);
 			_remoter = new Remoting(this, remoteLogSend, pass);

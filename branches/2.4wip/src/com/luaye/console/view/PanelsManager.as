@@ -167,7 +167,7 @@ package com.luaye.console.view {
 					if(!panel){
 						var rect:Rectangle = group.rect;
 						if(rect == null) rect = new Rectangle(NaN,NaN, 0, 0);
-						// todo: somehow auto place the panel if rect is empty
+						// TODO: somehow auto place the panel if rect is empty
 						if(isNaN(rect.x))  rect.x = _mainPanel.x+80;
 						if(isNaN(rect.y)) rect.y = _mainPanel.y+20;
 						if(rect.width<=0 || isNaN(rect.width))  rect.width = 100;
