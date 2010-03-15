@@ -91,7 +91,7 @@ package com.luaye.console.core {
 					// to force update next farme
 					_remoteDelayed = _master.remoteDelay;
 				}
-				send("logSend", [_remoteLinesQueue, _mspfsForRemote, _master.currentMemory, _master.cl.scopeString]);
+				//send("logSend", [_remoteLinesQueue, _mspfsForRemote, _master.currentMemory, _master.cl.scopeString]);
 				_remoteLinesQueue = newQueue;
 				_mspfsForRemote = [sFR?sFR:30];
 			}

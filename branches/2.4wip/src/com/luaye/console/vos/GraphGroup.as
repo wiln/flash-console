@@ -19,9 +19,22 @@ package com.luaye.console.vos {
 		public var inverse:Boolean;
 		public var interests:Array = [];
 		public var rect:Rectangle;
+		//
+		//
+		public var idle:int;
 		
 		public function GraphGroup(n:String){
 			name = n;
+		}
+		public function updateMinMax(v:Number):void{
+			if(!isNaN(v) && !fixed){
+				if(isNaN(lowest)) {
+					lowest = v;
+					highest = v;
+				}
+				if(v > highest) highest = v;
+				if(v < lowest) lowest = v;
+			}
 		}
 	}
 }

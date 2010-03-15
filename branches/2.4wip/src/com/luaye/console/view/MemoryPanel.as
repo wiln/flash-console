@@ -24,10 +24,9 @@
 */
 
 package com.luaye.console.view {
-	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.Console;
+	import com.luaye.console.vos.GraphGroup;
 
-	import flash.events.Event;
 	import flash.events.TextEvent;
 
 	public class MemoryPanel extends GraphingPanel {
@@ -35,8 +34,6 @@ package com.luaye.console.view {
 		public function MemoryPanel(m:Console) {
 			super(m, 80,40);
 			name = Console.PANEL_MEMORY;
-			updateEvery = 5;
-			drawEvery = 5;
 			minimumWidth = 32;
 		}
 		public override function close():void {
@@ -48,10 +45,10 @@ package com.luaye.console.view {
 			updateKeyText();
 		}
 		public override function updateKeyText():void{
-			if(isNaN(_v)){
+			if(isNaN(_interest.v)){
 				keyTxt.htmlText = "<r><s>no mem input <menu><a href=\"event:close\">X</a></menu></s></r>";
 			}else{
-				keyTxt.htmlText =  "<r><s>"+(Math.round(_v/10485.76)/100).toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
+				keyTxt.htmlText =  "<r><s>"+_interest.v.toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
 			}
 			keyTxt.scrollH = keyTxt.maxScrollH;
 		}

@@ -23,48 +23,32 @@
 * 
 */
 package com.luaye.console.view {
-	import com.luaye.console.vos.GraphInterest;
-
-	import flash.utils.Dictionary;
-
-	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.Console;
-	import com.luaye.console.utils.Utils;
+	import com.luaye.console.vos.GraphGroup;
+	import com.luaye.console.vos.GraphInterest;
 
 	import flash.display.Graphics;
 	import flash.display.Shape;
-	import flash.events.Event;
 	import flash.events.TextEvent;
 	import flash.text.TextField;
 
 	public class GraphingPanel extends AbstractPanel {
 		
 		//
-		protected var _v:Number;
+		protected var _group:GraphGroup;
+		protected var _interest:GraphInterest;
 		protected var _infoMap:Object = new Object();
 		//
-		
-		private var _interests:Array = [];
-		private var _updatedFrame:uint = 0;
-		private var _drawnFrame:uint = 0;
 		private var _needRedraw:Boolean;
-		private var _isRunning:Boolean;
-		protected var _history:Array = [];
 		//
-		protected var fixed:Boolean;
 		protected var underlay:Shape;
 		protected var graph:Shape;
 		protected var lowTxt:TextField;
 		protected var highTxt:TextField;
 		protected var keyTxt:TextField;
 		//
-		public var updateEvery:uint = 1;
-		public var drawEvery:uint = 1;
-		public var lowest:Number;
-		public var highest:Number;
-		public var averaging:uint;
+		public var updatedFrame:uint = 0;
 		public var startOffset:int = 5;
-		public var inverse:Boolean;
 		//
 		public function GraphingPanel(m:Console, W:int = 0, H:int = 0, resizable:Boolean = true) {
 			super(m);
@@ -106,91 +90,15 @@ package com.luaye.console.view {
 			//
 			init(W?W:100,H?H:80,resizable);
 		}
-		
-		public function get rand():Number{
-			return Math.random();
-		}/*
-		public function add(obj:Object, prop:String, col:Number = -1, key:String=null):void{
-			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
-			if(key == null) key = prop;
-			var i:Interest = new Interest(obj, prop, col, key);
-			var cur:Number;
-			try{
-				cur = i.getValue();
-				if(!isNaN(cur)){
-					if(isNaN(lowest)) lowest = cur;
-					if(isNaN(highest)) highest = cur;
-				}
-			}catch(e:Error){
-				
-			}
-			_interests.push(i);
-			updateKeyText();
-			//
-			start();
-		}
-		public function remove(obj:Object = null, prop:String = null):void{
-			var all:Boolean = (obj==null&&prop==null);
-			for(var i:int = _interests.length-1;i>=0;i--){
-				var interest:Interest = _interests[i];
-				if(all || (interest && (obj == null || interest.obj == obj) && (prop == null || interest.prop == prop))){
-					_interests.splice(i, 1);
-				}
-			}
-			if(_interests.length==0){
-				close();
-			}else{
-				updateKeyText();
-			}
-		}
-		public function mark(col:Number = -1, v:Number = NaN):void{
-			if(_history.length==0) return;
-			var interests:Array = _history[_history.length-1];
-			interests.push([col, v]);
-		}*/
-		public function start():void{
-			_isRunning = true;
-			// Note that if it has already started, it won't add another listener on top.
-			//addEventListener(Event.ENTER_FRAME, onFrame, false, 0, true);
-			addEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
-		}
-		public function stop():void {
-			_isRunning = false;
-			removeListeners();
-		}
-		private function removeListeners(e:Event=null):void{
-			//removeEventListener(Event.ENTER_FRAME, onFrame);
-			removeEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
-		}
-		public function get numInterests():int{
-			return _interests.length;
-		}
-		override public function close():void {
-			stop();
-			super.close();
+		private function stop():void {
+			if(_group) master.graphing.remove(_group.name);
+			close();
 		}
 		public function reset():void{
 			_infoMap = {};
-			if(!fixed){
-				lowest = NaN;
-				highest = NaN;
-			}
-			_history = [];
 			graph.graphics.clear();
 		}
-		public function get running():Boolean {
-			return _isRunning;
-		}
-		public function fixRange(low:Number,high:Number):void{
-			if(isNaN(low) || isNaN(high)) {
-				fixed = false;
-				return;
-			}
-			fixed = true;
-			lowest = low;
-			highest = high;
-		}
-		public function set showKeyText(b:Boolean):void{
+		/*public function set showKeyText(b:Boolean):void{
 			keyTxt.visible = b;
 		}
 		public function get showKeyText():Boolean{
@@ -202,7 +110,7 @@ package com.luaye.console.view {
 		}
 		public function get showBoundsText():Boolean{
 			return lowTxt.visible;
-		}
+		}*/
 		override public function set height(n:Number):void{
 			super.height = n;
 			lowTxt.y = n-master.style.menuFontSize;
@@ -222,20 +130,23 @@ package com.luaye.console.view {
 			keyTxt.width = n;
 			keyTxt.scrollH = keyTxt.maxScrollH;
 			_needRedraw = true;
-			
-		}
-		protected function getCurrentOf(i:int):Number{
-			var values:Array = _history[_history.length-1];
-			return values?values[i]:0;
-		}
-		protected function getAverageOf(i:int):Number{
-			var interest:Interest = _interests[i];
-			return interest?interest.avg:0;
 		}
 		//
 		//
 		//
 		public function update(group:GraphGroup):void{
+			_group = group;
+			var doPush:Boolean = true;
+			if(group.freq>1){
+				updatedFrame++;
+				if(updatedFrame < group.freq){
+					doPush = false;
+					if(!_needRedraw) return;
+				}else{
+					updatedFrame=0;
+				}
+			}
+			_needRedraw = false;
 			var interests:Array = group.interests;
 			var W:int = width-startOffset;
 			var H:int = height-graph.y;
@@ -245,33 +156,43 @@ package com.luaye.console.view {
 			var diffGraph:Number = highest-lowest;
 			var keys:Object = {};
 			var listchanged:Boolean = false;
-			for each(var interest:GraphInterest in interests){
-				var n:String = interest.key;
+			for each(_interest in interests){
+				var n:String = _interest.key;
 				keys[n] = true;
 				var info:InterestInfo = _infoMap[n];
 				if(info == null){
 					listchanged = true;
-					info = new InterestInfo(interest.col);
+					info = new InterestInfo(_interest.col);
 					_infoMap[n] = info;
 				}
 				var history:Array = info.history;
-				history.push(interest.values[interest.values.length-1]);
+				if(doPush) history.push(_interest.values[_interest.values.length-1]);
 				var len:int = history.length;
 				var maxLen:int = Math.floor(W)+10;
 				if(len > maxLen){
 					history.splice(0, (len-maxLen));
 					len = history.length;
 				}
-				graph.graphics.lineStyle(1, interest.col);
+				graph.graphics.lineStyle(1, _interest.col);
 				var maxi:int = W>len?len:W;
 				for(var i:int = 1; i<maxi; i++){
 					var Y:Number = (diffGraph?((history[len-i]-lowest)/diffGraph):0.5)*H;
 					if(!group.inverse) Y = H-Y;
+					if(Y<0)Y=0;
+					if(Y>H)Y=H;
 					if(i==1){
-						_v = history[len-i];
 						graph.graphics.moveTo(width, Y);
 					}
 					graph.graphics.lineTo((W-i), Y);
+				}
+				if(group.averaging>0 && diffGraph){
+					Y = ((_interest.avg-lowest)/diffGraph)*H;
+					if(!group.inverse) Y = H-Y;
+					if(Y<0)Y=0;
+					if(Y>H)Y=H;
+					graph.graphics.lineStyle(1,_interest.col, 0.3);
+					graph.graphics.moveTo(0, Y);
+					graph.graphics.lineTo(W, Y);
 				}
 			}
 			for(var X:String in _infoMap){
@@ -298,7 +219,7 @@ package com.luaye.console.view {
 			if(e.text == "reset"){
 				reset();
 			}else if(e.text == "close"){
-				close();
+				stop();
 			}
 			e.stopPropagation();
 		}
@@ -312,29 +233,5 @@ class InterestInfo{
 	public var history:Array = [];
 	public function InterestInfo(c:Number){
 		col = c;
-	}
-}
-import com.luaye.console.core.CommandExec;
-import com.luaye.console.utils.WeakRef;
-
-class Interest{
-	private var _ref:WeakRef;
-	public var prop:String;
-	public var col:Number;
-	public var key:String;
-	public var avg:Number;
-	private var useExec:Boolean;
-	public function Interest(object:Object, property:String, color:Number, keystr:String):void{
-		_ref = new WeakRef(object);
-		prop = property;
-		col = color;
-		key = keystr;
-		useExec = prop.search(/[^\w\d]/) >= 0;
-	}
-	public function getValue():Number{
-		return useExec?CommandExec.Exec(obj, prop):obj[prop];
-	}
-	public function get obj():Object{
-		return _ref.reference;
 	}
 }

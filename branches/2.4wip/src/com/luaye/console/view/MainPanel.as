@@ -492,6 +492,7 @@ package com.luaye.console.view {
 			//
 			_atBottom = true;
 			_needUpdateTrace = true;
+			_needUpdateMenu = true;
 			_lockScrollUpdate = false;
 		}
 		//
@@ -510,8 +511,8 @@ package com.luaye.console.view {
 				str += getChannelsLink(true);
 			}
 			str += "<menu>[ <b>";
-			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
-			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
+			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor);
+			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor);
 			if(master.commandLineAllowed){
 				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
 			}

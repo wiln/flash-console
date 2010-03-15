@@ -32,8 +32,6 @@ package com.luaye.console.view {
 	import flash.text.TextFieldAutoSize;
 
 	public class PanelsManager{
-		
-		
 		private static const USER_GRAPH_PREFIX:String = "graph_";
 		
 		private var _master:Console;
@@ -154,77 +152,6 @@ package com.luaye.console.view {
 		//
 		//
 		//
-		public function get fpsMonitor():Boolean{
-			return (getPanel(Console.PANEL_FPS) as FPSPanel)!=null;
-		}
-		public function set fpsMonitor(b:Boolean):void{
-			if(fpsMonitor != b){
-				if(b){
-					var fps:FPSPanel = new FPSPanel(_master);
-					fps.x = _mainPanel.x+_mainPanel.width-160;
-					fps.y = _mainPanel.y+15;
-					addPanel(fps);
-				}else {
-					removePanel(Console.PANEL_FPS);
-				}
-				_mainPanel.updateMenu();
-			}
-		}
-		//
-		//
-		//
-		public function get memoryMonitor():Boolean{
-			return (getPanel(Console.PANEL_MEMORY) as MemoryPanel)!=null;
-		}
-		public function set memoryMonitor(b:Boolean):void{
-			if(memoryMonitor != b){
-				if(b){
-					var mp:MemoryPanel = new MemoryPanel(_master);
-					mp.x = _mainPanel.x+_mainPanel.width-80;
-					mp.y = _mainPanel.y+15;
-					addPanel(mp);
-				}else {
-					removePanel(Console.PANEL_MEMORY);
-				}
-				_mainPanel.updateMenu();
-			}
-		}
-		//
-		//
-		//
-		/*public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			n = USER_GRAPH_PREFIX+n;
-			var graph:GraphingPanel = getPanel(n) as GraphingPanel;
-			if(!graph){
-				graph = new GraphingPanel(_master, 100,100);
-				graph.x = _mainPanel.x + 80;
-				graph.y = _mainPanel.y + 20;
-				graph.name = n;
-			}
-			if(rect){
-				graph.x = rect.x;
-				graph.y = rect.y;
-				if(rect.width>0)
-					graph.width = rect.width;
-				if(rect.height>0)
-					graph.height = rect.height;
-			}
-			if(inverse) graph.inverse = true; // one way setting
-			graph.add(obj,prop,col, key);
-			addPanel(graph);
-		}
-		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
-			var graph:GraphingPanel = getPanel(USER_GRAPH_PREFIX+n) as GraphingPanel;
-			if(graph){
-				graph.fixRange(min, max);
-			}
-		}
-		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
-			var graph:GraphingPanel = getPanel(USER_GRAPH_PREFIX+n) as GraphingPanel;
-			if(graph){
-				graph.remove(obj, prop);
-			}
-		}*/
 		private function updateGraphs(graphs:Array):void{
 			var usedMap:Object = {};
 			var fpsGroup:GraphGroup;
@@ -258,6 +185,7 @@ package com.luaye.console.view {
 			}
 			for(var X:String in _graphsMap){
 				if(!usedMap[X]){
+					removePanel(_graphsMap[X]);
 					delete _graphsMap[X];
 				}
 			}

@@ -23,21 +23,15 @@
 * 
 */
 package com.luaye.console.view {
-	import com.luaye.console.utils.Utils;
-	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.Console;
 	import com.luaye.console.view.GraphingPanel;
-	
-	import flash.events.Event;
+	import com.luaye.console.vos.GraphGroup;
 
 	public class FPSPanel extends GraphingPanel {
-		//
-		private var _avg:Number;
 		//
 		public function FPSPanel(m:Console) {
 			super(m, 80,40);
 			name = Console.PANEL_FPS;
-			lowest = 0;
 			minimumWidth = 32;
 			// 
 		}
@@ -47,15 +41,13 @@ package com.luaye.console.view {
 		}
 		public override function update(group:GraphGroup):void{
 			super.update(group);
-			if(isNaN(_avg)) _avg = _v;
-			_avg = Utils.averageOut(_avg, _v, 10);
 			updateKeyText();
 		}
 		public override function updateKeyText():void{
-			if(isNaN(_v)){
+			if(isNaN(_interest.v)) {
 				keyTxt.htmlText = "<r><s>no fps input <menu><a href=\"event:close\">X</a></menu></s></r>";
 			}else{
-				keyTxt.htmlText = "<r><s>"+_v.toFixed(1)+" | "+_avg.toFixed(1)+" <menu><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
+				keyTxt.htmlText = "<r><s>"+_interest.v.toFixed(1)+" | "+_interest.avg.toFixed(1)+" <menu><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
 			}
 			keyTxt.scrollH = keyTxt.maxScrollH;
 		}

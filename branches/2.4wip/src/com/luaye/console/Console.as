@@ -56,8 +56,8 @@ package com.luaye.console {
 	 */
 	public class Console extends Sprite {
 
-		public static const VERSION:Number = 2.35;
-		public static const VERSION_STAGE:String = "";
+		public static const VERSION:Number = 2.4;
+		public static const VERSION_STAGE:String = "WIP";
 		//
 		public static const NAME:String = "Console";
 		public static const PANEL_MAIN:String = "mainPanel";
@@ -116,8 +116,6 @@ package com.luaye.console {
 		private var _filterText:String;
 		private var _filterRegExp:RegExp;
 		private var _keyBinds:Object = {};
-		private var _mspf:Number;
-		private var _previousTime:Number;
 		private var _traceCall:Function = trace;
 		private var _rollerCaptureKey:String;
 		private var _commandLineAllowed:Boolean = true;
@@ -149,7 +147,7 @@ package com.luaye.console {
 			_lines = new Logs();
 			ud = new UserData(SharedObjectName,"/");
 			cl = new CommandLine(this);
-			graphing = new Graphing();
+			graphing = new Graphing(report);
 			_remoter = new Remoting(this, remoteLogSend, pass);
 			//
 			// VIEW setup
@@ -327,7 +325,7 @@ package com.luaye.console {
 		}
 		public function set fpsMonitor(b:Boolean):void{
 			graphing.fpsMonitor = b;
-			//panels.fpsMonitor = b;
+			panels.mainPanel.updateMenu();
 		}
 		//
 		public function get memoryMonitor():Boolean{
@@ -335,7 +333,7 @@ package com.luaye.console {
 		}
 		public function set memoryMonitor(b:Boolean):void{
 			graphing.memoryMonitor = b;
-			//panels.memoryMonitor = b;
+			panels.mainPanel.updateMenu();
 		}
 		//
 		public function watch(o:Object,n:String = null):String{
@@ -413,10 +411,6 @@ package com.luaye.console {
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			var time:int = getTimer();
-			_mspf = time-_previousTime;
-			_previousTime = time;
-			
 			if( _isRepeating ){
 				_repeated++;
 				if(_repeated > maxRepeats && maxRepeats >= 0){
@@ -445,17 +439,8 @@ package com.luaye.console {
 				_lineAdded = false;
 			}
 			if(_remoter.remoting){
-				_remoter.update(_mspf, stage?stage.frameRate:0);
+				//_remoter.update(_mspf, stage?stage.frameRate:0);
 			}
-		}
-		public function get fps():Number{
-			return 1000/_mspf;
-		}
-		public function get mspf():Number{
-			return _mspf;
-		}
-		public function get currentMemory():uint {
-			return _remoter.isRemote?_remoter.remoteMem:System.totalMemory;
 		}
 		//
 		// REMOTING
@@ -493,7 +478,7 @@ package com.luaye.console {
 					addLine(line.text,line.p,line.c,line.r,line.s);
 				}
 			}
-			var remoteMSPFs:Array = obj[1];
+			/*var remoteMSPFs:Array = obj[1];
 			if(remoteMSPFs){
 				var fpsp:FPSPanel = panels.getPanel(PANEL_FPS) as FPSPanel;
 				if(fpsp){
@@ -511,7 +496,7 @@ package com.luaye.console {
 					//fpsp.drawGraph();
 				}
 			}
-			_remoter.remoteMem = obj[2];
+			_remoter.remoteMem = obj[2];*/
 			if(obj[3]){ 
 				// older clients don't send CL scope
 				panels.mainPanel.updateCLScope(obj[3]);
