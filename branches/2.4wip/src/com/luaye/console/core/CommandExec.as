@@ -550,8 +550,6 @@ package com.luaye.console.core {
 	}
 }
 class Value{
-	// TODO: potentially, we can have value only for 'non-reference', and have a boolen to tell if its a reference or value
-	
 	// this is a class to remember the base object and property name that holds the value...
 	public var base:*;
 	public var prop:String;

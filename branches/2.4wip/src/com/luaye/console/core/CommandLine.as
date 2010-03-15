@@ -41,7 +41,6 @@ package com.luaye.console.core {
 		
 		private var _saved:WeakObject;
 		
-		// TODO: prev scope should be weak.
 		private var _scope:*;
 		private var _prevScope:WeakRef;
 		
@@ -238,19 +237,5 @@ package com.luaye.console.core {
 		//private function debug(...args):void{
 		//	_master.report(_master.joinArgs(args), 2, false);
 		//}
-	}
-}
-class Value{
-	// TODO: potentially, we can have value only for 'non-reference', and have a boolen to tell if its a reference or value
-	
-	// this is a class to remember the base object and property name that holds the value...
-	public var base:Object;
-	public var prop:String;
-	public var value:*;
-	
-	public function Value(v:* = null, b:Object = null, p:String = null):void{
-		base = b;
-		prop = p;
-		value = v;
 	}
 }

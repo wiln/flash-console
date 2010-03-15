@@ -70,6 +70,7 @@ package com.luaye.console.core {
 			}
 		}
 		public function update(mspf:Number, sFR:Number = NaN):void{
+			// TODO: pass in graphing (includes FPS and memory)
 			_remoteDelayed++;
 			if(!_loggedIn) return;
 			_mspfsForRemote.push(mspf);
