@@ -53,9 +53,19 @@ package com.luaye.console.core {
 				_map[n] = group;
 				_groups.push(group);
 			}
+			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
+			if(key == null) key = prop;
+			var interest:GraphInterest;
+			var interests:Array = group.interests;
+			for each(interest in interests){
+				if(interest.key == key){
+					// TODO: maybe warn in console that the key already exists.
+					return;
+				}
+			}
 			if(rect) group.rect = rect;
 			if(inverse) group.inverse = inverse;
-			var interest:GraphInterest = new GraphInterest(key, col);
+			interest = new GraphInterest(key, col);
 			interest.setObject(obj, prop);
 			group.interests.push(interest);
 		}
@@ -65,6 +75,7 @@ package com.luaye.console.core {
 			if(!group) return;
 			group.lowest = low;
 			group.highest = high;
+			group.fixed = !(isNaN(low)||isNaN(high));
 		}
 		public function remove(n:String, obj:Object = null, prop:String = null):void{
 			var group:GraphGroup = _map[n];
@@ -95,11 +106,15 @@ package com.luaye.console.core {
 		}
 		public function set fpsMonitor(b:Boolean):void{
 			if(b != fpsMonitor){
-				if(b) _fpsGroup = addSpecialGroup(GraphGroup.TYPE_FPS);
-				else{
+				if(b) {
+					_fpsGroup = addSpecialGroup(GraphGroup.TYPE_FPS);
+					_fpsGroup.lowest = 0;
+					_fpsGroup.fixed = true;
+				} else{
 					_previousTime = -1;
 					var index:int = _groups.indexOf(_fpsGroup);
 					if(index>=0) _groups.splice(index, 1);
+					_fpsGroup = null;
 				}
 			}
 		}
@@ -109,10 +124,13 @@ package com.luaye.console.core {
 		}
 		public function set memoryMonitor(b:Boolean):void{
 			if(b != memoryMonitor){
-				if(b) _memGroup = addSpecialGroup(GraphGroup.TYPE_MEM);
-				else{
+				if(b) {
+					_memGroup = addSpecialGroup(GraphGroup.TYPE_MEM);
+					_memGroup.freq = 5;
+				} else{
 					var index:int = _groups.indexOf(_memGroup);
 					if(index>=0) _groups.splice(index, 1);
+					_memGroup = null;
 				}
 			}
 		}
@@ -120,7 +138,7 @@ package com.luaye.console.core {
 			var group:GraphGroup = new GraphGroup("special");
 			group.type = type;
 			_groups.push(group);
-			var graph:GraphInterest = new GraphInterest();
+			var graph:GraphInterest = new GraphInterest("special", type==GraphGroup.TYPE_FPS?0xFF3333:0x5060FF);
 			group.interests.push(graph);
 			return group;
 		}
@@ -142,6 +160,7 @@ package com.luaye.console.core {
 				}else if(group.type == GraphGroup.TYPE_MEM){
 					interest = group.interests[0];
 					v = System.totalMemory;
+					updateMinMax(group, v);
 					if(stack) interest.values.push(v);
 					else interest.values = [v];
 				}else{
@@ -154,10 +173,19 @@ package com.luaye.console.core {
 							// TODO: Maybe report in console of the error and removal.
 							remove(group.name, interest.obj, interest.prop);
 						}
+						updateMinMax(group, v);
 					}
 				}
 			}
 			return _groups;
+		}
+		private function updateMinMax(group:GraphGroup, v:Number):void{
+			if(!isNaN(v) && !group.fixed){
+				if(isNaN(group.lowest)) group.lowest = v;
+				if(isNaN(group.highest)) group.highest = v;
+				if(v > group.highest) group.highest = v;
+				if(v < group.lowest) group.lowest = v;
+			}
 		}
 	}
 }

@@ -11,8 +11,10 @@ package com.luaye.console.vos {
 	
 		public var type:uint;
 		public var name:String;
+		public var freq:int = 1; // update every n number of frames.
 		public var lowest:Number;
 		public var highest:Number;
+		public var fixed:Boolean;
 		public var averaging:uint;
 		public var inverse:Boolean;
 		public var interests:Array = [];

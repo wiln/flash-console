@@ -249,15 +249,15 @@ package com.luaye.console {
 				return;
 			}
 			graphing.add(n,obj,prop,col,key,rect,inverse);
-			panels.addGraph(n,obj,prop,col,key,rect,inverse);
+			//panels.addGraph(n,obj,prop,col,key,rect,inverse);
 		}
 		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
 			graphing.fixRange(n, min, max);
-			panels.fixGraphRange(n, min, max);
+			//panels.fixGraphRange(n, min, max);
 		}
 		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			graphing.remove(n, obj, prop);
-			panels.removeGraph(n, obj, prop);
+			//panels.removeGraph(n, obj, prop);
 		}
 		//
 		// WARNING: key binding hard references the function. 
@@ -323,19 +323,19 @@ package com.luaye.console {
 		}
 		//
 		public function get fpsMonitor():Boolean{
-			return panels.fpsMonitor;
+			return graphing.fpsMonitor;
 		}
 		public function set fpsMonitor(b:Boolean):void{
 			graphing.fpsMonitor = b;
-			panels.fpsMonitor = b;
+			//panels.fpsMonitor = b;
 		}
 		//
 		public function get memoryMonitor():Boolean{
-			return panels.memoryMonitor;
+			return graphing.memoryMonitor;
 		}
 		public function set memoryMonitor(b:Boolean):void{
 			graphing.memoryMonitor = b;
-			panels.memoryMonitor = b;
+			//panels.memoryMonitor = b;
 		}
 		//
 		public function watch(o:Object,n:String = null):String{
@@ -423,29 +423,26 @@ package com.luaye.console {
 					_isRepeating = false;
 				}
 			}
-			if(!_isPaused && _mm!=null){
-				var arr:Array = _mm.update();
-				if(arr.length>0){
-					report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
-					if(!_mm.haveItemsWatching) _mm = null;
+			var graphsList:Array;
+			if(!_isPaused){
+				if(_mm!=null){
+					var arr:Array = _mm.update();
+					if(arr.length>0){
+						report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
+						if(!_mm.haveItemsWatching) _mm = null;
+					}
 				}
+				graphsList = graphing.update(false, stage?stage.frameRate:0);
 			}
-			var graphList:Array = graphing.update(false, stage?stage.frameRate:0);
 			// VIEW UPDATES ONLY
 			if(visible && parent!=null){
 				if(alwaysOnTop && parent.getChildAt(parent.numChildren-1) != this && moveTopAttempts>0){
 					moveTopAttempts--;
 					parent.addChild(this);
-					if(!quiet){
-						report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
-					}
+					if(!quiet) report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
 				}
-				panels.update(graphList, !_isPaused && _lineAdded);
-				if(_lineAdded) {
-					var chPanel:ChannelsPanel = panels.getPanel(PANEL_CHANNELS) as ChannelsPanel;
-					if(chPanel) chPanel.update();
-					_lineAdded = false;
-				}
+				panels.update(graphsList, _isPaused, _lineAdded);
+				_lineAdded = false;
 			}
 			if(_remoter.remoting){
 				_remoter.update(_mspf, stage?stage.frameRate:0);
@@ -508,10 +505,10 @@ package com.luaye.console {
 					for(var i:int = 1; i<len;i++){
 						var fps:Number = 1000/remoteMSPFs[i];
 						if(fps > highest) fps = highest;
-						fpsp.addCurrent(fps);
+						//fpsp.addCurrent(fps);
 					}
 					fpsp.updateKeyText();
-					fpsp.drawGraph();
+					//fpsp.drawGraph();
 				}
 			}
 			_remoter.remoteMem = obj[2];
