@@ -33,7 +33,8 @@ package com.luaye.console.view {
 	import flash.text.TextField;
 
 	public class GraphingPanel extends AbstractPanel {
-		
+		//
+		public static const FPS_MAX_LAG_FRAMES:uint = 30;
 		//
 		protected var _group:GraphGroup;
 		protected var _interest:GraphInterest;
@@ -166,7 +167,19 @@ package com.luaye.console.view {
 					_infoMap[n] = info;
 				}
 				var history:Array = info.history;
-				if(doPush) history.push(_interest.values[_interest.values.length-1]);
+				if(doPush) {
+					// special case for FPS, because it needs to fill some frames for lagged 1s...
+					if(group.type == GraphGroup.TYPE_FPS){
+						var frames:int = Math.floor(group.highest/_interest.v);
+						if(frames>FPS_MAX_LAG_FRAMES) frames = FPS_MAX_LAG_FRAMES; // Don't add too many
+						while(frames>0){
+							history.push(_interest.v);
+							frames--;
+						}
+					}else{
+						history.push(_interest.v);
+					}
+				}
 				var len:int = history.length;
 				var maxLen:int = Math.floor(W)+10;
 				if(len > maxLen){

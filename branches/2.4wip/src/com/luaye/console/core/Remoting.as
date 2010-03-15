@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console.core {
+	import com.luaye.console.vos.Log;
 	import com.luaye.console.Console;
 
 	import flash.events.EventDispatcher;
@@ -74,12 +75,12 @@ package com.luaye.console.core {
 			_mspfsForRemote.push(mspf);
 			if(sFR){
 				// this is to try add the frames that have been lagged
-				var frames:int = Math.floor(mspf/(1000/sFR));
-				if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES;
+				//var frames:int = Math.floor(mspf/(1000/sFR));
+				/*if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES;
 				while(frames>1){
 					_mspfsForRemote.push(mspf);
 					frames--;
-				}
+				}*/
 			}
 			if(_remoteDelayed >= _master.remoteDelay){
 				_remoteDelayed = 0;

@@ -184,13 +184,6 @@ package com.luaye.console.core {
 						group.highest = fps;
 						interest = interests[0];
 						var time:int = getTimer();
-						/* TODO: add frames dropped. somehow...
-						// this is to try add the frames that have been lagged
-						if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES; // Don't add too many
-						while(frames>1){
-							updateData();
-							frames--;
-						}*/
 						if(_previousTime >= 0){
 							var mspf:Number = time-_previousTime;
 							v = 1000/mspf;

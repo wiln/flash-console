@@ -23,19 +23,17 @@
 * 
 */
 package com.luaye.console {
-	import com.luaye.console.core.Graphing;
-	import com.luaye.console.view.MainPanel;
 	import com.luaye.console.core.CommandLine;
-	import com.luaye.console.core.Log;
-	import com.luaye.console.core.Logs;
+	import com.luaye.console.core.Graphing;
 	import com.luaye.console.core.MemoryMonitor;
 	import com.luaye.console.core.Remoting;
 	import com.luaye.console.core.UserData;
 	import com.luaye.console.utils.Utils;
-	import com.luaye.console.view.ChannelsPanel;
-	import com.luaye.console.view.FPSPanel;
+	import com.luaye.console.view.MainPanel;
 	import com.luaye.console.view.PanelsManager;
 	import com.luaye.console.view.RollerPanel;
+	import com.luaye.console.vos.Log;
+	import com.luaye.console.vos.Logs;
 
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
@@ -43,7 +41,6 @@ package com.luaye.console {
 	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
 	import flash.net.LocalConnection;
-	import flash.system.System;
 	import flash.text.StyleSheet;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
@@ -78,7 +75,6 @@ package com.luaye.console {
 		public static const ERROR_LEVEL:uint = 9;
 		public static const FATAL_LEVEL:uint = 10;
 		//
-		public static const FPS_MAX_LAG_FRAMES:uint = 25;
 		public static const MAPPING_SPLITTER:String = "|";
 		//
 		// You can change this if you don't want to use default channel
