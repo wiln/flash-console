@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console {
+	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Graphing;
 	import com.luaye.console.core.MemoryMonitor;
@@ -102,7 +103,7 @@ package com.luaye.console {
 		public var alwaysOnTop:Boolean = true;
 		public var moveTopAttempts:int = 50;
 		public var maxRepeats:Number = 75;
-		public var remoteDelay:int = 20;
+		public var remoteDelay:int = 10;
 		public var tracingPriority:int = 0;
 		public var rulerHidesMouse:Boolean = true;
 		//
@@ -116,6 +117,7 @@ package com.luaye.console {
 		private var _traceCall:Function = trace;
 		private var _rollerCaptureKey:String;
 		private var _commandLineAllowed:Boolean = true;
+		private var _stackGraph:Boolean;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL, DEFAULT_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -423,7 +425,12 @@ package com.luaye.console {
 						if(!_mm.haveItemsWatching) _mm = null;
 					}
 				}
-				graphsList = graphing.update(false, stage?stage.frameRate:0);
+				if(!_remoter.isRemote) graphsList = graphing.update(_stackGraph, stage?stage.frameRate:0);
+				if(_remoter.remoting){
+					_stackGraph = !_remoter.update(graphsList);
+				}else {
+					_stackGraph = false;
+				}
 			}
 			// VIEW UPDATES ONLY
 			if(visible && parent!=null){
@@ -432,11 +439,9 @@ package com.luaye.console {
 					parent.addChild(this);
 					if(!quiet) report("Moved console on top (alwaysOnTop enabled), "+moveTopAttempts+" attempts left.",-1);
 				}
-				panels.update(graphsList, _isPaused, _lineAdded);
+				panels.update(_isPaused, _lineAdded);
+				if(graphsList) panels.updateGraphs(graphsList); 
 				_lineAdded = false;
-			}
-			if(_remoter.remoting){
-				//_remoter.update(_mspf, stage?stage.frameRate:0);
 			}
 		}
 		//
@@ -475,27 +480,20 @@ package com.luaye.console {
 					addLine(line.text,line.p,line.c,line.r,line.s);
 				}
 			}
-			/*var remoteMSPFs:Array = obj[1];
-			if(remoteMSPFs){
-				var fpsp:FPSPanel = panels.getPanel(PANEL_FPS) as FPSPanel;
-				if(fpsp){
-					// the first value is stage.FrameRate
-					var highest:Number = remoteMSPFs[0];
-					fpsp.highest = highest;
-					fpsp.averaging = highest;
-					var len:int = remoteMSPFs.length;
-					for(var i:int = 1; i<len;i++){
-						var fps:Number = 1000/remoteMSPFs[i];
-						if(fps > highest) fps = highest;
-						//fpsp.addCurrent(fps);
-					}
-					fpsp.updateKeyText();
-					//fpsp.drawGraph();
+			try{
+			var graphs:Array = obj[1];
+			if(graphs){
+				var a:Array = [];
+				for each(var o:Object in obj[1]){
+					a.push(GraphGroup.fromObject(o));
 				}
+				panels.updateGraphs(a); 
 			}
-			_remoter.remoteMem = obj[2];*/
-			if(obj[3]){ 
-				// older clients don't send CL scope
+			}catch(e:Error){
+				report(e);
+			}
+			
+			if(obj[3]){
 				panels.mainPanel.updateCLScope(obj[3]);
 			}
 		}

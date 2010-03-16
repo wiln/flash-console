@@ -137,15 +137,17 @@ package com.luaye.console.view {
 		//
 		public function update(group:GraphGroup):void{
 			_group = group;
-			var doPush:Boolean = true;
+			var push:int = 1; // 0 = no push, 1 = 1 push, 2 = push all
 			if(group.freq>1){
 				updatedFrame++;
 				if(updatedFrame < group.freq){
-					doPush = false;
+					push = 0;
 					if(!_needRedraw) return;
 				}else{
 					updatedFrame=0;
 				}
+			}else if(group.freq<0){
+				push = 2;
 			}
 			_needRedraw = false;
 			var interests:Array = group.interests;
@@ -167,7 +169,7 @@ package com.luaye.console.view {
 					_infoMap[n] = info;
 				}
 				var history:Array = info.history;
-				if(doPush) {
+				if(push == 1) {
 					// special case for FPS, because it needs to fill some frames for lagged 1s...
 					if(group.type == GraphGroup.TYPE_FPS){
 						var frames:int = Math.floor(group.highest/_interest.v);
@@ -179,6 +181,9 @@ package com.luaye.console.view {
 					}else{
 						history.push(_interest.v);
 					}
+				}else if(push == 2) {
+					history = history.concat(_interest.values);
+					info.history = history;
 				}
 				var len:int = history.length;
 				var maxLen:int = Math.floor(W)+10;

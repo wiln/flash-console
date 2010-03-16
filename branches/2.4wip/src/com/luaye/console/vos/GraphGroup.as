@@ -36,5 +36,26 @@ package com.luaye.console.vos {
 				if(v < lowest) lowest = v;
 			}
 		}
+		//
+		//
+		//
+		public function toObject():Object{
+			var gis:Array = [];
+			for each(var gi:GraphInterest in interests) gis.push(gi.toObject());
+			return {type:type, name:name, freq:freq, lowest:lowest, highest:highest, fixed:fixed, averaging:averaging, inverse:inverse, interests:gis, rect:rect};
+		}
+		public static function fromObject(o:Object):GraphGroup{
+			var g:GraphGroup = new GraphGroup(o.name);
+			g.type = o.type;
+			g.freq = o.freq;
+			g.lowest = o.lowest;
+			g.highest = o.highest;
+			g.averaging = o.averaging;
+			g.inverse = o.inverse;
+			//g.rect = o.rect;
+			g.freq = -1;
+			for each(var io:Object in o.interests) g.interests.push(GraphInterest.fromObject(io));
+			return g;
+		}
 	}
 }

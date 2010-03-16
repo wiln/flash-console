@@ -23,6 +23,7 @@
 * 
 */
 package com.luaye.console.core {
+	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.vos.Log;
 	import com.luaye.console.Console;
 
@@ -69,7 +70,28 @@ package com.luaye.console.core {
 				_remoteLinesQueue.splice(0,1);
 			}
 		}
-		public function update(mspf:Number, sFR:Number = NaN):void{
+		public function update(graphs:Array):Boolean{
+			_remoteDelayed++;
+			if(!_loggedIn) return false;
+			if(_remoteDelayed >= _master.remoteDelay){
+				_remoteDelayed = 0;
+				var newQueue:Array = new Array();
+				if(_remoteLinesQueue.length > 20){
+					newQueue = _remoteLinesQueue.splice(20);
+					// to force update next farme
+					_remoteDelayed = _master.remoteDelay;
+				}
+				var a:Array = [];
+				for each(var ggroup:GraphGroup in graphs){
+					a.push(ggroup.toObject());
+				}
+				send("logSend", [_remoteLinesQueue, a, null, _master.cl.scopeString]);
+				_remoteLinesQueue = newQueue;
+				return true;
+			}
+			return false;
+		}
+		/*public function update(mspf:Number, sFR:Number = NaN):void{
 			// TODO: pass in graphing (includes FPS and memory)
 			_remoteDelayed++;
 			if(!_loggedIn) return;
@@ -77,27 +99,24 @@ package com.luaye.console.core {
 			if(sFR){
 				// this is to try add the frames that have been lagged
 				//var frames:int = Math.floor(mspf/(1000/sFR));
-				/*if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES;
+				if(frames>Console.FPS_MAX_LAG_FRAMES) frames = Console.FPS_MAX_LAG_FRAMES;
 				while(frames>1){
 					_mspfsForRemote.push(mspf);
 					frames--;
-				}*/
+				}
 			}
 			if(_remoteDelayed >= _master.remoteDelay){
 				_remoteDelayed = 0;
 				var newQueue:Array = new Array();
-				// don't send too many lines at once cause there is 50kb limit with LocalConnection.send
-				// Buffer it...
 				if(_remoteLinesQueue.length > 20){
 					newQueue = _remoteLinesQueue.splice(20);
 					// to force update next farme
 					_remoteDelayed = _master.remoteDelay;
 				}
-				//send("logSend", [_remoteLinesQueue, _mspfsForRemote, _master.currentMemory, _master.cl.scopeString]);
 				_remoteLinesQueue = newQueue;
 				_mspfsForRemote = [sFR?sFR:30];
 			}
-		}
+		}*/
 		public function send(command:String, ...args):void{
 			var target:String = Console.RemotingConnectionName+(_isRemote?CLIENT_PREFIX:REMOTE_PREFIX);
 			args = [target, command].concat(args);

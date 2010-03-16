@@ -78,10 +78,9 @@ package com.luaye.console.view {
 		public function getPanel(n:String):AbstractPanel{
 			return _master.getChildByName(n) as AbstractPanel;
 		}
-		public function update(graphs:Array, paused:Boolean, lineAdded:Boolean):void{
+		public function update(paused:Boolean, lineAdded:Boolean):void{
 			_mainPanel.update(!paused && lineAdded);
 			if(!paused) {
-				updateGraphs(graphs);
 				if(lineAdded && _chsPanel!=null){
 					_chsPanel.update();
 				}
@@ -152,7 +151,7 @@ package com.luaye.console.view {
 		//
 		//
 		//
-		private function updateGraphs(graphs:Array):void{
+		public function updateGraphs(graphs:Array):void{
 			var usedMap:Object = {};
 			var fpsGroup:GraphGroup;
 			var memGroup:GraphGroup;

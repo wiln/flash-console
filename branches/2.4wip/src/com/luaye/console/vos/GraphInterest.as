@@ -53,5 +53,18 @@ package com.luaye.console.vos {
 			}
 				
 		}
+		//
+		//
+		//
+		public function toObject():Object{
+			return {key:key, col:col, values:values, avg:avg};
+		}
+		public static function fromObject(o:Object):GraphInterest{
+			var interest:GraphInterest = new GraphInterest(o.key, o.col);
+			interest.values = o.values;
+			if(o.values.length) interest.v = o.values[o.values.length-1];
+			interest.avg = o.avg;
+			return interest;
+		}
 	}
 }
