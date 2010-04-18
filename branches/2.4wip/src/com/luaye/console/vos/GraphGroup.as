@@ -12,11 +12,11 @@ package com.luaye.console.vos {
 		public var type:uint;
 		public var name:String;
 		public var freq:int = 1; // update every n number of frames.
-		public var lowest:Number;
-		public var highest:Number;
+		public var low:Number;
+		public var hi:Number;
 		public var fixed:Boolean;
 		public var averaging:uint;
-		public var inverse:Boolean;
+		public var inv:Boolean;
 		public var interests:Array = [];
 		public var rect:Rectangle;
 		//
@@ -28,12 +28,12 @@ package com.luaye.console.vos {
 		}
 		public function updateMinMax(v:Number):void{
 			if(!isNaN(v) && !fixed){
-				if(isNaN(lowest)) {
-					lowest = v;
-					highest = v;
+				if(isNaN(low)) {
+					low = v;
+					hi = v;
 				}
-				if(v > highest) highest = v;
-				if(v < lowest) lowest = v;
+				if(v > hi) hi = v;
+				if(v < low) low = v;
 			}
 		}
 		//
@@ -42,19 +42,16 @@ package com.luaye.console.vos {
 		public function toObject():Object{
 			var gis:Array = [];
 			for each(var gi:GraphInterest in interests) gis.push(gi.toObject());
-			return {type:type, name:name, freq:freq, lowest:lowest, highest:highest, fixed:fixed, averaging:averaging, inverse:inverse, interests:gis, rect:rect};
+			return {t:type, n:name, l:low, h:hi, idle:idle, v:inv, i:gis};
 		}
-		public static function fromObject(o:Object):GraphGroup{
-			var g:GraphGroup = new GraphGroup(o.name);
-			g.type = o.type;
-			g.freq = o.freq;
-			g.lowest = o.lowest;
-			g.highest = o.highest;
-			g.averaging = o.averaging;
-			g.inverse = o.inverse;
-			//g.rect = o.rect;
-			g.freq = -1;
-			for each(var io:Object in o.interests) g.interests.push(GraphInterest.fromObject(io));
+		public static function FromObject(o:Object):GraphGroup{
+			var g:GraphGroup = new GraphGroup(o.n);
+			g.type = o.t;
+			g.idle = o.idle;
+			g.low = o.l;
+			g.hi = o.h;
+			g.inv = o.v;
+			if(o.i != null) for each(var io:Object in o.i) g.interests.push(GraphInterest.FromObject(io));
 			return g;
 		}
 	}

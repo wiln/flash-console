@@ -44,8 +44,6 @@ package com.luaye.console.core {
 		public function Graphing(reporter:Function){
 			_report = reporter;
 		}
-		// WINDOW name lowest highest averaging inverse
-		// GRAPH key color values
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			var group:GraphGroup = _map[n];
 			var newGroup:Boolean;
@@ -64,7 +62,7 @@ package com.luaye.console.core {
 				}
 			}
 			if(rect) group.rect = rect;
-			if(inverse) group.inverse = inverse;
+			if(inverse) group.inv = inverse;
 			interest = new GraphInterest(key, col);
 			var v:Number = NaN;
 			try{
@@ -87,8 +85,8 @@ package com.luaye.console.core {
 		public function fixRange(n:String, low:Number = NaN, high:Number = NaN):void{
 			var group:GraphGroup = _map[n];
 			if(!group) return;
-			group.lowest = low;
-			group.highest = high;
+			group.low = low;
+			group.hi = high;
 			group.fixed = !(isNaN(low)||isNaN(high));
 		}
 		public function remove(n:String, obj:Object = null, prop:String = null):void{
@@ -122,7 +120,7 @@ package com.luaye.console.core {
 			if(b != fpsMonitor){
 				if(b) {
 					_fpsGroup = addSpecialGroup(GraphGroup.TYPE_FPS);
-					_fpsGroup.lowest = 0;
+					_fpsGroup.low = 0;
 					_fpsGroup.fixed = true;
 					_fpsGroup.averaging = 30;
 				} else{
@@ -163,7 +161,7 @@ package com.luaye.console.core {
 			group.interests.push(graph);
 			return group;
 		}
-		public function update(stack:Boolean = false, fps:Number = 0):Array{
+		public function update(fps:Number = 0):Array{
 			var interest:GraphInterest;
 			var v:Number;
 			for each(var group:GraphGroup in _groups){
@@ -181,25 +179,25 @@ package com.luaye.console.core {
 					var averaging:uint = group.averaging;
 					var interests:Array = group.interests;
 					if(typ == GraphGroup.TYPE_FPS){
-						group.highest = fps;
+						group.hi = fps;
 						interest = interests[0];
 						var time:int = getTimer();
 						if(_previousTime >= 0){
 							var mspf:Number = time-_previousTime;
 							v = 1000/mspf;
-							interest.addValue(v, averaging, stack);
+							interest.setValue(v, averaging);
 						}
 						_previousTime = time;
 					}else if(typ == GraphGroup.TYPE_MEM){
 						interest = interests[0];
 						v = Math.round(System.totalMemory/10485.76)/100;
 						group.updateMinMax(v);
-						interest.addValue(v, averaging, stack);
+						interest.setValue(v, averaging);
 					}else{
 						for each(interest in interests){
 							try{
 								v = interest.getCurrentValue();
-								interest.addValue(v, averaging, stack);
+								interest.setValue(v, averaging);
 							}catch(e:Error){
 								_report("Error with graph value for key ["+interest.key+"] in ["+group.name+"].", 10);
 								remove(group.name, interest.obj, interest.prop);

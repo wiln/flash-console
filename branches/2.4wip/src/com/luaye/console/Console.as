@@ -23,7 +23,6 @@
 * 
 */
 package com.luaye.console {
-	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.core.CommandLine;
 	import com.luaye.console.core.Graphing;
 	import com.luaye.console.core.MemoryMonitor;
@@ -33,8 +32,10 @@ package com.luaye.console {
 	import com.luaye.console.view.MainPanel;
 	import com.luaye.console.view.PanelsManager;
 	import com.luaye.console.view.RollerPanel;
+	import com.luaye.console.vos.GraphGroup;
 	import com.luaye.console.vos.Log;
 	import com.luaye.console.vos.Logs;
+	import com.luaye.console.vos.RemoteSync;
 
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
@@ -103,7 +104,7 @@ package com.luaye.console {
 		public var alwaysOnTop:Boolean = true;
 		public var moveTopAttempts:int = 50;
 		public var maxRepeats:Number = 75;
-		public var remoteDelay:int = 10;
+		public var remoteDelay:int = 1;
 		public var tracingPriority:int = 0;
 		public var rulerHidesMouse:Boolean = true;
 		//
@@ -117,7 +118,6 @@ package com.luaye.console {
 		private var _traceCall:Function = trace;
 		private var _rollerCaptureKey:String;
 		private var _commandLineAllowed:Boolean = true;
-		private var _stackGraph:Boolean;
 		
 		private var _channels:Array = [GLOBAL_CHANNEL, DEFAULT_CHANNEL];
 		private var _viewingChannels:Array = [GLOBAL_CHANNEL];
@@ -147,7 +147,7 @@ package com.luaye.console {
 			ud = new UserData(SharedObjectName, SharedObjectPath);
 			cl = new CommandLine(this);
 			graphing = new Graphing(report);
-			_remoter = new Remoting(this, remoteLogSend, pass);
+			_remoter = new Remoting(this, pass);
 			//
 			// VIEW setup
 			style = skin?skin:new ConsoleStyle();
@@ -425,12 +425,8 @@ package com.luaye.console {
 						if(!_mm.haveItemsWatching) _mm = null;
 					}
 				}
-				if(!_remoter.isRemote) graphsList = graphing.update(_stackGraph, stage?stage.frameRate:0);
-				if(_remoter.remoting){
-					_stackGraph = !_remoter.update(graphsList);
-				}else {
-					_stackGraph = false;
-				}
+				if(!_remoter.isRemote) graphsList = graphing.update(stage?stage.frameRate:0);
+				if(_remoter.remoting) _remoter.update(graphsList);
 			}
 			// VIEW UPDATES ONLY
 			if(visible && parent!=null){
@@ -465,37 +461,6 @@ package com.luaye.console {
 		}
 		private function onMainPanelConnectRequest(e:Event) : void {
 			_remoter.login(MainPanel(e.currentTarget).commandLineText);
-		}
-		//
-		// this is sent from client for remote...
-		// obj[0] = array of log lines (text, priority, channel, repeating, safeHTML)
-		// obj[1] = array of 'milliseconds per frame' since previous logsend - for FPS display
-		// obj[2] = client's current memory usage
-		// obj[3] = client's command line scope - string
-		private function remoteLogSend(obj:Array):void{
-			if(!_remoter.isRemote || !obj) return;
-			var lines:Array = obj[0];
-			for each( var line:Object in lines){
-				if(line){
-					addLine(line.text,line.p,line.c,line.r,line.s);
-				}
-			}
-			try{
-			var graphs:Array = obj[1];
-			if(graphs){
-				var a:Array = [];
-				for each(var o:Object in obj[1]){
-					a.push(GraphGroup.fromObject(o));
-				}
-				panels.updateGraphs(a); 
-			}
-			}catch(e:Error){
-				report(e);
-			}
-			
-			if(obj[3]){
-				panels.mainPanel.updateCLScope(obj[3]);
-			}
 		}
 		//
 		//
@@ -542,7 +507,7 @@ package com.luaye.console {
 		public function report(obj:*,priority:Number = 0, skipSafe:Boolean = true):void{
 			addLine(obj, priority, CONSOLE_CHANNEL, false, skipSafe);
 		}
-		private function addLine(obj:*,priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false):void{
+		public function addLine(obj:*,priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false):void{
 			var isRepeat:Boolean = (isRepeating && _isRepeating);
 			var txt:String = (obj is XML || obj is XMLList)?obj.toXMLString():String(obj);
 			if(!channel || channel == GLOBAL_CHANNEL){
@@ -577,9 +542,7 @@ package com.luaye.console {
 			_lineAdded = true;
 			_isRepeating = isRepeating;
 			
-			if(_remoter.remoting){
-				_remoter.addLineQueue(line);
-			}
+			_remoter.addLineQueue(line);
 		}
 		public function lineShouldShow(line:Log):Boolean{
 			return (

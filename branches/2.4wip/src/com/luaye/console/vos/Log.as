@@ -42,7 +42,7 @@ package com.luaye.console.vos {
 			s = skipSafe;
 		}
 		public function toObject():Object{
-			return {text:text, c:c, p:p, r:r, s:s};
+			return {t:text, c:c, p:p, r:r};
 		}
 		public function toString():String{
 			return "["+c+"] " + text;

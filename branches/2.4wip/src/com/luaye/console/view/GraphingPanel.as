@@ -48,7 +48,6 @@ package com.luaye.console.view {
 		protected var highTxt:TextField;
 		protected var keyTxt:TextField;
 		//
-		public var updatedFrame:uint = 0;
 		public var startOffset:int = 5;
 		//
 		public function GraphingPanel(m:Console, W:int = 0, H:int = 0, resizable:Boolean = true) {
@@ -138,24 +137,17 @@ package com.luaye.console.view {
 		public function update(group:GraphGroup):void{
 			_group = group;
 			var push:int = 1; // 0 = no push, 1 = 1 push, 2 = push all
-			if(group.freq>1){
-				updatedFrame++;
-				if(updatedFrame < group.freq){
-					push = 0;
-					if(!_needRedraw) return;
-				}else{
-					updatedFrame=0;
-				}
-			}else if(group.freq<0){
-				push = 2;
+			if(group.idle>0){
+				push = 0;
+				if(!_needRedraw) return;
 			}
 			_needRedraw = false;
 			var interests:Array = group.interests;
 			var W:int = width-startOffset;
 			var H:int = height-graph.y;
 			graph.graphics.clear();
-			var lowest:Number = group.lowest;
-			var highest:Number = group.highest;
+			var lowest:Number = group.low;
+			var highest:Number = group.hi;
 			var diffGraph:Number = highest-lowest;
 			var keys:Object = {};
 			var listchanged:Boolean = false;
@@ -172,7 +164,7 @@ package com.luaye.console.view {
 				if(push == 1) {
 					// special case for FPS, because it needs to fill some frames for lagged 1s...
 					if(group.type == GraphGroup.TYPE_FPS){
-						var frames:int = Math.floor(group.highest/_interest.v);
+						var frames:int = Math.floor(group.hi/_interest.v);
 						if(frames>FPS_MAX_LAG_FRAMES) frames = FPS_MAX_LAG_FRAMES; // Don't add too many
 						while(frames>0){
 							history.push(_interest.v);
@@ -181,9 +173,6 @@ package com.luaye.console.view {
 					}else{
 						history.push(_interest.v);
 					}
-				}else if(push == 2) {
-					history = history.concat(_interest.values);
-					info.history = history;
 				}
 				var len:int = history.length;
 				var maxLen:int = Math.floor(W)+10;
@@ -195,7 +184,7 @@ package com.luaye.console.view {
 				var maxi:int = W>len?len:W;
 				for(var i:int = 1; i<maxi; i++){
 					var Y:Number = (diffGraph?((history[len-i]-lowest)/diffGraph):0.5)*H;
-					if(!group.inverse) Y = H-Y;
+					if(!group.inv) Y = H-Y;
 					if(Y<0)Y=0;
 					if(Y>H)Y=H;
 					if(i==1){
@@ -203,9 +192,9 @@ package com.luaye.console.view {
 					}
 					graph.graphics.lineTo((W-i), Y);
 				}
-				if(group.averaging>0 && diffGraph){
+				if(isNaN(_interest.avg) && diffGraph){
 					Y = ((_interest.avg-lowest)/diffGraph)*H;
-					if(!group.inverse) Y = H-Y;
+					if(!group.inv) Y = H-Y;
 					if(Y<0)Y=0;
 					if(Y>H)Y=H;
 					graph.graphics.lineStyle(1,_interest.col, 0.3);
@@ -219,8 +208,8 @@ package com.luaye.console.view {
 					delete _infoMap[X];
 				}
 			}
-			(group.inverse?highTxt:lowTxt).text = isNaN(group.lowest)?"":"<s>"+group.lowest+"</s>";
-			(group.inverse?lowTxt:highTxt).text = isNaN(group.highest)?"":"<s>"+group.highest+"</s>";
+			(group.inv?highTxt:lowTxt).text = isNaN(group.low)?"":"<s>"+group.low+"</s>";
+			(group.inv?lowTxt:highTxt).text = isNaN(group.hi)?"":"<s>"+group.hi+"</s>";
 			if(listchanged) updateKeyText();
 		}
 		public function updateKeyText():void{

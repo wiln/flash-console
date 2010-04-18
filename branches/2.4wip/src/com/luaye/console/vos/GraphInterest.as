@@ -15,8 +15,6 @@ package com.luaye.console.vos {
 		public var v:Number;
 		public var avg:Number;
 		
-		public var values:Array = [];
-		
 		public function GraphInterest(keystr:String ="", color:Number = 0):void{
 			col = color;
 			key = keystr;
@@ -26,8 +24,7 @@ package com.luaye.console.vos {
 			_prop = property;
 			useExec = _prop.search(/[^\w\d]/) >= 0;
 			//
-			var v:Number = getCurrentValue();
-			values = [v];
+			v = getCurrentValue();
 			avg = v;
 			return v;
 		}
@@ -43,26 +40,19 @@ package com.luaye.console.vos {
 		public function getCurrentValue():Number{
 			return useExec?CommandExec.Exec(obj, _prop):obj[_prop];
 		}
-		public function addValue(val:Number, averaging:uint = 0, stack:Boolean = false):void{
+		public function setValue(val:Number, averaging:uint = 0):void{
 			v = val;
-			if(stack) values.push(v);
-			else values = [v];
-			//
-			if(averaging>0) {
-				avg += ((v-avg)/averaging);
-			}
-				
+			if(averaging>0) avg += ((v-avg)/averaging);
 		}
 		//
 		//
 		//
 		public function toObject():Object{
-			return {key:key, col:col, values:values, avg:avg};
+			return {key:key, col:col, v:v, avg:avg};
 		}
-		public static function fromObject(o:Object):GraphInterest{
+		public static function FromObject(o:Object):GraphInterest{
 			var interest:GraphInterest = new GraphInterest(o.key, o.col);
-			interest.values = o.values;
-			if(o.values.length) interest.v = o.values[o.values.length-1];
+			interest.v = o.v;
 			interest.avg = o.avg;
 			return interest;
 		}
