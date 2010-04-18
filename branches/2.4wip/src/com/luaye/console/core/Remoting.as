@@ -207,8 +207,14 @@ package com.luaye.console.core {
 			// just for sort of security
 			_sharedConnection.client = {
 				login:login, requestLogin:requestLogin, loginFail:loginFail, loginSuccess:loginSuccess,
-				sync:remoteSync, gc:_master.gc, runCommand:_master.runCommand
+				sync:remoteSync, gc:_master.gc, fps:fpsRequest, mem:memRequest, runCommand:_master.runCommand
 				};
+		}
+		private function fpsRequest(b:Boolean):void{
+			_master.fpsMonitor = b;
+		}
+		private function memRequest(b:Boolean):void{
+			_master.memoryMonitor = b;
 		}
 		public function loginFail():void{
 			_master.report("Login Failed", 10);

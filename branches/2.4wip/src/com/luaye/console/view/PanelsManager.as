@@ -196,6 +196,7 @@ package com.luaye.console.view {
 					_fpsPanel.x = _mainPanel.x+_mainPanel.width-160;
 					_fpsPanel.y = _mainPanel.y+15;
 					addPanel(_fpsPanel);
+					_mainPanel.updateMenu();
 				}
 				_fpsPanel.update(fpsGroup);
 			}else if(_fpsPanel!=null){
@@ -210,12 +211,19 @@ package com.luaye.console.view {
 					_memPanel.x = _mainPanel.x+_mainPanel.width-80;
 					_memPanel.y = _mainPanel.y+15;
 					addPanel(_memPanel);
+					_mainPanel.updateMenu();
 				}
 				_memPanel.update(memGroup);
 			}else if(_memPanel!=null){
 				removePanel(Console.PANEL_MEMORY);
 				_memPanel = null;
 			}
+		}
+		public function get memoryMonitor():Boolean{
+			return _memPanel!=null;
+		}
+		public function get fpsMonitor():Boolean{
+			return _fpsPanel!=null;
 		}
 		//
 		//

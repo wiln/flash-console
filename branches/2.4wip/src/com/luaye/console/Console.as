@@ -320,19 +320,29 @@ package com.luaye.console {
 		}
 		//
 		public function get fpsMonitor():Boolean{
+			if(_remoter.isRemote) return panels.fpsMonitor;
 			return graphing.fpsMonitor;
 		}
 		public function set fpsMonitor(b:Boolean):void{
-			graphing.fpsMonitor = b;
-			panels.mainPanel.updateMenu();
+			if(_remoter.isRemote){
+				_remoter.send("fps", b);
+			}else{
+				graphing.fpsMonitor = b;
+				panels.mainPanel.updateMenu();
+			}
 		}
 		//
 		public function get memoryMonitor():Boolean{
+			if(_remoter.isRemote) return panels.memoryMonitor;
 			return graphing.memoryMonitor;
 		}
 		public function set memoryMonitor(b:Boolean):void{
-			graphing.memoryMonitor = b;
-			panels.mainPanel.updateMenu();
+			if(_remoter.isRemote){
+				_remoter.send("mem", b);
+			}else{
+				graphing.memoryMonitor = b;
+				panels.mainPanel.updateMenu();
+			}
 		}
 		//
 		public function watch(o:Object,n:String = null):String{
