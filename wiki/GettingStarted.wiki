@@ -1,4 +1,4 @@
-#labels Phase-Deploy,Featured,Phase-Implementation
+#labels Featured,Phase-Deploy,Phase-Implementation
 =Getting started=
 
 ==Introduction==
