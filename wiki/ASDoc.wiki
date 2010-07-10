@@ -1,4 +1,4 @@
 #summary ASDoc
-#labels Featured,Phase-Deploy
+#labels Phase-Deploy
 
 please see: http://junkbyte.com/flash-console/asdoc/
