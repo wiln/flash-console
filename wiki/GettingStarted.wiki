@@ -3,16 +3,16 @@
 
 ==Introduction==
 
-The main class need to use for console is `C`, (`com.luaye.console.C`). `C` is a static / singleton adapter for `Console` (`com.luaye.console.Console`). 
+
+==Basics==
+The main class need to use for console is `C`, (`com.junkbyte.console.C`). `C` is a static / singleton adapter for `Console` (`com.junkbyte.console.Console`). 
 
 In a later date when you don't need console in your flash project, you can just remove `C.startOnStage(..)` OR `C.start(..)` from your code and the rest of console related codes will stop executing to save memory and performance.
 
 
-==Basics==
-
 Start console on stage... 
 {{{
-import com.luaye.console.C;
+import com.junkbyte.console.C;
 C.startOnStage(this, "");
 }}}
 First parameter is any DisplayObject which is already on stage or to be added.
@@ -20,7 +20,7 @@ If you want to set a keyword for console to start, assign at second parameter.
 Use letters and numbers only. Console will start hidden if you set a password (you can set `C.visible = true;` to force display console)
 You will need to type the keyword in correct sequence to show the console.
 Recommended keyword: ` or ~ or debug (remember to have keyboard short cuts disabled in flash test authoring for some keys to be captured)
-If you want to assign custom style with ConsoleStyle, pass the style object as third param.
+If you want to assign custom style or configuration, pass the modified ConsoleConfig as third param.
 
 Logging...
 
@@ -126,28 +126,20 @@ C.fpsMonitor= true;
 // It will keep logging but will stop all update processes
 C.visible = false;
 
-// disable console
-// It will stop all processes until you enable by code again
-C.enabled = false;
-
-// disable always on top (default is on)
-// when disabled console will stop from keeping it self at the top of the display list
-// this can sometimes fix some problems if you need to manage the display list
-C.alwaysOnTop = false;
 }}}
-Please see JavaDoc for more usage document.
+Please see ASDoc for more usage document.
 
 ==Others==
 If you want to start console in a custom display container, use the following:
 {{{
-import com.luaye.console.C;
+import com.junkbyte.console.C;
 C.start(this);
 }}}
 
 
 You can manage your own instance of Console by directly managing it (`C` is designed to manage it for you ). 
 {{{
-import com.luaye.console.Console;
+import com.junkbyte.console.Console;
 
 private var _c:Console;
 
