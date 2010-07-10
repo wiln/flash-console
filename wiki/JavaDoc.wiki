@@ -1,3 +1,0 @@
-#summary JavaDoc
-
-please see: http://luaye.com/flash_console/javadoc/
