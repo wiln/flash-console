@@ -22,22 +22,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console {
-	import com.junkbyte.console.core.CommandLine;
-	import com.junkbyte.console.core.CommandTools;
+package com.junkbyte.console 
+{
 	import com.junkbyte.console.core.Graphing;
-	import com.junkbyte.console.core.KeyBinder;
 	import com.junkbyte.console.core.MemoryMonitor;
-	import com.junkbyte.console.core.ObjectsMonitor;
 	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.utils.ShortClassName;
-	import com.junkbyte.console.core.UserData;
 	import com.junkbyte.console.view.MainPanel;
 	import com.junkbyte.console.view.PanelsManager;
-	import com.junkbyte.console.view.RollerPanel;
 	import com.junkbyte.console.vos.Log;
 	import com.junkbyte.console.vos.Logs;
-	
+
 	import flash.display.DisplayObjectContainer;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
@@ -47,7 +42,7 @@ package com.junkbyte.console {
 	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.getQualifiedClassName;
-	import flash.utils.getTimer;	
+	import flash.utils.getTimer;
 
 	/**
 	 * Console is the main class. 
@@ -76,11 +71,6 @@ package com.junkbyte.console {
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
-		private var _cl:CommandLine;
-		private var _ud:UserData;
-		private var _kb:KeyBinder;
-		private var _om:ObjectsMonitor;
-		private var _mm:MemoryMonitor;
 		private var _graphing:Graphing;
 		private var _remoter:Remoting;
 		private var _topTries:int = 50;
@@ -111,18 +101,12 @@ package com.junkbyte.console {
 			//
 			_channels = [_config.globalChannel, _config.defaultChannel];
 			_lines = new Logs();
-			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
-			_om = new ObjectsMonitor();
-			_cl = new CommandLine(this);
 			_graphing = new Graphing(report);
 			_remoter = new Remoting(this, pass);
-			_kb = new KeyBinder(pass);
-			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
 			//
 			// VIEW setup
 			_config.updateStyleSheet();
 			var mainPanel:MainPanel = new MainPanel(this, _lines, _channels);
-			mainPanel.addEventListener(Event.CONNECT, onMainPanelConnectRequest, false, 0, true);
 			_panels = new PanelsManager(this, mainPanel, _channels);
 			//
 			report("<b>Console v"+VERSION+(VERSION_STAGE?(" "+VERSION_STAGE):"")+", Happy coding!</b>", -2);
@@ -132,36 +116,26 @@ package com.junkbyte.console {
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame);
 		}
 		private function stageAddedHandle(e:Event=null):void{
-			if(_cl.base == null) _cl.base = parent;
 			if(loaderInfo){
 				listenUncaughtErrors(loaderInfo);
 			}
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, _kb.keyDownHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
-			_cl.base = null;
 			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
-			stage.removeEventListener(KeyboardEvent.KEY_DOWN, _kb.keyDownHandler);
 		}
 		private function onStageMouseLeave(e:Event):void{
 			_panels.tooltip(null);
-		}
-		private function passwordEnteredHandle(e:Event):void{
-			if(visible && !_panels.mainPanel.visible){
-				_panels.mainPanel.visible = true;
-			}else visible = !visible;
 		}
 		public function destroy():void{
 			_remoter.close();
 			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
 			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
-			_cl.destory();
 		}
 		
 		// requires flash player target to be 10.1
@@ -188,156 +162,27 @@ package com.junkbyte.console {
 			}
 			report(str, FATAL_LEVEL, false);
 		}
-		
-		public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			if(obj == null) {
-				report("ERROR: Graph ["+n+"] received a null object to graph property ["+prop+"].", 10);
-				return;
-			}
-			_graphing.add(n,obj,prop,col,key,rect,inverse);
-		}
-		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
-			_graphing.fixRange(n, min, max);
-		}
-		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
-			_graphing.remove(n, obj, prop);
-		}
-		//
-		// WARNING: key binding hard references the function. 
-		// This should only be used for development purposes only.
-		//
-		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):void{
-			if(!_kb.bindKey(key, fun, args))
-			{
-				report("Warning: bindKey character ["+key.char+"] is conflicting with Console password.",8);
-			}else if(!quiet) {
-				report((fun ==null?"Unbined":"Bined")+" "+key.toString()+".",-1);
-			}
-		}
-		//
-		// Panel settings
-		// basically passing through to panels manager to save lines
-		//
-		public function setPanelArea(panelname:String, rect:Rectangle):void{
-			_panels.setPanelArea(panelname, rect);
-		}
-		//
-		public function get displayRoller():Boolean{
-			return _panels.displayRoller;
-		}
-		public function set displayRoller(b:Boolean):void{
-			_panels.displayRoller = b;
-		}
-		public function setRollerCaptureKey(char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false):void{
-			if(_rollerKey){
-				_kb.bindKey(_rollerKey, null);
-				_rollerKey = null;
-			}
-			if(char && char.length==1) {
-				_rollerKey = new KeyBind(char, shift, ctrl, alt);
-				_kb.bindKey(_rollerKey, onRollerCaptureKey);
-			}
-		}
-		public function get rollerCaptureKey():KeyBind{
-			return _rollerKey;
-		}
-		private function onRollerCaptureKey():void{
-			if(displayRoller){
-				report("Display Roller Capture:<br/>"+RollerPanel(_panels.getPanel(RollerPanel.NAME)).capture(), -1);
-			}
-		}
 		//
 		public function get fpsMonitor():Boolean{
-			if(_remoter.isRemote) return panels.fpsMonitor;
 			return _graphing.fpsMonitor;
 		}
 		public function set fpsMonitor(b:Boolean):void{
-			if(_remoter.isRemote){
-				_remoter.send("fps", b);
-			}else{
-				_graphing.fpsMonitor = b;
-				panels.mainPanel.updateMenu();
-			}
+			_graphing.fpsMonitor = b;
+			panels.mainPanel.updateMenu();
 		}
 		//
 		public function get memoryMonitor():Boolean{
-			if(_remoter.isRemote) return panels.memoryMonitor;
 			return _graphing.memoryMonitor;
 		}
 		public function set memoryMonitor(b:Boolean):void{
-			if(_remoter.isRemote){
-				_remoter.send("mem", b);
-			}else{
-				_graphing.memoryMonitor = b;
-				panels.mainPanel.updateMenu();
-			}
+			_graphing.memoryMonitor = b;
+			panels.mainPanel.updateMenu();
 		}
-		
 		//
-		public function watch(o:Object,n:String = null):String{
-			var className:String = getQualifiedClassName(o);
-			if(!n) n = className+"@"+getTimer();
-			if(!_mm) _mm = new MemoryMonitor();
-			var nn:String = _mm.watch(o,n);
-			if(!quiet) report("Watching <b>"+className+"</b> as <p5>"+ nn +"</p5>.",-1);
-			return nn;
-		}
-		public function unwatch(n:String):void{
-			if(_mm) _mm.unwatch(n);
-		}
 		public function gc():void{
-			if(remote){
-				try{
-					report("Sending garbage collection request to client",-1);
-					_remoter.send("gc");
-				}catch(e:Error){
-					report(e,10);
-				}
-			}else{
-				var ok:Boolean = MemoryMonitor.Gc();
-				var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
-				report(str,(ok?-1:10));
-			}
-		}
-		public function store(n:String, obj:Object, strong:Boolean = false):void{
-			_cl.store(n, obj, strong);
-		}
-		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			_cl.map(base, maxstep);
-		}
-		public function inspect(obj:Object, detail:Boolean = true):void{
-			_cl.inspect(obj,detail);
-		}
-		public function explode(obj:Object, depth:int = 3):void{
-			report(CommandTools.explode(obj, depth), 1);
-		}
-		public function monitor(obj:Object, n:String = null):void{
-			if(obj == null || typeof obj != "object"){
-				report("Can not monitor "+getQualifiedClassName(obj)+".", 10);
-				return;
-			}
-			_om.monitor(obj, n);
-		}
-		public function unmonitor(i:String = null):void{
-			if(_remoter.isRemote){
-				_remoter.send("unmonitor", i);
-			}else{
-				_om.unmonitor(i);
-			}
-		}
-		public function monitorIn(i:String, n:String):void{
-			if(_remoter.isRemote){
-				_remoter.send("monitorIn", i,n);
-			}else{
-				_om.monitorIn(i,n);
-			}
-		}
-		public function monitorOut(i:String):void{
-			if(_remoter.isRemote){
-				_remoter.send("monitorOut", i);
-			}else{
-				_om.monitorOut(i);
-			}
+			var ok:Boolean = MemoryMonitor.Gc();
+			var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
+			report(str,(ok?-1:10));
 		}
 		public function get paused():Boolean{
 			return _paused;
@@ -386,19 +231,8 @@ package com.junkbyte.console {
 			
 			if(_repeating > 0) _repeating--;
 			
-			if(_mm!=null){
-				var arr:Array = _mm.update();
-				if(arr.length>0){
-					report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
-					if(_mm.count == 0) _mm = null;
-				}
-			}
-			var graphsList:Array, om:Object;
-			if(!_remoter.isRemote){
-			 	om = _om.update();
-			 	graphsList = _graphing.update(stage?stage.frameRate:0);
-			}
-			_remoter.update(graphsList, om);
+			var graphsList:Array = _graphing.update(stage?stage.frameRate:0);
+			_remoter.update(graphsList, null);
 			
 			// VIEW UPDATES ONLY
 			if(visible && parent!=null){
@@ -409,7 +243,6 @@ package com.junkbyte.console {
 				}
 				_panels.mainPanel.update(!_paused && _lineAdded);
 				_panels.update(_paused, _lineAdded);
-				if(!_paused && om != null) _panels.updateObjMonitors(om);
 				if(graphsList != null) _panels.updateGraphs(graphsList, !_paused); 
 				_lineAdded = false;
 			}
@@ -423,18 +256,8 @@ package com.junkbyte.console {
 		public function set remoting(newV:Boolean):void{
 			_remoter.remoting = newV;
 		}
-		public function get remote():Boolean{
-			return _remoter.isRemote;
-		}
-		public function set remote(newV:Boolean):void{
-			_remoter.isRemote = newV;
-			_panels.updateMenu();
-		}
 		public function set remotingPassword(str:String):void{
 			_remoter.remotingPassword = str;
-		}
-		private function onMainPanelConnectRequest(e:Event) : void {
-			_remoter.login(MainPanel(e.currentTarget).commandLineText);
 		}
 		//
 		//
@@ -509,35 +332,6 @@ package com.junkbyte.console {
 				if((lines[i].search(reg) != 0)){
 					return lines.slice(i, i+depth);
 				}
-			}
-			return null;
-		}
-		//
-		// COMMAND LINE
-		//
-		public function set commandLine(b:Boolean):void{
-			if(b) _config.commandLineAllowed = true;
-			_panels.mainPanel.commandLine = b;
-		}
-		public function get commandLine ():Boolean{
-			return _panels.mainPanel.commandLine;
-		}
-		public function set commandBase (v:Object):void{
-			if(v) _cl.base = v;
-		}
-		public function get commandBase ():Object{
-			return _cl.base;
-		}
-		public function runCommand(line:String):*{
-			if(_remoter.isRemote){
-				report("Run command at remote: "+line,-2);
-				try{
-					_remoter.send("runCommand", line);
-				}catch(err:Error){
-					report("Command could not be sent to client: " + err, 10);
-				}
-			}else{
-				return _cl.run(line);
 			}
 			return null;
 		}
@@ -641,9 +435,6 @@ package com.junkbyte.console {
 		//
 		public function get config():ConsoleConfig{return _config;}
 		public function get panels():PanelsManager{return _panels;}
-		public function get cl():CommandLine{return _cl;}
-		public function get ud():UserData{return _ud;}
-		public function get om():ObjectsMonitor{return _om;}
 		public function get graphing():Graphing{return _graphing;}
 		//
 		public function getLogsAsObjects():Array{

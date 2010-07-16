@@ -24,42 +24,46 @@
 */
 
 package com.junkbyte.console.view {
+	import com.junkbyte.console.vos.GraphInterest;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.GraphGroup;
 
 	import flash.events.TextEvent;
 
-	public class MemoryPanel extends GraphingPanel {
+	public class MemoryPanel extends AbstractPanel {
 		//
 		public static const NAME:String = "memoryPanel";
 		
 		public function MemoryPanel(m:Console) {
-			super(m, 80,40);
+			super(m);
 			name = NAME;
-			minWidth = 32;
+			
+			txtField = makeTF("menuField");
+			txtField.height = m.config.menuFontSize+4;
+			txtField.width = 80;
+			registerTFRoller(txtField, onMenuRollOver, linkHandler);
+			registerDragger(txtField); // so that we can still drag from textfield
+			addChild(txtField);
+			
+			init(80,m.config.menuFontSize,false);
 		}
-		public override function update(group:GraphGroup, draw:Boolean = true):void{
-			super.update(group, draw);
-			updateKeyText();
-		}
-		public override function updateKeyText():void{
-			if(isNaN(_interest.v)){
+		public function update(group:GraphGroup):void{
+			var interest:GraphInterest = group.interests[0];
+			if(interest && isNaN(interest.v)) {
 				txtField.htmlText = "<r><s>no mem input <menu><a href=\"event:close\">X</a></menu></s></r>";
 			}else{
-				txtField.htmlText =  "<r><s>"+_interest.v.toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
+				txtField.htmlText =  "<r><s>"+interest.v.toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:close\">X</a></menu></r></s>";
 			}
 			txtField.scrollH = txtField.maxScrollH;
 		}
-		protected override function linkHandler(e:TextEvent):void{
+		protected function linkHandler(e:TextEvent):void{
 			if(e.text == "gc"){
 				master.gc();
 			}else if(e.text == "close"){
 				master.memoryMonitor = false;
-			}else{
-				super.linkHandler(e);
 			}
 		}
-		protected override function onMenuRollOver(e:TextEvent):void{
+		protected function onMenuRollOver(e:TextEvent):void{
 			var txt:String = e.text?e.text.replace("event:",""):null;
 			if(txt == "gc"){
 				txt = "Garbage collect::Requires debugger version of flash player";

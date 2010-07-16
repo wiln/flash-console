@@ -425,9 +425,7 @@ package com.junkbyte.console {
 		 *  		For example, if you don't want to change the height of the panel, pass rect.height = 0;
 		 */
 		public static function setPanelArea(panelname:String, rect:Rectangle):void{
-			if(_console){
-				_console.setPanelArea(panelname, rect);
-			}
+			
 		}
 		/**
 		 * Start/stop FPS monitor graph.
@@ -445,16 +443,16 @@ package com.junkbyte.console {
 			return getter("memoryMonitor") as Boolean;
 		}
 		public static function set memoryMonitor(v:Boolean):void{
-			setter("memoryMonitor", v);
+			
 		}
 		/**
 		 * Start/stop Display Roller.
 		 */
 		public static function get displayRoller():Boolean{
-			return getter("displayRoller") as Boolean;
+			return false;
 		}
 		public static function set displayRoller(v:Boolean):void{
-			setter("displayRoller", v);
+			
 		}
 		/**
 		 * width of main console panel
@@ -540,7 +538,7 @@ package com.junkbyte.console {
 			return getter("alwaysOnTop") as Boolean;
 		}
 		public static function set alwaysOnTop(v:Boolean):void{
-			setter("alwaysOnTop",v);
+			
 		}
 		//
 		// Remoting
@@ -594,9 +592,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function inspect(obj:Object, detail:Boolean = true):void {
-			if(_console){
-				_console.inspect(obj,detail);
-			}
+			
 		}
 		/**
 		 * Expand object values and print in console log channel
@@ -606,9 +602,7 @@ package com.junkbyte.console {
 		 * @param Depth of explosion, -1 = unlimited (default = 3)
 		 */
 		public static function explode(obj:Object, depth:int = 3):void {
-			if(_console){
-				_console.explode(obj,depth);
-			}
+			
 		}
 		/**
 		 * WORK IN PROGRESS... Brings up a panel to monitor values of the object
@@ -618,22 +612,17 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function monitor(obj:Object, n:String = null):void {
-			// WORK IN PROGRESS
-			if(_console){
-			// WORK IN PROGRESS
-				_console.monitor(obj, n);
-			}
-			// WORK IN PROGRESS
+			
 		}
 		/**
 		 * CommandLine UI's visibility.
 		 * When this is set to true, it will also automatically set commandLineAllowed to true.
 		 */
 		public static function get commandLine ():Boolean{
-			return getter("commandLine") as Boolean;
+			return false;
 		}
 		public static function set commandLine (v:Boolean):void{
-			setter("commandLine",v);
+			
 		}
 		/**
 		 * Command line base.
@@ -641,10 +630,10 @@ package com.junkbyte.console {
 		 * Default is set to console's parent DisplayContainer.
 		 */
 		public static function get commandBase():Object{
-			return getter("commandBase") as Object;
+			return null;
 		}
 		public static function set commandBase(v:Object):void{
-			setter("commandBase",v);
+			
 		}
 		/**
 		 * Store a reference in Console for use in CommandLine.
@@ -655,9 +644,7 @@ package com.junkbyte.console {
 		 * @param  (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
 		 */
 		public static function store(n:String, obj:Object, strong:Boolean = false):void{
-			if(_console ){
-				_console.store(n, obj, strong);
-			}
+			
 		}
 		/**
 		 * Print the display list map
@@ -667,9 +654,7 @@ package com.junkbyte.console {
 		 * @param  (optional) maximum child depth. 0 = unlimited
 		 */
 		public static function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			if(_console ){
-				_console.map(base, maxstep);
-			}
+			
 		}
 		/**
 		 * Run a commandLine string
@@ -677,9 +662,6 @@ package com.junkbyte.console {
 		 * @param  String to run
 		 */
 		public static function runCommand(str:String):*{
-			if(_console){
-				return _console.runCommand(str);
-			}
 			return null;
 		}
 		//
@@ -694,9 +676,6 @@ package com.junkbyte.console {
 		 * @return	Name console used to identify the object - this can be different to param n if another object of the same name is already being watched
 		 */
 		public static function watch(obj:Object,n:String = null):String{
-			if(_console){
-				return _console.watch(obj,n);
-			}
 			return null;
 		}
 		/**
@@ -705,9 +684,7 @@ package com.junkbyte.console {
 		 * @param	identification/name given to the object for watch
 		 */
 		public static function unwatch(n:String):void{
-			if(_console){
-				_console.unwatch(n);
-			}
+			
 		}
 		//
 		// Graphing utilites
@@ -736,9 +713,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			if(_console){
-				_console.addGraph(n,obj,prop,col,key,rect,inverse);
-			}
+			
 		}
 		/**
 		 * Fix graph's range.
@@ -756,9 +731,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
-			if(_console){
-				_console.fixGraphRange(n, min, max);
-			}
+			
 		}
 		/**
 		 * Remove graph.
@@ -770,9 +743,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
-			if(_console){
-				_console.removeGraph(n, obj, prop);
-			}
+			
 		}
 		/**
 		 * Bind keyboard key to a function.
@@ -788,9 +759,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function bindKey(key:KeyBind, fun:Function = null,args:Array = null):void{
-			if(_console){
-				_console.bindKey(key, fun ,args);
-			}
+			
 		}
 		/**
 		 * Assign key binding to capture Display roller's display mapping.
@@ -808,9 +777,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
-			if(_console){
-				_console.setRollerCaptureKey(char, shift, ctrl, alt);
-			}
+			
 		}
 		/**
 		 * Console already exists?

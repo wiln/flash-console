@@ -22,98 +22,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.core {
+package com.junkbyte.console.core 
+{
 	import flash.events.EventDispatcher;
 	import flash.system.System;
-	import flash.utils.Dictionary;
-	import flash.utils.getTimer;	
 
 	public class MemoryMonitor extends EventDispatcher{
 		
-		//public static const GARBAGE_COLLECTED:String = "garbageCollected";
-		//private static const DUMMY_GARBAGE:String = "_memoryMonitor_dummy_garbage";
-		
-		private var _namesList:Object;
-		private var _objectsList:Dictionary;
-		private var _count:uint;
 		//private var _notifyGC:Boolean;
 		//
 		//
 		public function MemoryMonitor() {
-			_namesList = new Object();
-			_objectsList = new Dictionary(true);
-		}
-		public function watch(obj:Object, n:String):String{
-			if(_objectsList[obj]){
-				if(_namesList[_objectsList[obj]]){
-					unwatch(_objectsList[obj]);
-				}
-			}
-			if(_namesList[n]){
-				if(_objectsList[obj] == n){
-					_count--;
-				}else{
-					n = n+"@"+getTimer()+"_"+Math.floor(Math.random()*100);
-				}
-			}
-			_namesList[n] = true;
-			_count++;
-			_objectsList[obj] = n;
-			return n;
-		}
-		public function unwatch(n:String):void{
-			for (var X:Object in _objectsList) {
-				if(_objectsList[X] == n){
-					delete _objectsList[X];
-				}
-			}
-			if(_namesList[n])
-			{
-				delete _namesList[n];
-				_count--;	
-			}
 		}
 		//
-		//
-		//
-		public function update():Array {
-			var arr:Array = new Array();
-			var o:Object = new Object();
-			for (var X:Object in _objectsList) {
-				o[_objectsList[X]] = true;
-			}
-			for(var Y:String in _namesList){
-				if(!o[Y]){
-					arr.push(Y);
-					delete _namesList[Y];
-					_count--;
-				}
-			}
-			return arr;
-		}
-		
-		public function get count():uint{
-			return _count;
-		}
-		/*private function seedGCDummy():void{
-			if(!_namesList[DUMMY_GARBAGE]){
-				// using MovieClip as dummy garbate as it doenst get collected straight away like others
-				watch(new MovieClip(), DUMMY_GARBAGE);
-			}
-		}
-		public function set notifyGC(b:Boolean):void{
-			if(_notifyGC != b){
-				_notifyGC = b;
-				if(b){
-					seedGCDummy();
-				}else if(!b){
-					unwatch(DUMMY_GARBAGE);
-				}
-			}
-		}
-		public function get notifyGC():Boolean{
-			return _notifyGC;
-		}*/
 		//
 		// only works in debugger player version
 		//

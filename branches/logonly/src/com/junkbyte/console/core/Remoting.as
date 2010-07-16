@@ -43,13 +43,10 @@ package com.junkbyte.console.core {
 		private var _master:Console;
 		private var _config:ConsoleConfig;
 		private var _isRemoting:Boolean;
-		private var _isRemote:Boolean;
 		private var _sharedConnection:LocalConnection;
 		private var _remoteLinesQueue:Array;
-		private var _mspfsForRemote:Array;
 		private var _delayed:int;
 		
-		private var _lastLogin:String = "";
 		private var _remotingPassword:String;
 		private var _loggedIn:Boolean;
 		private var _canDraw:Boolean;
@@ -92,7 +89,7 @@ package com.junkbyte.console.core {
 					var vo:RemoteSync = new RemoteSync();
 					vo.lines = _remoteLinesQueue;
 					vo.graphs = a;
-					vo.cl = _master.cl.scopeString;
+					vo.cl = "";
 					vo.om = om;
 					send("sync", vo);
 					_remoteLinesQueue = newQueue;
@@ -101,31 +98,8 @@ package com.junkbyte.console.core {
 				_canDraw = true;
 			}
 		}
-		private function remoteSync(obj:Object):void{
-			if(!isRemote || !obj) return;
-			//_master.clear();
-			//_master.explode(obj, -1);
-			var vo:RemoteSync = RemoteSync.FromObject(obj);
-			for each( var line:Object in vo.lines){
-				if(line) _master.addLine(line.t,line.p,line.c,line.r, true);
-			}
-			try{
-				var a:Array = [];
-				for each(var o:Object in vo.graphs){
-					a.push(GraphGroup.FromObject(o));
-				}
-				_master.panels.updateGraphs(a, _canDraw);
-				if(_canDraw) {
-					_master.panels.updateObjMonitors(vo.om);
-					_master.panels.mainPanel.updateCLScope(vo.cl);
-					_canDraw = false;
-				}
-			}catch(e:Error){
-				_master.report(e);
-			}
-		}
 		public function send(command:String, ...args):void{
-			var target:String = _config.remotingConnectionName+(_isRemote?CLIENT_PREFIX:REMOTE_PREFIX);
+			var target:String = _config.remotingConnectionName+(REMOTE_PREFIX);
 			args = [target, command].concat(args);
 			try{
 				_sharedConnection.send.apply(this, args);
@@ -138,11 +112,8 @@ package com.junkbyte.console.core {
 		}
 		public function set remoting(newV:Boolean):void{
 			_remoteLinesQueue = null;
-			_mspfsForRemote = null;
 			if(newV){
-				_isRemote = false;
 				_delayed = 0;
-				_mspfsForRemote = [30];
 				_remoteLinesQueue = new Array();
 				startSharedConnection();
 				_sharedConnection.addEventListener(StatusEvent.STATUS, onRemotingStatus);
@@ -173,38 +144,6 @@ package com.junkbyte.console.core {
 			_master.report("Remoting security error.", 9);
 			printHowToGlobalSetting();
 		}
-		public function get isRemote():Boolean{
-			return _isRemote;
-		}
-		public function set isRemote(newV:Boolean):void{
-			_isRemote = newV ;
-			if(newV){
-				_isRemoting = false;
-				startSharedConnection();
-				_sharedConnection.addEventListener(StatusEvent.STATUS, onRemoteStatus);
-				_sharedConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR , onRemotingSecurityError);
-				try{
-					_sharedConnection.connect(_config.remotingConnectionName+REMOTE_PREFIX);
-					_master.report("<b>Remote started.</b> "+getInfo(),-1);
-					var sdt:String = Security.sandboxType;
-					if(sdt == Security.LOCAL_WITH_FILE || sdt == Security.LOCAL_WITH_NETWORK){
-						_master.report("Untrusted local sandbox. You may not be able to listen for logs properly.", 10);
-						printHowToGlobalSetting();
-					}
-					login(_lastLogin);
-				}catch (error:Error){
-					_isRemoting = false;
-					_master.report("Could not create remote service. You might have a console remote already running.", 10);
-				}
-			}else{
-				close();
-			}
-		}
-		private function onRemoteStatus(e:StatusEvent):void{
-			if(_isRemote && e.level=="error"){
-				_master.report("Problem communicating to client.", 10);
-			}
-		}
 		private function getInfo():String{
 			return "</p5>channel:<p5>"+_config.remotingConnectionName+" ("+Security.sandboxType+")";
 		}
@@ -219,10 +158,8 @@ package com.junkbyte.console.core {
 			_sharedConnection.allowInsecureDomain("*");
 			// just for sort of security
 			_sharedConnection.client = {
-				login:login, requestLogin:requestLogin, loginFail:loginFail, loginSuccess:loginSuccess,
-				sync:remoteSync, gc:_master.gc, fps:fpsRequest, mem:memRequest, runCommand:_master.runCommand,
-				unmonitor:_master.unmonitor, monitorIn:_master.monitorIn, monitorOut:_master.monitorOut
-				};
+				login:login, gc:_master.gc, fps:fpsRequest, mem:memRequest
+			};
 		}
 		private function fpsRequest(b:Boolean):void{
 			_master.fpsMonitor = b;
@@ -230,36 +167,13 @@ package com.junkbyte.console.core {
 		private function memRequest(b:Boolean):void{
 			_master.memoryMonitor = b;
 		}
-		public function loginFail():void{
-			if(!_isRemote) return;
-			_master.report("Login Failed", 10);
-			_master.panels.mainPanel.requestLogin();
-		}
-		public function loginSuccess():void{
-			_master.report("Login Successful", -1);
-		}
-		public function requestLogin():void{
-			if(!_isRemote) return;
-			if(_lastLogin){
-				login(_lastLogin);
-			}else{
-				_master.panels.mainPanel.requestLogin();
-			}
-		}
 		public function login(pass:String = null):void{
-			if(_isRemote){
-				_lastLogin = pass;
-				_master.report("Attempting to login...", -1);
-				send("login", pass);
+			if(_loggedIn || checkLogin(pass)){
+				_loggedIn = true;
+				_remoteLinesQueue = _master.getLogsAsObjects();
+				send("loginSuccess");
 			}else{
-				// once logged in, next login attempts will always be success
-				if(_loggedIn || checkLogin(pass)){
-					_loggedIn = true;
-					_remoteLinesQueue = _master.getLogsAsObjects();
-					send("loginSuccess");
-				}else{
-					send("loginFail");
-				}
+				send("loginFail");
 			}
 		}
 		public function checkLogin(pass:String):Boolean{

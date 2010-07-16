@@ -22,39 +22,46 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.view {
+package com.junkbyte.console.view 
+{
+	import com.junkbyte.console.Console;
+	import com.junkbyte.console.vos.GraphGroup;
+	import com.junkbyte.console.vos.GraphInterest;
+
 	import flash.events.TextEvent;
 
-	import com.junkbyte.console.Console;
-	import com.junkbyte.console.view.GraphingPanel;
-	import com.junkbyte.console.vos.GraphGroup;
-
-	public class FPSPanel extends GraphingPanel {
+	public class FPSPanel extends AbstractPanel {
 		//
 		public static const NAME:String = "fpsPanel";
 		
 		public function FPSPanel(m:Console) {
-			super(m, 80,40);
+			super(m);
 			name = NAME;
-			minWidth = 32;
+			
+			txtField = makeTF("menuField");
+			txtField.height = m.config.menuFontSize+4;
+			txtField.width = 75;
+			registerTFRoller(txtField, onMenuRollOver, linkHandler);
+			registerDragger(txtField); // so that we can still drag from textfield
+			addChild(txtField);
+			
+			init(75,m.config.menuFontSize,false);
 			// 
 		}
-		protected override function linkHandler(e:TextEvent):void{
+		protected function linkHandler(e:TextEvent):void{
 			if(e.text == "close"){
 				master.fpsMonitor = false;
-			}else{
-				super.linkHandler(e);
 			}
 		}
-		public override function update(group:GraphGroup, draw:Boolean = true):void{
-			super.update(group, draw);
-			updateKeyText();
+		protected function onMenuRollOver(e:TextEvent):void{
+			master.panels.tooltip(e.text?e.text.replace("event:",""):null, this);
 		}
-		public override function updateKeyText():void{
-			if(isNaN(_interest.v)) {
+		public function update(group:GraphGroup):void{
+			var interest:GraphInterest = group.interests[0];
+			if(interest && isNaN(interest.v)) {
 				txtField.htmlText = "<r><s>no fps input <menu><a href=\"event:close\">X</a></menu></s></r>";
 			}else{
-				txtField.htmlText = "<r><s>"+_interest.v.toFixed(1)+" | "+_interest.avg.toFixed(1)+" <menu><a href=\"event:reset\">R</a> <a href=\"event:close\">X</a></menu></r></s>";
+				txtField.htmlText = "<r><s>"+interest.v.toFixed(1)+" | "+interest.avg.toFixed(1)+" <menu><a href=\"event:close\">X</a></menu></r></s>";
 			}
 			txtField.scrollH = txtField.maxScrollH;
 		}

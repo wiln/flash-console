@@ -29,12 +29,9 @@ package com.junkbyte.console.core {
 	import com.junkbyte.console.vos.GraphInterest;
 	import com.junkbyte.console.vos.GraphGroup;
 
-	import flash.geom.Rectangle;
-
 	public class Graphing {
 		
 		private var _groups:Array = [];
-		private var _map:Object = {};
 		
 		private var _fpsGroup:GraphGroup;
 		private var _memGroup:GraphGroup;
@@ -45,74 +42,7 @@ package com.junkbyte.console.core {
 		public function Graphing(reporter:Function){
 			_report = reporter;
 		}
-		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			var group:GraphGroup = _map[n];
-			var newGroup:Boolean;
-			if(!group) {
-				newGroup = true;
-				group = new GraphGroup(n);
-			}
-			if(isNaN(col) || col<0) col = Math.random()*0xFFFFFF;
-			if(key == null) key = prop;
-			var interests:Array = group.interests;
-			for each(var i:GraphInterest in interests){
-				if(i.key == key){
-					_report("Graph with key ["+key+"] already exists in ["+n+"]", 10);
-					return;
-				}
-			}
-			if(rect) group.rect = rect;
-			if(inverse) group.inv = inverse;
-			var interest:GraphInterest = new GraphInterest(key, col);
-			var v:Number = NaN;
-			try{
-				v = interest.setObject(obj, prop);
-			}catch (e:Error){
-				_report("Error with graph value for ["+key+"] in ["+n+"]. "+e, 10);
-				return;
-			}
-			if(isNaN(v)){
-				_report("Graph value for key ["+key+"] in ["+n+"] is not a number (NaN).", 10);
-			}else{
-				group.interests.push(interest);
-				if(newGroup){
-					_map[n] = group;
-					_groups.push(group);
-				}
-			}
-		}
-
-		public function fixRange(n:String, low:Number = NaN, high:Number = NaN):void{
-			var group:GraphGroup = _map[n];
-			if(!group) return;
-			group.low = low;
-			group.hi = high;
-			group.fixed = !(isNaN(low)||isNaN(high));
-		}
-		public function remove(n:String, obj:Object = null, prop:String = null):void{
-			var group:GraphGroup = _map[n];
-			if(!group) return;
-			if(obj==null&&prop==null){	
-				removeGroup(n);
-			}else{
-				var interests:Array = group.interests;
-				for(var i:int = interests.length-1;i>=0;i--){
-					var interest:GraphInterest = interests[i];
-					if((obj == null || interest.obj == obj) && (prop == null || interest.prop == prop)){
-						interests.splice(i, 1);
-					}
-				}
-				if(interests.length==0){
-					removeGroup(n);
-				}
-			}
-		}
-		private function removeGroup(n:String):void{
-			var g:GraphGroup = _map[n];
-			var index:int = _groups.indexOf(g);
-			if(index>=0) _groups.splice(index, 1);
-			delete _map[n];
-		}
+		
 		public function get fpsMonitor():Boolean{
 			return _fpsGroup!=null;
 		}
@@ -193,17 +123,6 @@ package com.junkbyte.console.core {
 						v = Math.round(System.totalMemory/10485.76)/100;
 						group.updateMinMax(v);
 						interest.setValue(v, averaging);
-					}else{
-						for each(var i:GraphInterest in interests){
-							try{
-								v = i.getCurrentValue();
-								i.setValue(v, averaging);
-							}catch(e:Error){
-								_report("Error with graph value for key ["+i.key+"] in ["+group.name+"]. "+e, 10);
-								remove(group.name, i.obj, i.prop);
-							}
-							group.updateMinMax(v);
-						}
 					}
 				}
 			}

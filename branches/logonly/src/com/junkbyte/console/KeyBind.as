@@ -59,27 +59,5 @@ package com.junkbyte.console
 			if(ctrl) extra |= CTRL;
 			if(alt) extra |= ALT;
 		}
-		
-		public function get key():String
-		{
-			return char+"+"+extra;
-		}
-		
-		public function toString():String
-		{
-			var str:String;
-			if(extra & KEYCODE)
-			{
-				str = String(char);
-			}
-			else
-			{
-				str = char;
-			}
-			if(extra & SHIFT) str+="+shift";
-			if(extra & CTRL) str+="+ctrl";
-			if(extra & ALT) str+="+alt";
-			return str;
-		}
 	}
 }
