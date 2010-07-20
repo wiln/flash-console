@@ -411,22 +411,6 @@ package com.junkbyte.console {
 		public static function set tracing(v:Boolean):void{
 			setter("tracing",v);
 		}
-		//
-		// Panel settings
-		//
-		/**
-		 * Set panel position and size.
-		 * <p>
-		 * See panel names in Console.PANEL_MAIN, Console.PANEL_FPS, etc...
-		 * No effect if panel of that name doesn't exist.
-		 * </p>
-		 * @param	Name of panel to set
-		 * @param	Rectangle area for panel size and position. Leave any property value zero to keep as is.
-		 *  		For example, if you don't want to change the height of the panel, pass rect.height = 0;
-		 */
-		public static function setPanelArea(panelname:String, rect:Rectangle):void{
-			
-		}
 		/**
 		 * Start/stop FPS monitor graph.
 		 */
@@ -443,16 +427,7 @@ package com.junkbyte.console {
 			return getter("memoryMonitor") as Boolean;
 		}
 		public static function set memoryMonitor(v:Boolean):void{
-			
-		}
-		/**
-		 * Start/stop Display Roller.
-		 */
-		public static function get displayRoller():Boolean{
-			return false;
-		}
-		public static function set displayRoller(v:Boolean):void{
-			
+			setter("memoryMonitor", v);
 		}
 		/**
 		 * width of main console panel
@@ -538,7 +513,7 @@ package com.junkbyte.console {
 			return getter("alwaysOnTop") as Boolean;
 		}
 		public static function set alwaysOnTop(v:Boolean):void{
-			
+			setter("alwaysOnTop",v);
 		}
 		//
 		// Remoting
@@ -579,203 +554,87 @@ package com.junkbyte.console {
 		public static function set remotingPassword(v:String):void{
 			setter("remotingPassword",v);
 		}
+		/////
 		//
-		// Command line tools
-		//
-		/**
-		 * Output an object's info such as it's variables, methods (if any), properties,
-		 * superclass, children displays (if Display), parent displays (if Display), etc.
-		 * commandLine: /inspect  OR  /inspectfull
-		 * 
-		 * @param Object to inspect
-		 * @param Set true to ouput in more detailed, such as the value of properties and variables
-		 * 
-		 */
+		// UNSUPPORTED FEATURES IN LITE VERSION
+		// 
+		/////
+		[Inspectable(environment="none")]
+		public static function setPanelArea(panelname:String, rect:Rectangle):void{
+			
+		}
+		[Inspectable(environment="none")]
+		public static function get displayRoller():Boolean{
+			return false;
+		}
+		[Inspectable(environment="none")]
+		public static function set displayRoller(v:Boolean):void{
+			
+		}
+		[Inspectable(environment="none")]
 		public static function inspect(obj:Object, detail:Boolean = true):void {
 			
 		}
-		/**
-		 * Expand object values and print in console log channel
-		 * Similar to JSON encode
-		 * 
-		 * @param Object to explode
-		 * @param Depth of explosion, -1 = unlimited (default = 3)
-		 */
+		[Inspectable(environment="none")]
 		public static function explode(obj:Object, depth:int = 3):void {
 			
 		}
-		/**
-		 * WORK IN PROGRESS... Brings up a panel to monitor values of the object
-		 * 
-		 * @param Object to monitor
-		 * @param name of panel (optional)
-		 * 
-		 */
+		[Inspectable(environment="none")]
 		public static function monitor(obj:Object, n:String = null):void {
 			
 		}
-		/**
-		 * CommandLine UI's visibility.
-		 * When this is set to true, it will also automatically set commandLineAllowed to true.
-		 */
+		[Inspectable(environment="none")]
 		public static function get commandLine ():Boolean{
 			return false;
 		}
+		[Inspectable(environment="none")]
 		public static function set commandLine (v:Boolean):void{
 			
 		}
-		/**
-		 * Command line base.
-		 * The value returned from /base in commandLine.
-		 * Default is set to console's parent DisplayContainer.
-		 */
+		[Inspectable(environment="none")]
 		public static function get commandBase():Object{
 			return null;
 		}
 		public static function set commandBase(v:Object):void{
 			
 		}
-		/**
-		 * Store a reference in Console for use in CommandLine.
-		 * (same as /save in commandLine)
-		 * 
-		 * @param  name to save as
-		 * @param  Object reference to save, pass null to remove previous save.
-		 * @param  (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
-		 */
+		[Inspectable(environment="none")]
 		public static function store(n:String, obj:Object, strong:Boolean = false):void{
 			
 		}
-		/**
-		 * Print the display list map
-		 * (same as /map in commandLine)
-		 * 
-		 * @param  Display object to start mapping from
-		 * @param  (optional) maximum child depth. 0 = unlimited
-		 */
+		[Inspectable(environment="none")]
 		public static function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			
 		}
-		/**
-		 * Run a commandLine string
-		 *
-		 * @param  String to run
-		 */
+		[Inspectable(environment="none")]
 		public static function runCommand(str:String):*{
 			return null;
 		}
-		//
-		// Memory management tools
-		//
-		/**
-		 * Watch an object to be notified in console when it is being garbage collected
-		 *
-		 * @param  Object to watch
-		 * @param  Object's identification/name
-		 * 
-		 * @return	Name console used to identify the object - this can be different to param n if another object of the same name is already being watched
-		 */
+		[Inspectable(environment="none")]
 		public static function watch(obj:Object,n:String = null):String{
 			return null;
 		}
-		/**
-		 * Stop watching an object from garbage collection
-		 *
-		 * @param	identification/name given to the object for watch
-		 */
+		[Inspectable(environment="none")]
 		public static function unwatch(n:String):void{
 			
 		}
-		//
-		// Graphing utilites
-		//
-		/**
-		 * Add graph.
-		 * Creates a new graph panel (or use an already existing one) and
-		 * graphs numeric values every frame. 
-		 * <p>
-		 * Reference to the object is weak, so when the object is garbage collected 
-		 * graph will also remove that particular graph line. (hopefully)
-		 * </p>
-		 * <p>
-		 * Example: To graph both mouseX and mouseY of stage:
-		 * Cc.addGraph("mouse", stage, "mouseX", 0xFF0000, "x");
-		 * Cc.addGraph("mouse", stage, "mouseY", 0x0000FF, "y");
-		 * </p>
-		 *
-		 * @param  Name of graph, if same name already exist, graph line will be added to it.
-		 * @param  Object of interest.
-		 * @param  Property name of interest belonging to obj.
-		 * @param  (optional) Color of graph line (If not passed it will randomally generate).
-		 * @param  (optional) Key string to use as identifier (If not passed, it will use string from 'prop' param).
-		 * @param  (optional) Rectangle area for size and position of graph.
-		 * @param  (optional) If set it will invert the graph, meaning the highest value at the bottom and lowest at the top.
-		 * 
-		 */
+		[Inspectable(environment="none")]
 		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			
 		}
-		/**
-		 * Fix graph's range.
-		 * When fixed, graph will only show within the fixed value however offset the real values may be.
-		 * <p>
-		 * For example: if the graph is fixed between 100 and 200, and the graph value at one point is 300, 
-		 * graph will not expand to accompany up to value 10, but remain fixed to 100 - 200 range.
-		 * Pass NaN to min or max to unfix graph.
-		 * No effect if no graph of the name exists.
-		 * </p>
-		 *
-		 * @param  Name of graph
-		 * @param  Minimum value. pass NaN to unfix.
-		 * @param  Maximum value. pass NaN to unfix.
-		 * 
-		 */
+		[Inspectable(environment="none")]
 		public static function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
 			
 		}
-		/**
-		 * Remove graph.
-		 * Leave obj and prop params blank to remove the whole graph.
-		 *
-		 * @param  Name of graph.
-		 * @param  Object of interest to remove (optional).
-		 * @param  Property name of interest to remove (optional).
-		 * 
-		 */
+		[Inspectable(environment="none")]
 		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
 			
 		}
-		/**
-		 * Bind keyboard key to a function.
-		 * <p>
-		 * WARNING: key binding hard references the function. 
-		 * This should only be used for development purposes.
-		 * Pass null Function to unbind.
-		 * </p>
-		 *
-		 * @param  KeyBind (char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false)
-		 * @param  Function to call on trigger. pass null to unbind previous.
-		 * @param  Arguments to pass when calling the Function.
-		 * 
-		 */
+		[Inspectable(environment="none")]
 		public static function bindKey(key:KeyBind, fun:Function = null,args:Array = null):void{
 			
 		}
-		/**
-		 * Assign key binding to capture Display roller's display mapping.
-		 * <p>
-		 * Pressing the key will output whatever display roller is mapping into console.
-		 * You can then press on each display name in Console to get reference to that display for CommandLine use.
-		 * Only activates when Display Roller is enabled.
-		 * Default: null (not assigned)
-		 * </p>
-		 *
-		 * @param  Keyboard character, must be ASCII. (pass null to remove binding)
-		 * @param  Set to true if CTRL key press is required to trigger.
-		 * @param  Set to true if ALT key press is required to trigger.
-		 * @param  Set to true if SHIFT key press is required to trigger.
-		 * 
-		 */
+		[Inspectable(environment="none")]
 		public static function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
 			
 		}
@@ -816,25 +675,12 @@ package com.junkbyte.console {
 		}
 		
 		
-		/**
-		 * Get all logs
-		 * This is incase you want all logs for use somewhere.
-		 * For example, send logs to server or email to someone.
-		 * 
-		 * @param (optional) line splitter, default is '\n'
-		 * @return All log lines in console
-		 */
+		[Inspectable(environment="none")]
 		public static function getAllLog(splitter:String = "\n"):String{
 			if(_console)return _console.getAllLog(splitter);
 			else return "";
 		}
-		/**
-		 * Get instance to Console
-		 * This is for debugging of console.
-		 * PLEASE avoid using it!
-		 * 
-		 * @return Console class instance
-		 */
+		[Inspectable(environment="none")]
 		public static function get instance():Console{
 			return _console;
 		}

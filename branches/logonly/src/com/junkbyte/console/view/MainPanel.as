@@ -234,7 +234,7 @@ package com.junkbyte.console.view
 			while(line){
 				if(lineShouldShow(line)){
 					var numlines:int = Math.ceil(line.text.length/ maxchars);
-					if(linesLeft >= numlines ){
+					if(line.s || linesLeft >= numlines ){
 						lines.push(makeLine(line));
 					}else{
 						line = line.clone();
@@ -477,7 +477,7 @@ package com.junkbyte.console.view
 			}else if(txt == "channel_"+ config.consoleChannel) {
 				txt = TOOLTIPS["consolech"];
 			}else if(txt == "channel_"+ config.filteredChannel) {
-				txt = TOOLTIPS["filterch"]+"::*"+master.filterText+"*";
+				txt = TOOLTIPS["filterch"]+"::*"+filterText+"*";
 			}else if(txt.indexOf("channel_")==0) {
 				txt = TOOLTIPS["channel"];
 			}else if(txt == "pause"){

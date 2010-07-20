@@ -37,10 +37,8 @@ package com.junkbyte.console.core {
 		private var _memGroup:GraphGroup;
 		
 		private var _previousTime:Number = -1;
-		private var _report:Function;
 		
-		public function Graphing(reporter:Function){
-			_report = reporter;
+		public function Graphing(){
 		}
 		
 		public function get fpsMonitor():Boolean{
@@ -84,7 +82,6 @@ package com.junkbyte.console.core {
 			var graph:GraphInterest = new GraphInterest("special");
 			if(type == GraphGroup.TYPE_FPS) {
 				graph.col = 0xFF3333;
-				graph.avg = 0;
 			}else{
 				graph.col = 0x5060FF;
 			}
