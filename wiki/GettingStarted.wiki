@@ -1,11 +1,11 @@
-#summary for v2.4 beta2 or above
+#summary for v2.4
 #labels Featured,Phase-Deploy,Phase-Implementation
 
 =Getting started=
 
 ==Introduction==
 
-The main class need to use for console is `Cc`, (`com.junkbyte.console.Cc`). `Cc` stands for Console controller which acts as a static / singleton adapter for `Console` (`com.junkbyte.console.Console`). 
+The main class you need to use for console is `Cc`, (`com.junkbyte.console.Cc`). `Cc` stands for Console controller which acts as a static / singleton adapter for `Console` (`com.junkbyte.console.Console`). 
 
 In a later date when you don't need console in your flash project, you can just remove `Cc.startOnStage(..)` OR `Cc.start(..)` from your code and the rest of console related codes will stop executing to save memory and performance.
 
@@ -79,7 +79,6 @@ Console interface menu is at the top of main panel. Roll over each name to find 
   * Ro = Show/Hide display Roller
   * RL = Start ruler tool (measure distance/angle between 2 points)
 
-  * T = Toggle use 'trace()' - only visible in debugger or test player, can call a different function in place of trace(), see: ConsoleConfig -> traceCall.
   * Cc = Copy all log to clipboard as plain text.
   * P0 = Priority filter level. For example when set to P5, you will only see logs with priority 5 or above
   * P = pause logging. (it will still silently log but will not update in display)
