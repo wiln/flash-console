@@ -12,6 +12,8 @@ In a later date when you don't need console in your flash project, you can just 
 
 ==Basics==
 
+For easy reference, please seen `samples/flash/Sample.as` for working sample.
+
 Start console on stage... 
 {{{
 import com.junkbyte.console.Cc;
@@ -161,7 +163,7 @@ Cc.start(this);
 }}}
 
 
-You can manage your own instance of Console by directly managing it (`C` is designed to manage it for you ). 
+You can manage your own instance of Console by directly managing it (`Cc` is designed to manage it for you ). 
 {{{
 import com.junkbyte.console.Console;
 
