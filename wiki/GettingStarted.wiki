@@ -69,6 +69,16 @@ Cc.ch("chn", "Advanced log in priority 3, 2 (no repeats)", 3, true);
 Cc.ch("chn", "Advanced log in priority 3, 3 (no repeats)", 3, true);
 }}}
 
+===Custom Configuration===
+You can set up custom configurations using `Cc.config`. You must set them before starting console. Example:
+{{{
+Cc.config.alwaysOnTop = false; // disables always on top
+Cc.config.maxLines = 5000; // change maximum log lines to 5000, default is 1000. Cc.startOnStage(this); // finally start with these config
+}}}
+doc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleConfig.html
+
+Alternatively, you can create a ConsoleConfig instance and pass it at Cc.startOnStage(...) - as seen in samples/flash/SampleStyle.as
+
 ===UI===
 
 Console interface menu is at the top of main panel. Roll over each name to find out what it is.
@@ -87,6 +97,19 @@ Console interface menu is at the top of main panel. Roll over each name to find 
 
 You can move panels by dragging from top.
 You can scale panels by dragging the arrow on the bttom right.
+
+===Custom Style===
+You can set up custom console style. You must set them before starting console. Example:
+{{{
+Cc.config.style.big(); // BIGGER text.
+Cc.config.style.whiteBase(); // Black on white.
+Cc.config.style.backgroundAlpha = 1; // makes it non-transparent background.
+Cc.startOnStage(this); // finally start with these styles
+}}}
+
+example: bin/sampleStyle.swf for demo. (src: samples/flash/SampleStyle.as).
+
+doc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleConfig.html#style
 
 
 ==Advanced==
