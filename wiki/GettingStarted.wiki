@@ -12,7 +12,7 @@ In a later date when you don't need console in your flash project, you can just 
 
 ==Basics==
 
-For easy reference, please seen `samples/flash/Sample.as` for working sample.
+For easy reference, please see `samples/flash/Sample.as` for working sample.
 
 Start console on stage... 
 {{{
