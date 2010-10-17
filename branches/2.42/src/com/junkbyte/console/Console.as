@@ -62,8 +62,8 @@ package com.junkbyte.console {
 
 		public static const VERSION:Number = 2.41;
 		public static const VERSION_STAGE:String = "WIP";
-		public static const BUILD:int = 508;
-		public static const BUILD_DATE:String = "2010/10/16 13:59";
+		public static const BUILD:int = 509;
+		public static const BUILD_DATE:String = "2010/10/17 23:55";
 		
 		public static const LITE:Boolean = false;
 		//
@@ -78,7 +78,7 @@ package com.junkbyte.console {
 		//
 		public static const REMAPSPLIT:String = "|";
 		
-		public static const INSPECTING_CHANNEL:String = "◊_◊_◊";
+		public static const INSPECTING_CHANNEL:String = "◊hidden◊";
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
@@ -516,6 +516,9 @@ package com.junkbyte.console {
 		}
 		public function getLogLink(o:*):uint{
 			return _linksRev[o];
+		}
+		public function getLogById(ind:uint):*{
+			return _linksMap[ind];
 		}
 		private function getStack(depth:int):Array{
 			var e:Error = new Error();

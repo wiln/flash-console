@@ -603,6 +603,12 @@ package com.junkbyte.console.view {
 				master.reMap(t.substring(5));
 			}else if(t.substring(0,6) == "sclip_"){
 				master.reMap("0"+Console.REMAPSPLIT+t.substring(6));
+			}else if(t.substring(0,3) == "cl_"){
+				var ind:int = t.indexOf("_", 3);
+				master.cl.setReturned(master.getLogById(uint(t.substring(3, ind<0?t.length:ind))), true);
+				if(ind>=0){
+					_cmdField.text = t.substring(ind+1);
+				}
 			}
 			txtField.setSelection(0, 0);
 			e.stopPropagation();

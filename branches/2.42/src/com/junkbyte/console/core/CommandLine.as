@@ -75,6 +75,7 @@ package com.junkbyte.console.core {
 			addCLCmd("autoscope", autoscopeCmd, "Toggle autoscoping.");
 			addCLCmd("clearhistory", clearhisCmd, "Clear history of commands you have entered.");
 			addCLCmd("base", baseCmd, "Return to base scope");
+			addCLCmd("/", prevCmd, "Return to previous scope");
 			
 		}
 		public function set base(obj:Object):void {
@@ -211,9 +212,9 @@ package com.junkbyte.console.core {
 				
 			}
 			if(returned !== undefined){
-				var rtext:String = String(returned);
+				var rtext:String = _master.makeLogLink(returned);
 				// this is incase its something like XML, need to keep the <> tags...
-				rtext = rtext.replace(new RegExp("<", "gm"), "&lt;");
+				//rtext = rtext.replace(new RegExp("<", "gm"), "&lt;");
  				//rtext = rtext.replace(new RegExp(">", "gm"), "&gt;");
  				if(change){
 					report("Changed to "+ getQualifiedClassName(returned) +": <b>"+rtext+"</b>", -1);
@@ -324,6 +325,10 @@ package com.junkbyte.console.core {
 		private function baseCmd(...args:Array):void
 		{
 			setReturned(base, true);
+		}
+		private function prevCmd(...args:Array):void
+		{
+			setReturned(_prevScope.reference, true);
 		}
 		private function clearhisCmd(...args:Array):void
 		{

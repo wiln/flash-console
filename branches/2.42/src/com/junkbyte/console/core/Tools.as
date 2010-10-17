@@ -53,6 +53,11 @@ package com.junkbyte.console.core {
 				report(obj, -2, true, ch);
 				return;
 			}
+			var linkIndex:uint = _master.setLogLink(obj);
+			var menuStr:String = "[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>] [Previous] [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
+			menuStr += " [<a href='event:"+(viewAll?"reff_":"ref_")+linkIndex+"'>refresh</a>]";
+			if(!viewAll) menuStr += " [<a href='event:reff_"+linkIndex+"'>Show inherited</a>]";
+			report(menuStr, -1, true, ch);
 			//
 			// Class extends... extendsClass
 			// Class implements... implementsInterface
@@ -70,7 +75,6 @@ package com.junkbyte.console.core {
 			var str:String = "<b>"+self+"</b>";
 			var props:Array = [];
 			var props2:Array = [];
-			var staticPrefix:String = "<p1><i>[static]</i></p1>";
 			var nodes:XMLList;
 			if(V.@isDynamic=="true"){
 				props.push("dynamic");
@@ -137,7 +141,7 @@ package com.junkbyte.console.core {
 					for each(var paraX:XML in mparamsList){
 						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
 					}
-					str += methodX.@name+"<p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
+					str += "<a href='event:cl_"+linkIndex+"_"+methodX.@name+"()'>"+methodX.@name+"</a><p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
 					report(str, 3, true, ch);
 				}else{
 					inherit++;
@@ -164,7 +168,7 @@ package com.junkbyte.console.core {
 					if(access == "readonly") str+= "get";
 					else if(access == "writeonly") str+= "set";
 					else str += "assign";
-					str+= "</p1> "+accessorX.@name+"<p1>:"+accessorX.@type+"</p1>";
+					str+= "</p1> <a href='event:cl_"+linkIndex+"_"+accessorX.@name+"'>"+accessorX.@name+"</a><p1>:"+accessorX.@type+"</p1>";
 					if(access != "writeonly"){
 						var t:Object = isstatic?cls:obj;
 						str+="<p1> = "+makeValue(t, accessorX.@name)+"</p1>";
@@ -250,8 +254,7 @@ package com.junkbyte.console.core {
 					}
 				}
 			}
-			var ind:uint = _master.setLogLink(obj);
-			report("[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>] [Previous] [refresh] [Set scope] "+(viewAll?"":" [<a href='event:reff_"+ind+"'>Show inherited</a>]"), -1, true, ch);
+			report(menuStr, -1, true, ch);
 		}
 		private function makeValue(obj:*, prop:String = null):String{
 			try{
