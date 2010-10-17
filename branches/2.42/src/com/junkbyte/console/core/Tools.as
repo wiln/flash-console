@@ -23,6 +23,7 @@
 * 
 */
 package com.junkbyte.console.core {
+	import flash.utils.getDefinitionByName;
 	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
@@ -32,22 +33,24 @@ package com.junkbyte.console.core {
 	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;import com.junkbyte.console.utils.CastToString;	
 
-	public class CommandTools {
+	public class Tools {
+		
+		private var _master:Console;
 		
 		private var _mapBases:WeakObject;
 		private var _mapBaseIndex:uint = 1;
-		private var _report:Function;
 		
-		public function CommandTools(f:Function) {
-			_report = f;
+		public function Tools(m:Console) {
+			_master = m;
 			_mapBases = new WeakObject();
 		}
-		public function report(obj:*,priority:Number = 1, skipSafe:Boolean = true):void{
-			_report(obj, priority, skipSafe);
+		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true, ch:String = null):void{
+			_master.addLine([obj], priority, ch?ch:_master.config.consoleChannel, false, skipSafe, 0);
 		}
-		public function inspect(obj:Object, viewAll:Boolean= true):void {
+		
+		public function inspect(obj:*, viewAll:Boolean= true, ch:String = null):void {
 			if(!obj){
-				report(str+"<br/>", -2);
+				report(obj, -2, true, ch);
 				return;
 			}
 			//
@@ -81,18 +84,18 @@ package com.junkbyte.console.core {
 			if(props.length > 0){
 				str += " <p-1>"+props.join(" | ")+"</p-1>";
 			}
-			report(str+"<br/>", -2);
+			report(str, -2, true, ch);
 			//
 			// extends...
 			//
 			props = [];
 			nodes = V.extendsClass;
 			for each (var extendX:XML in nodes) {
-				props.push(extendX.@type.toString());
+				props.push(makeValue(getDefinitionByName(extendX.@type.toString())));
 				if(!viewAll) break;
 			}
 			if(props.length){
-				report("<p10>Extends:</p10> "+props.join("<p-1> &gt; </p-1>")+"<br/>", 5);
+				report("<p10>Extends:</p10> "+props.join("<p-1> &gt; </p-1>"), 5, true, ch);
 			}
 			//
 			// implements...
@@ -100,10 +103,10 @@ package com.junkbyte.console.core {
 			props = [];
 			nodes = V.implementsInterface;
 			for each (var implementX:XML in nodes) {
-				props.push(implementX.@type.toString());
+				props.push(makeValue(getDefinitionByName(implementX.@type.toString())));
 			}
 			if(props.length){
-				report("<p10>Implements:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+				report("<p10>Implements:</p10> "+props.join(" "), 5, true, ch);
 			}
 			//
 			// constants...
@@ -111,11 +114,14 @@ package com.junkbyte.console.core {
 			props = [];
 			nodes = clsV..constant;
 			for each (var constantX:XML in nodes) {
-				props.push(constantX.@name+"<p0>("+constantX.@type+")</p0>");
+				str = "<p1>const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls[constantX.@name])+"</p0>";
+				report(str, 3, true, ch);
 			}
-			if(props.length){
-				report("<p10>Constants:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+			if(nodes.length()>0){
+				report("", 3, true, ch);
 			}
+			var inherit:uint = 0;
+			var isstatic:Boolean;
 			//
 			// methods
 			//
@@ -123,46 +129,72 @@ package com.junkbyte.console.core {
 			props2 = [];
 			nodes = clsV..method; // '..' to include from <factory>
 			for each (var methodX:XML in nodes) {
-				var mparamsList:XMLList = methodX.parameter;
-				str = methodX.parent().name()=="factory"?"":staticPrefix;
-				if(viewAll){
+				if(viewAll || self==methodX.@declaredBy){
+					isstatic = methodX.parent().name()!="factory";
+					str = "<p1>"+(isstatic?"static ":"")+"function </p1>";
 					var params:Array = [];
+					var mparamsList:XMLList = methodX.parameter;
 					for each(var paraX:XML in mparamsList){
 						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
 					}
-					str += methodX.@name+"<p0>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p0>";
+					str += methodX.@name+"<p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
+					report(str, 3, true, ch);
 				}else{
-					str += methodX.@name+"<p0>(<i>"+mparamsList.length()+"</i>):"+methodX.@returnType+"</p0>";
+					inherit++;
 				}
-				arr = (self==methodX.@declaredBy?props:props2);
-				arr.push(str);
 			}
-			makeInheritLine(props, props2, viewAll, "Methods", viewAll?"<br/>":"<p-1>; </p-1>");
+			if(inherit){
+				report("  + "+inherit+" inherited methods.", 1, true, ch);
+			}else if(nodes.length()){
+				report("", 3, true, ch);
+			}
 			//
 			// accessors
 			//
-			var arr:Array;
+			inherit = 0;
+			var arr:Array = new Array();
 			props = [];
 			props2 = [];
 			nodes = clsV..accessor; // '..' to include from <factory>
 			for each (var accessorX:XML in nodes) {
-				str = accessorX.parent().name()=="factory"?"":staticPrefix;
-				str += (accessorX.@access=="readonly"?("<i>"+accessorX.@name+"</i>"):accessorX.@name)+"<p0>("+accessorX.@type+")</p0>";
-				arr = (self==accessorX.@declaredBy?props:props2);
-				arr.push(str);
+				if(viewAll || self==accessorX.@declaredBy){
+					isstatic = accessorX.parent().name()!="factory";
+					str = "<p1>"+(isstatic?"static ":"");
+					var access:String = accessorX.@access;
+					if(access == "readonly") str+= "get";
+					else if(access == "writeonly") str+= "set";
+					else str += "assign";
+					str+= "</p1> "+accessorX.@name+"<p1>:"+accessorX.@type+"</p1>";
+					if(access != "writeonly"){
+						var t:Object = isstatic?cls:obj;
+						str+="<p1> = "+makeValue(t, accessorX.@name)+"</p1>";
+					}
+					report(str, 3, true, ch);
+				}else{
+					inherit++;
+				}
 			}
-			makeInheritLine(props, props2, viewAll, "Accessors", "<p-1>; </p-1>");
+			if(inherit){
+				report("  + "+inherit+" inherited accessors.", 1, true, ch);
+			}else if(nodes.length()){
+				report("", 3, true, ch);
+			}
 			//
 			// variables
 			//
 			props = [];
 			nodes = clsV..variable;
 			for each (var variableX:XML in nodes) {
-				str = (variableX.parent().name()=="factory"?"":staticPrefix)+variableX.@name+"<p0>("+variableX.@type+")</p0>";
+				str = "<p0>var </p0>";
+				if(variableX.parent().name()=="factory"){
+					str = "<p0>var </p0>"+variableX.@name+":<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
+				}else{
+					str = "<p0><i>static var</i></p0>"+variableX.@name+":<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
+				}
 				props.push(str);
 			}
 			if(props.length){
-				report("<p10>Variables:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+				report(props.join("<br/>"), 3, true, ch);
 			}
 			//
 			// dynamic values
@@ -170,13 +202,10 @@ package com.junkbyte.console.core {
 			try{
 				props = [];
 				for (var X:String in obj) {
-					props.push(X+"<p0>("+getQualifiedClassName(obj[X])+")</p0>");
-				}
-				if(props.length){
-					report("<p10>Values:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+					report("<p0>dynamic var </p0>"+X+"<p1> = "+makeValue(obj, X)+"</p1>", 3, true, ch);
 				}
 			}catch(e:Error){
-				report("Could not get values due to: "+e, 9);
+				report("Could not get values due to: "+e, 9, true, ch);
 			}
 			//
 			// events
@@ -190,7 +219,7 @@ package com.junkbyte.console.core {
 				}
 			}
 			if(props.length){
-				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true, ch);
 			}
 			//
 			// display's parents and direct children
@@ -204,7 +233,7 @@ package com.junkbyte.console.core {
 					props.push("<b>"+child.name+"</b>:("+ci+")"+getQualifiedClassName(child));
 				}
 				if(props.length){
-					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true, ch);
 				}
 			}
 			if (viewAll && obj is DisplayObject) {
@@ -217,13 +246,24 @@ package com.junkbyte.console.core {
 						props.push("<b>"+pr.name+"</b>:("+(theParent?theParent.getChildIndex(pr):"")+")"+getQualifiedClassName(pr));
 					}
 					if(props.length){
-						report("<p10>Parents:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5);
+						report("<p10>Parents:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true, ch);
 					}
 				}
 			}
-			if(!viewAll){
-				report("Tip: use /inspectfull to see full inspection with inheritance",-1);
+			var ind:uint = _master.setLogLink(obj);
+			report("[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>] [Previous] [refresh] [Set scope] "+(viewAll?"":" [<a href='event:reff_"+ind+"'>Show inherited</a>]"), -1, true, ch);
+		}
+		private function makeValue(obj:*, prop:String = null):String{
+			try{
+				if(prop) obj = obj[prop];
+				var str:String = _master.makeLogLink(obj);
+				if(str.length > 100){
+					str = str.substring(0, 100)+"...";
+				}
+			}catch(err:Error){
+				return "<p0><i>"+err.toString()+"</i></p0>";
 			}
+			return str;
 		}
 		public static function explode(obj:Object, depth:int = 3, p:int = 9):String{
 			if(!obj) return "explode() target is empty.";
@@ -263,18 +303,6 @@ package com.junkbyte.console.core {
 				}
 			}catch(e:Error){}
 			return "<p"+p+">{"+ShortClassName(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
-		}
-		private function makeInheritLine(props:Array, props2:Array, viewAll:Boolean, type:String, breaker:String):void{
-			var str:String = "";
-			if(props.length || props2.length){
-				str += "<p10>"+type+":</p10> "+props.join(breaker);
-				if(viewAll){
-					str += (props.length?breaker:"")+"<p2>"+props2.join(breaker)+"</p2>";
-				}else if(props2.length){
-					str += (props.length?breaker:"")+"<p2>+ "+props2.length+" inherited</p2>";
-				}
-				report(str+"<br/>", 5);
-			}
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(!base){
@@ -374,17 +402,6 @@ package com.junkbyte.console.core {
 				//debug(e.getStackTrace());
 			}
 			return null;
-		}
-		public function printHelp():void {
-			report("____Command Line Help___",10);
-			report("/filter (text) = filter/search logs for matching text",5);
-			report("/commands to see all slash commands",5);
-			report("Press up/down arrow keys to recall previous line",2);
-			report("__Examples:",10);
-			report("<b>stage.stageWidth</b>",5);
-			report("<b>stage.scaleMode = flash.display.StageScaleMode.NO_SCALE</b>",5);
-			report("<b>stage.frameRate = 12</b>",5);
-			report("__________",10);
 		}
 	}
 }

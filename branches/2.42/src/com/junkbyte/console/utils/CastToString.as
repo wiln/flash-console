@@ -23,6 +23,7 @@
 * 
 */
 package com.junkbyte.console.utils {
+	import flash.utils.ByteArray;
 	//import com.junkbyte.console.core.CommandTools;
 	
 	import flash.utils.getQualifiedClassName;		
@@ -52,6 +53,8 @@ package com.junkbyte.console.utils {
 				str += (i?",":"")+CastToString(obj[i]);
 			}
 			return str+"]";
+		}else if(obj is ByteArray){
+			return "[ByteArray length:"+ByteArray(obj).length+"]"; 
 		}
 		// TODO: auto explode objects ?	
 		return String(obj);

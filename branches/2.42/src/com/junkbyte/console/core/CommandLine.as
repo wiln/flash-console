@@ -23,6 +23,7 @@
 * 
 */
 package com.junkbyte.console.core {
+	import flash.display.DisplayObject;
 	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
@@ -48,19 +49,17 @@ package com.junkbyte.console.core {
 		private var _prevScope:WeakRef;
 		
 		private var _master:Console;
-		private var _tools:CommandTools;
 		private var _slashCmds:Object;
 		
 		public function CommandLine(m:Console) {
 			_master = m;
-			_tools = new CommandTools(report);
 			_saved = new WeakObject();
 			_scope = m;
 			_slashCmds = new Object();
 			_prevScope = new WeakRef(m);
 			_saved.set("C", m);
 			
-			addCLCmd("help", _tools.printHelp, "How to use command line");
+			addCLCmd("help", printHelp, "How to use command line");
 			addCLCmd("save|store", saveCmd, "Save current scope as weak reference. (same as Cc.store(...))");
 			addCLCmd("savestrong|storestrong", saveStrongCmd, "Save current scope as strong reference");
 			addCLCmd("saved|stored", savedCmd, "Show a list of all saved references");
@@ -78,7 +77,6 @@ package com.junkbyte.console.core {
 			addCLCmd("base", baseCmd, "Return to base scope");
 			
 		}
-		
 		public function set base(obj:Object):void {
 			if (base) {
 				report("Set new commandLine base from "+base+ " to "+ obj, 10);
@@ -95,7 +93,6 @@ package com.junkbyte.console.core {
 		public function destory():void {
 			_saved = null;
 			_master = null;
-			_tools = null;
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):void {
 			// if it is a function it needs to be strong reference atm, 
@@ -170,6 +167,11 @@ package com.junkbyte.console.core {
 		private function execCommand(str:String):void{
 			var brk:int = str.indexOf(" ");
 			var cmd:String = str.substring(1, brk>0?brk:str.length);
+			if(cmd == "")
+			{
+				setReturned(_saved.get(Executer.RETURNED), true);
+				return;
+			}
 			var param:String = brk>0?str.substring(brk+1):"";
 			if(_slashCmds[cmd] != null){
 				try{
@@ -186,7 +188,7 @@ package com.junkbyte.console.core {
 				report("Undefined command <b>/cmds</b> for list of all commands.",10);
 			}
 		}
-		private function setReturned(returned:*, changeScope:Boolean = false):void{
+		public function setReturned(returned:*, changeScope:Boolean = false):void{
 			var change:Boolean = false;
 			if(returned)
 			{
@@ -244,15 +246,6 @@ package com.junkbyte.console.core {
 			}
 			report(parts.join("\n"), 9);
 		}
-		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			_tools.map(base, maxstep);
-		}
-		public function reMap(param:String):void {
-			setReturned(_tools.reMap(param, _master.stage), true);
-		}
-		public function inspect(obj:Object, viewAll:Boolean= true):void {
-			_tools.inspect(obj, viewAll);
-		}
 		public function report(obj:*,priority:Number = 1, skipSafe:Boolean = true):void{
 			_master.report(obj, priority, skipSafe);
 		}
@@ -308,17 +301,17 @@ package com.junkbyte.console.core {
 			_master.panels.mainPanel.filterRegExp = new RegExp(param, "i");
 		}
 		private function inspectCmd(...args:Array):void{
-			inspect(_scope, false);
+			_master.inspect(_scope, false);
 		}
 		private function inspectfullCmd(...args:Array):void{
-			inspect(_scope, true);
+			_master.inspect(_scope, true);
 		}
 		private function explodeCmd(param:String):void{
 			var depth:int = int(param);
 			_master.explode(_scope, depth<=0?3:depth);
 		}
 		private function mapCmd(param:String):void{
-			map(_scope as DisplayObjectContainer, int(param));
+			_master.map(_scope as DisplayObjectContainer, int(param));
 		}
 		private function funCmd(param:String):void{
 			var fakeFunction:FakeFunction = new FakeFunction(run, param);
@@ -335,6 +328,17 @@ package com.junkbyte.console.core {
 		private function clearhisCmd(...args:Array):void
 		{
 			_master.panels.mainPanel.clearCommandLineHistory();
+		}
+		private function printHelp():void {
+			report("____Command Line Help___",10);
+			report("/filter (text) = filter/search logs for matching text",5);
+			report("/commands to see all slash commands",5);
+			report("Press up/down arrow keys to recall previous line",2);
+			report("__Examples:",10);
+			report("<b>stage.stageWidth</b>",5);
+			report("<b>stage.scaleMode = flash.display.StageScaleMode.NO_SCALE</b>",5);
+			report("<b>stage.frameRate = 12</b>",5);
+			report("__________",10);
 		}
 	}
 }

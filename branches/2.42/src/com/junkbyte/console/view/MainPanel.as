@@ -574,14 +574,6 @@ package com.junkbyte.console.view {
 				master.fpsMonitor = !master.fpsMonitor;
 			}else if(t == "priority"){
 				incPriority(_shift);
-				/*if(_shift){
-					if(_priority>0) _priority--;
-					else _priority = 10;
-				}else{
-					if(_priority<10) _priority++;
-					else _priority = 0;
-				}
-				setPriority(_priority);*/
 			}else if(t == "mm"){
 				master.memoryMonitor = !master.memoryMonitor;
 			}else if(t == "roller"){
@@ -601,6 +593,10 @@ package com.junkbyte.console.view {
 				Security.showSettings(SecurityPanel.SETTINGS_MANAGER);
 			}else if(t == "remote"){
 				master.remote = true;
+			}else if(t.substring(0,4) == "ref_"){
+				master.printRef(uint(t.substring(4)));
+			}else if(t.substring(0,5) == "reff_"){
+				master.printRef(uint(t.substring(5)), true);
 			}else if(t.substring(0,8) == "channel_"){
 				onChannelPressed(t.substring(8));
 			}else if(t.substring(0,5) == "clip_"){
@@ -613,6 +609,9 @@ package com.junkbyte.console.view {
 		}
 		public function onChannelPressed(chn:String):void{
 			var current:Array = _viewingChannels.concat();
+			if(current[0] == Console.INSPECTING_CHANNEL){
+				master.clear(Console.INSPECTING_CHANNEL);
+			}
 			if(_shift && chn != config.globalChannel){
 				var ind:int = current.indexOf(chn);
 				if(ind>=0){
@@ -627,6 +626,14 @@ package com.junkbyte.console.view {
 			}else{
 				viewingChannels = [chn];
 			}
+		}
+		public function set priority(p:int):void{
+			_priority = p;
+			updateToBottom();
+			updateMenu();
+		}
+		public function get priority():int{
+			return _priority;
 		}
 		//
 		private function incPriority(down:Boolean):void{
@@ -651,9 +658,7 @@ package com.junkbyte.console.view {
 				if(top == p) p = 0;
 				else p = top;
 			}
-			_priority = p;
-			updateToBottom();
-			updateMenu();
+			priority = p;
 		}
 		//
 		// COMMAND LINE

@@ -23,8 +23,10 @@
 * 
 */
 package com.junkbyte.console {
+	import flash.utils.Dictionary;
+	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.core.CommandLine;
-	import com.junkbyte.console.core.CommandTools;
+	import com.junkbyte.console.core.Tools;
 	import com.junkbyte.console.core.Graphing;
 	import com.junkbyte.console.core.KeyBinder;
 	import com.junkbyte.console.core.MemoryMonitor;
@@ -60,8 +62,8 @@ package com.junkbyte.console {
 
 		public static const VERSION:Number = 2.41;
 		public static const VERSION_STAGE:String = "WIP";
-		public static const BUILD:int = 506;
-		public static const BUILD_DATE:String = "2010/09/25 16:16";
+		public static const BUILD:int = 508;
+		public static const BUILD_DATE:String = "2010/10/16 13:59";
 		
 		public static const LITE:Boolean = false;
 		//
@@ -75,6 +77,8 @@ package com.junkbyte.console {
 		public static const FATAL:uint = 10;
 		//
 		public static const REMAPSPLIT:String = "|";
+		
+		public static const INSPECTING_CHANNEL:String = "◊_◊_◊";
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
@@ -85,6 +89,7 @@ package com.junkbyte.console {
 		private var _mm:MemoryMonitor;
 		private var _graphing:Graphing;
 		private var _remoter:Remoting;
+		private var _tools:Tools;
 		private var _topTries:int = 50;
 		//
 		private var _paused:Boolean;
@@ -93,6 +98,9 @@ package com.junkbyte.console {
 		private var _repeating:uint;
 		private var _lines:Logs;
 		private var _lineAdded:Boolean;
+		private var _linksMap:WeakObject;
+		private var _linksRev:Dictionary;
+		private var _linkIndex:uint = 1;
 		
 		/**
 		 * Console is the main class. However please use C for singleton Console adapter.
@@ -113,10 +121,13 @@ package com.junkbyte.console {
 			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
 			//_om = new ObjectsMonitor();
 			_cl = new CommandLine(this);
+			_tools =  new Tools(this);
 			_graphing = new Graphing(report);
 			_remoter = new Remoting(this, pass);
 			_kb = new KeyBinder(pass);
 			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
+			_linksMap = new WeakObject();
+			_linksRev = new Dictionary(true);
 			//
 			// VIEW setup
 			_config.style.updateStyleSheet();
@@ -302,21 +313,21 @@ package com.junkbyte.console {
 			_cl.store(n, obj, strong);
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			_cl.map(base, maxstep);
+			_tools.map(base, maxstep);
 		}
 		public function reMap(path:String):void
 		{
 			if(remote){
 				_remoter.send(Remoting.RMAP, path);
 			}else{
-				_cl.reMap(path);
+				_cl.setReturned(_tools.reMap(path, stage), true);
 			}
 		}
-		public function inspect(obj:Object, detail:Boolean = true):void{
-			_cl.inspect(obj,detail);
+		public function inspect(obj:Object, detail:Boolean = true, ch:String = null):void{
+			_tools.inspect(obj,detail, ch);
 		}
 		public function explode(obj:Object, depth:int = 3):void{
-			report(CommandTools.explode(obj, depth), 1);
+			report(Tools.explode(obj, depth), 1);
 		}
 		public function get paused():Boolean{
 			return _paused;
@@ -421,10 +432,16 @@ package com.junkbyte.console {
 			_panels.mainPanel.viewingChannels = a;
 		}
 		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true):void{
-			addLine(obj, priority, _config.consoleChannel, false, skipSafe, 0);
+			addLine([obj], priority, _config.consoleChannel, false, skipSafe, 0);
 		}
-		public function addLine(obj:*, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false, stacks:int = -1):void{
-			var txt:String = CastToString(obj);
+		public function addLine(arr:Array, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false, stacks:int = -1):void{
+			
+			var txt:String = "";
+			var len:int = arr.length;
+			for(var i:int = 0; i < len; i++){
+				txt += (i?" ":"")+makeLogLink(arr[i], null, skipSafe);
+			}
+			
 			var isRepeat:Boolean = (isRepeating && _repeating > 0);
 			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
@@ -434,10 +451,7 @@ package com.junkbyte.console {
 			if( _config.tracing && !isRepeat && _config.traceCall != null){
 				_config.traceCall(channel, (stackArr==null?txt:(txt+"\n @ "+stackArr.join("\n @ "))), priority);
 			}
-			if(!skipSafe){
-				txt = txt.replace(/</gm, "&lt;");
- 				txt = txt.replace(new RegExp(">", "gm"), "&gt;");
-			}
+			
 			if(stackArr) {
 				var tp:int = priority;
 				for each(var sline:String in stackArr) {
@@ -445,7 +459,7 @@ package com.junkbyte.console {
 					if(tp>0) tp--;
 				}
 			}
-			if(_channels.indexOf(channel) < 0){
+			if(_channels.indexOf(channel) < 0 && channel != INSPECTING_CHANNEL){
 				_channels.push(channel);
 			}
 			var line:Log = new Log(txt,channel,priority, isRepeating, skipSafe);
@@ -465,6 +479,43 @@ package com.junkbyte.console {
 			_lineAdded = true;
 			
 			_remoter.addLineQueue(line);
+		}
+		public function printRef(i:uint, full:Boolean = false):void{
+			var o:Object = _linksMap[i];
+			if(o){
+				clear(INSPECTING_CHANNEL);
+				inspect(o, full, INSPECTING_CHANNEL);
+				viewingChannels = [INSPECTING_CHANNEL];
+			}else{
+				var cn:String = viewingChannels[0] == config.globalChannel?config.defaultChannel:viewingChannels[0];
+				ch(cn, "Reference no longer exist.", -2);
+			}
+		}
+		public function makeLogLink(o:Object, prop:String = null, skipSafe:Boolean = false):String{
+			var txt:String;
+			if(o && typeof o == "object") {
+				var ind:uint = setLogLink(o);
+				txt = "<a href='event:ref_"+ind+"'>[<p-1>"+ShortClassName(o)+"</p-1>]</a>";
+			}else{
+				txt = String(o);
+				if(!skipSafe){
+					txt = txt.replace(/</gm, "&lt;");
+	 				txt = txt.replace(new RegExp(">", "gm"), "&gt;");
+				}
+			}
+			return txt;
+		}
+		public function setLogLink(o:*):uint{
+			var ind:uint = _linksRev[o];
+			if(!ind){
+				ind = _linkIndex;
+				_linksMap[ind] = o;
+				_linkIndex++;
+			}
+			return ind;
+		}
+		public function getLogLink(o:*):uint{
+			return _linksRev[o];
 		}
 		private function getStack(depth:int):Array{
 			var e:Error = new Error();
@@ -517,67 +568,60 @@ package com.junkbyte.console {
 		//
 		// LOGGING
 		//
+		public function add(newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
+			addLine(new Array(newLine), priority, _config.defaultChannel, isRepeating);
+		}
+		public function stack(newLine:*, depth:int = -1, priority:Number = 5):void{
+			addLine(new Array(newLine), priority, _config.defaultChannel, false, false, depth>=0?depth:_config.defaultStackDepth);
+		}
+		public function stackch(ch:String, newLine:*, depth:int = -1, priority:Number = 5):void{
+			addLine(new Array(newLine), priority, ch, false, false, depth>=0?depth:_config.defaultStackDepth);
+		}
+		public function log(...args):void{
+			addLine(args, LOG);
+		}
+		public function info(...args):void{
+			addLine(args, INFO);
+		}
+		public function debug(...args):void{
+			addLine(args, DEBUG);
+		}
+		public function warn(...args):void{
+			addLine(args, WARN);
+		}
+		public function error(...args):void{
+			addLine(args, ERROR);
+		}
+		public function fatal(...args):void{
+			addLine(args, FATAL);
+		}
 		public function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
+			addCh(channel, new Array(newLine), priority, isRepeating);
+		}
+		public function logch(channel:*, ...args):void{
+			addCh(channel, args, LOG);
+		}
+		public function infoch(channel:*, ...args):void{
+			addCh(channel, args, INFO);
+		}
+		public function debugch(channel:*, ...args):void{
+			addCh(channel, args, DEBUG);
+		}
+		public function warnch(channel:*, ...args):void{
+			addCh(channel, args, WARN);
+		}
+		public function errorch(channel:*, ...args):void{
+			addCh(channel, args, ERROR);
+		}
+		public function fatalch(channel:*, ...args):void{
+			addCh(channel, args, FATAL);
+		}
+		private function addCh(channel:*, newLine:Array, priority:Number = 2, isRepeating:Boolean = false):void{
 			var chn:String;
 			if(channel is String) chn = channel as String;
 			else if(channel) chn = ShortClassName(channel);
 			else chn = _config.defaultChannel;
 			addLine(newLine, priority,chn, isRepeating);
-		}
-		public function add(newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
-			addLine(newLine, priority, _config.defaultChannel, isRepeating);
-		}
-		public function stack(newLine:*, depth:int = -1, priority:Number = 5):void{
-			addLine(newLine, priority, _config.defaultChannel, false, false, depth>=0?depth:_config.defaultStackDepth);
-		}
-		public function stackch(ch:String, newLine:*, depth:int = -1, priority:Number = 5):void{
-			addLine(newLine, priority, ch, false, false, depth>=0?depth:_config.defaultStackDepth);
-		}
-		public function log(...args):void{
-			addLine(joinArgs(args), LOG);
-		}
-		public function info(...args):void{
-			addLine(joinArgs(args), INFO);
-		}
-		public function debug(...args):void{
-			addLine(joinArgs(args), DEBUG);
-		}
-		public function warn(...args):void{
-			addLine(joinArgs(args), WARN);
-		}
-		public function error(...args):void{
-			addLine(joinArgs(args), ERROR);
-		}
-		public function fatal(...args):void{
-			addLine(joinArgs(args), FATAL);
-		}
-		public function logch(channel:*, ...args):void{
-			ch(channel, joinArgs(args), LOG);
-		}
-		public function infoch(channel:*, ...args):void{
-			ch(channel, joinArgs(args), INFO);
-		}
-		public function debugch(channel:*, ...args):void{
-			ch(channel, joinArgs(args), DEBUG);
-		}
-		public function warnch(channel:*, ...args):void{
-			ch(channel, joinArgs(args), WARN);
-		}
-		public function errorch(channel:*, ...args):void{
-			ch(channel, joinArgs(args), ERROR);
-		}
-		public function fatalch(channel:*, ...args):void{
-			ch(channel, joinArgs(args), FATAL);
-		}
-		// Need to specifically cast to string in array to produce correct results
-		// e.g: new Array("str",null,undefined,0).toString() // traces to: str,,,0, SHOULD BE: str,null,undefined,0
-		private function joinArgs(args:Array):String{
-			var str:String = "";
-			var len:int = args.length;
-			for(var i:int = 0; i < len; i++){
-				str += (i?" ":"")+CastToString(args[i]);
-			}
-			return str;
 		}
 		//
 		//
