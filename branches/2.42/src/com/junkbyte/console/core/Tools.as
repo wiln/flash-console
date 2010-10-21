@@ -22,16 +22,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.core {
-	import flash.utils.getDefinitionByName;
-	import com.junkbyte.console.utils.ShortClassName;
+package com.junkbyte.console.core 
+{
 	import com.junkbyte.console.Console;
+	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.vos.WeakObject;
-	
+
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.utils.describeType;
-	import flash.utils.getQualifiedClassName;import com.junkbyte.console.utils.CastToString;	
+	import flash.utils.getQualifiedClassName;
 
 	public class Tools {
 		
@@ -47,232 +47,11 @@ package com.junkbyte.console.core {
 		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true, ch:String = null):void{
 			_master.addLine([obj], priority, ch?ch:_master.config.consoleChannel, false, skipSafe, 0);
 		}
-		
-		public function inspect(obj:*, viewAll:Boolean= true, ch:String = null):void {
-			if(!obj){
-				report(obj, -2, true, ch);
-				return;
-			}
-			var linkIndex:uint = _master.setLogLink(obj);
-			var menuStr:String = "[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>] [Previous] [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
-			menuStr += " [<a href='event:"+(viewAll?"reff_":"ref_")+linkIndex+"'>refresh</a>]";
-			if(!viewAll) menuStr += " [<a href='event:reff_"+linkIndex+"'>Show inherited</a>]";
-			report(menuStr, -1, true, ch);
-			//
-			// Class extends... extendsClass
-			// Class implements... implementsInterface
-			// constant // statics
-			// methods
-			// accessors
-			// varaibles
-			// values
-			// EVENTS .. metadata name="Event"
-			//
-			var V:XML = describeType(obj);
-			var cls:Object = obj is Class?obj:obj.constructor;
-			var clsV:XML = describeType(cls);
-			var self:String = V.@name;
-			var str:String = "<b>"+self+"</b>";
-			var props:Array = [];
-			var props2:Array = [];
-			var nodes:XMLList;
-			if(V.@isDynamic=="true"){
-				props.push("dynamic");
-			}
-			if(V.@isFinal=="true"){
-				props.push("final");
-			}
-			if(V.@isStatic=="true"){
-				props.push("static");
-			}
-			if(props.length > 0){
-				str += " <p-1>"+props.join(" | ")+"</p-1>";
-			}
-			report(str, -2, true, ch);
-			//
-			// extends...
-			//
-			props = [];
-			nodes = V.extendsClass;
-			for each (var extendX:XML in nodes) {
-				props.push(makeValue(getDefinitionByName(extendX.@type.toString())));
-				if(!viewAll) break;
-			}
-			if(props.length){
-				report("<p10>Extends:</p10> "+props.join("<p-1> &gt; </p-1>"), 5, true, ch);
-			}
-			//
-			// implements...
-			//
-			props = [];
-			nodes = V.implementsInterface;
-			for each (var implementX:XML in nodes) {
-				props.push(makeValue(getDefinitionByName(implementX.@type.toString())));
-			}
-			if(props.length){
-				report("<p10>Implements:</p10> "+props.join(" "), 5, true, ch);
-			}
-			//
-			// constants...
-			//
-			props = [];
-			nodes = clsV..constant;
-			for each (var constantX:XML in nodes) {
-				str = "<p1>const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls[constantX.@name])+"</p0>";
-				report(str, 3, true, ch);
-			}
-			if(nodes.length()>0){
-				report("", 3, true, ch);
-			}
-			var inherit:uint = 0;
-			var isstatic:Boolean;
-			//
-			// methods
-			//
-			props = [];
-			props2 = [];
-			nodes = clsV..method; // '..' to include from <factory>
-			for each (var methodX:XML in nodes) {
-				if(viewAll || self==methodX.@declaredBy){
-					isstatic = methodX.parent().name()!="factory";
-					str = "<p1>"+(isstatic?"static ":"")+"function </p1>";
-					var params:Array = [];
-					var mparamsList:XMLList = methodX.parameter;
-					for each(var paraX:XML in mparamsList){
-						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
-					}
-					str += "<a href='event:cl_"+linkIndex+"_"+methodX.@name+"()'>"+methodX.@name+"</a><p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
-					report(str, 3, true, ch);
-				}else{
-					inherit++;
-				}
-			}
-			if(inherit){
-				report("  + "+inherit+" inherited methods.", 1, true, ch);
-			}else if(nodes.length()){
-				report("", 3, true, ch);
-			}
-			//
-			// accessors
-			//
-			inherit = 0;
-			var arr:Array = new Array();
-			props = [];
-			props2 = [];
-			nodes = clsV..accessor; // '..' to include from <factory>
-			for each (var accessorX:XML in nodes) {
-				if(viewAll || self==accessorX.@declaredBy){
-					isstatic = accessorX.parent().name()!="factory";
-					str = "<p1>"+(isstatic?"static ":"");
-					var access:String = accessorX.@access;
-					if(access == "readonly") str+= "get";
-					else if(access == "writeonly") str+= "set";
-					else str += "assign";
-					str+= "</p1> <a href='event:cl_"+linkIndex+"_"+accessorX.@name+"'>"+accessorX.@name+"</a><p1>:"+accessorX.@type+"</p1>";
-					if(access != "writeonly"){
-						var t:Object = isstatic?cls:obj;
-						str+="<p1> = "+makeValue(t, accessorX.@name)+"</p1>";
-					}
-					report(str, 3, true, ch);
-				}else{
-					inherit++;
-				}
-			}
-			if(inherit){
-				report("  + "+inherit+" inherited accessors.", 1, true, ch);
-			}else if(nodes.length()){
-				report("", 3, true, ch);
-			}
-			//
-			// variables
-			//
-			props = [];
-			nodes = clsV..variable;
-			for each (var variableX:XML in nodes) {
-				str = "<p0>var </p0>";
-				if(variableX.parent().name()=="factory"){
-					str = "<p0>var </p0>"+variableX.@name+":<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
-				}else{
-					str = "<p0><i>static var</i></p0>"+variableX.@name+":<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
-				}
-				props.push(str);
-			}
-			if(props.length){
-				report(props.join("<br/>"), 3, true, ch);
-			}
-			//
-			// dynamic values
-			// - It can sometimes fail if we are looking at proxy object which havnt extended nextNameIndex, nextName, etc.
-			try{
-				props = [];
-				for (var X:String in obj) {
-					report("<p0>dynamic var </p0>"+X+"<p1> = "+makeValue(obj, X)+"</p1>", 3, true, ch);
-				}
-			}catch(e:Error){
-				report("Could not get values due to: "+e, 9, true, ch);
-			}
-			//
-			// events
-			// metadata name="Event"
-			props = [];
-			nodes = V.metadata;
-			for each (var metadataX:XML in nodes) {
-				if(metadataX.@name=="Event"){
-					var mn:XMLList = metadataX.arg;
-					props.push(mn.(@key=="name").@value+"<p0>("+mn.(@key=="type").@value+")</p0>");
-				}
-			}
-			if(props.length){
-				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true, ch);
-			}
-			//
-			// display's parents and direct children
-			//
-			if (viewAll && obj is DisplayObjectContainer) {
-				props = [];
-				var mc:DisplayObjectContainer = obj as DisplayObjectContainer;
-				var clen:int = mc.numChildren;
-				for (var ci:int = 0; ci<clen; ci++) {
-					var child:DisplayObject = mc.getChildAt(ci);
-					props.push("<b>"+child.name+"</b>:("+ci+")"+getQualifiedClassName(child));
-				}
-				if(props.length){
-					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true, ch);
-				}
-			}
-			if (viewAll && obj is DisplayObject) {
-				var theParent:DisplayObjectContainer = mc.parent;
-				if (theParent) {
-					props = ["("+theParent.getChildIndex(mc)+")"];
-					while (theParent) {
-						var pr:DisplayObjectContainer = theParent;
-						theParent = theParent.parent;
-						props.push("<b>"+pr.name+"</b>:("+(theParent?theParent.getChildIndex(pr):"")+")"+getQualifiedClassName(pr));
-					}
-					if(props.length){
-						report("<p10>Parents:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true, ch);
-					}
-				}
-			}
-			report(menuStr, -1, true, ch);
-		}
-		private function makeValue(obj:*, prop:String = null):String{
-			try{
-				if(prop) obj = obj[prop];
-				var str:String = _master.makeLogLink(obj);
-				if(str.length > 100){
-					str = str.substring(0, 100)+"...";
-				}
-			}catch(err:Error){
-				return "<p0><i>"+err.toString()+"</i></p0>";
-			}
-			return str;
-		}
-		public static function explode(obj:Object, depth:int = 3, p:int = 9):String{
+		public function explode(obj:Object, depth:int = 3, p:int = 9):String{
 			if(!obj) return "explode() target is empty.";
 			var t:String = typeof obj;
 			if(t != "object" || depth == 0){
-				return CastToString(obj);
+				return _master.links.makeRefString(obj);
 			}else if(obj == null){ 
 				// could be null, undefined, NaN, etc. all should be printed as is
 				return "<p-2>"+obj+"</p-2>";

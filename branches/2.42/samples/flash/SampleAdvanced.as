@@ -24,6 +24,7 @@
 */
 package 
 {
+	import flash.utils.ByteArray;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleConfig;
@@ -36,6 +37,8 @@ package
 	// Might want to add compile argument: -use-network=false -debug=true
 	
 	public dynamic class SampleAdvanced extends MovieClip{
+		
+		private var temp:Object = {o1:{o2:{o3:{}}}};
 		
 		public function SampleAdvanced() {
 			//
@@ -89,13 +92,16 @@ package
 			var o:Log = new Log("test", "ch1", 5);
 			o.prev = new Log("Previous log", "ch0", 1);
 			// explode an object into its values..
-			var arr:Array = ["a","b","c",{o1:{o2:{o3:{}}}}, o];
+			var arr:Array = ["a","b","c",temp, o];
 			Cc.explode(arr);
 			Cc.log("Temp object: ", arr);
 			
 			Cc.log(<xx aa="AA"><yy bb="BB"><zz>ZZ</zz></yy></xx>);
 			Cc.log(Cc.instance);
 			Cc.log(Cc.config);
+			var ba:ByteArray = new ByteArray();
+			ba.writeUTF("abcdefg");
+			Cc.log(ba);
 			// test of Cc.stack,  If you have debugger version installed you will see a stack trace like:
 			// HELLO
 			//  @ SampleAdvanced/e()

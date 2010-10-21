@@ -315,6 +315,10 @@ package com.junkbyte.console.view {
 			return _viewingChannels;
 		}
 		public function set viewingChannels(a:Array):void{
+			if(a[0] != _viewingChannels[0] && _viewingChannels[0] == Console.INSPECTING_CHANNEL){
+				master.clear(Console.INSPECTING_CHANNEL);
+				master.links.exitFocus();
+			}
 			_viewingChannels.splice(0);
 			if(a && a.length) {
 				if(a.indexOf(config.globalChannel) >= 0) a = [];
@@ -593,10 +597,8 @@ package com.junkbyte.console.view {
 				Security.showSettings(SecurityPanel.SETTINGS_MANAGER);
 			}else if(t == "remote"){
 				master.remote = true;
-			}else if(t.substring(0,4) == "ref_"){
-				master.printRef(uint(t.substring(4)));
-			}else if(t.substring(0,5) == "reff_"){
-				master.printRef(uint(t.substring(5)), true);
+			}else if(t.substring(0,4) == "ref_" || t.substring(0,5) == "reff_"){
+				master.links.focusByRefString(t);
 			}else if(t.substring(0,8) == "channel_"){
 				onChannelPressed(t.substring(8));
 			}else if(t.substring(0,5) == "clip_"){
@@ -605,7 +607,7 @@ package com.junkbyte.console.view {
 				master.reMap("0"+Console.REMAPSPLIT+t.substring(6));
 			}else if(t.substring(0,3) == "cl_"){
 				var ind:int = t.indexOf("_", 3);
-				master.cl.setReturned(master.getLogById(uint(t.substring(3, ind<0?t.length:ind))), true);
+				master.cl.setReturned(master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind))), true);
 				if(ind>=0){
 					_cmdField.text = t.substring(ind+1);
 				}
@@ -615,9 +617,6 @@ package com.junkbyte.console.view {
 		}
 		public function onChannelPressed(chn:String):void{
 			var current:Array = _viewingChannels.concat();
-			if(current[0] == Console.INSPECTING_CHANNEL){
-				master.clear(Console.INSPECTING_CHANNEL);
-			}
 			if(_shift && chn != config.globalChannel){
 				var ind:int = current.indexOf(chn);
 				if(ind>=0){

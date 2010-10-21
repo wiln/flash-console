@@ -22,17 +22,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.core {
-	import flash.display.DisplayObject;
-	import com.junkbyte.console.utils.ShortClassName;
+package com.junkbyte.console.core 
+{
 	import com.junkbyte.console.Console;
+	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.vos.WeakRef;
-	
+
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.utils.getQualifiedClassName;import com.junkbyte.console.utils.CastToString;	
+	import flash.utils.getQualifiedClassName;
 
 	public class CommandLine extends EventDispatcher {
 		
@@ -183,7 +183,7 @@ package com.junkbyte.console.core {
 						slashcmd.f(param);
 					}
 				}catch(err:Error){
-					report("ERROR slash command: "+CastToString(err), 10);
+					report("ERROR slash command: "+_master.links.makeRefString(err), 10);
 				}
 			} else{
 				report("Undefined command <b>/cmds</b> for list of all commands.",10);
@@ -212,13 +212,13 @@ package com.junkbyte.console.core {
 				
 			}
 			if(returned !== undefined){
-				var rtext:String = _master.makeLogLink(returned);
+				var rtext:String = _master.links.makeRefString(returned);
 				// this is incase its something like XML, need to keep the <> tags...
 				//rtext = rtext.replace(new RegExp("<", "gm"), "&lt;");
  				//rtext = rtext.replace(new RegExp(">", "gm"), "&gt;");
  				if(change){
 					report("Changed to "+ getQualifiedClassName(returned) +": <b>"+rtext+"</b>", -1);
- 				}else{
+ 				}else if(!changeScope){
 					report("Returned "+ getQualifiedClassName(returned) +": <b>"+rtext+"</b>", -2);
  				}
 			}else{
@@ -226,7 +226,7 @@ package com.junkbyte.console.core {
 			}
 		}
 		private function reportError(e:Error):void{
-			var str:String = CastToString(e);
+			var str:String = _master.links.makeRefString(e);
 			var lines:Array = str.split(/\n\s*/);
 			var p:int = 10;
 			var internalerrs:int = 0;
@@ -302,10 +302,10 @@ package com.junkbyte.console.core {
 			_master.panels.mainPanel.filterRegExp = new RegExp(param, "i");
 		}
 		private function inspectCmd(...args:Array):void{
-			_master.inspect(_scope, false);
+			_master.links.focus(_scope, false);
 		}
 		private function inspectfullCmd(...args:Array):void{
-			_master.inspect(_scope, true);
+			_master.links.focus(_scope, true);
 		}
 		private function explodeCmd(param:String):void{
 			var depth:int = int(param);

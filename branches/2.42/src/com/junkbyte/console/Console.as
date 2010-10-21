@@ -22,25 +22,23 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console {
-	import flash.utils.Dictionary;
-	import com.junkbyte.console.vos.WeakObject;
+package com.junkbyte.console 
+{
 	import com.junkbyte.console.core.CommandLine;
-	import com.junkbyte.console.core.Tools;
 	import com.junkbyte.console.core.Graphing;
 	import com.junkbyte.console.core.KeyBinder;
+	import com.junkbyte.console.core.LogLinks;
 	import com.junkbyte.console.core.MemoryMonitor;
-	//import com.junkbyte.console.core.ObjectsMonitor;
 	import com.junkbyte.console.core.Remoting;
+	import com.junkbyte.console.core.Tools;
 	import com.junkbyte.console.core.UserData;
-	import com.junkbyte.console.utils.CastToString;
 	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.view.MainPanel;
 	import com.junkbyte.console.view.PanelsManager;
 	import com.junkbyte.console.view.RollerPanel;
 	import com.junkbyte.console.vos.Log;
 	import com.junkbyte.console.vos.Logs;
-	
+
 	import flash.display.DisplayObjectContainer;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
@@ -50,7 +48,10 @@ package com.junkbyte.console {
 	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.getQualifiedClassName;
-	import flash.utils.getTimer;	
+	import flash.utils.getTimer;
+
+	//import com.junkbyte.console.core.ObjectsMonitor;
+	
 
 	/**
 	 * Console is the main class. 
@@ -62,8 +63,8 @@ package com.junkbyte.console {
 
 		public static const VERSION:Number = 2.41;
 		public static const VERSION_STAGE:String = "WIP";
-		public static const BUILD:int = 509;
-		public static const BUILD_DATE:String = "2010/10/17 23:55";
+		public static const BUILD:int = 511;
+		public static const BUILD_DATE:String = "2010/10/21 01:00";
 		
 		public static const LITE:Boolean = false;
 		//
@@ -85,6 +86,7 @@ package com.junkbyte.console {
 		private var _cl:CommandLine;
 		private var _ud:UserData;
 		private var _kb:KeyBinder;
+		private var _links:LogLinks;
 		//private var _om:ObjectsMonitor;
 		private var _mm:MemoryMonitor;
 		private var _graphing:Graphing;
@@ -98,9 +100,6 @@ package com.junkbyte.console {
 		private var _repeating:uint;
 		private var _lines:Logs;
 		private var _lineAdded:Boolean;
-		private var _linksMap:WeakObject;
-		private var _linksRev:Dictionary;
-		private var _linkIndex:uint = 1;
 		
 		/**
 		 * Console is the main class. However please use C for singleton Console adapter.
@@ -120,14 +119,13 @@ package com.junkbyte.console {
 			_lines = new Logs();
 			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
 			//_om = new ObjectsMonitor();
+			_links = new LogLinks(this);
 			_cl = new CommandLine(this);
 			_tools =  new Tools(this);
 			_graphing = new Graphing(report);
 			_remoter = new Remoting(this, pass);
 			_kb = new KeyBinder(pass);
 			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
-			_linksMap = new WeakObject();
-			_linksRev = new Dictionary(true);
 			//
 			// VIEW setup
 			_config.style.updateStyleSheet();
@@ -189,7 +187,7 @@ package com.junkbyte.console {
 			var error:Object = e["error"]; // for flash 9 compatibility
 			var str:String;
 			if (error is Error){
-				str = CastToString(error);
+				str = _links.makeRefString(error);
 			}else if (error is ErrorEvent){
 				str = ErrorEvent(error).text;
 			}
@@ -323,11 +321,11 @@ package com.junkbyte.console {
 				_cl.setReturned(_tools.reMap(path, stage), true);
 			}
 		}
-		public function inspect(obj:Object, detail:Boolean = true, ch:String = null):void{
-			_tools.inspect(obj,detail, ch);
+		public function inspect(obj:Object, detail:Boolean = true):void{
+			_links.inspect(obj,detail);
 		}
 		public function explode(obj:Object, depth:int = 3):void{
-			report(Tools.explode(obj, depth), 1);
+			report(_tools.explode(obj, depth), 1);
 		}
 		public function get paused():Boolean{
 			return _paused;
@@ -432,14 +430,15 @@ package com.junkbyte.console {
 			_panels.mainPanel.viewingChannels = a;
 		}
 		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true):void{
-			addLine([obj], priority, _config.consoleChannel, false, skipSafe, 0);
+			var cn:String = viewingChannels[0] == config.globalChannel?config.consoleChannel:viewingChannels[0];
+			addLine([obj], priority, cn, false, skipSafe, 0);
 		}
 		public function addLine(arr:Array, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false, stacks:int = -1):void{
 			
 			var txt:String = "";
 			var len:int = arr.length;
 			for(var i:int = 0; i < len; i++){
-				txt += (i?" ":"")+makeLogLink(arr[i], null, skipSafe);
+				txt += (i?" ":"")+_links.makeRefString(arr[i], null, skipSafe);
 			}
 			
 			var isRepeat:Boolean = (isRepeating && _repeating > 0);
@@ -479,46 +478,6 @@ package com.junkbyte.console {
 			_lineAdded = true;
 			
 			_remoter.addLineQueue(line);
-		}
-		public function printRef(i:uint, full:Boolean = false):void{
-			var o:Object = _linksMap[i];
-			if(o){
-				clear(INSPECTING_CHANNEL);
-				inspect(o, full, INSPECTING_CHANNEL);
-				viewingChannels = [INSPECTING_CHANNEL];
-			}else{
-				var cn:String = viewingChannels[0] == config.globalChannel?config.defaultChannel:viewingChannels[0];
-				ch(cn, "Reference no longer exist.", -2);
-			}
-		}
-		public function makeLogLink(o:Object, prop:String = null, skipSafe:Boolean = false):String{
-			var txt:String;
-			if(o && typeof o == "object") {
-				var ind:uint = setLogLink(o);
-				txt = "<a href='event:ref_"+ind+"'>[<p-1>"+ShortClassName(o)+"</p-1>]</a>";
-			}else{
-				txt = String(o);
-				if(!skipSafe){
-					txt = txt.replace(/</gm, "&lt;");
-	 				txt = txt.replace(new RegExp(">", "gm"), "&gt;");
-				}
-			}
-			return txt;
-		}
-		public function setLogLink(o:*):uint{
-			var ind:uint = _linksRev[o];
-			if(!ind){
-				ind = _linkIndex;
-				_linksMap[ind] = o;
-				_linkIndex++;
-			}
-			return ind;
-		}
-		public function getLogLink(o:*):uint{
-			return _linksRev[o];
-		}
-		public function getLogById(ind:uint):*{
-			return _linksMap[ind];
 		}
 		private function getStack(depth:int):Array{
 			var e:Error = new Error();
@@ -655,6 +614,7 @@ package com.junkbyte.console {
 		public function get ud():UserData{return _ud;}
 		//public function get om():ObjectsMonitor{return _om;}
 		public function get graphing():Graphing{return _graphing;}
+		public function get links():LogLinks{return _links;}
 		//
 		public function getLogsAsBytes():Array{
 			var a:Array = [];
