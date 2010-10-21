@@ -307,7 +307,7 @@ package com.junkbyte.console.core
 		private function inspectfullCmd(...args:Array):void{
 			_master.links.focus(_scope, true);
 		}
-		private function explodeCmd(param:String):void{
+		private function explodeCmd(param:String = "0"):void{
 			var depth:int = int(param);
 			_master.explode(_scope, depth<=0?3:depth);
 		}

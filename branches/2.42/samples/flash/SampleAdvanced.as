@@ -24,14 +24,12 @@
 */
 package 
 {
-	import flash.utils.ByteArray;
-	import com.junkbyte.console.Console;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleConfig;
 	import com.junkbyte.console.vos.Log;
 
 	import flash.display.*;
-	import flash.geom.Rectangle;
+	import flash.utils.ByteArray;
 
 	[SWF(width='800',height='600',backgroundColor='0xFFFFFF',frameRate='30')]
 	// Might want to add compile argument: -use-network=false -debug=true
@@ -39,7 +37,7 @@ package
 	public dynamic class SampleAdvanced extends MovieClip{
 		
 		private var temp:Object = {o1:{o2:{o3:{}}}};
-		
+		private var  ba:ByteArray;
 		public function SampleAdvanced() {
 			//
 			// SET UP - only required once
@@ -83,6 +81,7 @@ package
 			var aSprite:Sprite = new Sprite();
 			Cc.watch(aSprite, "aSprite");
 			Cc.log("Gonna start watching", aSprite, ".");
+			Cc.inspect(aSprite);
 			aSprite = null;
 			// it probably won't get garbage collected straight away,
 			// but if you have debugger version of flash player installed,
@@ -99,9 +98,11 @@ package
 			Cc.log(<xx aa="AA"><yy bb="BB"><zz>ZZ</zz></yy></xx>);
 			Cc.log(Cc.instance);
 			Cc.log(Cc.config);
-			var ba:ByteArray = new ByteArray();
+			ba = new ByteArray();
 			ba.writeUTF("abcdefg");
 			Cc.log(ba);
+			var vv:Vector.<int> = Vector.<int>([2,3,4,5]);
+			Cc.log(vv);
 			// test of Cc.stack,  If you have debugger version installed you will see a stack trace like:
 			// HELLO
 			//  @ SampleAdvanced/e()

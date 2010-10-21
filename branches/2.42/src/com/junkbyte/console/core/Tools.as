@@ -25,11 +25,11 @@
 package com.junkbyte.console.core 
 {
 	import com.junkbyte.console.Console;
-	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.vos.WeakObject;
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
+	import flash.utils.ByteArray;
 	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;
 
@@ -48,14 +48,13 @@ package com.junkbyte.console.core
 			_master.addLine([obj], priority, ch?ch:_master.config.consoleChannel, false, skipSafe, 0);
 		}
 		public function explode(obj:Object, depth:int = 3, p:int = 9):String{
-			if(!obj) return "explode() target is empty.";
 			var t:String = typeof obj;
-			if(t != "object" || depth == 0){
-				return _master.links.makeRefString(obj);
-			}else if(obj == null){ 
+			if(obj == null){ 
 				// could be null, undefined, NaN, etc. all should be printed as is
 				return "<p-2>"+obj+"</p-2>";
-			}
+			}else if(t != "object" || depth == 0 || obj is ByteArray){
+				return _master.links.makeRefString(obj);
+			} 
 			if(p<0) p = 0;
 			var V:XML = describeType(obj);
 			var nodes:XMLList, n:String;
@@ -84,7 +83,7 @@ package com.junkbyte.console.core
 					list.push(X+":"+explode(obj[X], depth-1, p-1));
 				}
 			}catch(e:Error){}
-			return "<p"+p+">{"+ShortClassName(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
+			return "<p"+p+">{"+_master.links.makeRefString(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(!base){

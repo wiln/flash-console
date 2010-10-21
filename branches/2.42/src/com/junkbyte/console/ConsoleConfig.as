@@ -71,6 +71,11 @@ package com.junkbyte.console {
 		 */
 		public var defaultStackDepth:int = 3;
 		
+		/** 
+		 * Object linking allows you click on individual objects you have logged to inspect the detials in a specific view.
+		 * The down side is that it will take a little more memory to keep a WEAK reference to all objects pass for logging.
+		 */
+		public var useObjectLinking:Boolean = true;
 		
 		/**
 		 * Use flash's build in (or external) trace().

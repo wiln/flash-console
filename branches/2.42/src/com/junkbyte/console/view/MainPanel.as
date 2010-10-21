@@ -597,8 +597,8 @@ package com.junkbyte.console.view {
 				Security.showSettings(SecurityPanel.SETTINGS_MANAGER);
 			}else if(t == "remote"){
 				master.remote = true;
-			}else if(t.substring(0,4) == "ref_" || t.substring(0,5) == "reff_"){
-				master.links.focusByRefString(t);
+			}else if(t.substring(0,3) == "ref"){
+				master.links.handleRefString(t);
 			}else if(t.substring(0,8) == "channel_"){
 				onChannelPressed(t.substring(8));
 			}else if(t.substring(0,5) == "clip_"){
@@ -607,9 +607,14 @@ package com.junkbyte.console.view {
 				master.reMap("0"+Console.REMAPSPLIT+t.substring(6));
 			}else if(t.substring(0,3) == "cl_"){
 				var ind:int = t.indexOf("_", 3);
-				master.cl.setReturned(master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind))), true);
-				if(ind>=0){
-					_cmdField.text = t.substring(ind+1);
+				var v:* = master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind)));
+				if(v){
+					master.cl.setReturned(v, true);
+					if(ind>=0){
+						_cmdField.text = t.substring(ind+1);
+					}
+				}else{
+					master.report("Reference no longer exist.", -2);
 				}
 			}
 			txtField.setSelection(0, 0);

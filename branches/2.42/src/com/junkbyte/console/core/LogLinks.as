@@ -45,7 +45,10 @@ package com.junkbyte.console.core
 		
 		private var _dofull:Boolean;
 		private var _current:*;// current will be kept as hard reference so that it stays...
-	
+		
+		private var _history:Array;
+		private var _hisIndex:uint;
+		
 		public function LogLinks(m:Console) {
 			_master = m;
 			
@@ -53,6 +56,7 @@ package com.junkbyte.console.core
 			_linksRev = new Dictionary(true);
 		}
 		public function setLogRef(o:*):uint{
+			if(!_master.config.useObjectLinking) return 0;
 			var ind:uint = _linksRev[o];
 			if(!ind){
 				ind = _linkIndex;
@@ -94,11 +98,17 @@ package com.junkbyte.console.core
 					str += (i?", ":"")+makeRefString(v[i]);
 				}
 				return str+"]";
-			}else if(v is ByteArray){
-				return "[ByteArray position:"+ByteArray(v).position+" length:"+ByteArray(v).length+"]"; 
 			}else if(v && typeof v == "object") {
+				var add:String = "";
+				if(v is ByteArray){
+					add = " position:"+ByteArray(v).position+" length:"+ByteArray(v).length;
+				}
 				var ind:uint = setLogRef(o);
-				txt = "<a href='event:ref_"+ind+(prop?("_"+prop):"")+"'>[<p-1>"+ShortClassName(v)+"</p-1>]</a>";
+				if(ind){
+					txt = "{<p-1><a href='event:ref_"+ind+(prop?("_"+prop):"")+"'>"+ShortClassName(v)+"</a></p-1>"+add+"}";
+				}else{
+					txt = "{"+ShortClassName(v)+add+"}";
+				}
 			}else{
 				txt = String(v);
 				if(!skipSafe){
@@ -111,24 +121,43 @@ package com.junkbyte.console.core
 			str = str.replace(/</gm, "&lt;");
 	 		return str.replace(new RegExp(">", "gm"), "&gt;");
 		}
-		public function focusByRefString(str:String):void{
-			var full:Boolean = str.indexOf("reff_") == 0;
-			var ind1:int = str.indexOf("_")+1;
-			if(ind1>0){
-				var id:uint;
-				var prop:String = "";
-				var ind2:int = str.indexOf("_", ind1);
-				if(ind2>0){
-					id = uint(str.substring(ind1, ind2));
-					prop = str.substring(ind2+1);
-				}else{
-					id = uint(str.substring(ind1));
-				}
-				var o:Object = getRefById(id);
-				if(prop) o = o[prop];
-				if(o){
-					focus(o, full);
-					return;
+		private function historyInc(i:int):void{
+			_hisIndex+=i;
+			var v:* = _history[_hisIndex];
+			if(v){
+				focus(v, _dofull);
+			}
+		}
+		public function handleRefString(str:String):void{
+			if(str == "refprev"){
+				historyInc(-2);
+			}else if(str == "reffwd"){
+				historyInc(0);
+			}else if(str == "refi"){
+				_dofull = !_dofull;
+				historyInc(-1);
+			}else{
+				var ind1:int = str.indexOf("_")+1;
+				if(ind1>0){
+					var id:uint;
+					var prop:String = "";
+					var ind2:int = str.indexOf("_", ind1);
+					if(ind2>0){
+						id = uint(str.substring(ind1, ind2));
+						prop = str.substring(ind2+1);
+					}else{
+						id = uint(str.substring(ind1));
+					}
+					var o:Object = getRefById(id);
+					if(prop) o = o[prop];
+					if(o){
+						if(str.indexOf("refe_")==0){
+							_master.explode(o);
+						}else{
+							focus(o, _dofull);
+						}
+						return;
+					}
 				}
 			}
 			report("Reference no longer exist.", -2);
@@ -136,14 +165,23 @@ package com.junkbyte.console.core
 		public function focus(o:*, full:Boolean = false):void{
 			_master.clear(Console.INSPECTING_CHANNEL);
 			_master.viewingChannels = [Console.INSPECTING_CHANNEL];
-			if(full) _dofull = true;
+			
+			if(!_history) _history = new Array();
+			
+			_dofull = full;
 			inspect(o, _dofull);
 			_current = o; // current is kept as hard reference so that it stays...
+			
+			if(_history.length <= _hisIndex) _history.push(o);
+			else _history[_hisIndex] = o;
+			_hisIndex++;
 		}
 		
 		public function exitFocus():void{
 			_current = null;
 			_dofull = false;
+			_history = null;
+			_hisIndex = 0;
 		}
 		
 		private function report(obj:*, priority:Number = 0, skipSafe:Boolean = true):void{
@@ -158,10 +196,24 @@ package com.junkbyte.console.core
 				return;
 			}
 			var linkIndex:uint = _master.links.setLogRef(obj);
-			var menuStr:String = "[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>] [Previous] [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
-			menuStr += " [<a href='event:"+(viewAll?"reff_":"ref_")+linkIndex+"'>refresh</a>]";
-			if(!viewAll) menuStr += " [<a href='event:reff_"+linkIndex+"'>Show inherited</a>]";
-			report(menuStr, -1, true);
+			var menuStr:String;
+			if(_history){
+				menuStr = "<b>[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>]";
+				if(_hisIndex>0){
+					menuStr += " [<a href='event:refprev'>Previous</a>]";
+				}
+				if(_history && _hisIndex < _history.length-1){
+					menuStr += " [<a href='event:reffwd'>Forward</a>]";
+				}
+				menuStr += "</b> || [<a href='event:ref_"+linkIndex+"'>refresh</a>]";
+				menuStr += "</b> [<a href='event:refe_"+linkIndex+"'>explode</a>]";
+				menuStr += " [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
+				
+				if(viewAll) menuStr += " [<a href='event:refi'>Hide inherited</a>]";
+				else menuStr += " [<a href='event:refi'>Show inherited</a>]";
+				report(menuStr, -1, true);
+				report("", -1);
+			}
 			//
 			// Class extends... extendsClass
 			// Class implements... implementsInterface
@@ -216,13 +268,14 @@ package com.junkbyte.console.core
 			if(props.length){
 				report("<p10>Implements:</p10> "+props.join(" "), 5, true);
 			}
+				report("");
 			//
 			// constants...
 			//
 			props = [];
 			nodes = clsV..constant;
 			for each (var constantX:XML in nodes) {
-				str = "<p1>const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls[constantX.@name])+"</p0>";
+				str = "<p1> const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls[constantX.@name])+"</p0>";
 				report(str, 3, true);
 			}
 			if(nodes.length()>0){
@@ -239,7 +292,7 @@ package com.junkbyte.console.core
 			for each (var methodX:XML in nodes) {
 				if(viewAll || self==methodX.@declaredBy){
 					isstatic = methodX.parent().name()!="factory";
-					str = "<p1>"+(isstatic?"static ":"")+"function </p1>";
+					str = "<p1> "+(isstatic?"static ":"")+"function </p1>";
 					var params:Array = [];
 					var mparamsList:XMLList = methodX.parameter;
 					for each(var paraX:XML in mparamsList){
@@ -252,7 +305,7 @@ package com.junkbyte.console.core
 				}
 			}
 			if(inherit){
-				report("  + "+inherit+" inherited methods.", 1, true);
+				report("   \t + "+inherit+" inherited methods.", 1, true);
 			}else if(nodes.length()){
 				report("", 3, true);
 			}
@@ -267,7 +320,7 @@ package com.junkbyte.console.core
 			for each (var accessorX:XML in nodes) {
 				if(viewAll || self==accessorX.@declaredBy){
 					isstatic = accessorX.parent().name()!="factory";
-					str = "<p1>"+(isstatic?"static ":"");
+					str = "<p1> "+(isstatic?"static ":"");
 					var access:String = accessorX.@access;
 					if(access == "readonly") str+= "get";
 					else if(access == "writeonly") str+= "set";
@@ -283,7 +336,7 @@ package com.junkbyte.console.core
 				}
 			}
 			if(inherit){
-				report("  + "+inherit+" inherited accessors.", 1, true);
+				report("   \t + "+inherit+" inherited accessors.", 1, true);
 			}else if(nodes.length()){
 				report("", 3, true);
 			}
@@ -293,11 +346,10 @@ package com.junkbyte.console.core
 			props = [];
 			nodes = clsV..variable;
 			for each (var variableX:XML in nodes) {
-				str = "<p0>var </p0>";
 				if(variableX.parent().name()=="factory"){
-					str = "<p0>var </p0><a href='event:cl_"+linkIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
+					str = "<p0> var </p0><a href='event:cl_"+linkIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
 				}else{
-					str = "<p0><i>static var</i></p0><a href='event:cl_"+linkIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
+					str = "<p0> <i>static var</i></p0><a href='event:cl_"+linkIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
 				}
 				props.push(str);
 			}
@@ -310,7 +362,7 @@ package com.junkbyte.console.core
 			try{
 				props = [];
 				for (var X:String in obj) {
-					report("<p0>dynamic var </p0><a href='event:cl_"+linkIndex+"_"+X+" = '>"+X+"</a><p1> = "+makeValue(obj, X)+"</p1>", 3, true);
+					report("<p0> dynamic var </p0><a href='event:cl_"+linkIndex+"_"+X+" = '>"+X+"</a><p1> = "+makeValue(obj, X)+"</p1>", 3, true);
 				}
 			}catch(e:Error){
 				report("Could not get values due to: "+e, 9, true);
@@ -323,7 +375,9 @@ package com.junkbyte.console.core
 			for each (var metadataX:XML in nodes) {
 				if(metadataX.@name=="Event"){
 					var mn:XMLList = metadataX.arg;
-					props.push(mn.(@key=="name").@value+"<p0>("+mn.(@key=="type").@value+")</p0>");
+					var en:String = mn.(@key=="name").@value;
+					var et:String = mn.(@key=="type").@value;
+					props.push("<a href='event:cl_"+linkIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
 				}
 			}
 			if(props.length){
@@ -358,7 +412,10 @@ package com.junkbyte.console.core
 					}
 				}
 			}
-			report(menuStr, -1, true);
+			if(menuStr){
+				report("", -1);
+				report(menuStr, -1, true);
+			}
 		}
 		private function makeValue(obj:*, prop:String = null):String{
 			var str:String = makeRefString(obj, prop);
