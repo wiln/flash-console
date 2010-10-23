@@ -311,7 +311,7 @@ package com.junkbyte.console.core
 			var depth:int = int(param);
 			_master.explode(_scope, depth<=0?3:depth);
 		}
-		private function mapCmd(param:String):void{
+		private function mapCmd(param:String = "0"):void{
 			_master.map(_scope as DisplayObjectContainer, int(param));
 		}
 		private function funCmd(param:String):void{

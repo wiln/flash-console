@@ -24,6 +24,7 @@
 */
 package com.junkbyte.console.core 
 {
+	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 
@@ -83,7 +84,7 @@ package com.junkbyte.console.core
 					list.push(X+":"+explode(obj[X], depth-1, p-1));
 				}
 			}catch(e:Error){}
-			return "<p"+p+">{"+_master.links.makeRefString(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
+			return "<p"+p+">{"+ShortClassName(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(!base){
