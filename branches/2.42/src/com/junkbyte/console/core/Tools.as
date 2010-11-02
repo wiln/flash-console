@@ -61,7 +61,7 @@ package com.junkbyte.console.core
 			var nodes:XMLList, n:String;
 			var list:Array = [];
 			//
-			nodes = V.accessor;
+			nodes = V["accessor"];
 			for each (var accessorX:XML in nodes) {
 				n = accessorX.@name;
 				if(accessorX.@access!="writeonly"){
@@ -73,7 +73,7 @@ package com.junkbyte.console.core
 				}
 			}
 			//
-			nodes = V.variable;
+			nodes = V["variable"];
 			for each (var variableX:XML in nodes) {
 				n = variableX.@name;
 				list.push(n+":"+explode(obj[n], depth-1, p-1));

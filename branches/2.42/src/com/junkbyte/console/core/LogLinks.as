@@ -195,7 +195,7 @@ package com.junkbyte.console.core
 				report(obj, -2, true);
 				return;
 			}
-			var linkIndex:uint = _master.links.setLogRef(obj);
+			var linkIndex:uint = setLogRef(obj);
 			var menuStr:String;
 			if(_history){
 				menuStr = "<b>[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>]";

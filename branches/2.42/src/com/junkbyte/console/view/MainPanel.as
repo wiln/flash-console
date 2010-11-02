@@ -55,7 +55,7 @@ package com.junkbyte.console.view {
 		private var _cmdField:TextField;
 		private var _cmdBG:Shape;
 		private var _bottomLine:Shape;
-		private var _isMinimised:Boolean;
+		private var _mini:Boolean;
 		private var _shift:Boolean;
 		private var _txtscroll:TextScroller;
 		
@@ -305,7 +305,7 @@ package com.junkbyte.console.view {
 				(
 					_viewingChannels.length == 0
 			 		|| _viewingChannels.indexOf(line.c)>=0 
-			 		|| (_filterText && _viewingChannels.indexOf(config.filteredChannel) >= 0 && line.t.toLowerCase().indexOf(_filterText.toLowerCase())>=0 )
+			 		|| (_filterText && _viewingChannels.indexOf(config.filteredChannel) >= 0 && line.t.toLowerCase().indexOf(_filterText)>=0 )
 			 		|| (_filterRegExp && _viewingChannels.indexOf(config.filteredChannel)>=0 && line.t.search(_filterRegExp)>=0 )
 			 	) 
 			 	&& ( _priority <= 0 || line.p >= _priority)
@@ -329,30 +329,35 @@ package com.junkbyte.console.view {
 		}
 		//
 		public function set filterText(str:String):void{
-			_filterText = str;
 			if(str){
 				_filterRegExp = null;
-				master.clear(config.filteredChannel);
-				_channels.splice(1,0,config.filteredChannel);
-				master.ch(config.filteredChannel, "Filtering ["+str+"]", -2);
-				viewingChannels = [config.filteredChannel];
-			}else if(_viewingChannels.length == 1 && _viewingChannels[0] == config.filteredChannel){
-				viewingChannels = [config.globalChannel];
+				_filterText = str.toLowerCase();
+				startFilter();
+			}else{
+				endFilter();
+			}
+		}
+		public function set filterRegExp(expstr:String):void{
+			if(expstr){
+				_filterText = null;
+				_filterRegExp = new RegExp("("+expstr+")", "gi");
+				startFilter();
+			}else{
+				endFilter();
 			}
 		}
 		public function get filterText():String{
 			return _filterText?_filterText:(_filterRegExp?String(_filterRegExp):null);
 		}
-		//
-		public function set filterRegExp(exp:RegExp):void{
-			_filterRegExp = exp;
-			if(exp){
-				_filterText = null;
-				master.clear(config.filteredChannel);
-				_channels.splice(1,0,config.filteredChannel);
-				master.ch(config.filteredChannel, "Filtering RegExp ["+exp+"]", -2);
-				viewingChannels = [config.filteredChannel];
-			}else if(_viewingChannels.length == 1 && _viewingChannels[0] == config.filteredChannel){
+		private function startFilter():void{
+			master.clear(config.filteredChannel);
+			_channels.splice(1,0,config.filteredChannel);
+			viewingChannels = [config.filteredChannel];
+		}
+		private function endFilter():void{
+			_filterRegExp = null;
+			_filterText = null;
+			if(_viewingChannels.length == 1 && _viewingChannels[0] == config.filteredChannel){
 				viewingChannels = [config.globalChannel];
 			}
 		}
@@ -361,6 +366,17 @@ package com.junkbyte.console.view {
 			var txt:String = line.t;
 			if(line.c != config.defaultChannel && (_viewingChannels.length == 0 || _viewingChannels.length>1)){
 				txt = "[<a href=\"event:channel_"+line.c+"\">"+line.c+"</a>] "+txt;
+			}
+			if(_filterRegExp){
+				txt = txt.replace(_filterRegExp, "<u>$1</u>");
+			}else if(_filterText){
+				// could have been simple if txt.replace replaces every match.
+				var lowercase:String = txt.toLowerCase();
+				var index:int = lowercase.lastIndexOf(_filterText);
+				while(index>=0){
+					txt = txt.substring(0, index)+"<u>"+txt.substring(index, index+_filterText.length)+"</u>"+txt.substring(index+_filterText.length);
+					index = lowercase.lastIndexOf(_filterText, index-2);
+				}
 			}
 			var ptag:String = "p"+line.p;
 			str += "<p><"+ptag+">" + txt + "</"+ptag+"></p>";
@@ -412,7 +428,7 @@ package com.junkbyte.console.view {
 			_lockScrollUpdate = true;
 			super.width = n;
 			_traceField.width = n-4;
-			txtField.width = n;
+			txtField.width = n-4;
 			_cmdField.width = width-15-_cmdField.x;
 			_cmdBG.width = n;
 			
@@ -429,25 +445,23 @@ package com.junkbyte.console.view {
 		}
 		override public function set height(n:Number):void{
 			_lockScrollUpdate = true;
-			super.height = n;
 			var fsize:int = style.menuFontSize;
 			var msize:Number = fsize+6+style.traceFontSize;
-			var minimize:Boolean = style.topMenu?(n < (_cmdField.visible?(msize+fsize+4):msize)):true;
-			if(_isMinimised != minimize){
-				registerDragger(txtField, minimize);
-				registerDragger(_traceField, !minimize);
-				_isMinimised = minimize;
+			if(super.height != n)
+			{
+				_mini = n < (_cmdField.visible?(msize+fsize+4):msize);
+				super.height = n;
 			}
-			txtField.visible = !minimize;
-			_traceField.y = minimize?0:fsize;
-			_traceField.height = n-(_cmdField.visible?(fsize+4):0)-(minimize?0:fsize);
+			var mini:Boolean = _mini || !style.topMenu;
+			_traceField.y = mini?0:fsize;
+			_traceField.height = n-(_cmdField.visible?(fsize+4):0)-(mini?0:fsize);
 			var cmdy:Number = n-(fsize+6);
 			_cmdField.y = cmdy;
 			_cmdPrefx.y = cmdy;
 			_cmdBG.y = cmdy;
 			_bottomLine.y = _cmdField.visible?cmdy:n;
 			//
-			_txtscroll.y = minimize?6:fsize+4;
+			_txtscroll.y = mini?6:fsize+4;
 			_txtscroll.height = (_bottomLine.y-(_cmdField.visible?0:10))-_txtscroll.y;
 			//
 			_atBottom = true;
@@ -465,35 +479,39 @@ package com.junkbyte.console.view {
 			}
 		}
 		private function _updateMenu():void{
+			
 			var str:String = "<r><w>";
-			if(!master.panels.channelsPanel){
-				str += getChannelsLink(true);
-			}
-			str += "<menu>[ <b>";
-			
-			/*var extras:uint = _extraMenus.length;
-			if(extras){
-				for(var i:uint = 0; i<extras; i++){
-					str += " <a href=\"event:external_"+i+"\">"+_extraMenus[i].key+"</a>";
+			if(_mini || !style.topMenu){
+				str += "<menu><b> <a href=\"event:show\">‹</a> </b></menu>";
+			}else {
+				if(!master.panels.channelsPanel){
+					str += getChannelsLink(true);
 				}
-			}*/
-			
-			str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
-			str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
-			if(config.commandLineAllowed){
-				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
+				str += "<menu> <b>";
+				
+				/*var extras:uint = _extraMenus.length;
+				if(extras){
+					for(var i:uint = 0; i<extras; i++){
+						str += " <a href=\"event:external_"+i+"\">"+_extraMenus[i].key+"</a>";
+					}
+				}*/
+				
+				str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
+				str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
+				if(config.commandLineAllowed){
+					str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
+				}
+				if(!master.remote){
+					str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
+					str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
+				}
+				str += " ¦</b>";
+				str += " <a href=\"event:copy\">Cc</a>";
+				str += " <a href=\"event:priority\">P"+_priority+"</a>";
+				str += doActive(" <a href=\"event:pause\">P</a>", master.paused);
+				str += " <a href=\"event:clear\">C</a> <a href=\"event:close\">X</a> <a href=\"event:hide\">›</a> </b></menu>";
 			}
-			if(!master.remote){
-				str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
-				str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
-			}
-			str += " ¦</b>";
-			str += " <a href=\"event:copy\">Cc</a>";
-			str += " <a href=\"event:priority\">P"+_priority+"</a>";
-			str += doActive(" <a href=\"event:pause\">P</a>", master.paused);
-			str += " <a href=\"event:clear\">C</a> <a href=\"event:close\">X</a>";
-			
-			str += " ]</menu> </w></r>";
+			str += "</w></r>";
 			txtField.htmlText = str;
 			txtField.scrollH = txtField.maxScrollH;
 		}
@@ -558,16 +576,25 @@ package com.junkbyte.console.view {
 			txtField.setSelection(0, 0);
 			stopDrag();
 			var t:String = e.text;
-			//if(topMenuClick!=null && topMenuClick(e.text)) return;
 			if(t == "pause"){
 				if(master.paused){
 					master.paused = false;
-					//master.panels.tooltip("Pause updates", this);
 				}else{
 					master.paused = true;
-					//master.panels.tooltip("Resume updates", this);
 				}
 				master.panels.tooltip(null);
+			}else if(t == "hide"){
+				master.panels.tooltip();
+				_mini = true;
+				master.config.style.topMenu = false;
+				height = height;
+				updateMenu();
+			}else if(t == "show"){
+				master.panels.tooltip();
+				_mini = false;
+				master.config.style.topMenu = true;
+				height = height;
+				updateMenu();
 			}else if(t == "close"){
 				master.panels.tooltip();
 				visible = false;

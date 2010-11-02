@@ -68,7 +68,6 @@ package com.junkbyte.console.core
 			addCLCmd("filter", filterCmd, "Filter console logs to matching string. When done, click on the * (global channel) at top.");
 			addCLCmd("filterexp", filterexpCmd, "Filter console logs to matching regular expression");
 			addCLCmd("inspect", inspectCmd, "Inspect current scope");
-			addCLCmd("inspectfull", inspectfullCmd, "Inspect current scope in detail");
 			addCLCmd("explode", explodeCmd, "Explode current scope to its properties and values (similar to JSON)");
 			addCLCmd("map", mapCmd, "Get display list map starting from current scope");
 			addCLCmd("function", funCmd, "Create function. param is the commandline string to create as function. (experimental)");
@@ -213,13 +212,10 @@ package com.junkbyte.console.core
 			}
 			if(returned !== undefined){
 				var rtext:String = _master.links.makeRefString(returned);
-				// this is incase its something like XML, need to keep the <> tags...
-				//rtext = rtext.replace(new RegExp("<", "gm"), "&lt;");
- 				//rtext = rtext.replace(new RegExp(">", "gm"), "&gt;");
  				if(change){
-					report("Changed to "+ getQualifiedClassName(returned) +": <b>"+rtext+"</b>", -1);
+					report("Changed to "+rtext, -1);
  				}else if(!changeScope){
-					report("Returned "+ getQualifiedClassName(returned) +": <b>"+rtext+"</b>", -2);
+					report("Returned "+rtext, -2);
  				}
 			}else{
 				report("Exec successful, undefined return.", -2);
@@ -267,7 +263,7 @@ package com.junkbyte.console.core
 				var sao:* = _saved[X];
 				sii++;
 				if(sao==null) sii2++;
-				report("<b>$"+X+"</b> = "+(sao==null?"null":getQualifiedClassName(sao)), -2);
+				report("<b>$"+X+"</b> = "+_master.links.makeRefString(sao), -2);
 			}
 			report("Found "+sii+" item(s), "+sii2+" empty (or garbage collected).", -1);
 		}
@@ -295,17 +291,14 @@ package com.junkbyte.console.core
 				}
 			}
 		}
-		private function filterCmd(param:String):void{
+		private function filterCmd(param:String = ""):void{
 			_master.panels.mainPanel.filterText = param;
 		}
-		private function filterexpCmd(param:String):void{
-			_master.panels.mainPanel.filterRegExp = new RegExp(param, "i");
+		private function filterexpCmd(param:String = ""):void{
+			_master.panels.mainPanel.filterRegExp = param;
 		}
 		private function inspectCmd(...args:Array):void{
-			_master.links.focus(_scope, false);
-		}
-		private function inspectfullCmd(...args:Array):void{
-			_master.links.focus(_scope, true);
+			_master.links.focus(_scope);
 		}
 		private function explodeCmd(param:String = "0"):void{
 			var depth:int = int(param);
@@ -314,7 +307,7 @@ package com.junkbyte.console.core
 		private function mapCmd(param:String = "0"):void{
 			_master.map(_scope as DisplayObjectContainer, int(param));
 		}
-		private function funCmd(param:String):void{
+		private function funCmd(param:String = ""):void{
 			var fakeFunction:FakeFunction = new FakeFunction(run, param);
 			setReturned(fakeFunction.exec);
 		}

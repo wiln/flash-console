@@ -31,15 +31,17 @@ package
 	import flash.display.*;
 	import flash.utils.ByteArray;
 
-	[SWF(width='800',height='600',backgroundColor='0xFFFFFF',frameRate='30')]
+	[SWF(width='700',height='300',backgroundColor='0xFFFFFF',frameRate='30')]
 	// Might want to add compile argument: -use-network=false -debug=true
 	
 	public dynamic class SampleAdvanced extends MovieClip{
 		
-		private var temp:Object = {o1:{o2:{o3:{}}}};
+		private var temp:Object = {o1:{o11:{o111:{text:"Some randome text", number:123}, o12:[2,3,4,5]}}, o2:{o21:[]}};
 		private var  ba:ByteArray;
 		public function SampleAdvanced() {
 			//
+			stage.scaleMode = StageScaleMode.NO_SCALE;
+			
 			// SET UP - only required once
 			//
 			var config:ConsoleConfig = new ConsoleConfig(); // optional.
@@ -53,10 +55,10 @@ package
 			//Cc.fpsMonitor = true;
 			//Cc.displayRoller = true;
 			//Cc.setRollerCaptureKey("c");
-			Cc.width = 800;
-			Cc.height = 600;
-			Cc.remotingPassword = null; // Just so that remote don't ask for password
-			Cc.remoting = true;
+			Cc.width = 700;
+			Cc.height = 300;
+			//Cc.remotingPassword = null; // Just so that remote don't ask for password
+			//Cc.remoting = true;
 			//
 			// End of setup
 			//
@@ -78,52 +80,36 @@ package
 			//
 			//
 			// Garbage collection monitor
-			var aSprite:Sprite = new Sprite();
-			Cc.watch(aSprite, "aSprite");
-			Cc.log("Gonna start watching", aSprite, ".");
-			Cc.inspect(aSprite);
-			aSprite = null;
 			// it probably won't get garbage collected straight away,
 			// but if you have debugger version of flash player installed,
 			// you can open memory monitor (M) and then press G in that panel to force garbage collect
 			// You will see "[C] GARBAGE COLLECTED 1 item(s): aSprite"
 			
+			Cc.log("Welcome to Console v2.5 PREVIEW / ALPHA...");
+			Cc.log("");
+			Cc.log("Lets try some object linking...");
+			Cc.info("Here is a link to stage: ", stage);
+			Cc.info("Here is a link to Cc class", Cc);
+			Cc.info("Here is a link to Console instance", Cc.instance);
+			
+			Cc.log("___");
 			var o:Log = new Log("test", "ch1", 5);
 			o.prev = new Log("Previous log", "ch0", 1);
 			// explode an object into its values..
 			var arr:Array = ["a","b","c",temp, o];
+			Cc.log("Going to Cc.explode() a junk of values below...");
 			Cc.explode(arr);
-			Cc.log("Temp object: ", arr);
 			
-			Cc.log(<xx aa="AA"><yy bb="BB"><zz>ZZ</zz></yy></xx>);
-			Cc.log(Cc.instance);
-			Cc.log(Cc.config);
+			Cc.log("___");
 			ba = new ByteArray();
-			ba.writeUTF("abcdefg");
-			Cc.log(ba);
-			var vv:Vector.<int> = Vector.<int>([2,3,4,5]);
-			Cc.log(vv);
-			// test of Cc.stack,  If you have debugger version installed you will see a stack trace like:
-			// HELLO
-			//  @ SampleAdvanced/e()
-			//  @ SampleAdvanced/d()
-			//  @ SampleAdvanced/c()
-			a(); // see function e() below
-		}
-		private function a():void{
-			b();
-		}
-		private function b():void{
-			c();
-		}
-		private function c():void{
-			d();
-		}
-		private function d():void{
-			e();
-		}
-		private function e():void{
-			Cc.stack("HELLO");
+			ba.writeUTF("HA! You found the secret byte array string!");
+			Cc.info("Bytearry will now print properly rather than breaking the whole console.");
+			Cc.info("A byteArray with UTF string:", ba);
+			Cc.log("You will have to read the byte array manually using commandline once you click the link tho...");
+			Cc.log("So.. click on the ByteArray link above, click on 'set scope' near the bottom. then write in command line 'position=0; readUTF()'");
+
+			Cc.log("___");
+			Cc.info("Try the new search highlighting... Type '/filter link' in commandline below.");
 		}
 	}
 }
