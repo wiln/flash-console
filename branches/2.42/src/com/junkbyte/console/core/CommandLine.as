@@ -111,7 +111,8 @@ package com.junkbyte.console.core
 			}
 			if(!_master.config.quiet){
 				var str:String = strong?"STRONG":"WEAK";
-				report("Stored <p5>$"+n+"</p5> for <b>"+getQualifiedClassName(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
+				
+				report("Stored <p5>$"+n+"</p5> for <b>"+_master.links.makeRefTyped(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
 			}
 		}
 		public function get scopeString():String{

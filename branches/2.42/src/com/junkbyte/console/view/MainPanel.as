@@ -450,8 +450,8 @@ package com.junkbyte.console.view {
 			if(super.height != n)
 			{
 				_mini = n < (_cmdField.visible?(msize+fsize+4):msize);
-				super.height = n;
 			}
+			super.height = n;
 			var mini:Boolean = _mini || !style.topMenu;
 			_traceField.y = mini?0:fsize;
 			_traceField.height = n-(_cmdField.visible?(fsize+4):0)-(mini?0:fsize);

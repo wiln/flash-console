@@ -63,8 +63,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.45;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 518;
-		public static const BUILD_DATE:String = "2010/11/02 01:02";
+		public static const BUILD:int = 520;
+		public static const BUILD_DATE:String = "2010/11/05 01:00";
 		
 		public static const LITE:Boolean = false;
 		//
@@ -215,11 +215,10 @@ package com.junkbyte.console
 		// This should only be used for development purposes only.
 		//
 		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):void{
-			if(!_kb.bindKey(key, fun, args))
-			{
+			if(!_kb.bindKey(key, fun, args)){
 				report("Warning: bindKey character ["+key.char+"] is conflicting with Console password.",8);
 			}else if(!config.quiet) {
-				report((fun ==null?"Unbined":"Bined")+" "+key.toString()+".",-1);
+				report((fun ==null?"Unbined":"Bined")+" "+key.toString(),-1);
 			}
 		}
 		//

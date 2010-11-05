@@ -61,6 +61,7 @@ package com.junkbyte.console.core
 			if(!ind){
 				ind = _linkIndex;
 				_linksMap[ind] = o;
+				_linksRev[o] = ind;
 				_linkIndex++;
 			}
 			return ind;
@@ -105,7 +106,7 @@ package com.junkbyte.console.core
 				}
 				var ind:uint = setLogRef(o);
 				if(ind){
-					txt = "{<p-1><a href='event:ref_"+ind+(prop?("_"+prop):"")+"'>"+ShortClassName(v)+"</a></p-1>"+add+"}";
+					txt = "{<l><a href='event:ref_"+ind+(prop?("_"+prop):"")+"'>"+ShortClassName(v)+"</a></l>"+add+"}";
 				}else{
 					txt = "{"+ShortClassName(v)+add+"}";
 				}
@@ -116,6 +117,17 @@ package com.junkbyte.console.core
 				}
 			}
 			return txt;
+		}
+		public function makeRefTyped(v:*):String
+		{
+			if(v && typeof v == "object")
+			{
+				var ind:uint = setLogRef(v);
+				if(ind){
+					return "{<l><a href='event:ref_"+ind+"'>"+ShortClassName(v)+"</a></l>}";
+				}
+			}
+			return "{"+ShortClassName(v)+"}";
 		}
 		private function safeString(str:String):String{
 			str = str.replace(/</gm, "&lt;");
@@ -268,7 +280,54 @@ package com.junkbyte.console.core
 			if(props.length){
 				report("<p10>Implements:</p10> "+props.join(" "), 5, true);
 			}
-				report("");
+			report("");
+			//
+			// events
+			// metadata name="Event"
+			props = [];
+			nodes = V.metadata;
+			for each (var metadataX:XML in nodes) {
+				if(metadataX.@name=="Event"){
+					var mn:XMLList = metadataX.arg;
+					var en:String = mn.(@key=="name").@value;
+					var et:String = mn.(@key=="type").@value;
+					props.push("<a href='event:cl_"+linkIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
+				}
+			}
+			if(props.length){
+				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
+			}
+			//
+			// display's parents and direct children
+			//
+			if (obj is DisplayObject) {
+				var disp:DisplayObject = obj as DisplayObject;
+				var theParent:DisplayObjectContainer = disp.parent;
+				if (theParent) {
+					props = ["@"+theParent.getChildIndex(disp)];
+					while (theParent) {
+						var pr:DisplayObjectContainer = theParent;
+						theParent = theParent.parent;
+						var indstr:String = theParent?"@"+theParent.getChildIndex(pr):"";
+						props.push("<b>"+pr.name+"</b>"+indstr+makeValue(pr));
+					}
+					if(props.length){
+						report("<p10>Parents:</p10> "+props.join("<p-1> -> </p-1>")+"<br/>", 1, true);
+					}
+				}
+			}
+			if (obj is DisplayObjectContainer) {
+				props = [];
+				var cont:DisplayObjectContainer = obj as DisplayObjectContainer;
+				var clen:int = cont.numChildren;
+				for (var ci:int = 0; ci<clen; ci++) {
+					var child:DisplayObject = cont.getChildAt(ci);
+					props.push("<b>"+child.name+"</b>@"+ci+makeValue(child));
+				}
+				if(props.length){
+					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 1, true);
+				}
+			}
 			//
 			// constants...
 			//
@@ -326,7 +385,7 @@ package com.junkbyte.console.core
 					else if(access == "writeonly") str+= "set";
 					else str += "assign";
 					str+= "</p1> <a href='event:cl_"+linkIndex+"_"+accessorX.@name+"'>"+accessorX.@name+"</a><p1>:"+accessorX.@type+"</p1>";
-					if(access != "writeonly"){
+					if(access != "writeonly" && (isstatic || !(obj is Class))){
 						var t:Object = isstatic?cls:obj;
 						str+="<p1> = "+makeValue(t, accessorX.@name)+"</p1>";
 					}
@@ -367,50 +426,15 @@ package com.junkbyte.console.core
 			}catch(e:Error){
 				report("Could not get values due to: "+e, 9, true);
 			}
-			//
-			// events
-			// metadata name="Event"
-			props = [];
-			nodes = V.metadata;
-			for each (var metadataX:XML in nodes) {
-				if(metadataX.@name=="Event"){
-					var mn:XMLList = metadataX.arg;
-					var en:String = mn.(@key=="name").@value;
-					var et:String = mn.(@key=="type").@value;
-					props.push("<a href='event:cl_"+linkIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
-				}
-			}
-			if(props.length){
-				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
-			}
-			//
-			// display's parents and direct children
-			//
-			if (viewAll && obj is DisplayObjectContainer) {
-				props = [];
-				var mc:DisplayObjectContainer = obj as DisplayObjectContainer;
-				var clen:int = mc.numChildren;
-				for (var ci:int = 0; ci<clen; ci++) {
-					var child:DisplayObject = mc.getChildAt(ci);
-					props.push("<b>"+child.name+"</b>:("+ci+")"+getQualifiedClassName(child));
-				}
-				if(props.length){
-					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
-				}
-			}
-			if (viewAll && obj is DisplayObject) {
-				var theParent:DisplayObjectContainer = mc.parent;
-				if (theParent) {
-					props = ["("+theParent.getChildIndex(mc)+")"];
-					while (theParent) {
-						var pr:DisplayObjectContainer = theParent;
-						theParent = theParent.parent;
-						props.push("<b>"+pr.name+"</b>:("+(theParent?theParent.getChildIndex(pr):"")+")"+getQualifiedClassName(pr));
-					}
-					if(props.length){
-						report("<p10>Parents:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
-					}
-				}
+			
+			if(obj is String){
+				report("");
+				report("String", 10);
+				report(safeString(obj));
+			}else if(obj is XML || obj is XMLList){
+				report("");
+				report("XMLString", 10);
+				report(safeString(obj.toXMLString()));
 			}
 			if(menuStr){
 				report("", -1);
@@ -420,7 +444,16 @@ package com.junkbyte.console.core
 		private function makeValue(obj:*, prop:String = null):String{
 			var str:String = makeRefString(obj, prop);
 			if(str.length > 100){
-				str = str.substring(0, 100)+"...";
+				var id:uint = getRefId(obj);
+				str = str.substring(0, 100);
+				if(id)
+				{
+					str += "<l><a href='event:ref_"+id+(prop?("_"+prop):"")+"'> ...</a></l>";
+				}
+				else
+				{
+					str += " ...";
+				}
 			}
 			return str;
 		}
