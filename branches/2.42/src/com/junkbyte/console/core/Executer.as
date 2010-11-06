@@ -33,32 +33,38 @@ package com.junkbyte.console.core
 		public static const RETURNED:String = "returned";
 		public static const CLASSES:String = "ExecuterValue|((com.junkbyte.console.core::)?Executer)";
 		
-		public static function Exec(scope:Object, str:String, saved:Object = null, reserved:Array = null):*{
+		public static function Exec(scope:Object, str:String, saved:Object = null):*{
 			var e:Executer = new Executer();
-			return e.exec(scope, str, saved, reserved);
+			e.setStored(saved);
+			return e.exec(scope, str);
 		}
 		
 		
 		private static const VALKEY:String = "#";
 		
-		private var _saved:Object;
-		private var _reserved:Array;
 		private var _values:Array;
 		private var _running:Boolean;
 		private var _scope:*;
 		private var _returned:*;
 		
-		public function Executer(){
-			
-		}
-		public function get returned():*
-		{
+		private var _saved:Object;
+		private var _reserved:Array;
+		
+		public var autoScope:Boolean;
+		
+		public function get returned():*{
 			return _returned;
 		}
-		public function get scope():*
-		{
+		public function get scope():*{
 			return _scope;
 		}
+		public function setStored(o:Object):void{
+			_saved = o;
+		}
+		public function setReserved(a:Array):void{
+			_reserved = a;
+		}
+		
 		// TEST CASES...
 		// com.junkbyte.console.Cc.instance.visible
 		// com.junkbyte.console.Cc.instance.addGraph('test',stage,'mouseX')
@@ -73,15 +79,13 @@ package com.junkbyte.console.core
 		// new Array(11,22,33,44,55,66,77,88,99);/;this.1 // should be 22
 		// new XML("<t a=\"A\"><b>B</b></t>").attribute("a")
 		// new XML("<t a=\"A\"><b>B</b></t>").b
-		public function exec(s:*, str:String, saved:Object = null, reserved:Array = null):*{
+		public function exec(s:*, str:String):*{
 			if(_running) throw new Error("CommandExec.exec() is already runnnig. Does not support loop backs.");
 			_running = true;
 			_scope = s;
-			_saved = saved;
 			_values = [];
 			if(!_saved) _saved = new Object();
-			_reserved = reserved;
-			if(!_reserved) _reserved = [];
+			if(!_reserved) _reserved = new Array();
 			try{
 				_exec(str);
 			}catch (e:Error){
@@ -123,8 +127,9 @@ package com.junkbyte.console.core
 			var lineBreaks:Array = str.split(/\s*;\s*/);
 			for each(var line:String in lineBreaks){
 				if(line.length){
-					if(_saved[RETURNED] && (line == "/" || line == "/scope")){
-						_scope = _saved[RETURNED];
+					var returned:* = _saved[RETURNED];
+					if(returned && line == "/"){
+						_scope = returned;
 						dispatchEvent(new Event(Event.COMPLETE));
 					}else{
 						execNest(line);
@@ -184,6 +189,12 @@ package com.junkbyte.console.core
 				indOpen = line.lastIndexOf("(", indOpen-1);
 			}
 			_returned = execOperations(line).value;
+			if(_returned && autoScope){
+				var typ:String = typeof(_returned);
+				if(typ == "object" || typ=="xml"){
+					_scope = _returned;
+				}
+			}
 			dispatchEvent(new Event(Event.COMPLETE));
 			return _returned;
 		}

@@ -135,7 +135,7 @@ package com.junkbyte.console.core
 			else _slashCmds[n] = new SlashCommand(n, callback, desc);
 		}
 		public function run(str:String):* {
-			report("&gt; "+str,5, false);
+			report("&gt; "+str, 4, false);
 			if(!_master.config.commandLineAllowed) {
 				report("CommandLine is disabled.",10);
 				return null;
@@ -147,7 +147,10 @@ package com.junkbyte.console.core
 				}else{
 					var exe:Executer = new Executer();
 					exe.addEventListener(Event.COMPLETE, onExecLineComplete, false, 0, true);
-					v = exe.exec(_scope, str, _saved, RESERVED);
+					exe.setStored(_saved);
+					exe.setReserved(RESERVED);
+					exe.autoScope = _master.config.commandLineAutoScope;
+					v = exe.exec(_scope, str);
 				}
 			}catch(e:Error){
 				reportError(e);
@@ -188,34 +191,20 @@ package com.junkbyte.console.core
 			}
 		}
 		public function setReturned(returned:*, changeScope:Boolean = false):void{
-			var change:Boolean = false;
-			if(returned)
+			if(returned !== undefined)
 			{
-				_saved.set(Executer.RETURNED, returned, true);
 				if(returned !== _scope){
+					_saved.set(Executer.RETURNED, returned, true);
+					var rtext:String = _master.links.makeRefString(returned);
 					if(changeScope){
-						change = true;
-					}else if(_master.config.commandLineAutoScope){
-						var typ:String = typeof(returned);
-						if(typ == "object" || typ=="xml"){
-							change = true;
-						}
-					}
-					if(change){
 						_prevScope.reference = _scope;
 						_scope = returned;
+						report("Changed to "+rtext, -1);
 						dispatchEvent(new Event(Event.CHANGE));
+					}else{
+						report("Returned "+rtext, -2);
 					}
 				}
-				
-			}
-			if(returned !== undefined){
-				var rtext:String = _master.links.makeRefString(returned);
- 				if(change){
-					report("Changed to "+rtext, -1);
- 				}else if(!changeScope){
-					report("Returned "+rtext, -2);
- 				}
 			}else{
 				report("Exec successful, undefined return.", -2);
 			}
@@ -264,7 +253,7 @@ package com.junkbyte.console.core
 				if(sao==null) sii2++;
 				report("<b>$"+X+"</b> = "+_master.links.makeRefString(sao), -2);
 			}
-			report("Found "+sii+" item(s), "+sii2+" empty (or garbage collected).", -1);
+			report("Found "+sii+" item(s), "+sii2+" empty.", -1);
 		}
 		private function stringCmd(param:String):void{
 			report("String with "+param.length+" chars entered. Use /save <i>(name)</i> to save.", -2);
