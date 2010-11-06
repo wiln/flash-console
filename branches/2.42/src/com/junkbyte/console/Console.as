@@ -79,7 +79,7 @@ package com.junkbyte.console
 		//
 		public static const REMAPSPLIT:String = "|";
 		
-		public static const INSPECTING_CHANNEL:String = "◊hidden◊";
+		public static const INSPECTING_CHANNEL:String = "⌂";
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
@@ -433,7 +433,6 @@ package com.junkbyte.console
 			addLine([obj], priority, cn, false, skipSafe, 0);
 		}
 		public function addLine(arr:Array, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false, stacks:int = -1):void{
-			
 			var txt:String = "";
 			var len:int = arr.length;
 			for(var i:int = 0; i < len; i++){
@@ -446,9 +445,6 @@ package com.junkbyte.console
 			if(skipSafe) stacks = -1;
 			var stackArr:Array = stacks>0?getStack(stacks):null;
 			
-			if( _config.tracing && !isRepeat && _config.traceCall != null){
-				_config.traceCall(channel, (stackArr==null?txt:(txt+"\n @ "+stackArr.join("\n @ "))), priority);
-			}
 			
 			if(stackArr) {
 				var tp:int = priority;
@@ -461,6 +457,11 @@ package com.junkbyte.console
 				_channels.push(channel);
 			}
 			var line:Log = new Log(txt,channel,priority, isRepeating, skipSafe);
+			
+			if( _config.tracing && !isRepeat && _config.traceCall != null){
+				_config.traceCall(channel, line.plainText(), priority);
+			}
+			
 			if(isRepeat){
 				_lines.pop();
 				_lines.push(line);

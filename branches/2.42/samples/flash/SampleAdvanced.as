@@ -55,10 +55,11 @@ package
 			//Cc.fpsMonitor = true;
 			//Cc.displayRoller = true;
 			//Cc.setRollerCaptureKey("c");
+			Cc.config.tracing = true;
 			Cc.width = 700;
 			Cc.height = 300;
-			//Cc.remotingPassword = null; // Just so that remote don't ask for password
-			//Cc.remoting = true;
+			Cc.remotingPassword = null; // Just so that remote don't ask for password
+			Cc.remoting = true;
 			//
 			// End of setup
 			//

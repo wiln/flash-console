@@ -50,9 +50,14 @@ package com.junkbyte.console.vos {
 			bytes.writeBoolean(r);
 			return bytes;
 		}
-		public function toString():String{
-			return "["+c+"] " + t;
+		
+		public function plainText():String{
+			return t.replace(/<.*?>/g, "");
 		}
+		public function toString():String{
+			return "["+c+"] " + plainText();
+		}
+		
 		public function clone():Log{
 			return new Log(t, c, p, r, s);
 		}

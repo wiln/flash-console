@@ -49,7 +49,7 @@ package
 			
 			Cc.startOnStage(this, "`", config); // "`" - change for password. This will start hidden
 			Cc.visible = true; // show console, because having password hides console.
-			//C.tracing = true; // trace on flash's normal trace
+			Cc.config.tracing = true; // trace on flash's normal trace
 			Cc.commandLine = true; // enable command line
 			
 			Cc.height = 220;
