@@ -63,8 +63,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.45;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 520;
-		public static const BUILD_DATE:String = "2010/11/05 01:00";
+		public static const BUILD:int = 521;
+		public static const BUILD_DATE:String = "2010/11/06 02:15";
 		
 		public static const LITE:Boolean = false;
 		//
@@ -444,8 +444,6 @@ package com.junkbyte.console
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
 			if(skipSafe) stacks = -1;
 			var stackArr:Array = stacks>0?getStack(stacks):null;
-			
-			
 			if(stackArr) {
 				var tp:int = priority;
 				for each(var sline:String in stackArr) {
@@ -453,7 +451,11 @@ package com.junkbyte.console
 					if(tp>0) tp--;
 				}
 			}
-			if(_channels.indexOf(channel) < 0 && channel != INSPECTING_CHANNEL){
+			if(channel == INSPECTING_CHANNEL){
+				if(viewingChannels[0] != Console.INSPECTING_CHANNEL) {
+					viewingChannels = [Console.INSPECTING_CHANNEL];
+				}
+			}else if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
 			}
 			var line:Log = new Log(txt,channel,priority, isRepeating, skipSafe);
@@ -612,7 +614,7 @@ package com.junkbyte.console
 		public function get panels():PanelsManager{return _panels;}
 		public function get cl():CommandLine{return _cl;}
 		public function get ud():UserData{return _ud;}
-		//public function get om():ObjectsMonitor{return _om;}
+		public function get remoter():Remoting{return _remoter;}
 		public function get graphing():Graphing{return _graphing;}
 		public function get links():LogLinks{return _links;}
 		//

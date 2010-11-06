@@ -54,6 +54,7 @@ package com.junkbyte.console.core
 		public static const FPS:String = "fps";
 		public static const MEM:String = "mem";
 		public static const CMD:String = "cmd";
+		public static const REF:String = "ref";
 		//public static const CALL_UNMONITOR:String = "unmonitor";
 		//public static const CALL_MONITORIN:String = "monitorIn";
 		//public static const CALL_MONITOROUT:String = "monitorOut";
@@ -261,6 +262,7 @@ package com.junkbyte.console.core
 			o[FPS] = fpsRequest;
 			o[MEM] = memRequest;
 			o[CMD] = _c.runCommand;
+			o[REF] = _c.links.handleString;
 			/*o[CALL_UNMONITOR] = _master.unmonitor;
 			o[CALL_MONITORIN] = _master.monitorIn;
 			o[CALL_MONITOROUT] = _master.monitorOut;*/

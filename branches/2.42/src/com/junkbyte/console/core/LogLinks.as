@@ -140,8 +140,17 @@ package com.junkbyte.console.core
 				focus(v, _dofull);
 			}
 		}
-		public function handleRefString(str:String):void{
-			if(str == "refprev"){
+		public function handleRefEvent(str:String):void{
+			if(_master.remote){
+				_master.remoter.send(Remoting.REF, str);
+			}else{
+				handleString(str);
+			}
+		}
+		public function handleString(str:String):void{
+			if(str == ""){
+				exitFocus();
+			}else if(str == "refprev"){
 				historyInc(-2);
 			}else if(str == "reffwd"){
 				historyInc(0);
@@ -171,8 +180,8 @@ package com.junkbyte.console.core
 						return;
 					}
 				}
+				report("Reference no longer exist.", -2);
 			}
-			report("Reference no longer exist.", -2);
 		}
 		public function focus(o:*, full:Boolean = false):void{
 			_master.clear(Console.INSPECTING_CHANNEL);
@@ -194,6 +203,10 @@ package com.junkbyte.console.core
 			_dofull = false;
 			_history = null;
 			_hisIndex = 0;
+			if(_master.remote){
+				_master.remoter.send(Remoting.REF, "");
+			}
+			_master.clear(Console.INSPECTING_CHANNEL);
 		}
 		
 		private function report(obj:*, priority:Number = 0, skipSafe:Boolean = true):void{

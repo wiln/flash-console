@@ -32,14 +32,12 @@ package com.junkbyte.console.core
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
-	import flash.utils.getQualifiedClassName;
 
 	public class CommandLine extends EventDispatcher {
 		
 		private static const INTSTACKS:int = 1; // max number of internal (commandLine) stack traces
 		
 		public static const BASE:String = "base";
-		//public static const MONITORING_OBJ_KEY:String = "monitorObj";
 		
 		private static const RESERVED:Array = [Executer.RETURNED, BASE, "C"];
 		

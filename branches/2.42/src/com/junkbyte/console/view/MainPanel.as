@@ -23,10 +23,10 @@
 * 
 */
 
-package com.junkbyte.console.view {
-
-	import com.junkbyte.console.ConsoleChannel;
+package com.junkbyte.console.view 
+{
 	import com.junkbyte.console.Console;
+	import com.junkbyte.console.ConsoleChannel;
 	import com.junkbyte.console.vos.Log;
 	import com.junkbyte.console.vos.Logs;
 
@@ -316,7 +316,6 @@ package com.junkbyte.console.view {
 		}
 		public function set viewingChannels(a:Array):void{
 			if(a[0] != _viewingChannels[0] && _viewingChannels[0] == Console.INSPECTING_CHANNEL){
-				master.clear(Console.INSPECTING_CHANNEL);
 				master.links.exitFocus();
 			}
 			_viewingChannels.splice(0);
@@ -624,15 +623,15 @@ package com.junkbyte.console.view {
 				Security.showSettings(SecurityPanel.SETTINGS_MANAGER);
 			}else if(t == "remote"){
 				master.remote = true;
-			}else if(t.substring(0,3) == "ref"){
-				master.links.handleRefString(t);
-			}else if(t.substring(0,8) == "channel_"){
+			}else if(t.indexOf("ref")==0){
+				master.links.handleRefEvent(t);
+			}else if(t.indexOf("channel_")==0){
 				onChannelPressed(t.substring(8));
-			}else if(t.substring(0,5) == "clip_"){
+			}else if(t.indexOf("clip_")==0){
 				master.reMap(t.substring(5));
-			}else if(t.substring(0,6) == "sclip_"){
+			}else if(t.indexOf("sclip_")==0){
 				master.reMap("0"+Console.REMAPSPLIT+t.substring(6));
-			}else if(t.substring(0,3) == "cl_"){
+			}else if(t.indexOf("cl_")==0){
 				var ind:int = t.indexOf("_", 3);
 				var v:* = master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind)));
 				if(v){
@@ -806,15 +805,3 @@ package com.junkbyte.console.view {
 		}
 	}
 }
-/*
-internal class ExternalMenu{
-	public var key:String;
-	public var rollover:String;
-	public var click:Function;
-	
-	public function ExternalMenu(k:String, rover:String, clk:Function):void{
-		key = k;
-		rollover = rover;
-		click = clk;
-	}
-}*/
