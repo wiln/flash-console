@@ -363,7 +363,6 @@ package com.junkbyte.console
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			
 			if(_repeating > 0) _repeating--;
 			
 			if(_mm){
@@ -388,7 +387,6 @@ package com.junkbyte.console
 					if(!config.quiet) report("Moved console on top (alwaysOnTop enabled), "+_topTries+" attempts left.",-1);
 				}
 				_panels.update(_paused, _lineAdded);
-				//if(!_paused && om != null) _panels.updateObjMonitors(om);
 				if(graphsList) _panels.updateGraphs(graphsList, !_paused); 
 				_lineAdded = false;
 			}
@@ -424,7 +422,7 @@ package com.junkbyte.console
 		public function set viewingChannels(a:Array):void{
 			_panels.mainPanel.viewingChannels = a;
 		}
-		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true):void{
+		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true):void{
 			var cn:String = viewingChannels[0] == config.globalChannel?config.consoleChannel:viewingChannels[0];
 			addLine([obj], priority, cn, false, skipSafe, 0);
 		}
@@ -435,18 +433,9 @@ package com.junkbyte.console
 				txt += (i?" ":"")+_links.makeString(arr[i], null, html);
 			}
 			
-			var isRepeat:Boolean = (isRepeating && _repeating > 0);
-			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
-			if(html) stacks = -1;
-			var stackArr:Array = stacks>0?getStack(stacks):null;
-			if(stackArr) {
-				var tp:int = priority;
-				for each(var sline:String in stackArr) {
-					txt += "\n<p"+tp+"> @ "+sline+"</p"+tp+">";
-					if(tp>0) tp--;
-				}
-			}
+			
+			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
 			if(channel == INSPECTING_CHANNEL){
 				if(viewingChannels[0] != Console.INSPECTING_CHANNEL) {
 					viewingChannels = [Console.INSPECTING_CHANNEL];
@@ -454,8 +443,13 @@ package com.junkbyte.console
 			}else if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
 			}
-			var line:Log = new Log(txt,channel,priority, isRepeating, html);
 			
+			if(!html && stacks>=0){
+				txt += getStack(stacks, priority);
+			}
+			var line:Log = new Log(txt, channel, priority, isRepeating, html);
+			
+			var isRepeat:Boolean = (isRepeating && _repeating > 0);
 			if( _config.tracing && !isRepeat && _config.traceCall != null){
 				_config.traceCall(channel, line.plainText(), priority);
 			}
@@ -474,22 +468,31 @@ package com.junkbyte.console
 				}
 			}
 			_lineAdded = true;
-			
 			_remoter.addLineQueue(line);
 		}
-		private function getStack(depth:int):Array{
+		private function getStack(depth:int, priority:int):String{
 			var e:Error = new Error();
 			var str:String = e.hasOwnProperty("getStackTrace")?e.getStackTrace():null;
-			if(!str) return null;
+			if(!str) return "";
+			var txt:String = "";
 			var lines:Array = str.split(/\n\sat\s/);
 			var len:int = lines.length;
 			var reg:RegExp = new RegExp("Function|"+getQualifiedClassName(this)+"|"+getQualifiedClassName(Cc));
+			var found:Boolean = false;
 			for (var i:int = 2; i < len; i++){
-				if((lines[i].search(reg) != 0)){
-					return lines.slice(i, i+depth);
+				if(!found && (lines[i].search(reg) != 0)){
+					found = true;
+				}
+				if(found){
+					txt += "\n<p"+priority+"> @ "+lines[i]+"</p"+priority+">";
+					if(priority>0) priority--;
+					depth--;
+					if(depth<=0){
+						break;
+					}
 				}
 			}
-			return null;
+			return txt;
 		}
 		//
 		// COMMAND LINE
@@ -522,13 +525,13 @@ package com.junkbyte.console
 		//
 		// LOGGING
 		//
-		public function add(newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
+		public function add(newLine:*, priority:int = 2, isRepeating:Boolean = false):void{
 			addLine(new Array(newLine), priority, _config.defaultChannel, isRepeating);
 		}
-		public function stack(newLine:*, depth:int = -1, priority:Number = 5):void{
+		public function stack(newLine:*, depth:int = -1, priority:int = 5):void{
 			addLine(new Array(newLine), priority, _config.defaultChannel, false, false, depth>=0?depth:_config.defaultStackDepth);
 		}
-		public function stackch(ch:String, newLine:*, depth:int = -1, priority:Number = 5):void{
+		public function stackch(ch:String, newLine:*, depth:int = -1, priority:int = 5):void{
 			addLine(new Array(newLine), priority, ch, false, false, depth>=0?depth:_config.defaultStackDepth);
 		}
 		public function log(...args):void{
@@ -570,7 +573,7 @@ package com.junkbyte.console
 		public function fatalch(channel:*, ...args):void{
 			addCh(channel, args, FATAL);
 		}
-		private function addCh(channel:*, newLine:Array, priority:Number = 2, isRepeating:Boolean = false):void{
+		private function addCh(channel:*, newLine:Array, priority:int = 2, isRepeating:Boolean = false):void{
 			var chn:String;
 			if(channel is String) chn = channel as String;
 			else if(channel) chn = ShortClassName(channel);

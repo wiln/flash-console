@@ -69,7 +69,7 @@ package com.junkbyte.console {
 		 * Default stack trace depth.
 		 * default depth = 3;
 		 */
-		public var defaultStackDepth:int = 3;
+		public var defaultStackDepth:int = 2;
 		
 		/** 
 		 * Object linking allows you click on individual objects you have logged to inspect the detials in a specific view.

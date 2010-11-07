@@ -90,15 +90,22 @@ package com.junkbyte.console.core
 				}
 				return err.toString();
 			}else if(v is XML || v is XMLList){
-				return safeString(shortenString(v.toXMLString(), maxlen, o, prop));
+				return shortenString(safeString(v.toXMLString()), maxlen, o, prop);
 			}else if(v is Array || getQualifiedClassName(v).indexOf("__AS3__.vec::Vector.") == 0){
 				// note: using getQualifiedClassName for vector for backward compatibility
 				// Need to specifically cast to string in array to produce correct results
 				// e.g: new Array("str",null,undefined,0).toString() // traces to: str,,,0, SHOULD BE: str,null,undefined,0
 				var str:String = "[";
 				var len:int = v.length;
+				var hasmaxlen:Boolean = maxlen>=0;
 				for(var i:int = 0; i < len; i++){
-					str += (i?", ":"")+makeString(v[i]);
+					var strpart:String = makeString(v[i], null, false, maxlen);
+					str += (i?", ":"")+strpart;
+					maxlen -= strpart.length;
+					if(hasmaxlen && maxlen<=0 && i<len-1){
+						str += ", "+genLinkString(o, prop, "...");
+						break;
+					}
 				}
 				return str+"]";
 			}else if(v && typeof v == "object") {
@@ -106,29 +113,27 @@ package com.junkbyte.console.core
 				if(v is ByteArray){
 					add = " position:"+ByteArray(v).position+" length:"+ByteArray(v).length;
 				}
-				var ind:uint = setLogRef(o);
-				if(ind){
-					txt = "{<l><a href='event:ref_"+ind+(prop?("_"+prop):"")+"'>"+ShortClassName(v)+"</a></l>"+add+"}";
-				}else{
-					txt = "{"+ShortClassName(v)+add+"}";
-				}
+				txt = "{"+genLinkString(o, prop, ShortClassName(v))+add+"}";
 			}else{
 				txt = String(v);
 				if(!html){
-					return safeString(shortenString(txt, maxlen, o, prop));
+					return shortenString(safeString(txt), maxlen, o, prop);
 				}
 			}
 			return txt;
 		}
-		private function shortenString(str:String, maxlen:int, refid:uint, prop:String = null):String{
+		private function genLinkString(o:*, prop:String, str:String):String{
+			var ind:uint = setLogRef(o);
+			if(ind){
+				return "<l><a href='event:ref_"+ind+(prop?("_"+prop):"")+"'>"+str+"</a></l>";
+			}else{
+				return str;
+			}
+		}
+		private function shortenString(str:String, maxlen:int, o:*, prop:String = null):String{
 			if(maxlen>=0 && str.length > maxlen) {
 				str = str.substring(0, maxlen);
-				if(refid){
-					str += "<l><a href='event:ref_"+refid+(prop?("_"+prop):"")+"'> ...</a></l>";
-				}else{
-					str += " ...";
-				}
-				return str;
+				return str+genLinkString(o, prop, " ...");
 			}
 			return str;
 		}
@@ -136,14 +141,11 @@ package com.junkbyte.console.core
 		{
 			if(v && typeof v == "object")
 			{
-				var ind:uint = setLogRef(v);
-				if(ind){
-					return "{<l><a href='event:ref_"+ind+"'>"+ShortClassName(v)+"</a></l>}";
-				}
+				return "{"+genLinkString(v, null, ShortClassName(v))+"}";
 			}
 			return "{"+ShortClassName(v)+"}";
 		}
-		private function safeString(str:String):String{
+		public function safeString(str:String):String{
 			str = str.replace(/</gm, "&lt;");
 	 		return str.replace(new RegExp(">", "gm"), "&gt;");
 		}
@@ -224,7 +226,7 @@ package com.junkbyte.console.core
 			_master.clear(Console.INSPECTING_CHANNEL);
 		}
 		
-		private function report(obj:*, priority:Number = 0, skipSafe:Boolean = true):void{
+		private function report(obj:* = "", priority:Number = 3, skipSafe:Boolean = true):void{
 			_master.report(obj, priority, skipSafe);
 		}
 		
@@ -254,7 +256,7 @@ package com.junkbyte.console.core
 				if(viewAll) menuStr += " [<a href='event:refi'>Hide inherited</a>]";
 				else menuStr += " [<a href='event:refi'>Show inherited</a>]";
 				report(menuStr, -1, true);
-				report("", -1);
+				report();
 			}
 			//
 			// Class extends... extendsClass
@@ -272,7 +274,6 @@ package com.junkbyte.console.core
 			var self:String = V.@name;
 			var str:String = "<b>"+self+"</b>";
 			var props:Array = [];
-			var props2:Array = [];
 			var nodes:XMLList;
 			if(V.@isDynamic=="true"){
 				props.push("dynamic");
@@ -290,40 +291,41 @@ package com.junkbyte.console.core
 			//
 			// extends...
 			//
-			props = [];
 			nodes = V.extendsClass;
-			for each (var extendX:XML in nodes) {
-				props.push(makeValue(getDefinitionByName(extendX.@type.toString())));
-				if(!viewAll) break;
-			}
-			if(props.length){
-				report("<p10>Extends:</p10> "+props.join("<p-1> &gt; </p-1>"), 5, true);
+			if(nodes.length()){
+				props = [];
+				for each (var extendX:XML in nodes) {
+					props.push(makeValue(getDefinitionByName(extendX.@type.toString())));
+					if(!viewAll) break;
+				}
+				report("<p10>Extends:</p10> "+props.join(" &gt; "));
 			}
 			//
 			// implements...
 			//
-			props = [];
 			nodes = V.implementsInterface;
-			for each (var implementX:XML in nodes) {
-				props.push(makeValue(getDefinitionByName(implementX.@type.toString())));
+			if(nodes.length()){
+				props = [];
+				for each (var implementX:XML in nodes) {
+					props.push(makeValue(getDefinitionByName(implementX.@type.toString())));
+				}
+				report("<p10>Implements:</p10> "+props.join(", "));
 			}
-			if(props.length){
-				report("<p10>Implements:</p10> "+props.join(" "), 5, true);
-			}
-			report("");
+			report();
 			//
 			// events
 			// metadata name="Event"
 			props = [];
 			nodes = V.metadata.(@name == "Event");
-			for each (var metadataX:XML in nodes) {
-				var mn:XMLList = metadataX.arg;
-				var en:String = mn.(@key=="name").@value;
-				var et:String = mn.(@key=="type").@value;
-				props.push("<a href='event:cl_"+refIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
-			}
-			if(props.length){
-				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
+			if(nodes.length()){
+				for each (var metadataX:XML in nodes) {
+					var mn:XMLList = metadataX.arg;
+					var en:String = mn.(@key=="name").@value;
+					var et:String = mn.(@key=="type").@value;
+					props.push("<a href='event:cl_"+refIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
+				}
+				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>"));
+				report();
 			}
 			//
 			// display's parents and direct children
@@ -332,16 +334,14 @@ package com.junkbyte.console.core
 				var disp:DisplayObject = obj as DisplayObject;
 				var theParent:DisplayObjectContainer = disp.parent;
 				if (theParent) {
-					props = ["@"+theParent.getChildIndex(disp)];
+					props = new Array("@"+theParent.getChildIndex(disp));
 					while (theParent) {
 						var pr:DisplayObjectContainer = theParent;
 						theParent = theParent.parent;
 						var indstr:String = theParent?"@"+theParent.getChildIndex(pr):"";
 						props.push("<b>"+pr.name+"</b>"+indstr+makeValue(pr));
 					}
-					if(props.length){
-						report("<p10>Parents:</p10> "+props.join("<p-1> -> </p-1>")+"<br/>", 1, true);
-					}
+					report("<p10>Parents:</p10> "+props.join("<p-1> -> </p-1>")+"<br/>", 1, true);
 				}
 			}
 			if (obj is DisplayObjectContainer) {
@@ -352,7 +352,7 @@ package com.junkbyte.console.core
 					var child:DisplayObject = cont.getChildAt(ci);
 					props.push("<b>"+child.name+"</b>@"+ci+makeValue(child));
 				}
-				if(props.length){
+				if(clen){
 					report("<p10>Children:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 1, true);
 				}
 			}
@@ -362,85 +362,82 @@ package com.junkbyte.console.core
 			props = [];
 			nodes = clsV..constant;
 			for each (var constantX:XML in nodes) {
-				str = "<p1> const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls, constantX.@name)+"</p0>";
-				report(str, 3, true);
+				report(" const <p3>"+constantX.@name+"</p3>:"+constantX.@type+" = "+makeValue(cls, constantX.@name)+"</p0>", 1);
 			}
-			if(nodes.length()>0){
-				report("", 3, true);
+			if(nodes.length()){
+				report("");
 			}
 			var inherit:uint = 0;
+			var hasstuff:Boolean;
 			var isstatic:Boolean;
 			//
 			// methods
 			//
 			props = [];
-			props2 = [];
 			nodes = clsV..method; // '..' to include from <factory>
 			for each (var methodX:XML in nodes) {
 				if(viewAll || self==methodX.@declaredBy){
+					hasstuff = true;
 					isstatic = methodX.parent().name()!="factory";
-					str = "<p1> "+(isstatic?"static ":"")+"function </p1>";
+					str = " "+(isstatic?"static ":"")+"function ";
 					var params:Array = [];
 					var mparamsList:XMLList = methodX.parameter;
 					for each(var paraX:XML in mparamsList){
 						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
 					}
-					str += "<a href='event:cl_"+refIndex+"_"+methodX.@name+"()'>"+methodX.@name+"</a><p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
-					report(str, 3, true);
+					str += "<a href='event:cl_"+refIndex+"_"+methodX.@name+"()'><p3>"+methodX.@name+"</p3></a>(<i>"+params.join(",")+"</i>):"+methodX.@returnType;
+					report(str, 1);
 				}else{
 					inherit++;
 				}
 			}
 			if(inherit){
-				report("   \t + "+inherit+" inherited methods.", 1, true);
-			}else if(nodes.length()){
-				report("", 3, true);
+				report("   \t + "+inherit+" inherited methods.", 1);
+			}else if(hasstuff){
+				report();
 			}
 			//
 			// accessors
 			//
+			hasstuff = false;
 			inherit = 0;
 			props = [];
-			props2 = [];
 			nodes = clsV..accessor; // '..' to include from <factory>
 			for each (var accessorX:XML in nodes) {
 				if(viewAll || self==accessorX.@declaredBy){
+					hasstuff = true;
 					isstatic = accessorX.parent().name()!="factory";
-					str = "<p1> "+(isstatic?"static ":"");
+					str = " ";
+					if(isstatic) str += "static ";
 					var access:String = accessorX.@access;
 					if(access == "readonly") str+= "get";
 					else if(access == "writeonly") str+= "set";
 					else str += "assign";
-					str+= "</p1> <a href='event:cl_"+refIndex+"_"+accessorX.@name+"'>"+accessorX.@name+"</a><p1>:"+accessorX.@type+"</p1>";
+					str += " <a href='event:cl_"+refIndex+"_"+accessorX.@name+"'><p3>"+accessorX.@name+"</p3></a>:"+accessorX.@type;
 					if(access != "writeonly" && (isstatic || !(obj is Class))){
 						var t:Object = isstatic?cls:obj;
-						str+="<p1> = "+makeValue(t, accessorX.@name)+"</p1>";
+						str += " = "+makeValue(t, accessorX.@name);
 					}
-					report(str, 3, true);
+					report(str, 1);
 				}else{
 					inherit++;
 				}
 			}
 			if(inherit){
-				report("   \t + "+inherit+" inherited accessors.", 1, true);
-			}else if(nodes.length()){
-				report("", 3, true);
+				report("   \t + "+inherit+" inherited accessors.", 1);
+			}else if(hasstuff){
+				report();
 			}
 			//
 			// variables
 			//
-			props = [];
 			nodes = clsV..variable;
 			for each (var variableX:XML in nodes) {
 				if(variableX.parent().name()=="factory"){
-					str = "<p0> var </p0><a href='event:cl_"+refIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
+					report(" var <a href='event:cl_"+refIndex+"_"+variableX.@name+" = '><p3>"+variableX.@name+"</p3></a>:"+variableX.@type+" = "+makeValue(obj, variableX.@name), 1);
 				}else{
-					str = "<p0> <i>static var</i></p0><a href='event:cl_"+refIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
+					report(" static var <a href='event:cl_"+refIndex+"_"+variableX.@name+" = '><p3>"+variableX.@name+"</p3></a>:"+variableX.@type+" = "+makeValue(cls, variableX.@name), 1);
 				}
-				props.push(str);
-			}
-			if(props.length){
-				report(props.join("<br/>"), 3, true);
 			}
 			//
 			// dynamic values
@@ -448,22 +445,22 @@ package com.junkbyte.console.core
 			try{
 				props = [];
 				for (var X:String in obj) {
-					report("<p0> dynamic var </p0><a href='event:cl_"+refIndex+"_"+X+" = '>"+X+"</a><p1> = "+makeValue(obj, X)+"</p1>", 3, true);
+					report(" dynamic var <a href='event:cl_"+refIndex+"_"+X+" = '><p3>"+X+"</p3></a> = "+makeValue(obj, X), 1);
 				}
 			}catch(e:Error){
-				report("Could not get values due to: "+e, 9, true);
+				report("Could not get values due to: "+e, 9);
 			}
 			if(obj is String){
-				report("");
+				report();
 				report("String", 10);
 				report(safeString(obj));
 			}else if(obj is XML || obj is XMLList){
-				report("");
+				report();
 				report("XMLString", 10);
 				report(safeString(obj.toXMLString()));
 			}
 			if(menuStr){
-				report("", -1);
+				report();
 				report(menuStr, -1, true);
 			}
 		}
@@ -490,7 +487,7 @@ package com.junkbyte.console.core
 				n = accessorX.@name;
 				if(accessorX.@access!="writeonly"){
 					try{
-						list.push(n+":"+explode(obj[n], depth-1, p-1));
+						list.push(stepExp(obj, n, depth, p));
 					}catch(e:Error){}
 				}else{
 					list.push(n);
@@ -500,15 +497,18 @@ package com.junkbyte.console.core
 			nodes = V["variable"];
 			for each (var variableX:XML in nodes) {
 				n = variableX.@name;
-				list.push(n+":"+explode(obj[n], depth-1, p-1));
+				list.push(stepExp(obj, n, depth, p));
 			}
 			//
 			try{
 				for (var X:String in obj) {
-					list.push(X+":"+explode(obj[X], depth-1, p-1));
+					list.push(stepExp(obj, X, depth, p));
 				}
 			}catch(e:Error){}
 			return "<p"+p+">{"+ShortClassName(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
+		}
+		private function stepExp(o:*, n:String, d:int, p:int):String{
+			return n+":"+explode(o[n], d-1, p-1);
 		}
 	}
 }

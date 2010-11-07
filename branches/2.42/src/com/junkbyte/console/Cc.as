@@ -171,7 +171,7 @@ package com.junkbyte.console {
 		 * @param  Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
 		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
 		 */
-		public static function add(str:*, priority:Number = 2, isRepeating:Boolean = false):void{
+		public static function add(str:*, priority:int = 2, isRepeating:Boolean = false):void{
 			if(_console){
 				_console.add(str, priority, isRepeating);
 			}
@@ -184,7 +184,7 @@ package com.junkbyte.console {
 		 * @param  Priority of line. 0-10 (optional, default: 5)
 		 * 
 		 */
-		public static function stack(str:*, depth:int = -1, priority:Number = 5):void{
+		public static function stack(str:*, depth:int = -1, priority:int = 5):void{
 			if(_console){
 				_console.stack(str,depth,priority);
 			}
@@ -198,7 +198,7 @@ package com.junkbyte.console {
 		 * @param  Priority of line. 0-10 (optional, default: 5)
 		 * 
 		 */
-		public static function stackch(ch:String, str:*, depth:int = -1, priority:Number = 5):void{
+		public static function stackch(ch:String, str:*, depth:int = -1, priority:int = 5):void{
 			if(_console){
 				_console.stackch(ch, str, depth, priority);
 			}
@@ -212,7 +212,7 @@ package com.junkbyte.console {
 		 * @param  Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
 		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
 		 */
-		public static function ch(channel:*, str:*, priority:Number = 2, isRepeating:Boolean = false):void{
+		public static function ch(channel:*, str:*, priority:int = 2, isRepeating:Boolean = false):void{
 			if(_console){
 				_console.ch(channel,str, priority, isRepeating);
 			}

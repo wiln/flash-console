@@ -92,7 +92,7 @@ package com.junkbyte.console.core
 		}
 		public function destory():void {
 			_saved = null;
-			_master = null;
+			_scope = null;
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):void {
 			// if it is a function it needs to be strong reference atm, 

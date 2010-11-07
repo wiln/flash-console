@@ -42,8 +42,8 @@ package com.junkbyte.console.core
 			_master = m;
 			_mapBases = new WeakObject();
 		}
-		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true, ch:String = null):void{
-			_master.addLine([obj], priority, ch?ch:_master.config.consoleChannel, false, skipSafe, 0);
+		public function report(obj:*, priority:Number = 0):void{
+			_master.report(obj, priority);
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(!base){
