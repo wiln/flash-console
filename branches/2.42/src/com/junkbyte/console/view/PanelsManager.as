@@ -23,6 +23,7 @@
 * 
 */
 package com.junkbyte.console.view {
+	import com.junkbyte.console.core.Logs;
 	import com.junkbyte.console.vos.GraphGroup;
 	import com.junkbyte.console.Console;
 
@@ -40,7 +41,6 @@ package com.junkbyte.console.view {
 		private var _c:Console;
 		private var _mainPanel:MainPanel;
 		private var _ruler:Ruler;
-		private var _channels:Array;
 		
 		private var _chsPanel:ChannelsPanel;
 		private var _fpsPanel:FPSPanel;
@@ -52,10 +52,9 @@ package com.junkbyte.console.view {
 		
 		private var _tooltipField:TextField;
 		
-		public function PanelsManager(master:Console, mp:MainPanel, channels:Array) {
+		public function PanelsManager(master:Console, lines:Logs) {
 			_c = master;
-			_mainPanel = mp;
-			_channels = channels;
+			_mainPanel = new MainPanel(_c, lines);
 			_tooltipField = mainPanel.makeTF("tooltip", false, true);
 			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
 			_tooltipField.multiline = true;
@@ -260,7 +259,7 @@ package com.junkbyte.console.view {
 					_chsPanel.x = _mainPanel.x+_mainPanel.width-332;
 					_chsPanel.y = _mainPanel.y-2;
 					addPanel(_chsPanel);
-					_chsPanel.start(_channels);
+					_chsPanel.update();
 					updateMenu();
 				}else {
 					removePanel(ChannelsPanel.NAME);

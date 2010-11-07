@@ -32,8 +32,6 @@ package com.junkbyte.console.view {
 		
 		public static const NAME:String = "channelsPanel";
 		
-		private var _channels:Array;
-		
 		public function ChannelsPanel(m:Console) {
 			super(m);
 			name = NAME;
@@ -46,10 +44,6 @@ package com.junkbyte.console.view {
 			registerTFRoller(txtField, onMenuRollOver, linkHandler);
 			registerDragger(txtField);
 			addChild(txtField);
-		}
-		public function start(channels:Array):void{
-			_channels = channels;
-			update();
 		}
 		public function update():void{
 			txtField.wordWrap = false;

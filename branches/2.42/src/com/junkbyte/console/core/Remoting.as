@@ -55,9 +55,6 @@ package com.junkbyte.console.core
 		public static const MEM:String = "mem";
 		public static const CMD:String = "cmd";
 		public static const REF:String = "ref";
-		//public static const CALL_UNMONITOR:String = "unmonitor";
-		//public static const CALL_MONITORIN:String = "monitorIn";
-		//public static const CALL_MONITOROUT:String = "monitorOut";
 		
 		private var _c:Console;
 		private var _cfg:ConsoleConfig;
@@ -182,7 +179,7 @@ package com.junkbyte.console.core
 				_c.report("<b>Remoting started.</b> "+getInfo(),-1);
 				_loggedIn = checkLogin("");
 				if(_loggedIn){
-					_queue = _c.getLogsAsBytes();
+					_queue = _c.lines.getLogsAsBytes();
 					send(LOGINSUCCESS);
 				}else{
 					send(LOGINREQUEST);
@@ -263,9 +260,6 @@ package com.junkbyte.console.core
 			o[MEM] = memRequest;
 			o[CMD] = _c.runCommand;
 			o[REF] = _c.links.handleString;
-			/*o[CALL_UNMONITOR] = _master.unmonitor;
-			o[CALL_MONITORIN] = _master.monitorIn;
-			o[CALL_MONITOROUT] = _master.monitorOut;*/
 			_connection.client = o;
 			
 			try{
@@ -306,7 +300,7 @@ package com.junkbyte.console.core
 				// once logged in, next login attempts will always be success
 				if(_loggedIn || checkLogin(pass)){
 					_loggedIn = true;
-					_queue = _c.getLogsAsBytes();
+					_queue = _c.lines.getLogsAsBytes();
 					send(LOGINSUCCESS);
 				}else{
 					send(LOGINFAIL);

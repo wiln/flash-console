@@ -25,11 +25,12 @@
 
 package com.junkbyte.console.view 
 {
+	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
 	import com.junkbyte.console.vos.Log;
-	import com.junkbyte.console.vos.Logs;
+	import com.junkbyte.console.core.Logs;
 
 	import flash.display.Shape;
 	import flash.events.Event;
@@ -60,7 +61,6 @@ package com.junkbyte.console.view
 		private var _shift:Boolean;
 		private var _txtscroll:TextScroller;
 		
-		private var _channels:Array;
 		private var _viewingChannels:Array;
 		private var _lines:Logs;
 		private var _cmdsHistory:Array = [];
@@ -75,10 +75,9 @@ package com.junkbyte.console.view
 		private var _atBottom:Boolean = true;
 		private var _enteringLogin:Boolean;
 		
-		public function MainPanel(m:Console, lines:Logs, channels:Array) {
+		public function MainPanel(m:Console, lines:Logs) {
 			super(m);
 			var fsize:int = style.menuFontSize;
-			_channels = channels;
 			_viewingChannels = new Array();
 			_lines = lines;
 			_cmdsHistory = m.ud.commandLineHistory;
@@ -248,12 +247,12 @@ package com.junkbyte.console.view
 		}
 		private function updateFull():void{
 			var str:String = "";
-			var line:Log = _lines.first;
+			var line:Log = _lines.last;
 			while(line){
 				if(lineShouldShow(line)){
-					str += makeLine(line);
+					str = makeLine(line)+str;
 				}
-				line = line.next;
+				line = line.prev;
 			}
 			_lockScrollUpdate = true;
 			_traceField.htmlText = str;
@@ -316,7 +315,7 @@ package com.junkbyte.console.view
 			return _viewingChannels;
 		}
 		public function set viewingChannels(a:Array):void{
-			if(a[0] != _viewingChannels[0] && _viewingChannels[0] == Console.INSPECTING_CHANNEL){
+			if(a[0] != _viewingChannels[0] && _viewingChannels[0] == LogReferences.INSPECTING_CHANNEL){
 				master.links.exitFocus();
 			}
 			_viewingChannels.splice(0);
@@ -351,7 +350,7 @@ package com.junkbyte.console.view
 		}
 		private function startFilter():void{
 			master.clear(config.filteredChannel);
-			_channels.splice(1,0,config.filteredChannel);
+			_lines.channels.splice(1,0,config.filteredChannel);
 			viewingChannels = [config.filteredChannel];
 		}
 		private function endFilter():void{
@@ -517,15 +516,15 @@ package com.junkbyte.console.view
 		}
 		public function getChannelsLink(limited:Boolean = false):String{
 			var str:String = "<chs>";
-			var len:int = _channels.length;
+			var len:int = _lines.channels.length;
 			if(limited && len>style.maxChannelsInMenu) len = style.maxChannelsInMenu;
-			for(var ci:int = 0; ci<len;  ci++){
-				var channel:String = _channels[ci];
-				var channelTxt:String = ((ci == 0 && _viewingChannels.length == 0) || _viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
+			for(var i:int = 0; i<len;  i++){
+				var channel:String = _lines.channels[i];
+				var channelTxt:String = ((i == 0 && _viewingChannels.length == 0) || _viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
 				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
 			if(limited){
-				str += "<ch><a href=\"event:channels\"><b>"+(_channels.length>len?"...":"")+"</b>^^ </a></ch>";
+				str += "<ch><a href=\"event:channels\"><b>"+(_lines.channels.length>len?"...":"")+"</b>^^ </a></ch>";
 			}
 			str += "</chs> ";
 			return str;
@@ -546,6 +545,8 @@ package com.junkbyte.console.view
 				txt = "Console's channel::Logs generated from Console";
 			}else if(txt == "channel_"+ config.filteredChannel) {
 				txt = "Filtering channel"+"::*"+filterText+"*";
+			}else if(txt == "channel_"+LogReferences.INSPECTING_CHANNEL) {
+				txt = "Inspecting channel";
 			}else if(txt.indexOf("channel_")==0) {
 				txt = "Change channel::Hold shift to select multiple channels";
 			}else if(txt == "pause"){
@@ -649,7 +650,7 @@ package com.junkbyte.console.view
 		}
 		public function onChannelPressed(chn:String):void{
 			var current:Array = _viewingChannels.concat();
-			if(_shift && chn != config.globalChannel){
+			if(_shift && chn != config.globalChannel && current[0] != LogReferences.INSPECTING_CHANNEL){
 				var ind:int = current.indexOf(chn);
 				if(ind>=0){
 					current.splice(ind,1);
@@ -676,7 +677,7 @@ package com.junkbyte.console.view
 		private function incPriority(down:Boolean):void{
 			var top:uint = 10;
 			var bottom:uint;
-			var line:Log = _lines.first;
+			var line:Log = _lines.last;
 			var p:int = _priority;
 			_priority = 0;
 			var i:uint = 32000; // just for crash safety, it wont look more than 32000 lines.
@@ -686,7 +687,7 @@ package com.junkbyte.console.view
 					if(line.p > p && top>line.p) top = line.p;
 					if(line.p < p && bottom<line.p) bottom = line.p;
 				}
-				line = line.next;
+				line = line.prev;
 			}
 			if(down){
 				if(bottom == p) p = 10;
@@ -713,7 +714,7 @@ package com.junkbyte.console.view
 			if( e.keyCode == Keyboard.ENTER){
 				updateToBottom();
 				if(_enteringLogin){
-					dispatchEvent(new Event(Event.CONNECT));
+					master.remoter.login(commandLineText);
 					_cmdField.text = "";
 					requestLogin(false);
 				}else{

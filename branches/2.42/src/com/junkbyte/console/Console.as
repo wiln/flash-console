@@ -25,19 +25,18 @@
 package com.junkbyte.console 
 {
 	import com.junkbyte.console.core.CommandLine;
+	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.core.Graphing;
 	import com.junkbyte.console.core.KeyBinder;
 	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.core.MemoryMonitor;
 	import com.junkbyte.console.core.Remoting;
-	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.core.UserData;
 	import com.junkbyte.console.utils.ShortClassName;
-	import com.junkbyte.console.view.MainPanel;
 	import com.junkbyte.console.view.PanelsManager;
 	import com.junkbyte.console.view.RollerPanel;
 	import com.junkbyte.console.vos.Log;
-	import com.junkbyte.console.vos.Logs;
+	import com.junkbyte.console.core.Logs;
 
 	import flash.display.DisplayObjectContainer;
 	import flash.display.LoaderInfo;
@@ -75,8 +74,6 @@ package com.junkbyte.console
 		public static const ERROR:uint = 9;
 		public static const FATAL:uint = 10;
 		//
-		
-		public static const INSPECTING_CHANNEL:String = "⌂";
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
@@ -84,17 +81,14 @@ package com.junkbyte.console
 		private var _ud:UserData;
 		private var _kb:KeyBinder;
 		private var _links:LogReferences;
-		//private var _om:ObjectsMonitor;
 		private var _mm:MemoryMonitor;
 		private var _graphing:Graphing;
 		private var _remoter:Remoting;
-		private var _tools:DisplayMapper;
+		private var _mapper:DisplayMapper;
 		private var _topTries:int = 50;
 		//
 		private var _paused:Boolean;
 		private var _rollerKey:KeyBind;
-		private var _channels:Array;
-		private var _repeating:uint;
 		private var _lines:Logs;
 		private var _lineAdded:Boolean;
 		
@@ -112,24 +106,19 @@ package com.junkbyte.console
 			tabChildren = false; // Tabbing is not supported
 			_config = config?config:new ConsoleConfig();
 			//
-			_channels = [_config.globalChannel, _config.defaultChannel];
-			_lines = new Logs();
+			_lines = new Logs(_config);
 			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
-			//_om = new ObjectsMonitor();
 			_links = new LogReferences(this);
 			_cl = new CommandLine(this);
-			_tools =  new DisplayMapper(this);
+			_mapper =  new DisplayMapper(this);
 			_graphing = new Graphing(report);
 			_remoter = new Remoting(this, pass);
 			_kb = new KeyBinder(pass);
 			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
-			//
-			// VIEW setup
+			
 			_config.style.updateStyleSheet();
-			var mainPanel:MainPanel = new MainPanel(this, _lines, _channels);
-			mainPanel.addEventListener(Event.CONNECT, onMainPanelConnectRequest, false, 0, true);
-			_panels = new PanelsManager(this, mainPanel, _channels);
-			//
+			_panels = new PanelsManager(this, _lines);
+			
 			report("<b>Console v"+VERSION+VERSION_STAGE+" b"+BUILD+". Happy coding!</b>", -2);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			if(pass) visible = false;
@@ -303,13 +292,13 @@ package com.junkbyte.console
 			_cl.store(n, obj, strong);
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			_tools.map(base, maxstep);
+			_mapper.map(base, maxstep);
 		}
 		public function reMap(path:String):void{
 			if(remote){
 				_remoter.send(Remoting.RMAP, path);
 			}else{
-				_cl.setReturned(_tools.reMap(path, stage), true);
+				_cl.setReturned(_mapper.reMap(path, stage), true);
 			}
 		}
 		public function inspect(obj:Object, detail:Boolean = true):void{
@@ -359,8 +348,7 @@ package com.junkbyte.console
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			if(_repeating > 0) _repeating--;
-			
+			_lines.tick();
 			if(_mm){
 				var arr:Array = _mm.update();
 				if(arr.length>0){
@@ -406,9 +394,6 @@ package com.junkbyte.console
 		public function set remotingPassword(str:String):void{
 			_remoter.remotingPassword = str;
 		}
-		private function onMainPanelConnectRequest(e:Event) : void {
-			_remoter.login(MainPanel(e.currentTarget).commandLineText);
-		}
 		//
 		//
 		//
@@ -432,12 +417,8 @@ package com.junkbyte.console
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
 			
 			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
-			if(channel == INSPECTING_CHANNEL){
-				if(viewingChannels[0] != Console.INSPECTING_CHANNEL) {
-					viewingChannels = [Console.INSPECTING_CHANNEL];
-				}
-			}else if(_channels.indexOf(channel) < 0){
-				_channels.push(channel);
+			if(channel == LogReferences.INSPECTING_CHANNEL && viewingChannels[0] != LogReferences.INSPECTING_CHANNEL){
+				viewingChannels = [LogReferences.INSPECTING_CHANNEL];
 			}
 			
 			if(!html && stacks>=0){
@@ -445,24 +426,11 @@ package com.junkbyte.console
 			}
 			var line:Log = new Log(txt, channel, priority, isRepeating, html);
 			
-			var isRepeat:Boolean = (isRepeating && _repeating > 0);
-			if( _config.tracing && !isRepeat && _config.traceCall != null){
+			var cantrace:Boolean = _lines.add(line, isRepeating);
+			if( _config.tracing && cantrace && _config.traceCall != null){
 				_config.traceCall(channel, line.plainText(), priority);
 			}
 			
-			if(isRepeat){
-				_lines.pop();
-				_lines.push(line);
-			}else{
-				_repeating = isRepeating?_config.maxRepeats:0;
-				_lines.push(line);
-				if(_config.maxLines > 0 ){
-					var off:int = _lines.length - _config.maxLines;
-					if(off > 0){
-						_lines.shift(off);
-					}
-				}
-			}
 			_lineAdded = true;
 			_remoter.addLineQueue(line);
 		}
@@ -580,23 +548,12 @@ package com.junkbyte.console
 		//
 		//
 		public function clear(channel:String = null):void{
-			if(channel){
-				var line:Log = _lines.first;
-				while(line){
-					if(line.c == channel){
-						_lines.remove(line);
-					}
-					line = line.next;
-				}
-				var ind:int = _channels.indexOf(channel);
-				if(ind>=0) _channels.splice(ind,1);
-			}else{
-				_lines.clear();
-				_channels.splice(0);
-				_channels.push(_config.globalChannel, _config.defaultChannel);
-			}
+			_lines.clear(channel);
 			if(!_paused) _panels.mainPanel.updateToBottom();
 			_panels.updateMenu();
+		}
+		public function getAllLog(splitter:String = "\n"):String{
+			return _lines.getAllLog(splitter);
 		}
 		//
 		public function get config():ConsoleConfig{return _config;}
@@ -606,24 +563,6 @@ package com.junkbyte.console
 		public function get remoter():Remoting{return _remoter;}
 		public function get graphing():Graphing{return _graphing;}
 		public function get links():LogReferences{return _links;}
-		//
-		public function getLogsAsBytes():Array{
-			var a:Array = [];
-			var line:Log = _lines.first;
-			while(line){
-				a.push(line.toBytes());
-				line = line.next;
-			}
-			return a;
-		}
-		public function getAllLog(splitter:String = "\n"):String{
-			var str:String = "";
-			var line:Log = _lines.first;
-			while(line){
-				str += (line.toString()+(line.next?splitter:""));
-				line = line.next;
-			}
-			return str;
-		}
+		public function get lines():Logs{return _lines;}
 	}
 }

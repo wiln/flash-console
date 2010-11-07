@@ -40,6 +40,8 @@ package com.junkbyte.console.core
 	{
 		private static const MAX_VAL_LENGTH:uint = 100;
 		
+		public static const INSPECTING_CHANNEL:String = "⌂";
+		
 		private var _master:Console;
 		private var _refMap:WeakObject;
 		private var _refRev:Dictionary;
@@ -200,8 +202,8 @@ package com.junkbyte.console.core
 			}
 		}
 		public function focus(o:*, full:Boolean = false):void{
-			_master.clear(Console.INSPECTING_CHANNEL);
-			_master.viewingChannels = [Console.INSPECTING_CHANNEL];
+			_master.clear(LogReferences.INSPECTING_CHANNEL);
+			_master.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
 			
 			if(!_history) _history = new Array();
 			
@@ -223,7 +225,7 @@ package com.junkbyte.console.core
 			if(_master.remote){
 				_master.remoter.send(Remoting.REF, "");
 			}
-			_master.clear(Console.INSPECTING_CHANNEL);
+			_master.clear(LogReferences.INSPECTING_CHANNEL);
 		}
 		
 		private function report(obj:* = "", priority:Number = 3, skipSafe:Boolean = true):void{
