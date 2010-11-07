@@ -552,7 +552,7 @@ package com.junkbyte.console
 			if(!_paused) _panels.mainPanel.updateToBottom();
 			_panels.updateMenu();
 		}
-		public function getAllLog(splitter:String = "\n"):String{
+		public function getAllLog(splitter:String = "\r\n"):String{
 			return _logs.getAllLog(splitter);
 		}
 		//

@@ -30,6 +30,7 @@ package com.junkbyte.console.core {
 		private var _channels:Array;
 		private var _config:ConsoleConfig;
 		private var _repeating:uint;
+		private var _lastRepeat:Log;
 		
 		private var first:Log;
 		public var last:Log;
@@ -51,22 +52,24 @@ package com.junkbyte.console.core {
 			if(_channels.indexOf(line.c) < 0){
 				_channels.push(line.c);
 			}
-			var isRepeat:Boolean = (isRepeating && _repeating > 0);
-			if(isRepeat){
-				pop();
-				push(line);
-				return false;
-			}else{
-				_repeating = isRepeating?_config.maxRepeats:0;
-				push(line);
-				if(_config.maxLines > 0 ){
-					var off:int = _length - _config.maxLines;
-					if(off > 0){
-						shift(off);
-					}
+			var added:Boolean = true;
+			if(isRepeating){
+				if(_repeating > 0 && _lastRepeat){
+					added = false;
+					remove(_lastRepeat);
+				}else{
+					_repeating = _config.maxRepeats; 
+				}
+				_lastRepeat = line;
+			}
+			push(line);
+			if(_config.maxLines > 0 ){
+				var off:int = _length - _config.maxLines;
+				if(off > 0){
+					shift(off);
 				}
 			}
-			return true;
+			return added;
 		}
 		public function clear(channel:String = null):void{
 			if(channel){
@@ -96,7 +99,7 @@ package com.junkbyte.console.core {
 			}
 			return a;
 		}
-		public function getAllLog(splitter:String = "\n"):String{
+		public function getAllLog(splitter:String = "\r\n"):String{
 			var str:String = "";
 			var line:Log = first;
 			while(line){
@@ -120,14 +123,16 @@ package com.junkbyte.console.core {
 			last = v;
 			_length++;
 		}
-		private function pop():void{
+		/*private function pop():void{
 			if(last) {
+				if(last == _lastRepeat) _lastRepeat = null;
 				last = last.prev;
 				_length--;
 			}
-		}
+		}*/
 		private function shift(count:uint = 1):void{
 			while(first != null && count>0){
+				if(first == _lastRepeat) _lastRepeat = null;
 				first = first.next;
 				count--;
 				_length--;
@@ -136,6 +141,7 @@ package com.junkbyte.console.core {
 		private function remove(log:Log):void{
 			if(first == log) first = log.next;
 			if(last == log) last = log.prev;
+			if(log == _lastRepeat) _lastRepeat = null;
 			if(log.next != null) log.next.prev = log.prev;
 			if(log.prev != null) log.prev.next = log.next;
 			_length--;
