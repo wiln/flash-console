@@ -36,9 +36,10 @@ http://code.google.com/p/flash-console/issues/
 ===2.41===
   * added ability to add custom slash commands. using Cc.addSlashCommand();
   * commandLine autoScoping can be set from Cc.config.commandLineAutoScope.
-  * Cc.stack() no longer accept channel name. use Cc.stackch() for channel.
+  * Cc.stack() no longer accept channel name. use Cc.stackch() for channel
   * Top menu can now be hidden from ConsoleStyle.topMenu = false;
   * Fixed bug with channel name generation from non-string param in Cc.logch, Cc.warnch, etc...
+  * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
   * Remote: to run local command line on remote, prefix string with ~, e.g. `~stage.frameRate=100;`
   * Remoting now use ByteArray data format which will break with older clients.
   

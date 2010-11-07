@@ -407,24 +407,6 @@ package com.junkbyte.console {
 			setter("viewingChannels",v);
 		}
 
-		//
-		// Panel settings
-		//
-		/**
-		 * Set panel position and size.
-		 * <p>
-		 * See panel names in Console.NAME, FPSPanel.NAME, MemoryPanel.NAME, RollerPanel.NAME, RollerPanel.NAME, etc...
-		 * No effect if panel of that name doesn't exist.
-		 * </p>
-		 * @param	Name of panel to set
-		 * @param	Rectangle area for panel size and position. Leave any property value zero to keep as is.
-		 *  		For example, if you don't want to change the height of the panel, pass rect.height = 0;
-		 */
-		public static function setPanelArea(panelname:String, rect:Rectangle):void{
-			if(_console){
-				_console.setPanelArea(panelname, rect);
-			}
-		}
 		/**
 		 * Start/stop FPS monitor graph.
 		 */
@@ -594,17 +576,6 @@ package com.junkbyte.console {
 			setter("commandLine",v);
 		}
 		/**
-		 * Command line base.
-		 * The value returned from /base in commandLine.
-		 * Default is set to console's parent DisplayContainer.
-		 */
-		public static function get commandBase():Object{
-			return getter("commandBase") as Object;
-		}
-		public static function set commandBase(v:Object):void{
-			setter("commandBase",v);
-		}
-		/**
 		 * Store a reference in Console for use in CommandLine.
 		 * (same as /save in commandLine)
 		 * 
@@ -650,17 +621,6 @@ package com.junkbyte.console {
 			if(_console ){
 				_console.map(base, maxstep);
 			}
-		}
-		/**
-		 * Run a commandLine string
-		 *
-		 * @param  String to run
-		 */
-		public static function runCommand(str:String):*{
-			if(_console){
-				return _console.runCommand(str);
-			}
-			return null;
 		}
 		//
 		// Memory management tools

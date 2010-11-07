@@ -184,10 +184,10 @@ package com.junkbyte.console
 			}
 		}
 		private function uncaughtErrorHandle(e:Event):void{
-			var error:Object = e["error"]; // for flash 9 compatibility
+			var error:* = e.hasOwnProperty("error")?e["error"]:e; // for flash 9 compatibility
 			var str:String;
 			if (error is Error){
-				str = _links.makeRefString(error);
+				str = _links.makeString(error);
 			}else if (error is ErrorEvent){
 				str = ErrorEvent(error).text;
 			}
@@ -224,10 +224,6 @@ package com.junkbyte.console
 		//
 		// Panel settings
 		// basically passing through to panels manager to save lines
-		//
-		public function setPanelArea(panelname:String, rect:Rectangle):void{
-			_panels.setPanelArea(panelname, rect);
-		}
 		//
 		public function get displayRoller():Boolean{
 			return _panels.displayRoller;
@@ -432,17 +428,17 @@ package com.junkbyte.console
 			var cn:String = viewingChannels[0] == config.globalChannel?config.consoleChannel:viewingChannels[0];
 			addLine([obj], priority, cn, false, skipSafe, 0);
 		}
-		public function addLine(arr:Array, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, skipSafe:Boolean = false, stacks:int = -1):void{
+		public function addLine(arr:Array, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
 			var txt:String = "";
 			var len:int = arr.length;
 			for(var i:int = 0; i < len; i++){
-				txt += (i?" ":"")+_links.makeRefString(arr[i], null, skipSafe);
+				txt += (i?" ":"")+_links.makeString(arr[i], null, html);
 			}
 			
 			var isRepeat:Boolean = (isRepeating && _repeating > 0);
 			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
-			if(skipSafe) stacks = -1;
+			if(html) stacks = -1;
 			var stackArr:Array = stacks>0?getStack(stacks):null;
 			if(stackArr) {
 				var tp:int = priority;
@@ -458,7 +454,7 @@ package com.junkbyte.console
 			}else if(_channels.indexOf(channel) < 0){
 				_channels.push(channel);
 			}
-			var line:Log = new Log(txt,channel,priority, isRepeating, skipSafe);
+			var line:Log = new Log(txt,channel,priority, isRepeating, html);
 			
 			if( _config.tracing && !isRepeat && _config.traceCall != null){
 				_config.traceCall(channel, line.plainText(), priority);
@@ -504,12 +500,6 @@ package com.junkbyte.console
 		}
 		public function get commandLine ():Boolean{
 			return _panels.mainPanel.commandLine;
-		}
-		public function set commandBase (v:Object):void{
-			if(v) _cl.base = v;
-		}
-		public function get commandBase ():Object{
-			return _cl.base;
 		}
 		public function runCommand(line:String):*{
 			if(_remoter.isRemote){

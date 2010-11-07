@@ -35,6 +35,8 @@ package com.junkbyte.console.core
 
 	public class CommandLine extends EventDispatcher {
 		
+		private static const DISABLED:String = "CommandLine is disabled.";
+		
 		private static const INTSTACKS:int = 1; // max number of internal (commandLine) stack traces
 		
 		public static const BASE:String = "base";
@@ -135,11 +137,11 @@ package com.junkbyte.console.core
 			else _slashCmds[n] = new SlashCommand(n, callback, desc);
 		}
 		public function run(str:String):* {
-			report("&gt; "+str, 4, false);
 			if(!_master.config.commandLineAllowed) {
-				report("CommandLine is disabled.",10);
+				report(DISABLED,10);
 				return null;
 			}
+			report("&gt; "+str, 4, false);
 			var v:* = null;
 			try{
 				if(str.charAt(0) == "/"){
@@ -184,18 +186,21 @@ package com.junkbyte.console.core
 						slashcmd.f(param);
 					}
 				}catch(err:Error){
-					report("ERROR slash command: "+_master.links.makeRefString(err), 10);
+					report("ERROR slash command: "+_master.links.makeString(err), 10);
 				}
 			} else{
 				report("Undefined command <b>/cmds</b> for list of all commands.",10);
 			}
 		}
 		public function setReturned(returned:*, changeScope:Boolean = false):void{
+			if(!_master.config.commandLineAllowed) {
+				report(DISABLED,10);
+			}
 			if(returned !== undefined)
 			{
 				if(returned !== _scope){
 					_saved.set(Executer.RETURNED, returned, true);
-					var rtext:String = _master.links.makeRefString(returned);
+					var rtext:String = _master.links.makeString(returned);
 					if(changeScope){
 						_prevScope.reference = _scope;
 						_scope = returned;
@@ -210,7 +215,7 @@ package com.junkbyte.console.core
 			}
 		}
 		private function reportError(e:Error):void{
-			var str:String = _master.links.makeRefString(e);
+			var str:String = _master.links.makeString(e);
 			var lines:Array = str.split(/\n\s*/);
 			var p:int = 10;
 			var internalerrs:int = 0;
@@ -251,7 +256,7 @@ package com.junkbyte.console.core
 				var sao:* = _saved[X];
 				sii++;
 				if(sao==null) sii2++;
-				report("<b>$"+X+"</b> = "+_master.links.makeRefString(sao), -2);
+				report("<b>$"+X+"</b> = "+_master.links.makeString(sao), -2);
 			}
 			report("Found "+sii+" item(s), "+sii2+" empty.", -1);
 		}

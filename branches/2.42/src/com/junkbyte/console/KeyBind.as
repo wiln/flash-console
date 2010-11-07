@@ -47,8 +47,7 @@ package com.junkbyte.console
 			char = String(v).toUpperCase();
 			if(v is uint){
 				extra |= KEYCODE;
-			}
-			else if(char.length != 1) {
+			}else if(char.length != 1) {
 				throw new Error("KeyBind: character (first char) must be a single character. You gave ["+char+"]");
 			}
 			if(shift) extra |= SHIFT;
@@ -68,8 +67,7 @@ package com.junkbyte.console
 		
 		public function toString():String
 		{
-			var str:String = (extra & KEYCODE)?String(char):char;
-			
+			var str:String = ((extra & KEYCODE)?"keycode:":"")+char;
 			if(extra & SHIFT) str+="+shift";
 			if(extra & CTRL) str+="+ctrl";
 			if(extra & ALT) str+="+alt";

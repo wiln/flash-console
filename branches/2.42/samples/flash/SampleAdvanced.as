@@ -24,6 +24,8 @@
 */
 package 
 {
+	import flash.ui.Keyboard;
+	import com.junkbyte.console.KeyBind;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleConfig;
 	import com.junkbyte.console.vos.Log;
@@ -63,7 +65,6 @@ package
 			//
 			// End of setup
 			//
-			
 			//Cc.addSlashCommand("test", function():void{ Cc.log("Do the test!");} );
 			//Cc.addSlashCommand("test2", function(param:String):void{Cc.log("Do the test 2 with param string:", param);} );
 			

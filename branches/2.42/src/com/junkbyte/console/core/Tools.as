@@ -51,10 +51,10 @@ package com.junkbyte.console.core
 		public function explode(obj:Object, depth:int = 3, p:int = 9):String{
 			var t:String = typeof obj;
 			if(obj == null){ 
-				// could be null, undefined, NaN, etc. all should be printed as is
+				// could be null, undefined, NaN, 0, etc. all should be printed as is
 				return "<p-2>"+obj+"</p-2>";
 			}else if(t != "object" || depth == 0 || obj is ByteArray){
-				return _master.links.makeRefString(obj);
+				return _master.links.makeString(obj);
 			} 
 			if(p<0) p = 0;
 			var V:XML = describeType(obj);

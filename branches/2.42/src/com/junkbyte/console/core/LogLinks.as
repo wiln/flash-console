@@ -38,6 +38,8 @@ package com.junkbyte.console.core
 
 	public class LogLinks 
 	{
+		private static const MAX_VAL_LENGTH:uint = 100;
+		
 		private var _master:Console;
 		private var _linksMap:WeakObject;
 		private var _linksRev:Dictionary;
@@ -72,7 +74,7 @@ package com.junkbyte.console.core
 		public function getRefById(ind:uint):*{
 			return _linksMap[ind];
 		}
-		public function makeRefString(o:*, prop:String = null, skipSafe:Boolean = false):String{
+		public function makeString(o:*, prop:String = null, html:Boolean = false, maxlen:int = -1):String{
 			var txt:String;
 			try{
 				var v:* = prop?o[prop]:o;
@@ -88,7 +90,7 @@ package com.junkbyte.console.core
 				}
 				return err.toString();
 			}else if(v is XML || v is XMLList){
-				return safeString(v.toXMLString());
+				return safeString(shortenString(v.toXMLString(), maxlen, o, prop));
 			}else if(v is Array || getQualifiedClassName(v).indexOf("__AS3__.vec::Vector.") == 0){
 				// note: using getQualifiedClassName for vector for backward compatibility
 				// Need to specifically cast to string in array to produce correct results
@@ -96,7 +98,7 @@ package com.junkbyte.console.core
 				var str:String = "[";
 				var len:int = v.length;
 				for(var i:int = 0; i < len; i++){
-					str += (i?", ":"")+makeRefString(v[i]);
+					str += (i?", ":"")+makeString(v[i]);
 				}
 				return str+"]";
 			}else if(v && typeof v == "object") {
@@ -112,11 +114,23 @@ package com.junkbyte.console.core
 				}
 			}else{
 				txt = String(v);
-				if(!skipSafe){
-					return safeString(txt);
+				if(!html){
+					return safeString(shortenString(txt, maxlen, o, prop));
 				}
 			}
 			return txt;
+		}
+		private function shortenString(str:String, maxlen:int, refid:uint, prop:String = null):String{
+			if(maxlen>=0 && str.length > maxlen) {
+				str = str.substring(0, maxlen);
+				if(refid){
+					str += "<l><a href='event:ref_"+refid+(prop?("_"+prop):"")+"'> ...</a></l>";
+				}else{
+					str += " ...";
+				}
+				return str;
+			}
+			return str;
 		}
 		public function makeRefTyped(v:*):String
 		{
@@ -191,11 +205,12 @@ package com.junkbyte.console.core
 			
 			_dofull = full;
 			inspect(o, _dofull);
-			_current = o; // current is kept as hard reference so that it stays...
-			
-			if(_history.length <= _hisIndex) _history.push(o);
-			else _history[_hisIndex] = o;
-			_hisIndex++;
+			if(_current != o){
+				_current = o; // current is kept as hard reference so that it stays...
+				if(_history.length <= _hisIndex) _history.push(o);
+				else _history[_hisIndex] = o;
+				_hisIndex++;
+			}
 		}
 		
 		public function exitFocus():void{
@@ -232,7 +247,9 @@ package com.junkbyte.console.core
 				}
 				menuStr += "</b> || [<a href='event:ref_"+linkIndex+"'>refresh</a>]";
 				menuStr += "</b> [<a href='event:refe_"+linkIndex+"'>explode</a>]";
-				menuStr += " [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
+				if(_master.config.commandLineAllowed){
+					menuStr += " [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
+				}
 				
 				if(viewAll) menuStr += " [<a href='event:refi'>Hide inherited</a>]";
 				else menuStr += " [<a href='event:refi'>Show inherited</a>]";
@@ -298,14 +315,12 @@ package com.junkbyte.console.core
 			// events
 			// metadata name="Event"
 			props = [];
-			nodes = V.metadata;
+			nodes = V.metadata.(@name == "Event");
 			for each (var metadataX:XML in nodes) {
-				if(metadataX.@name=="Event"){
-					var mn:XMLList = metadataX.arg;
-					var en:String = mn.(@key=="name").@value;
-					var et:String = mn.(@key=="type").@value;
-					props.push("<a href='event:cl_"+linkIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
-				}
+				var mn:XMLList = metadataX.arg;
+				var en:String = mn.(@key=="name").@value;
+				var et:String = mn.(@key=="type").@value;
+				props.push("<a href='event:cl_"+linkIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
 			}
 			if(props.length){
 				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
@@ -347,7 +362,7 @@ package com.junkbyte.console.core
 			props = [];
 			nodes = clsV..constant;
 			for each (var constantX:XML in nodes) {
-				str = "<p1> const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls[constantX.@name])+"</p0>";
+				str = "<p1> const </p1>"+constantX.@name+"<p0>:"+constantX.@type+" = "+makeValue(cls, constantX.@name)+"</p0>";
 				report(str, 3, true);
 			}
 			if(nodes.length()>0){
@@ -385,7 +400,6 @@ package com.junkbyte.console.core
 			// accessors
 			//
 			inherit = 0;
-			var arr:Array = new Array();
 			props = [];
 			props2 = [];
 			nodes = clsV..accessor; // '..' to include from <factory>
@@ -439,7 +453,6 @@ package com.junkbyte.console.core
 			}catch(e:Error){
 				report("Could not get values due to: "+e, 9, true);
 			}
-			
 			if(obj is String){
 				report("");
 				report("String", 10);
@@ -455,20 +468,7 @@ package com.junkbyte.console.core
 			}
 		}
 		private function makeValue(obj:*, prop:String = null):String{
-			var str:String = makeRefString(obj, prop);
-			if(str.length > 100){
-				var id:uint = getRefId(obj);
-				str = str.substring(0, 100);
-				if(id)
-				{
-					str += "<l><a href='event:ref_"+id+(prop?("_"+prop):"")+"'> ...</a></l>";
-				}
-				else
-				{
-					str += " ...";
-				}
-			}
-			return str;
+			return makeString(obj, prop, false, MAX_VAL_LENGTH);
 		}
 	}
 }

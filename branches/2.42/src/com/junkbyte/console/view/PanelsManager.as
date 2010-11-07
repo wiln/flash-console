@@ -86,6 +86,16 @@ package com.junkbyte.console.view {
 		public function panelExists(n:String):Boolean{
 			return (_c.getChildByName(n) as AbstractPanel)?true:false;
 		}
+		/**
+		 * Set panel position and size.
+		 * <p>
+		 * See panel names in Console.NAME, FPSPanel.NAME, MemoryPanel.NAME, RollerPanel.NAME, RollerPanel.NAME, etc...
+		 * No effect if panel of that name doesn't exist.
+		 * </p>
+		 * @param	Name of panel to set
+		 * @param	Rectangle area for panel size and position. Leave any property value zero to keep as is.
+		 *  		For example, if you don't want to change the height of the panel, pass rect.height = 0;
+		 */
 		public function setPanelArea(panelname:String, rect:Rectangle):void{
 			var panel:AbstractPanel = getPanel(panelname);
 			if(panel){
