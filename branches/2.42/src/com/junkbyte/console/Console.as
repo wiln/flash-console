@@ -553,7 +553,7 @@ package com.junkbyte.console
 			_panels.updateMenu();
 		}
 		public function getAllLog(splitter:String = "\r\n"):String{
-			return _logs.getAllLog(splitter);
+			return _logs.getLogsAsString(splitter);
 		}
 		//
 		public function get config():ConsoleConfig{return _config;}

@@ -31,6 +31,7 @@ package com.junkbyte.console.core {
 		private var _config:ConsoleConfig;
 		private var _repeating:uint;
 		private var _lastRepeat:Log;
+		private var _newRepeat:Log;
 		
 		private var first:Log;
 		public var last:Log;
@@ -47,20 +48,26 @@ package com.junkbyte.console.core {
 		
 		public function tick():void{
 			if(_repeating > 0) _repeating--;
+			if(_newRepeat){
+				if(_lastRepeat) remove(_lastRepeat);
+				_lastRepeat = _newRepeat;
+				_newRepeat = null;
+				push(_lastRepeat);
+			}
 		}
 		public function add(line:Log, isRepeating:Boolean):Boolean{
 			if(_channels.indexOf(line.c) < 0){
 				_channels.push(line.c);
 			}
-			var added:Boolean = true;
+			var add:Boolean = true;
 			if(isRepeating){
 				if(_repeating > 0 && _lastRepeat){
-					added = false;
-					remove(_lastRepeat);
+					_newRepeat = line;
+					return false;
 				}else{
-					_repeating = _config.maxRepeats; 
+					_repeating = _config.maxRepeats;
+					_lastRepeat = line;
 				}
-				_lastRepeat = line;
 			}
 			push(line);
 			if(_config.maxLines > 0 ){
@@ -69,7 +76,7 @@ package com.junkbyte.console.core {
 					shift(off);
 				}
 			}
-			return added;
+			return add;
 		}
 		public function clear(channel:String = null):void{
 			if(channel){
@@ -99,7 +106,7 @@ package com.junkbyte.console.core {
 			}
 			return a;
 		}
-		public function getAllLog(splitter:String = "\r\n"):String{
+		public function getLogsAsString(splitter:String = "\r\n"):String{
 			var str:String = "";
 			var line:Log = first;
 			while(line){
@@ -142,6 +149,7 @@ package com.junkbyte.console.core {
 			if(first == log) first = log.next;
 			if(last == log) last = log.prev;
 			if(log == _lastRepeat) _lastRepeat = null;
+			if(log == _newRepeat) _newRepeat = null;
 			if(log.next != null) log.next.prev = log.prev;
 			if(log.prev != null) log.prev.next = log.next;
 			_length--;
