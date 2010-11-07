@@ -89,7 +89,7 @@ package com.junkbyte.console
 		//
 		private var _paused:Boolean;
 		private var _rollerKey:KeyBind;
-		private var _lines:Logs;
+		private var _logs:Logs;
 		private var _lineAdded:Boolean;
 		
 		/**
@@ -106,7 +106,7 @@ package com.junkbyte.console
 			tabChildren = false; // Tabbing is not supported
 			_config = config?config:new ConsoleConfig();
 			//
-			_lines = new Logs(_config);
+			_logs = new Logs(_config);
 			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
 			_links = new LogReferences(this);
 			_cl = new CommandLine(this);
@@ -117,7 +117,7 @@ package com.junkbyte.console
 			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
 			
 			_config.style.updateStyleSheet();
-			_panels = new PanelsManager(this, _lines);
+			_panels = new PanelsManager(this);
 			
 			report("<b>Console v"+VERSION+VERSION_STAGE+" b"+BUILD+". Happy coding!</b>", -2);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
@@ -348,7 +348,7 @@ package com.junkbyte.console
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			_lines.tick();
+			_logs.tick();
 			if(_mm){
 				var arr:Array = _mm.update();
 				if(arr.length>0){
@@ -426,7 +426,7 @@ package com.junkbyte.console
 			}
 			var line:Log = new Log(txt, channel, priority, isRepeating, html);
 			
-			var cantrace:Boolean = _lines.add(line, isRepeating);
+			var cantrace:Boolean = _logs.add(line, isRepeating);
 			if( _config.tracing && cantrace && _config.traceCall != null){
 				_config.traceCall(channel, line.plainText(), priority);
 			}
@@ -548,12 +548,12 @@ package com.junkbyte.console
 		//
 		//
 		public function clear(channel:String = null):void{
-			_lines.clear(channel);
+			_logs.clear(channel);
 			if(!_paused) _panels.mainPanel.updateToBottom();
 			_panels.updateMenu();
 		}
 		public function getAllLog(splitter:String = "\n"):String{
-			return _lines.getAllLog(splitter);
+			return _logs.getAllLog(splitter);
 		}
 		//
 		public function get config():ConsoleConfig{return _config;}
@@ -563,6 +563,6 @@ package com.junkbyte.console
 		public function get remoter():Remoting{return _remoter;}
 		public function get graphing():Graphing{return _graphing;}
 		public function get links():LogReferences{return _links;}
-		public function get lines():Logs{return _lines;}
+		public function get lines():Logs{return _logs;}
 	}
 }

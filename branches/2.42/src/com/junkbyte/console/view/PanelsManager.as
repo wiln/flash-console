@@ -52,9 +52,9 @@ package com.junkbyte.console.view {
 		
 		private var _tooltipField:TextField;
 		
-		public function PanelsManager(master:Console, lines:Logs) {
+		public function PanelsManager(master:Console) {
 			_c = master;
-			_mainPanel = new MainPanel(_c, lines);
+			_mainPanel = new MainPanel(_c);
 			_tooltipField = mainPanel.makeTF("tooltip", false, true);
 			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
 			_tooltipField.multiline = true;

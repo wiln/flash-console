@@ -62,7 +62,6 @@ package com.junkbyte.console.view
 		private var _txtscroll:TextScroller;
 		
 		private var _viewingChannels:Array;
-		private var _lines:Logs;
 		private var _cmdsHistory:Array = [];
 		private var _cmdsInd:int = -1;
 		private var _priority:int;
@@ -75,11 +74,10 @@ package com.junkbyte.console.view
 		private var _atBottom:Boolean = true;
 		private var _enteringLogin:Boolean;
 		
-		public function MainPanel(m:Console, lines:Logs) {
+		public function MainPanel(m:Console) {
 			super(m);
 			var fsize:int = style.menuFontSize;
 			_viewingChannels = new Array();
-			_lines = lines;
 			_cmdsHistory = m.ud.commandLineHistory;
 			
 			name = NAME;
@@ -247,7 +245,7 @@ package com.junkbyte.console.view
 		}
 		private function updateFull():void{
 			var str:String = "";
-			var line:Log = _lines.last;
+			var line:Log = master.lines.last;
 			while(line){
 				if(lineShouldShow(line)){
 					str = makeLine(line)+str;
@@ -275,7 +273,7 @@ package com.junkbyte.console.view
 			var linesLeft:int = Math.round(_traceField.height/style.traceFontSize);
 			var maxchars:int = Math.round(_traceField.width*5/style.traceFontSize);
 			
-			var line:Log = _lines.last;
+			var line:Log = master.lines.last;
 			while(line){
 				if(lineShouldShow(line)){
 					var numlines:int = Math.ceil(line.t.length/ maxchars);
@@ -350,7 +348,7 @@ package com.junkbyte.console.view
 		}
 		private function startFilter():void{
 			master.clear(config.filteredChannel);
-			_lines.channels.splice(1,0,config.filteredChannel);
+			master.lines.channels.splice(1,0,config.filteredChannel);
 			viewingChannels = [config.filteredChannel];
 		}
 		private function endFilter():void{
@@ -516,15 +514,16 @@ package com.junkbyte.console.view
 		}
 		public function getChannelsLink(limited:Boolean = false):String{
 			var str:String = "<chs>";
-			var len:int = _lines.channels.length;
+			var channels:Array = master.lines.channels;
+			var len:int = channels.length;
 			if(limited && len>style.maxChannelsInMenu) len = style.maxChannelsInMenu;
 			for(var i:int = 0; i<len;  i++){
-				var channel:String = _lines.channels[i];
+				var channel:String = channels[i];
 				var channelTxt:String = ((i == 0 && _viewingChannels.length == 0) || _viewingChannels.indexOf(channel)>=0) ? "<ch><b>"+channel+"</b></ch>" : channel;
 				str += "<a href=\"event:channel_"+channel+"\">["+channelTxt+"]</a> ";
 			}
 			if(limited){
-				str += "<ch><a href=\"event:channels\"><b>"+(_lines.channels.length>len?"...":"")+"</b>^^ </a></ch>";
+				str += "<ch><a href=\"event:channels\"><b>"+(channels.length>len?"...":"")+"</b>^^ </a></ch>";
 			}
 			str += "</chs> ";
 			return str;
@@ -677,7 +676,7 @@ package com.junkbyte.console.view
 		private function incPriority(down:Boolean):void{
 			var top:uint = 10;
 			var bottom:uint;
-			var line:Log = _lines.last;
+			var line:Log = master.lines.last;
 			var p:int = _priority;
 			_priority = 0;
 			var i:uint = 32000; // just for crash safety, it wont look more than 32000 lines.
