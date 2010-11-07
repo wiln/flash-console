@@ -59,7 +59,6 @@ package com.junkbyte.console.core {
 			if(_channels.indexOf(line.c) < 0){
 				_channels.push(line.c);
 			}
-			var add:Boolean = true;
 			if(isRepeating){
 				if(_repeating > 0 && _lastRepeat){
 					_newRepeat = line;
@@ -76,7 +75,7 @@ package com.junkbyte.console.core {
 					shift(off);
 				}
 			}
-			return add;
+			return true;
 		}
 		public function clear(channel:String = null):void{
 			if(channel){
