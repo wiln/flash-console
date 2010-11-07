@@ -27,10 +27,10 @@ package com.junkbyte.console
 	import com.junkbyte.console.core.CommandLine;
 	import com.junkbyte.console.core.Graphing;
 	import com.junkbyte.console.core.KeyBinder;
-	import com.junkbyte.console.core.LogLinks;
+	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.core.MemoryMonitor;
 	import com.junkbyte.console.core.Remoting;
-	import com.junkbyte.console.core.Tools;
+	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.core.UserData;
 	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.view.MainPanel;
@@ -86,12 +86,12 @@ package com.junkbyte.console
 		private var _cl:CommandLine;
 		private var _ud:UserData;
 		private var _kb:KeyBinder;
-		private var _links:LogLinks;
+		private var _links:LogReferences;
 		//private var _om:ObjectsMonitor;
 		private var _mm:MemoryMonitor;
 		private var _graphing:Graphing;
 		private var _remoter:Remoting;
-		private var _tools:Tools;
+		private var _tools:DisplayMapper;
 		private var _topTries:int = 50;
 		//
 		private var _paused:Boolean;
@@ -119,9 +119,9 @@ package com.junkbyte.console
 			_lines = new Logs();
 			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
 			//_om = new ObjectsMonitor();
-			_links = new LogLinks(this);
+			_links = new LogReferences(this);
 			_cl = new CommandLine(this);
-			_tools =  new Tools(this);
+			_tools =  new DisplayMapper(this);
 			_graphing = new Graphing(report);
 			_remoter = new Remoting(this, pass);
 			_kb = new KeyBinder(pass);
@@ -320,7 +320,7 @@ package com.junkbyte.console
 			_links.inspect(obj,detail);
 		}
 		public function explode(obj:Object, depth:int = 3):void{
-			report(_tools.explode(obj, depth), 1);
+			report(_links.explode(obj, depth), 1);
 		}
 		public function get paused():Boolean{
 			return _paused;
@@ -606,7 +606,7 @@ package com.junkbyte.console
 		public function get ud():UserData{return _ud;}
 		public function get remoter():Remoting{return _remoter;}
 		public function get graphing():Graphing{return _graphing;}
-		public function get links():LogLinks{return _links;}
+		public function get links():LogReferences{return _links;}
 		//
 		public function getLogsAsBytes():Array{
 			var a:Array = [];

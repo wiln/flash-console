@@ -198,17 +198,15 @@ package com.junkbyte.console.core
 			}
 			if(returned !== undefined)
 			{
-				if(returned !== _scope){
+				var rtext:String = _master.links.makeString(returned);
+				if(changeScope && returned !== _scope){
 					_saved.set(Executer.RETURNED, returned, true);
-					var rtext:String = _master.links.makeString(returned);
-					if(changeScope){
-						_prevScope.reference = _scope;
-						_scope = returned;
-						report("Changed to "+rtext, -1);
-						dispatchEvent(new Event(Event.CHANGE));
-					}else{
-						report("Returned "+rtext, -2);
-					}
+					_prevScope.reference = _scope;
+					_scope = returned;
+					report("Changed to "+rtext, -1);
+					dispatchEvent(new Event(Event.CHANGE));
+				}else{
+					report("Returned "+rtext, -2);
 				}
 			}else{
 				report("Exec successful, undefined return.", -2);

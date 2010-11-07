@@ -36,14 +36,14 @@ package com.junkbyte.console.core
 	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.Console;
 
-	public class LogLinks 
+	public class LogReferences 
 	{
 		private static const MAX_VAL_LENGTH:uint = 100;
 		
 		private var _master:Console;
-		private var _linksMap:WeakObject;
-		private var _linksRev:Dictionary;
-		private var _linkIndex:uint = 1;
+		private var _refMap:WeakObject;
+		private var _refRev:Dictionary;
+		private var _refIndex:uint = 1;
 		
 		private var _dofull:Boolean;
 		private var _current:*;// current will be kept as hard reference so that it stays...
@@ -51,28 +51,28 @@ package com.junkbyte.console.core
 		private var _history:Array;
 		private var _hisIndex:uint;
 		
-		public function LogLinks(m:Console) {
+		public function LogReferences(m:Console) {
 			_master = m;
 			
-			_linksMap = new WeakObject();
-			_linksRev = new Dictionary(true);
+			_refMap = new WeakObject();
+			_refRev = new Dictionary(true);
 		}
 		public function setLogRef(o:*):uint{
 			if(!_master.config.useObjectLinking) return 0;
-			var ind:uint = _linksRev[o];
+			var ind:uint = _refRev[o];
 			if(!ind){
-				ind = _linkIndex;
-				_linksMap[ind] = o;
-				_linksRev[o] = ind;
-				_linkIndex++;
+				ind = _refIndex;
+				_refMap[ind] = o;
+				_refRev[o] = ind;
+				_refIndex++;
 			}
 			return ind;
 		}
 		public function getRefId(o:*):uint{
-			return _linksRev[o];
+			return _refRev[o];
 		}
 		public function getRefById(ind:uint):*{
-			return _linksMap[ind];
+			return _refMap[ind];
 		}
 		public function makeString(o:*, prop:String = null, html:Boolean = false, maxlen:int = -1):String{
 			var txt:String;
@@ -235,7 +235,7 @@ package com.junkbyte.console.core
 				report(obj, -2, true);
 				return;
 			}
-			var linkIndex:uint = setLogRef(obj);
+			var refIndex:uint = setLogRef(obj);
 			var menuStr:String;
 			if(_history){
 				menuStr = "<b>[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>]";
@@ -245,10 +245,10 @@ package com.junkbyte.console.core
 				if(_history && _hisIndex < _history.length-1){
 					menuStr += " [<a href='event:reffwd'>Forward</a>]";
 				}
-				menuStr += "</b> || [<a href='event:ref_"+linkIndex+"'>refresh</a>]";
-				menuStr += "</b> [<a href='event:refe_"+linkIndex+"'>explode</a>]";
+				menuStr += "</b> || [<a href='event:ref_"+refIndex+"'>refresh</a>]";
+				menuStr += "</b> [<a href='event:refe_"+refIndex+"'>explode</a>]";
 				if(_master.config.commandLineAllowed){
-					menuStr += " [<a href='event:cl_"+linkIndex+"'>Set scope</a>]";
+					menuStr += " [<a href='event:cl_"+refIndex+"'>Set scope</a>]";
 				}
 				
 				if(viewAll) menuStr += " [<a href='event:refi'>Hide inherited</a>]";
@@ -320,7 +320,7 @@ package com.junkbyte.console.core
 				var mn:XMLList = metadataX.arg;
 				var en:String = mn.(@key=="name").@value;
 				var et:String = mn.(@key=="type").@value;
-				props.push("<a href='event:cl_"+linkIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
+				props.push("<a href='event:cl_"+refIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
 			}
 			if(props.length){
 				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>")+"<br/>", 5, true);
@@ -385,7 +385,7 @@ package com.junkbyte.console.core
 					for each(var paraX:XML in mparamsList){
 						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
 					}
-					str += "<a href='event:cl_"+linkIndex+"_"+methodX.@name+"()'>"+methodX.@name+"</a><p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
+					str += "<a href='event:cl_"+refIndex+"_"+methodX.@name+"()'>"+methodX.@name+"</a><p1>(<i>"+params.join(",")+"</i>):"+methodX.@returnType+"</p1>";
 					report(str, 3, true);
 				}else{
 					inherit++;
@@ -411,7 +411,7 @@ package com.junkbyte.console.core
 					if(access == "readonly") str+= "get";
 					else if(access == "writeonly") str+= "set";
 					else str += "assign";
-					str+= "</p1> <a href='event:cl_"+linkIndex+"_"+accessorX.@name+"'>"+accessorX.@name+"</a><p1>:"+accessorX.@type+"</p1>";
+					str+= "</p1> <a href='event:cl_"+refIndex+"_"+accessorX.@name+"'>"+accessorX.@name+"</a><p1>:"+accessorX.@type+"</p1>";
 					if(access != "writeonly" && (isstatic || !(obj is Class))){
 						var t:Object = isstatic?cls:obj;
 						str+="<p1> = "+makeValue(t, accessorX.@name)+"</p1>";
@@ -433,9 +433,9 @@ package com.junkbyte.console.core
 			nodes = clsV..variable;
 			for each (var variableX:XML in nodes) {
 				if(variableX.parent().name()=="factory"){
-					str = "<p0> var </p0><a href='event:cl_"+linkIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
+					str = "<p0> var </p0><a href='event:cl_"+refIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(obj, variableX.@name)+"</p1>";
 				}else{
-					str = "<p0> <i>static var</i></p0><a href='event:cl_"+linkIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
+					str = "<p0> <i>static var</i></p0><a href='event:cl_"+refIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>:<p1>"+variableX.@type+" = "+makeValue(cls, variableX.@name)+"</p1>";
 				}
 				props.push(str);
 			}
@@ -448,7 +448,7 @@ package com.junkbyte.console.core
 			try{
 				props = [];
 				for (var X:String in obj) {
-					report("<p0> dynamic var </p0><a href='event:cl_"+linkIndex+"_"+X+" = '>"+X+"</a><p1> = "+makeValue(obj, X)+"</p1>", 3, true);
+					report("<p0> dynamic var </p0><a href='event:cl_"+refIndex+"_"+X+" = '>"+X+"</a><p1> = "+makeValue(obj, X)+"</p1>", 3, true);
 				}
 			}catch(e:Error){
 				report("Could not get values due to: "+e, 9, true);
@@ -469,6 +469,46 @@ package com.junkbyte.console.core
 		}
 		private function makeValue(obj:*, prop:String = null):String{
 			return makeString(obj, prop, false, MAX_VAL_LENGTH);
+		}
+		public function explode(obj:Object, depth:int = 3, p:int = 9):String{
+			var t:String = typeof obj;
+			if(obj == null){ 
+				// could be null, undefined, NaN, 0, etc. all should be printed as is
+				return "<p-2>"+obj+"</p-2>";
+			}else if(obj is String){
+				return '"'+safeString(obj as String)+'"';
+			}else if(t != "object" || depth == 0 || obj is ByteArray){
+				return makeString(obj);
+			}
+			if(p<0) p = 0;
+			var V:XML = describeType(obj);
+			var nodes:XMLList, n:String;
+			var list:Array = [];
+			//
+			nodes = V["accessor"];
+			for each (var accessorX:XML in nodes) {
+				n = accessorX.@name;
+				if(accessorX.@access!="writeonly"){
+					try{
+						list.push(n+":"+explode(obj[n], depth-1, p-1));
+					}catch(e:Error){}
+				}else{
+					list.push(n);
+				}
+			}
+			//
+			nodes = V["variable"];
+			for each (var variableX:XML in nodes) {
+				n = variableX.@name;
+				list.push(n+":"+explode(obj[n], depth-1, p-1));
+			}
+			//
+			try{
+				for (var X:String in obj) {
+					list.push(X+":"+explode(obj[X], depth-1, p-1));
+				}
+			}catch(e:Error){}
+			return "<p"+p+">{"+ShortClassName(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
 		}
 	}
 }

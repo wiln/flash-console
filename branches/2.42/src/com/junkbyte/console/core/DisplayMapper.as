@@ -24,67 +24,26 @@
 */
 package com.junkbyte.console.core 
 {
-	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.utils.ByteArray;
-	import flash.utils.describeType;
 	import flash.utils.getQualifiedClassName;
 
-	public class Tools {
+	public class DisplayMapper {
 		
 		private var _master:Console;
 		
 		private var _mapBases:WeakObject;
 		private var _mapBaseIndex:uint = 1;
 		
-		public function Tools(m:Console) {
+		public function DisplayMapper(m:Console) {
 			_master = m;
 			_mapBases = new WeakObject();
 		}
 		public function report(obj:*, priority:Number = 0, skipSafe:Boolean = true, ch:String = null):void{
 			_master.addLine([obj], priority, ch?ch:_master.config.consoleChannel, false, skipSafe, 0);
-		}
-		public function explode(obj:Object, depth:int = 3, p:int = 9):String{
-			var t:String = typeof obj;
-			if(obj == null){ 
-				// could be null, undefined, NaN, 0, etc. all should be printed as is
-				return "<p-2>"+obj+"</p-2>";
-			}else if(t != "object" || depth == 0 || obj is ByteArray){
-				return _master.links.makeString(obj);
-			} 
-			if(p<0) p = 0;
-			var V:XML = describeType(obj);
-			var nodes:XMLList, n:String;
-			var list:Array = [];
-			//
-			nodes = V["accessor"];
-			for each (var accessorX:XML in nodes) {
-				n = accessorX.@name;
-				if(accessorX.@access!="writeonly"){
-					try{
-						list.push(n+":"+explode(obj[n], depth-1, p-1));
-					}catch(e:Error){}
-				}else{
-					list.push(n);
-				}
-			}
-			//
-			nodes = V["variable"];
-			for each (var variableX:XML in nodes) {
-				n = variableX.@name;
-				list.push(n+":"+explode(obj[n], depth-1, p-1));
-			}
-			//
-			try{
-				for (var X:String in obj) {
-					list.push(X+":"+explode(obj[X], depth-1, p-1));
-				}
-			}catch(e:Error){}
-			return "<p"+p+">{"+ShortClassName(obj)+"</p"+p+"> "+list.join(", ")+"<p"+p+">}</p"+p+">";
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(!base){
