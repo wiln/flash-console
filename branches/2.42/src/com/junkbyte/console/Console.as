@@ -65,8 +65,6 @@ package com.junkbyte.console
 		public static const VERSION_STAGE:String = "alpha";
 		public static const BUILD:int = 521;
 		public static const BUILD_DATE:String = "2010/11/06 02:15";
-		
-		public static const LITE:Boolean = false;
 		//
 		public static const NAME:String = "Console";
 		//
@@ -77,7 +75,6 @@ package com.junkbyte.console
 		public static const ERROR:uint = 9;
 		public static const FATAL:uint = 10;
 		//
-		public static const REMAPSPLIT:String = "|";
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
 		//
@@ -308,8 +305,7 @@ package com.junkbyte.console
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			_tools.map(base, maxstep);
 		}
-		public function reMap(path:String):void
-		{
+		public function reMap(path:String):void{
 			if(remote){
 				_remoter.send(Remoting.RMAP, path);
 			}else{

@@ -23,6 +23,7 @@
 * 
 */
 package com.junkbyte.console.view {
+	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.KeyBind;
 	import com.junkbyte.console.utils.ShortClassName;
@@ -141,7 +142,7 @@ package com.junkbyte.console.view {
 				arr.push(mc.name);
 				mc = mc.parent;
 			}
-			return arr.reverse().join(Console.REMAPSPLIT);
+			return arr.reverse().join(DisplayMapper.SPLITTER);
 		}
 		public override function close():void {
 			cancelCaptureKeySet();

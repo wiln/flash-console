@@ -25,6 +25,7 @@
 
 package com.junkbyte.console.view 
 {
+	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
 	import com.junkbyte.console.vos.Log;
@@ -630,7 +631,7 @@ package com.junkbyte.console.view
 			}else if(t.indexOf("clip_")==0){
 				master.reMap(t.substring(5));
 			}else if(t.indexOf("sclip_")==0){
-				master.reMap("0"+Console.REMAPSPLIT+t.substring(6));
+				master.reMap("0"+DisplayMapper.SPLITTER+t.substring(6));
 			}else if(t.indexOf("cl_")==0){
 				var ind:int = t.indexOf("_", 3);
 				var v:* = master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind)));
