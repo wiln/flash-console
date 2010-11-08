@@ -22,12 +22,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.view {
-	import com.junkbyte.console.core.DisplayMapper;
+package com.junkbyte.console.view 
+{
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.KeyBind;
-	import com.junkbyte.console.utils.ShortClassName;
-	
+	import com.junkbyte.console.core.DisplayMapper;
+	import com.junkbyte.console.core.LogReferences;
+
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Stage;
@@ -37,7 +38,7 @@ package com.junkbyte.console.view {
 	import flash.geom.Point;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
-	import flash.utils.Dictionary;	
+	import flash.utils.Dictionary;
 
 	public class RollerPanel extends AbstractPanel{
 		
@@ -116,7 +117,7 @@ package com.junkbyte.console.view {
 						
 						var n:String = obj.name;
 						if(dolink) n = "<a href='event:sclip_"+mapUpward(obj)+"'>"+n+"</a> "+master.links.makeString(obj);
-						n = n+" ("+ShortClassName(obj)+")";
+						n = n+" ("+LogReferences.ShortClassName(obj)+")";
 			
 						if(obj == stg){
 							str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";

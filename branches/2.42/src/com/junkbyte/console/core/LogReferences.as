@@ -25,16 +25,16 @@
 
 package com.junkbyte.console.core 
 {
-	import flash.utils.ByteArray;
-	import com.junkbyte.console.utils.ShortClassName;
-	import flash.utils.describeType;
-	import flash.utils.getQualifiedClassName;
+	import com.junkbyte.console.Console;
+	import com.junkbyte.console.vos.WeakObject;
+
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.utils.getDefinitionByName;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
-	import com.junkbyte.console.vos.WeakObject;
-	import com.junkbyte.console.Console;
+	import flash.utils.describeType;
+	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 
 	public class LogReferences 
 	{
@@ -511,6 +511,16 @@ package com.junkbyte.console.core
 		}
 		private function stepExp(o:*, n:String, d:int, p:int):String{
 			return n+":"+explode(o[n], d-1, p-1);
+		}	
+		
+		/** 
+		 * Produces class name without package path
+		 * e.g: flash.display.Sprite => Sprite
+		 */	
+		public static function ShortClassName(cls:Object):String{
+			var str:String = getQualifiedClassName(cls);
+			var ind:int = str.lastIndexOf("::");
+			return str.substring(ind>=0?(ind+2):0);
 		}
 	}
 }

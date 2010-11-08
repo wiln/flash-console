@@ -29,7 +29,6 @@ package com.junkbyte.console.core
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.utils.getQualifiedClassName;
 
 	public class DisplayMapper {
 		

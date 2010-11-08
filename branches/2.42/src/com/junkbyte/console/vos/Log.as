@@ -26,40 +26,40 @@ package com.junkbyte.console.vos {
 	import flash.utils.ByteArray;
 	
 	public class Log{
-		public var t:String;
-		public var c:String;
-		public var p:int;
-		public var r:Boolean;
-		public var s:Boolean;
+		public var text:String;
+		public var ch:String;
+		public var priority:int;
+		public var repeat:Boolean;
+		public var html:Boolean;
 		//
 		public var next:Log;
 		public var prev:Log;
 		//
-		public function Log(txt:String, ch:String, pr:int, repeating:Boolean = false, skipSafe:Boolean = false){
-			t = txt;
-			c = ch;
-			p = pr;
-			r = repeating;
-			s = skipSafe;
+		public function Log(txt:String, cc:String, pp:int, repeating:Boolean = false, skipSafe:Boolean = false){
+			text = txt;
+			ch = cc;
+			priority = pp;
+			repeat = repeating;
+			html = skipSafe;
 		}
 		public function toBytes():ByteArray{
 			var bytes:ByteArray = new ByteArray();
-			bytes.writeUTF(t);
-			bytes.writeUTF(c);
-			bytes.writeInt(p);
-			bytes.writeBoolean(r);
+			bytes.writeUTF(text);
+			bytes.writeUTF(ch);
+			bytes.writeInt(priority);
+			bytes.writeBoolean(repeat);
 			return bytes;
 		}
 		
 		public function plainText():String{
-			return t.replace(/<.*?>/g, "");
+			return text.replace(/<.*?>/g, "");
 		}
 		public function toString():String{
-			return "["+c+"] " + plainText();
+			return "["+ch+"] " + plainText();
 		}
 		
 		public function clone():Log{
-			return new Log(t, c, p, r, s);
+			return new Log(text, ch, priority, repeat, html);
 		}
 	}
 }

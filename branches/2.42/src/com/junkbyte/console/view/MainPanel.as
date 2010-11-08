@@ -275,12 +275,12 @@ package com.junkbyte.console.view
 			var line:Log = master.logs.last;
 			while(line){
 				if(lineShouldShow(line)){
-					var numlines:int = Math.ceil(line.t.length/ maxchars);
-					if(line.s || linesLeft >= numlines ){
+					var numlines:int = Math.ceil(line.text.length/ maxchars);
+					if(line.html || linesLeft >= numlines ){
 						lines.push(makeLine(line));
 					}else{
 						line = line.clone();
-						line.t = line.t.substring(Math.max(0,line.t.length-(maxchars*linesLeft)));
+						line.text = line.text.substring(Math.max(0,line.text.length-(maxchars*linesLeft)));
 						lines.push(makeLine(line));
 						break;
 					}
@@ -301,11 +301,11 @@ package com.junkbyte.console.view
 			return (
 				(
 					_viewingChannels.length == 0
-			 		|| _viewingChannels.indexOf(line.c)>=0 
-			 		|| (_filterText && _viewingChannels.indexOf(config.filteredChannel) >= 0 && line.t.toLowerCase().indexOf(_filterText)>=0 )
-			 		|| (_filterRegExp && _viewingChannels.indexOf(config.filteredChannel)>=0 && line.t.search(_filterRegExp)>=0 )
+			 		|| _viewingChannels.indexOf(line.ch)>=0 
+			 		|| (_filterText && _viewingChannels.indexOf(config.filteredChannel) >= 0 && line.text.toLowerCase().indexOf(_filterText)>=0 )
+			 		|| (_filterRegExp && _viewingChannels.indexOf(config.filteredChannel)>=0 && line.text.search(_filterRegExp)>=0 )
 			 	) 
-			 	&& ( _priority <= 0 || line.p >= _priority)
+			 	&& ( _priority <= 0 || line.priority >= _priority)
 			);
 		}
 		public function get viewingChannels():Array{
@@ -359,9 +359,9 @@ package com.junkbyte.console.view
 		}
 		private function makeLine(line:Log):String{
 			var str:String = "";
-			var txt:String = line.t;
-			if(line.c != config.defaultChannel && (_viewingChannels.length == 0 || _viewingChannels.length>1)){
-				txt = "[<a href=\"event:channel_"+line.c+"\">"+line.c+"</a>] "+txt;
+			var txt:String = line.text;
+			if(line.ch != config.defaultChannel && (_viewingChannels.length == 0 || _viewingChannels.length>1)){
+				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+txt;
 			}
 			if(_filterRegExp){
 				txt = txt.replace(_filterRegExp, "<u>$1</u>");
@@ -374,7 +374,7 @@ package com.junkbyte.console.view
 					index = lowercase.lastIndexOf(_filterText, index-2);
 				}
 			}
-			var ptag:String = "p"+line.p;
+			var ptag:String = "p"+line.priority;
 			str += "<p><"+ptag+">" + txt + "</"+ptag+"></p>";
 			return str;
 		}
@@ -682,8 +682,8 @@ package com.junkbyte.console.view
 			while(line && i>0){
 				i--;
 				if(lineShouldShow(line)){
-					if(line.p > p && top>line.p) top = line.p;
-					if(line.p < p && bottom<line.p) bottom = line.p;
+					if(line.priority > p && top>line.priority) top = line.priority;
+					if(line.priority < p && bottom<line.priority) bottom = line.priority;
 				}
 				line = line.prev;
 			}

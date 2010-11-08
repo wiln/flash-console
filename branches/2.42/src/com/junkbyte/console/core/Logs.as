@@ -53,7 +53,7 @@ package com.junkbyte.console.core {
 			}
 		}
 		public function add(line:Log, isRepeating:Boolean):Boolean{
-			addChannel(line.c);
+			addChannel(line.ch);
 			if(isRepeating){
 				if(_repeating > 0 && _lastRepeat){
 					_newRepeat = line;
@@ -76,7 +76,7 @@ package com.junkbyte.console.core {
 			if(channel){
 				var line:Log = first;
 				while(line){
-					if(line.c == channel){
+					if(line.ch == channel){
 						remove(line);
 					}
 					line = line.next;
@@ -128,7 +128,7 @@ package com.junkbyte.console.core {
 			_channels = new Object();
 			var line:Log = first;
 			while(line){
-				addChannel(line.c);
+				addChannel(line.ch);
 				line = line.next;
 			}
 		}

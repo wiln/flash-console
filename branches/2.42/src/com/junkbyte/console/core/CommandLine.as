@@ -25,7 +25,6 @@
 package com.junkbyte.console.core 
 {
 	import com.junkbyte.console.Console;
-	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.vos.WeakRef;
 
@@ -101,7 +100,7 @@ package com.junkbyte.console.core
 				report("ERROR: Give a name to save.",10);
 				return;
 			}
-			strong = (strong || obj is Function);
+			strong |= obj is Function;
 			n = n.replace(/[^\w]*/g, "");
 			if(RESERVED.indexOf(n)>=0){
 				report("ERROR: The name ["+n+"] is reserved",10);
@@ -116,7 +115,7 @@ package com.junkbyte.console.core
 			}
 		}
 		public function get scopeString():String{
-			return ShortClassName(_scope);
+			return LogReferences.ShortClassName(_scope);
 		}
 		private function addCLCmd(n:String, callback:Function, desc:String):void{
 			var split:Array = n.split("|");

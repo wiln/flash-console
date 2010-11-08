@@ -29,14 +29,13 @@ package com.junkbyte.console
 	import com.junkbyte.console.core.Graphing;
 	import com.junkbyte.console.core.KeyBinder;
 	import com.junkbyte.console.core.LogReferences;
+	import com.junkbyte.console.core.Logs;
 	import com.junkbyte.console.core.MemoryMonitor;
 	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.core.UserData;
-	import com.junkbyte.console.utils.ShortClassName;
 	import com.junkbyte.console.view.PanelsManager;
 	import com.junkbyte.console.view.RollerPanel;
 	import com.junkbyte.console.vos.Log;
-	import com.junkbyte.console.core.Logs;
 
 	import flash.display.DisplayObjectContainer;
 	import flash.display.LoaderInfo;
@@ -540,7 +539,7 @@ package com.junkbyte.console
 		private function addCh(channel:*, newLine:Array, priority:int = 2, isRepeating:Boolean = false):void{
 			var chn:String;
 			if(channel is String) chn = channel as String;
-			else if(channel) chn = ShortClassName(channel);
+			else if(channel) chn = LogReferences.ShortClassName(channel);
 			else chn = _config.defaultChannel;
 			addLine(newLine, priority,chn, isRepeating);
 		}
