@@ -37,6 +37,7 @@ package com.junkbyte.console.core
 		private static const DISABLED:String = "CommandLine is disabled.";
 		
 		private static const INTSTACKS:int = 1; // max number of internal (commandLine) stack traces
+		private static const CMD:String = "cmd";
 		
 		public static const BASE:String = "base";
 		
@@ -57,6 +58,8 @@ package com.junkbyte.console.core
 			_slashCmds = new Object();
 			_prevScope = new WeakRef(m);
 			_saved.set("C", m);
+			
+			_master.remoter.registerClient(CMD, run);
 			
 			addCLCmd("help", printHelp, "How to use command line");
 			addCLCmd("save|store", saveCmd, "Save current scope as weak reference. (same as Cc.store(...))");
@@ -135,6 +138,17 @@ package com.junkbyte.console.core
 			else _slashCmds[n] = new SlashCommand(n, callback, desc);
 		}
 		public function run(str:String):* {
+			if(_master.remote){
+				if(str && str.charAt(0) == "~"){
+					str = str.substring(1);
+				}else{
+					report("Run command at remote: "+str,-2);
+					if(!_master.remoter.send(CMD, str)){
+						report("Command could not be sent to client.", 10);
+					}
+					return null;
+				}
+			}
 			if(!_master.config.commandLineAllowed) {
 				report(DISABLED,10);
 				return null;

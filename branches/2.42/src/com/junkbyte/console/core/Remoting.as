@@ -39,26 +39,23 @@ package com.junkbyte.console.core
 
 	public class Remoting extends EventDispatcher{
 		
+		public static const NONE:uint = 0;
+		public static const SENDER:uint = 1;
+		public static const RECIEVER:uint = 2;
+		
 		private static const MAXSIZE:uint = 36000; // real limit is 40kb
-		
-		private static const RECIEVER:String = "R";
-		private static const SENDER:String = "C";
-		
+
 		private static const LOGIN:String = "login";
 		private static const LOGINREQUEST:String = "requestLogin";
 		private static const LOGINFAIL:String = "loginFail";
 		private static const LOGINSUCCESS:String = "loginSuccess";
 		private static const SYNC:String = "sync";
-		public static const GC:String = "gc";
-		public static const RMAP:String = "remap";
-		public static const FPS:String = "fps";
-		public static const MEM:String = "mem";
-		public static const CMD:String = "cmd";
-		public static const REF:String = "ref";
+		
 		
 		private var _c:Console;
 		private var _cfg:ConsoleConfig;
-		private var _mode:String;
+		private var _client:Object;
+		private var _mode:uint;
 		private var _connection:LocalConnection;
 		private var _queue:Array;
 		
@@ -74,6 +71,12 @@ package com.junkbyte.console.core
 			_c = m;
 			_cfg = _c.config;
 			_password = pass;
+			_client = new Object();
+			_client[LOGIN] = login;
+			_client[LOGINREQUEST] = requestLogin;
+			_client[LOGINFAIL] = loginFail;
+			_client[LOGINSUCCESS] = loginSuccess;
+			_client[SYNC] = remoteSync;
 		}
 		public function set remotingPassword(str:String):void{
 			_password = str;
@@ -239,7 +242,7 @@ package com.junkbyte.console.core
 			_c.report("Go to Settings Manager [<a href='event:settings'>click here</a>] &gt; 'Global Security Settings Panel' (on left) &gt; add the location of the local flash (swf) file.", -2);
 		}
 		
-		private function startSharedConnection(targetmode:String):Boolean{
+		private function startSharedConnection(targetmode:uint):Boolean{
 			close();
 			_mode = targetmode;
 			_connection = new LocalConnection();
@@ -248,19 +251,7 @@ package com.junkbyte.console.core
 				_connection.allowInsecureDomain(_cfg.allowedRemoteDomain);
 			}
 			_connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR , onRemotingSecurityError, false, 0, true);
-			var o:Object = new Object();
-			o[LOGIN] = login;
-			o[LOGINREQUEST] = requestLogin;
-			o[LOGINFAIL] = loginFail;
-			o[LOGINSUCCESS] = loginSuccess;
-			o[SYNC] = remoteSync;
-			o[RMAP] = _c.reMap;
-			o[GC] = _c.gc;
-			o[FPS] = fpsRequest;
-			o[MEM] = memRequest;
-			o[CMD] = _c.runCommand;
-			o[REF] = _c.links.handleString;
-			_connection.client = o;
+			_connection.client = _client;
 			
 			try{
 				_connection.connect(_cfg.remotingConnectionName+_mode);
@@ -269,11 +260,8 @@ package com.junkbyte.console.core
 			}
 			return true;
 		}
-		private function fpsRequest(b:Boolean):void{
-			_c.fpsMonitor = b;
-		}
-		private function memRequest(b:Boolean):void{
-			_c.memoryMonitor = b;
+		public function registerClient(key:String, fun:Function):void{
+			_client[key] = fun;
 		}
 		private function loginFail():void{
 			if(!isRemote) return;
@@ -318,7 +306,7 @@ package com.junkbyte.console.core
 					_c.report("Remote.close: "+error, 10);
 				}
 			}
-			_mode = null;
+			_mode = NONE;
 			_connection = null;
 		}
 		//

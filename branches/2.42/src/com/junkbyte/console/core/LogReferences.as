@@ -38,9 +38,11 @@ package com.junkbyte.console.core
 
 	public class LogReferences 
 	{
-		private static const MAX_VAL_LENGTH:uint = 100;
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
+		
+		private static const MAX_VAL_LENGTH:uint = 100;
+		public static const REF:String = "ref";
 		
 		private var _master:Console;
 		private var _refMap:WeakObject;
@@ -58,6 +60,8 @@ package com.junkbyte.console.core
 			
 			_refMap = new WeakObject();
 			_refRev = new Dictionary(true);
+			
+			_master.remoter.registerClient(REF, handleString);
 		}
 		public function setLogRef(o:*):uint{
 			if(!_master.config.useObjectLinking) return 0;
@@ -156,12 +160,12 @@ package com.junkbyte.console.core
 		}
 		public function handleRefEvent(str:String):void{
 			if(_master.remote){
-				_master.remoter.send(Remoting.REF, str);
+				_master.remoter.send(REF, str);
 			}else{
 				handleString(str);
 			}
 		}
-		public function handleString(str:String):void{
+		private function handleString(str:String):void{
 			if(str == ""){
 				exitFocus();
 			}else if(str == "refprev"){
@@ -219,7 +223,7 @@ package com.junkbyte.console.core
 			_history = null;
 			_hisIndex = 0;
 			if(_master.remote){
-				_master.remoter.send(Remoting.REF, "");
+				_master.remoter.send(REF, "");
 			}
 			_master.clear(LogReferences.INSPECTING_CHANNEL);
 		}

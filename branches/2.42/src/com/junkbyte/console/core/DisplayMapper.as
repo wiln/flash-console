@@ -33,6 +33,7 @@ package com.junkbyte.console.core
 	public class DisplayMapper {
 		
 		public static const SPLITTER:String = "|";
+		private static const RMAP:String = "remap";
 		
 		private var _master:Console;
 		
@@ -41,6 +42,7 @@ package com.junkbyte.console.core
 		
 		public function DisplayMapper(m:Console) {
 			_master = m;
+			_master.remoter.registerClient(RMAP, reMap);
 			_mapBases = new WeakObject();
 		}
 		public function report(obj:*, priority:Number = 0):void{
@@ -122,7 +124,12 @@ package com.junkbyte.console.core
 			report(base.name+":"+_master.links.makeString(base)+" has "+list.length+" children/sub-children.", 10);
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
-		public function reMap(path:String, mc:DisplayObjectContainer):DisplayObject{
+		public function reMap(path:String):void{
+			if(_master.remote){
+				_master.remoter.send(RMAP, path);
+				return;
+			}
+			var mc:DisplayObjectContainer = _master.stage;
 			var pathArr:Array = path.split(SPLITTER);
 			var first:String = pathArr.shift();
 			if(first != "0") mc = _mapBases[first];
@@ -138,11 +145,10 @@ package com.junkbyte.console.core
 						break;
 					}
 				}
-				return child;
+				_master.cl.setReturned(child, true);
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
 			}
-			return null;
 		}
 	}
 }

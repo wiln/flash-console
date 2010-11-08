@@ -46,7 +46,6 @@ package com.junkbyte.console
 	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
 	import flash.utils.getQualifiedClassName;
-	import flash.utils.getTimer;
 
 	//import com.junkbyte.console.core.ObjectsMonitor;
 	
@@ -105,13 +104,14 @@ package com.junkbyte.console
 			tabChildren = false; // Tabbing is not supported
 			_config = config?config:new ConsoleConfig();
 			//
+			_remoter = new Remoting(this, pass);
 			_logs = new Logs(_config);
 			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
 			_links = new LogReferences(this);
 			_cl = new CommandLine(this);
 			_mapper =  new DisplayMapper(this);
-			_graphing = new Graphing(report);
-			_remoter = new Remoting(this, pass);
+			_graphing = new Graphing(this);
+			_mm = new MemoryMonitor(this);
 			_kb = new KeyBinder(pass);
 			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
 			
@@ -236,69 +236,34 @@ package com.junkbyte.console
 		}
 		//
 		public function get fpsMonitor():Boolean{
-			if(_remoter.isRemote) return panels.fpsMonitor;
 			return _graphing.fpsMonitor;
 		}
 		public function set fpsMonitor(b:Boolean):void{
-			if(_remoter.isRemote){
-				_remoter.send(Remoting.FPS, b);
-			}else{
-				_graphing.fpsMonitor = b;
-				panels.mainPanel.updateMenu();
-			}
+			_graphing.fpsMonitor = b;
 		}
 		//
 		public function get memoryMonitor():Boolean{
-			if(_remoter.isRemote) return panels.memoryMonitor;
 			return _graphing.memoryMonitor;
 		}
 		public function set memoryMonitor(b:Boolean):void{
-			if(_remoter.isRemote){
-				_remoter.send(Remoting.MEM, b);
-			}else{
-				_graphing.memoryMonitor = b;
-				panels.mainPanel.updateMenu();
-			}
+			_graphing.memoryMonitor = b;
 		}
 		
 		//
 		public function watch(o:Object,n:String = null):String{
-			var className:String = getQualifiedClassName(o);
-			if(!n) n = className+"@"+getTimer();
-			if(!_mm) _mm = new MemoryMonitor();
-			var nn:String = _mm.watch(o,n);
-			if(!config.quiet) report("Watching <b>"+className+"</b> as <p5>"+ nn +"</p5>.",-1);
-			return nn;
+			return _mm.watch(o,n);
 		}
 		public function unwatch(n:String):void{
-			if(_mm) _mm.unwatch(n);
+			_mm.unwatch(n);
 		}
 		public function gc():void{
-			if(remote){
-				try{
-					report("Sending garbage collection request to client",-1);
-					_remoter.send(Remoting.GC);
-				}catch(e:Error){
-					report(e,10);
-				}
-			}else{
-				var ok:Boolean = MemoryMonitor.Gc();
-				var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
-				report(str,(ok?-1:10));
-			}
+			_mm.gc();
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):void{
 			_cl.store(n, obj, strong);
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			_mapper.map(base, maxstep);
-		}
-		public function reMap(path:String):void{
-			if(remote){
-				_remoter.send(Remoting.RMAP, path);
-			}else{
-				_cl.setReturned(_mapper.reMap(path, stage), true);
-			}
 		}
 		public function inspect(obj:Object, detail:Boolean = true):void{
 			_links.inspect(obj,detail);
@@ -348,13 +313,7 @@ package com.junkbyte.console
 		//
 		private function _onEnterFrame(e:Event):void{
 			_logs.tick();
-			if(_mm){
-				var arr:Array = _mm.update();
-				if(arr.length>0){
-					report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
-					if(_mm.count == 0) _mm = null;
-				}
-			}
+			_mm.update();
 			var graphsList:Array;
 			if(!_remoter.isRemote){
 			 	//om = _om.update();
@@ -467,21 +426,6 @@ package com.junkbyte.console
 		public function get commandLine ():Boolean{
 			return _panels.mainPanel.commandLine;
 		}
-		public function runCommand(line:String):*{
-			if(_remoter.isRemote){
-				if(line && line.charAt(0) == "~"){
-					return _cl.run(line.substring(1));
-				}else{
-					report("Run command at remote: "+line,-2);
-					if(!_remoter.send(Remoting.CMD, line)){
-						report("Command could not be sent to client.", 10);
-					}
-				}
-			}else{
-				return _cl.run(line);
-			}
-			return null;
-		}
 		public function addSlashCommand(n:String, callback:Function):void{
 			_cl.addSlashCommand(n, callback);
 		}
@@ -563,5 +507,6 @@ package com.junkbyte.console
 		public function get graphing():Graphing{return _graphing;}
 		public function get links():LogReferences{return _links;}
 		public function get logs():Logs{return _logs;}
+		public function get mapper():DisplayMapper{return _mapper;}
 	}
 }

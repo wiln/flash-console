@@ -628,9 +628,9 @@ package com.junkbyte.console.view
 			}else if(t.indexOf("channel_")==0){
 				onChannelPressed(t.substring(8));
 			}else if(t.indexOf("clip_")==0){
-				master.reMap(t.substring(5));
+				master.mapper.reMap(t.substring(5));
 			}else if(t.indexOf("sclip_")==0){
-				master.reMap("0"+DisplayMapper.SPLITTER+t.substring(6));
+				master.mapper.reMap("0"+DisplayMapper.SPLITTER+t.substring(6));
 			}else if(t.indexOf("cl_")==0){
 				var ind:int = t.indexOf("_", 3);
 				var v:* = master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind)));
@@ -732,7 +732,7 @@ package com.junkbyte.console.view
 						master.ud.commandLineHistoryChanged();
 					}
 					_cmdField.text = "";
-					master.runCommand(txt);
+					master.cl.run(txt);
 				}
 			}if( e.keyCode == Keyboard.ESCAPE){
 				if(stage) stage.focus = null;
