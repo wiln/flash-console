@@ -92,7 +92,7 @@ package com.junkbyte.console.core
 				}
 				return err.toString();
 			}else if(v is XML || v is XMLList){
-				return shortenString(safeString(v.toXMLString()), maxlen, o, prop);
+				return shortenString(EscHTML(v.toXMLString()), maxlen, o, prop);
 			}else if(v is Array || getQualifiedClassName(v).indexOf("__AS3__.vec::Vector.") == 0){
 				// note: using getQualifiedClassName for vector for backward compatibility
 				// Need to specifically cast to string in array to produce correct results
@@ -119,7 +119,7 @@ package com.junkbyte.console.core
 			}else{
 				txt = String(v);
 				if(!html){
-					return shortenString(safeString(txt), maxlen, o, prop);
+					return shortenString(EscHTML(txt), maxlen, o, prop);
 				}
 			}
 			return txt;
@@ -146,10 +146,6 @@ package com.junkbyte.console.core
 				return "{"+genLinkString(v, null, ShortClassName(v))+"}";
 			}
 			return "{"+ShortClassName(v)+"}";
-		}
-		public function safeString(str:String):String{
-			str = str.replace(/</gm, "&lt;");
-	 		return str.replace(new RegExp(">", "gm"), "&gt;");
 		}
 		private function historyInc(i:int):void{
 			_hisIndex+=i;
@@ -455,11 +451,11 @@ package com.junkbyte.console.core
 			if(obj is String){
 				report();
 				report("String", 10);
-				report(safeString(obj));
+				report(EscHTML(obj));
 			}else if(obj is XML || obj is XMLList){
 				report();
 				report("XMLString", 10);
-				report(safeString(obj.toXMLString()));
+				report(EscHTML(obj.toXMLString()));
 			}
 			if(menuStr){
 				report();
@@ -475,7 +471,7 @@ package com.junkbyte.console.core
 				// could be null, undefined, NaN, 0, etc. all should be printed as is
 				return "<p-2>"+obj+"</p-2>";
 			}else if(obj is String){
-				return '"'+safeString(obj as String)+'"';
+				return '"'+EscHTML(obj as String)+'"';
 			}else if(t != "object" || depth == 0 || obj is ByteArray){
 				return makeString(obj);
 			}
@@ -513,6 +509,10 @@ package com.junkbyte.console.core
 			return n+":"+explode(o[n], d-1, p-1);
 		}	
 		
+		public static function EscHTML(str:String):String{
+			str = str.replace(/</gm, "&lt;");
+	 		return str.replace(new RegExp(">", "gm"), "&gt;");
+		}
 		/** 
 		 * Produces class name without package path
 		 * e.g: flash.display.Sprite => Sprite

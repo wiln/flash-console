@@ -31,10 +31,10 @@ package com.junkbyte.console.vos {
 		private var _strong:Boolean; // strong flag
 		
 		//
+		// Known issue: storing a function reference that's on timeline don't seem to work on next frame. fix = manually store as strong ref.
 		// There is abilty to use strong reference incase you need to mix - 
 		// weak and strong references together somewhere
 		public function WeakRef(ref:*, strong:Boolean = false) {
-			if(ref is Function) strong = true; // Function must be strong ref, for now :/
 			_strong = strong;
 			reference = ref;
 		}

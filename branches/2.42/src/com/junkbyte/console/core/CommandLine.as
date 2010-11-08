@@ -100,7 +100,6 @@ package com.junkbyte.console.core
 				report("ERROR: Give a name to save.",10);
 				return;
 			}
-			strong |= obj is Function;
 			n = n.replace(/[^\w]*/g, "");
 			if(RESERVED.indexOf(n)>=0){
 				report("ERROR: The name ["+n+"] is reserved",10);
@@ -250,10 +249,10 @@ package com.junkbyte.console.core
 			var sii:uint = 0;
 			var sii2:uint = 0;
 			for(var X:String in _saved){
-				var sao:* = _saved[X];
+				var ref:WeakRef = _saved.getWeakRef(X);
 				sii++;
-				if(sao==null) sii2++;
-				report("<b>$"+X+"</b> = "+_master.links.makeString(sao), -2);
+				if(ref.reference==null) sii2++;
+				report((ref.strong?"strong":"weak")+" <b>$"+X+"</b> = "+_master.links.makeString(ref.reference), -2);
 			}
 			report("Found "+sii+" item(s), "+sii2+" empty.", -1);
 		}

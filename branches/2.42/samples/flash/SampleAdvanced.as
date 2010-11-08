@@ -101,7 +101,6 @@ package
 			var arr:Array = ["a","b","c",temp, o];
 			Cc.log("Going to Cc.explode() a junk of values below...");
 			Cc.explode(arr);
-			
 			Cc.log("___");
 			ba = new ByteArray();
 			ba.writeUTF("HA! You found the secret byte array string!");

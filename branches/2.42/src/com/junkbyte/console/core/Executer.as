@@ -24,6 +24,8 @@
 */
 package com.junkbyte.console.core 
 {
+	import com.junkbyte.console.vos.WeakObject;
+
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.utils.getDefinitionByName;
@@ -222,11 +224,11 @@ package com.junkbyte.console.core
 					result = reg.exec(str);
 					if(result==null){
 						seq.push(str.substring(lastindex, index));
-						seq.push(operation.replace(/\s/g, ""));
+						seq.push(ignoreWhite(operation));
 						seq.push(str.substring(index+operation.length));
 					}else{
 						seq.push(str.substring(lastindex, index));
-						seq.push(operation.replace(/\s/g, ""));
+						seq.push(ignoreWhite(operation));
 						lastindex = index+operation.length;
 					}
 				}
@@ -333,7 +335,7 @@ package com.junkbyte.console.core
 					var newbase:* = newv.value;
 					var closeindex:int = str.indexOf(")", index);
 					var paramstr:String = str.substring(index+1, closeindex);
-					paramstr = paramstr.replace(/\s/g,"");
+					paramstr = ignoreWhite(paramstr);
 					var params:Array = [];
 					if(paramstr){
 						params = execValue(paramstr).value;
@@ -407,7 +409,9 @@ package com.junkbyte.console.core
 				if(_reserved.indexOf(key)<0){
 					v.obj = _saved;
 					v.prop = key;
-				}else{
+				}else if(_saved is WeakObject){
+					v.obj = WeakObject(_saved).get(key);
+				}else {
 					v.obj = _saved[key];
 				}
 			}else{
@@ -490,7 +494,7 @@ package com.junkbyte.console.core
 			if(openindex>0){
 				var closeindex:int = str.indexOf(")", openindex);
 				var paramstr:String = str.substring(openindex+1, closeindex);
-				paramstr = paramstr.replace(/\s/g,"");
+				paramstr = ignoreWhite(paramstr);
 				var p:Array = [];
 				if(paramstr){
 					p = execValue(paramstr).value;

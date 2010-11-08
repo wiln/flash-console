@@ -22,10 +22,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package {
-	
-	import com.junkbyte.console.ConsoleConfig;
+package 
+{
 	import com.junkbyte.console.Cc;
+	import com.junkbyte.console.ConsoleConfig;
 
 	import flash.display.*;
 	import flash.events.*;
@@ -46,6 +46,7 @@ package {
 			Cc.start(this, "", config);
 			Cc.remote = true;
 			Cc.commandLine = true;
+			Cc.config.maxRepeats = 200;
 			
 			//
 			// This is special case for remote to disable scaling and moving

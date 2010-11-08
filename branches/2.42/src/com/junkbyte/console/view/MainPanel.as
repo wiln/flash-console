@@ -327,7 +327,7 @@ package com.junkbyte.console.view
 		public function set filterText(str:String):void{
 			if(str){
 				_filterRegExp = null;
-				_filterText = master.links.safeString(str.toLowerCase());
+				_filterText = LogReferences.EscHTML(str.toLowerCase());
 				startFilter();
 			}else{
 				endFilter();
@@ -336,7 +336,7 @@ package com.junkbyte.console.view
 		public function set filterRegExp(expstr:String):void{
 			if(expstr){
 				_filterText = null;
-				_filterRegExp = new RegExp("("+master.links.safeString(expstr)+")", "gi");
+				_filterRegExp = new RegExp("("+LogReferences.EscHTML(expstr)+")", "gi");
 				startFilter();
 			}else{
 				endFilter();

@@ -85,7 +85,7 @@ package
 			// advanced logging
 			//
 			Cc.add("My advanced log in priority 7.", 7);
-			Cc.add("My advanced log in priority 2, 1 (no repeats)", 2, true);
+			/*Cc.add("My advanced log in priority 2, 1 (no repeats)", 2, true);
 			Cc.add("My advanced log in priority 2, 2 (no repeats)", 2, true);
 			Cc.add("My advanced log in priority 2, 3 (no repeats)", 2, true);
 			// When 'no repeat' (3rd param) is set to true, it will not generate new lines for each log.
@@ -97,14 +97,31 @@ package
 			Cc.ch("chn", "Advanced log in priority 7.", 7);
 			Cc.ch("chn", "Advanced log in priority 3, 1 (no repeats)", 3, true);
 			Cc.ch("chn", "Advanced log in priority 3, 2 (no repeats)", 3, true);
-			Cc.ch("chn", "Advanced log in priority 3, 3 (no repeats)", 3, true);
+			Cc.ch("chn", "Advanced log in priority 3, 3 (no repeats)", 3, true);*/
 			
-			
+			a();
 			
 			//
 			// End of demo code
 			//
 			setupUI();
+		}
+		
+		function a():void
+		{
+			b();
+		}
+		function b():void
+		{
+			c();
+		}
+		function c():void
+		{
+			d();
+		}
+		function d():void
+		{
+			Cc.stack("HI!");
 		}
 		private function setupUI():void{
 			TextField(txtPriority).restrict = "0-9";
@@ -140,7 +157,7 @@ package
 						_interval = 0;
 						btnInterval.txt.text = "Start Interval";
 					}else{
-						_interval = setInterval(onIntervalEvent,100);
+						_interval = setInterval(onIntervalEvent,50);
 						btnInterval.txt.text = "Stop Interval";
 					}
 				break;
@@ -150,7 +167,7 @@ package
 			}
 		}
 		private function onIntervalEvent():void{
-			Cc.add("Repeative log _ " + getTimer(), 5,true);
+			Cc.ch("test", "Repeative log _ " + getTimer(), 5,true);
 		}
 		private function spam():void{
 			for(var i:int = 0;i<100;i++){
