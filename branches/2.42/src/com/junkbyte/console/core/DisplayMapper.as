@@ -111,7 +111,7 @@ package com.junkbyte.console.core
 					}else{
 						n = "<i>"+n+"</i>";
 					}
-					str += n+" ("+getQualifiedClassName(mcDO)+")";
+					str += n+" "+_master.links.makeString(mcDO);
 					report(str,mcDO is DisplayObjectContainer?5:2);
 				}else if(!wasHiding){
 					wasHiding = true;
@@ -120,7 +120,7 @@ package com.junkbyte.console.core
 				lastmcDO = mcDO;
 			}
 			_mapBaseIndex++;
-			report(base.name+":"+getQualifiedClassName(base)+" has "+list.length+" children/sub-children.", 10);
+			report(base.name+":"+_master.links.makeString(base)+" has "+list.length+" children/sub-children.", 10);
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
 		public function reMap(path:String, mc:DisplayObjectContainer):DisplayObject{
@@ -142,7 +142,6 @@ package com.junkbyte.console.core
 				return child;
 			} catch (e:Error) {
 				report("Problem getting the clip reference. Display list must have changed since last map request",10);
-				//debug(e.getStackTrace());
 			}
 			return null;
 		}

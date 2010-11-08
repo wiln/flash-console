@@ -27,7 +27,7 @@ package com.junkbyte.console.core {
 	import com.junkbyte.console.ConsoleConfig;
 	public class Logs{
 		
-		private var _channels:Array;
+		private var _channels:Object;
 		private var _config:ConsoleConfig;
 		private var _repeating:uint;
 		private var _lastRepeat:Log;
@@ -40,10 +40,7 @@ package com.junkbyte.console.core {
 		
 		public function Logs(config:ConsoleConfig){
 			_config = config;
-			_channels = new Array(_config.globalChannel, _config.defaultChannel);
-		}
-		public function get channels():Array{
-			return _channels;
+			_channels = new Object();
 		}
 		
 		public function tick():void{
@@ -56,9 +53,7 @@ package com.junkbyte.console.core {
 			}
 		}
 		public function add(line:Log, isRepeating:Boolean):Boolean{
-			if(_channels.indexOf(line.c) < 0){
-				_channels.push(line.c);
-			}
+			addChannel(line.c);
 			if(isRepeating){
 				if(_repeating > 0 && _lastRepeat){
 					_newRepeat = line;
@@ -86,14 +81,12 @@ package com.junkbyte.console.core {
 					}
 					line = line.next;
 				}
-				var ind:int = _channels.indexOf(channel);
-				if(ind>=0) _channels.splice(ind,1);
+				delete _channels[channel];
 			}else{
 				first = null;
 				last = null;
 				_length = 0;
-				_channels.splice(0);
-				_channels.push(_config.globalChannel, _config.defaultChannel);
+				_channels = new Object();
 			}
 		}
 		public function getLogsAsBytes():Array{
@@ -114,8 +107,34 @@ package com.junkbyte.console.core {
 			}
 			return str;
 		}
-		
-		
+		public function getChannels():Array{
+			var arr:Array = new Array(_config.globalChannel);
+			addIfexist(_config.defaultChannel, arr);
+			addIfexist(_config.filteredChannel, arr);
+			addIfexist(LogReferences.INSPECTING_CHANNEL, arr);
+			addIfexist(_config.consoleChannel, arr);
+			var others:Array = new Array();
+			for(var X:String in _channels){
+				if(arr.indexOf(X)<0){
+					others.push(X);
+				}
+			}
+			return arr.concat(others.sort(Array.CASEINSENSITIVE));
+		}
+		private function addIfexist(n:String, arr:Array):void{
+			if(_channels.hasOwnProperty(n)) arr.push(n);
+		}
+		public function cleanChannels():void{
+			_channels = new Object();
+			var line:Log = first;
+			while(line){
+				addChannel(line.c);
+				line = line.next;
+			}
+		}
+		public function addChannel(n:String):void{
+			_channels[n] = null;
+		}
 		//
 		// Log chain controls
 		//

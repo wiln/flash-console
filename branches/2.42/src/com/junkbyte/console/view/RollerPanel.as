@@ -113,22 +113,17 @@ package com.junkbyte.console.view {
 						for(var j:uint = i;j>0;j--){
 							str += j==1?" ∟":" -";
 						}
-						if(dolink){
-							if(obj == stg){
-								str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";
-							}else if(i == len-1){
-								str +=  "<p5><a href='event:sclip_"+mapUpward(obj)+"'>"+obj.name+" ("+ShortClassName(obj)+")</a></p5><br/>";
-							}else {
-								str +=  "<p2><a href='event:sclip_"+mapUpward(obj)+"'><i>"+obj.name+" ("+ShortClassName(obj)+")</i></a></p2><br/>";
-							}
-						}else{
-							if(obj == stg){
-								str +=  "<p1><i>Stage</i> ["+stg.mouseX+","+stg.mouseY+"]</p1><br/>";
-							}else if(i == len-1){
-								str +=  "<p5>"+obj.name+" ("+ShortClassName(obj)+")</p5><br/>";
-							}else {
-								str +=  "<p2>"+obj.name+" ("+ShortClassName(obj)+")</p2><br/>";
-							}
+						
+						var n:String = obj.name;
+						if(dolink) n = "<a href='event:sclip_"+mapUpward(obj)+"'>"+n+"</a> "+master.links.makeString(obj);
+						n = n+" ("+ShortClassName(obj)+")";
+			
+						if(obj == stg){
+							str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";
+						}else if(i == len-1){
+							str +=  "<p5>"+n+"</p5><br/>";
+						}else {
+							str +=  "<p2><i>"+n+"</i></p2><br/>";
 						}
 					}
 				}

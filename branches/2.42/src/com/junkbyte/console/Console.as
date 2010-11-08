@@ -60,10 +60,10 @@ package com.junkbyte.console
 	 */
 	public class Console extends Sprite {
 
-		public static const VERSION:Number = 2.45;
+		public static const VERSION:Number = 2.5;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 521;
-		public static const BUILD_DATE:String = "2010/11/06 02:15";
+		public static const BUILD:int = 522;
+		public static const BUILD_DATE:String = "2010/11/07 22:19";
 		//
 		public static const NAME:String = "Console";
 		//
@@ -404,10 +404,10 @@ package com.junkbyte.console
 			_panels.mainPanel.viewingChannels = a;
 		}
 		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true):void{
-			var cn:String = viewingChannels[0] == config.globalChannel?config.consoleChannel:viewingChannels[0];
-			addLine([obj], priority, cn, false, skipSafe, 0);
+			var cn:String = viewingChannels.length == 1?viewingChannels[0]:config.consoleChannel;
+			addLine([obj], priority, cn, false, skipSafe);
 		}
-		public function addLine(arr:Array, priority:Number = 0,channel:String = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
+		public function addLine(arr:Array, priority:int = 0,channel:String = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
 			var txt:String = "";
 			var len:int = arr.length;
 			for(var i:int = 0; i < len; i++){
@@ -421,7 +421,7 @@ package com.junkbyte.console
 				viewingChannels = [LogReferences.INSPECTING_CHANNEL];
 			}
 			
-			if(!html && stacks>=0){
+			if(!html && stacks>0){
 				txt += getStack(stacks, priority);
 			}
 			var line:Log = new Log(txt, channel, priority, isRepeating, html);
@@ -563,6 +563,6 @@ package com.junkbyte.console
 		public function get remoter():Remoting{return _remoter;}
 		public function get graphing():Graphing{return _graphing;}
 		public function get links():LogReferences{return _links;}
-		public function get lines():Logs{return _logs;}
+		public function get logs():Logs{return _logs;}
 	}
 }

@@ -25,12 +25,11 @@
 
 package com.junkbyte.console.view 
 {
-	import com.junkbyte.console.core.LogReferences;
-	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
+	import com.junkbyte.console.core.DisplayMapper;
+	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.vos.Log;
-	import com.junkbyte.console.core.Logs;
 
 	import flash.display.Shape;
 	import flash.events.Event;
@@ -245,7 +244,7 @@ package com.junkbyte.console.view
 		}
 		private function updateFull():void{
 			var str:String = "";
-			var line:Log = master.lines.last;
+			var line:Log = master.logs.last;
 			while(line){
 				if(lineShouldShow(line)){
 					str = makeLine(line)+str;
@@ -273,7 +272,7 @@ package com.junkbyte.console.view
 			var linesLeft:int = Math.round(_traceField.height/style.traceFontSize);
 			var maxchars:int = Math.round(_traceField.width*5/style.traceFontSize);
 			
-			var line:Log = master.lines.last;
+			var line:Log = master.logs.last;
 			while(line){
 				if(lineShouldShow(line)){
 					var numlines:int = Math.ceil(line.t.length/ maxchars);
@@ -348,7 +347,7 @@ package com.junkbyte.console.view
 		}
 		private function startFilter():void{
 			master.clear(config.filteredChannel);
-			master.lines.channels.splice(1,0,config.filteredChannel);
+			master.logs.addChannel(config.filteredChannel);
 			viewingChannels = [config.filteredChannel];
 		}
 		private function endFilter():void{
@@ -514,7 +513,7 @@ package com.junkbyte.console.view
 		}
 		public function getChannelsLink(limited:Boolean = false):String{
 			var str:String = "<chs>";
-			var channels:Array = master.lines.channels;
+			var channels:Array = master.logs.getChannels();
 			var len:int = channels.length;
 			if(limited && len>style.maxChannelsInMenu) len = style.maxChannelsInMenu;
 			for(var i:int = 0; i<len;  i++){
@@ -676,7 +675,7 @@ package com.junkbyte.console.view
 		private function incPriority(down:Boolean):void{
 			var top:uint = 10;
 			var bottom:uint;
-			var line:Log = master.lines.last;
+			var line:Log = master.logs.last;
 			var p:int = _priority;
 			_priority = 0;
 			var i:uint = 32000; // just for crash safety, it wont look more than 32000 lines.

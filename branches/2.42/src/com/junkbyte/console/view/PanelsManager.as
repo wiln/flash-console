@@ -22,10 +22,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.view {
-	import com.junkbyte.console.core.Logs;
-	import com.junkbyte.console.vos.GraphGroup;
+package com.junkbyte.console.view 
+{
 	import com.junkbyte.console.Console;
+	import com.junkbyte.console.vos.GraphGroup;
 
 	import flash.events.Event;
 	import flash.geom.Rectangle;
@@ -254,6 +254,7 @@ package com.junkbyte.console.view {
 		}
 		public function set channelsPanel(b:Boolean):void{
 			if(channelsPanel != b){
+				_c.logs.cleanChannels();
 				if(b){
 					_chsPanel = new ChannelsPanel(_c);
 					_chsPanel.x = _mainPanel.x+_mainPanel.width-332;

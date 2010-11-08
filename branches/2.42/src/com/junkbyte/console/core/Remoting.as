@@ -179,7 +179,7 @@ package com.junkbyte.console.core
 				_c.report("<b>Remoting started.</b> "+getInfo(),-1);
 				_loggedIn = checkLogin("");
 				if(_loggedIn){
-					_queue = _c.lines.getLogsAsBytes();
+					_queue = _c.logs.getLogsAsBytes();
 					send(LOGINSUCCESS);
 				}else{
 					send(LOGINREQUEST);
@@ -300,7 +300,7 @@ package com.junkbyte.console.core
 				// once logged in, next login attempts will always be success
 				if(_loggedIn || checkLogin(pass)){
 					_loggedIn = true;
-					_queue = _c.lines.getLogsAsBytes();
+					_queue = _c.logs.getLogsAsBytes();
 					send(LOGINSUCCESS);
 				}else{
 					send(LOGINFAIL);
