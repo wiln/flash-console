@@ -22,15 +22,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.core {
-	import flash.utils.getQualifiedClassName;
+package com.junkbyte.console.core 
+{
 	import com.junkbyte.console.Console;
-	import flash.events.EventDispatcher;
+
 	import flash.system.System;
 	import flash.utils.Dictionary;
-	import flash.utils.getTimer;	
+	import flash.utils.getQualifiedClassName;
+	import flash.utils.getTimer;
 
-	public class MemoryMonitor extends EventDispatcher{
+	public class MemoryMonitor{
 		
 		private static const GC:String = "gc";
 		

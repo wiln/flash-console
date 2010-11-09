@@ -151,8 +151,6 @@ package com.junkbyte.console.view
 			addEventListener(TextEvent.LINK, linkHandler, false, 0, true);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
-			
-			master.cl.addEventListener(Event.CHANGE, onUpdateCommandLineScope, false, 0, true);
 		}
 		/*
 		public function addMenu(key:String, f:Function, rollover:String):void{
@@ -433,7 +431,7 @@ package com.junkbyte.console.view
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
 			_txtscroll.x = n;
-			onUpdateCommandLineScope();
+			if(!master.remote) updateCLScope(master.cl.scopeString);
 			_atBottom = true;
 			_needUpdateMenu = true;
 			_needUpdateTrace = true;
@@ -761,9 +759,6 @@ package com.junkbyte.console.view
 				}
 			}
 			e.stopPropagation();
-		}
-		private function onUpdateCommandLineScope(e:Event=null):void{
-			if(!master.remote) updateCLScope(master.cl.scopeString);
 		}
 		public function get commandLineText():String{
 			return _cmdField.text;

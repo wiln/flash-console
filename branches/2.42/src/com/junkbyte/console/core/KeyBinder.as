@@ -22,22 +22,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.core {
+package com.junkbyte.console.core 
+{
+	import com.junkbyte.console.Console;
 	import com.junkbyte.console.KeyBind;
+
 	import flash.events.KeyboardEvent;
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
 
 	/**
 	 * Suppse this could be 'view' ?
 	 */
-	public class KeyBinder extends EventDispatcher {
+	public class KeyBinder {
 		
 		private var _pass:String;
 		private var _passInd:int;
 		private var _binds:Object = {};
 		
-		public function KeyBinder(pass:String) {
+		private var _master:Console;
+		
+		public function KeyBinder(console:Console, pass:String) {
+			_master = console;
 			_pass = pass == ""?null:pass;
 		}
 		public function keyDownHandler(e:KeyboardEvent):void{
@@ -46,7 +50,7 @@ package com.junkbyte.console.core {
 				_passInd++;
 				if(_passInd >= _pass.length){
 					_passInd = 0;
-					dispatchEvent(new Event(Event.CONNECT));
+					passwordEnteredHandle();
 				}
 			}
 			else
@@ -59,6 +63,11 @@ package com.junkbyte.console.core {
 					tryRunKey(bind.key);
 				}
 			}
+		}
+		private function passwordEnteredHandle():void{
+			if(_master.visible && !_master.panels.mainPanel.visible){
+				_master.panels.mainPanel.visible = true;
+			}else _master.visible = !_master.visible;
 		}
 		private function tryRunKey(key:String):void
 		{

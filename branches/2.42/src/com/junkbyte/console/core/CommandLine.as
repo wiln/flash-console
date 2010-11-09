@@ -30,9 +30,8 @@ package com.junkbyte.console.core
 
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 
-	public class CommandLine extends EventDispatcher {
+	public class CommandLine {
 		
 		private static const DISABLED:String = "CommandLine is disabled.";
 		
@@ -85,7 +84,7 @@ package com.junkbyte.console.core
 			}else{
 				_prevScope.reference = _scope;
 				_scope = obj;
-				dispatchEvent(new Event(Event.CHANGE));
+				_master.panels.mainPanel.updateCLScope(scopeString);
 			}
 			_saved.set(BASE, obj);
 		}
@@ -216,7 +215,7 @@ package com.junkbyte.console.core
 					_prevScope.reference = _scope;
 					_scope = returned;
 					report("Changed to "+rtext, -1);
-					dispatchEvent(new Event(Event.CHANGE));
+					_master.panels.mainPanel.updateCLScope(scopeString);
 				}else{
 					report("Returned "+rtext, -2);
 				}

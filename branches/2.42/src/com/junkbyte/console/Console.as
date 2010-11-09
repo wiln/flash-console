@@ -112,8 +112,7 @@ package com.junkbyte.console
 			_mapper =  new DisplayMapper(this);
 			_graphing = new Graphing(this);
 			_mm = new MemoryMonitor(this);
-			_kb = new KeyBinder(pass);
-			_kb.addEventListener(Event.CONNECT, passwordEnteredHandle, false, 0, true);
+			_kb = new KeyBinder(this, pass);
 			
 			_config.style.updateStyleSheet();
 			_panels = new PanelsManager(this);
@@ -143,11 +142,6 @@ package com.junkbyte.console
 		}
 		private function onStageMouseLeave(e:Event):void{
 			_panels.tooltip(null);
-		}
-		private function passwordEnteredHandle(e:Event):void{
-			if(visible && !_panels.mainPanel.visible){
-				_panels.mainPanel.visible = true;
-			}else visible = !visible;
 		}
 		public function destroy():void{
 			_remoter.close();

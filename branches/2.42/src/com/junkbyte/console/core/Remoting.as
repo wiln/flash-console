@@ -30,14 +30,13 @@ package com.junkbyte.console.core
 	import com.junkbyte.console.vos.Log;
 
 	import flash.events.AsyncErrorEvent;
-	import flash.events.EventDispatcher;
 	import flash.events.SecurityErrorEvent;
 	import flash.events.StatusEvent;
 	import flash.net.LocalConnection;
 	import flash.system.Security;
 	import flash.utils.ByteArray;
 
-	public class Remoting extends EventDispatcher{
+	public class Remoting{
 		
 		public static const NONE:uint = 0;
 		public static const SENDER:uint = 1;
@@ -148,7 +147,6 @@ package com.junkbyte.console.core
 				}
 				_c.panels.updateGraphs(a, _canDraw);
 				if(_canDraw) {
-					//_master.panels.updateObjMonitors(vo.om);
 					_c.panels.mainPanel.updateCLScope(bytes.readUTF());
 					_canDraw = false;
 				}
