@@ -31,7 +31,7 @@ package com.junkbyte.console.core
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 
-	public class CommandLine {
+	public class CommandLine extends ConsoleCore{
 		
 		private static const DISABLED:String = "CommandLine is disabled.";
 		
@@ -47,18 +47,17 @@ package com.junkbyte.console.core
 		private var _scope:*;
 		private var _prevScope:WeakRef;
 		
-		private var _master:Console;
 		private var _slashCmds:Object;
 		
 		public function CommandLine(m:Console) {
-			_master = m;
+			super(m);
 			_saved = new WeakObject();
 			_scope = m;
 			_slashCmds = new Object();
 			_prevScope = new WeakRef(m);
 			_saved.set("C", m);
 			
-			_master.remoter.registerClient(CMD, run);
+			console.remoter.registerClient(CMD, run);
 			
 			addCLCmd("help", printHelp, "How to use command line");
 			addCLCmd("save|store", saveCmd, "Save current scope as weak reference. (same as Cc.store(...))");
@@ -84,7 +83,7 @@ package com.junkbyte.console.core
 			}else{
 				_prevScope.reference = _scope;
 				_scope = obj;
-				_master.panels.mainPanel.updateCLScope(scopeString);
+				console.panels.mainPanel.updateCLScope(scopeString);
 			}
 			_saved.set(BASE, obj);
 		}
@@ -109,10 +108,10 @@ package com.junkbyte.console.core
 			}else{
 				_saved.set(n, obj, strong);
 			}
-			if(!_master.config.quiet){
+			if(!config.quiet){
 				var str:String = strong?"STRONG":"WEAK";
 				
-				report("Stored <p5>$"+n+"</p5> for <b>"+_master.links.makeRefTyped(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
+				report("Stored <p5>$"+n+"</p5> for <b>"+console.links.makeRefTyped(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
 			}
 		}
 		public function get scopeString():String{
@@ -137,18 +136,18 @@ package com.junkbyte.console.core
 			else _slashCmds[n] = new SlashCommand(n, callback, desc);
 		}
 		public function run(str:String):* {
-			if(_master.remote){
+			if(console.remote){
 				if(str && str.charAt(0) == "~"){
 					str = str.substring(1);
 				}else{
 					report("Run command at remote: "+str,-2);
-					if(!_master.remoter.send(CMD, str)){
+					if(!console.remoter.send(CMD, str)){
 						report("Command could not be sent to client.", 10);
 					}
 					return null;
 				}
 			}
-			if(!_master.config.commandLineAllowed) {
+			if(!config.commandLineAllowed) {
 				report(DISABLED,10);
 				return null;
 			}
@@ -162,7 +161,7 @@ package com.junkbyte.console.core
 					exe.addEventListener(Event.COMPLETE, onExecLineComplete, false, 0, true);
 					exe.setStored(_saved);
 					exe.setReserved(RESERVED);
-					exe.autoScope = _master.config.commandLineAutoScope;
+					exe.autoScope = config.commandLineAutoScope;
 					v = exe.exec(_scope, str);
 				}
 			}catch(e:Error){
@@ -197,25 +196,25 @@ package com.junkbyte.console.core
 						slashcmd.f(param);
 					}
 				}catch(err:Error){
-					report("ERROR slash command: "+_master.links.makeString(err), 10);
+					report("ERROR slash command: "+console.links.makeString(err), 10);
 				}
 			} else{
 				report("Undefined command <b>/cmds</b> for list of all commands.",10);
 			}
 		}
 		public function setReturned(returned:*, changeScope:Boolean = false):void{
-			if(!_master.config.commandLineAllowed) {
+			if(!config.commandLineAllowed) {
 				report(DISABLED,10);
 			}
 			if(returned !== undefined)
 			{
-				var rtext:String = _master.links.makeString(returned);
+				var rtext:String = console.links.makeString(returned);
 				if(changeScope && returned !== _scope){
 					_saved.set(Executer.RETURNED, returned, true);
 					_prevScope.reference = _scope;
 					_scope = returned;
 					report("Changed to "+rtext, -1);
-					_master.panels.mainPanel.updateCLScope(scopeString);
+					console.panels.mainPanel.updateCLScope(scopeString);
 				}else{
 					report("Returned "+rtext, -2);
 				}
@@ -224,7 +223,7 @@ package com.junkbyte.console.core
 			}
 		}
 		private function reportError(e:Error):void{
-			var str:String = _master.links.makeString(e);
+			var str:String = console.links.makeString(e);
 			var lines:Array = str.split(/\n\s*/);
 			var p:int = 10;
 			var internalerrs:int = 0;
@@ -245,9 +244,6 @@ package com.junkbyte.console.core
 			}
 			report(parts.join("\n"), 9);
 		}
-		public function report(obj:*,priority:Number = 1, skipSafe:Boolean = true):void{
-			_master.report(obj, priority, skipSafe);
-		}
 		//private function debug(...args):void{
 		//	_master.report(_master.joinArgs(args), 2, false);
 		//}
@@ -265,7 +261,7 @@ package com.junkbyte.console.core
 				var ref:WeakRef = _saved.getWeakRef(X);
 				sii++;
 				if(ref.reference==null) sii2++;
-				report((ref.strong?"strong":"weak")+" <b>$"+X+"</b> = "+_master.links.makeString(ref.reference), -2);
+				report((ref.strong?"strong":"weak")+" <b>$"+X+"</b> = "+console.links.makeString(ref.reference), -2);
 			}
 			report("Found "+sii+" item(s), "+sii2+" empty.", -1);
 		}
@@ -294,28 +290,28 @@ package com.junkbyte.console.core
 			}
 		}
 		private function filterCmd(param:String = ""):void{
-			_master.panels.mainPanel.filterText = param;
+			console.panels.mainPanel.filterText = param;
 		}
 		private function filterexpCmd(param:String = ""):void{
-			_master.panels.mainPanel.filterRegExp = param;
+			console.panels.mainPanel.filterRegExp = param;
 		}
 		private function inspectCmd(...args:Array):void{
-			_master.links.focus(_scope);
+			console.links.focus(_scope);
 		}
 		private function explodeCmd(param:String = "0"):void{
 			var depth:int = int(param);
-			_master.explode(_scope, depth<=0?3:depth);
+			console.explode(_scope, depth<=0?3:depth);
 		}
 		private function mapCmd(param:String = "0"):void{
-			_master.map(_scope as DisplayObjectContainer, int(param));
+			console.map(_scope as DisplayObjectContainer, int(param));
 		}
 		private function funCmd(param:String = ""):void{
 			var fakeFunction:FakeFunction = new FakeFunction(run, param);
 			setReturned(fakeFunction.exec);
 		}
 		private function autoscopeCmd(...args:Array):void{
-			_master.config.commandLineAutoScope = !_master.config.commandLineAutoScope;
-			report("Auto-scoping <b>"+(_master.config.commandLineAutoScope?"enabled":"disabled")+"</b>.",10);
+			config.commandLineAutoScope = !config.commandLineAutoScope;
+			report("Auto-scoping <b>"+(config.commandLineAutoScope?"enabled":"disabled")+"</b>.",10);
 		}
 		private function baseCmd(...args:Array):void
 		{
@@ -327,7 +323,7 @@ package com.junkbyte.console.core
 		}
 		private function clearhisCmd(...args:Array):void
 		{
-			_master.panels.mainPanel.clearCommandLineHistory();
+			console.panels.mainPanel.clearCommandLineHistory();
 		}
 		private function printHelp():void {
 			report("____Command Line Help___",10);

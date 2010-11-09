@@ -32,16 +32,14 @@ package com.junkbyte.console.core
 	/**
 	 * Suppse this could be 'view' ?
 	 */
-	public class KeyBinder {
+	public class KeyBinder extends ConsoleCore{
 		
 		private var _pass:String;
 		private var _passInd:int;
 		private var _binds:Object = {};
 		
-		private var _master:Console;
-		
 		public function KeyBinder(console:Console, pass:String) {
-			_master = console;
+			super(console);
 			_pass = pass == ""?null:pass;
 		}
 		public function keyDownHandler(e:KeyboardEvent):void{
@@ -65,9 +63,9 @@ package com.junkbyte.console.core
 			}
 		}
 		private function passwordEnteredHandle():void{
-			if(_master.visible && !_master.panels.mainPanel.visible){
-				_master.panels.mainPanel.visible = true;
-			}else _master.visible = !_master.visible;
+			if(console.visible && !console.panels.mainPanel.visible){
+				console.panels.mainPanel.visible = true;
+			}else console.visible = !console.visible;
 		}
 		private function tryRunKey(key:String):void
 		{

@@ -36,7 +36,7 @@ package com.junkbyte.console.core
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 
-	public class LogReferences 
+	public class LogReferences extends ConsoleCore
 	{
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
@@ -44,7 +44,6 @@ package com.junkbyte.console.core
 		private static const MAX_VAL_LENGTH:uint = 100;
 		public static const REF:String = "ref";
 		
-		private var _master:Console;
 		private var _refMap:WeakObject;
 		private var _refRev:Dictionary;
 		private var _refIndex:uint = 1;
@@ -55,16 +54,16 @@ package com.junkbyte.console.core
 		private var _history:Array;
 		private var _hisIndex:uint;
 		
-		public function LogReferences(m:Console) {
-			_master = m;
+		public function LogReferences(console:Console) {
+			super(console);
 			
 			_refMap = new WeakObject();
 			_refRev = new Dictionary(true);
 			
-			_master.remoter.registerClient(REF, handleString);
+			console.remoter.registerClient(REF, handleString);
 		}
 		public function setLogRef(o:*):uint{
-			if(!_master.config.useObjectLinking) return 0;
+			if(!console.config.useObjectLinking) return 0;
 			var ind:uint = _refRev[o];
 			if(!ind){
 				ind = _refIndex;
@@ -159,8 +158,8 @@ package com.junkbyte.console.core
 			}
 		}
 		public function handleRefEvent(str:String):void{
-			if(_master.remote){
-				_master.remoter.send(REF, str);
+			if(console.remote){
+				console.remoter.send(REF, str);
 			}else{
 				handleString(str);
 			}
@@ -191,7 +190,7 @@ package com.junkbyte.console.core
 					if(prop) o = o[prop];
 					if(o){
 						if(str.indexOf("refe_")==0){
-							_master.explode(o);
+							console.explode(o);
 						}else{
 							focus(o, _dofull);
 						}
@@ -202,8 +201,8 @@ package com.junkbyte.console.core
 			}
 		}
 		public function focus(o:*, full:Boolean = false):void{
-			_master.clear(LogReferences.INSPECTING_CHANNEL);
-			_master.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
+			console.clear(LogReferences.INSPECTING_CHANNEL);
+			console.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
 			
 			if(!_history) _history = new Array();
 			
@@ -222,16 +221,11 @@ package com.junkbyte.console.core
 			_dofull = false;
 			_history = null;
 			_hisIndex = 0;
-			if(_master.remote){
-				_master.remoter.send(REF, "");
+			if(console.remote){
+				console.remoter.send(REF, "");
 			}
-			_master.clear(LogReferences.INSPECTING_CHANNEL);
+			console.clear(LogReferences.INSPECTING_CHANNEL);
 		}
-		
-		private function report(obj:* = "", priority:Number = 3, skipSafe:Boolean = true):void{
-			_master.report(obj, priority, skipSafe);
-		}
-		
 		
 		
 		public function inspect(obj:*, viewAll:Boolean= true):void {
@@ -242,7 +236,7 @@ package com.junkbyte.console.core
 			var refIndex:uint = setLogRef(obj);
 			var menuStr:String;
 			if(_history){
-				menuStr = "<b>[<a href='event:channel_"+_master.config.globalChannel+ "'>Exit</a>]";
+				menuStr = "<b>[<a href='event:channel_"+console.config.globalChannel+ "'>Exit</a>]";
 				if(_hisIndex>0){
 					menuStr += " [<a href='event:refprev'>Previous</a>]";
 				}
@@ -251,7 +245,7 @@ package com.junkbyte.console.core
 				}
 				menuStr += "</b> || [<a href='event:ref_"+refIndex+"'>refresh</a>]";
 				menuStr += "</b> [<a href='event:refe_"+refIndex+"'>explode</a>]";
-				if(_master.config.commandLineAllowed){
+				if(console.config.commandLineAllowed){
 					menuStr += " [<a href='event:cl_"+refIndex+"'>Set scope</a>]";
 				}
 				

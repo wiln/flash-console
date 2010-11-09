@@ -32,12 +32,11 @@ package com.junkbyte.console.core {
 
 	import flash.geom.Rectangle;
 
-	public class Graphing {
+	public class Graphing extends ConsoleCore{
 		
 		private static const FPS:String = "fps";
 		public static const MEM:String = "mem";
 		
-		private var _master:Console;
 		private var _groups:Array = [];
 		private var _map:Object = {};
 		
@@ -47,9 +46,9 @@ package com.junkbyte.console.core {
 		private var _previousTime:Number = -1;
 		
 		public function Graphing(m:Console){
-			_master = m;
-			_master.remoter.registerClient(FPS, fpsRequest);
-			_master.remoter.registerClient(MEM, memRequest);
+			super(m);
+			console.remoter.registerClient(FPS, fpsRequest);
+			console.remoter.registerClient(MEM, memRequest);
 		}
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			var group:GraphGroup = _map[n];
@@ -63,7 +62,7 @@ package com.junkbyte.console.core {
 			var interests:Array = group.interests;
 			for each(var i:GraphInterest in interests){
 				if(i.key == key){
-					_master.report("Graph with key ["+key+"] already exists in ["+n+"]", 10);
+					report("Graph with key ["+key+"] already exists in ["+n+"]", 10);
 					return;
 				}
 			}
@@ -74,11 +73,11 @@ package com.junkbyte.console.core {
 			try{
 				v = interest.setObject(obj, prop);
 			}catch (e:Error){
-				_master.report("Error with graph value for ["+key+"] in ["+n+"]. "+e, 10);
+				report("Error with graph value for ["+key+"] in ["+n+"]. "+e, 10);
 				return;
 			}
 			if(isNaN(v)){
-				_master.report("Graph value for key ["+key+"] in ["+n+"] is not a number (NaN).", 10);
+				report("Graph value for key ["+key+"] in ["+n+"] is not a number (NaN).", 10);
 			}else{
 				group.interests.push(interest);
 				if(newGroup){
@@ -120,12 +119,12 @@ package com.junkbyte.console.core {
 			delete _map[n];
 		}
 		public function get fpsMonitor():Boolean{
-			if(_master.remote) return _master.panels.fpsMonitor;
+			if(console.remote) return console.panels.fpsMonitor;
 			return _fpsGroup!=null;
 		}
 		public function set fpsMonitor(b:Boolean):void{
-			if(_master.remote) {
-				_master.remoter.send(FPS, b);
+			if(console.remote) {
+				console.remoter.send(FPS, b);
 			}else if(b != fpsMonitor){
 				if(b) {
 					_fpsGroup = addSpecialGroup(GraphGroup.FPS);
@@ -138,7 +137,7 @@ package com.junkbyte.console.core {
 					if(index>=0) _groups.splice(index, 1);
 					_fpsGroup = null;
 				}
-				_master.panels.mainPanel.updateMenu();
+				console.panels.mainPanel.updateMenu();
 			}
 		}
 		private function fpsRequest(b:Boolean):void{
@@ -146,12 +145,12 @@ package com.junkbyte.console.core {
 		}
 		//
 		public function get memoryMonitor():Boolean{
-			if(_master.remote) return _master.panels.memoryMonitor;
+			if(console.remote) return console.panels.memoryMonitor;
 			return _memGroup!=null;
 		}
 		public function set memoryMonitor(b:Boolean):void{
-			if(_master.remote) {
-				_master.remoter.send(MEM, b);
+			if(console.remote) {
+				console.remoter.send(MEM, b);
 			}else if(b != memoryMonitor){
 				if(b) {
 					_memGroup = addSpecialGroup(GraphGroup.MEM);
@@ -161,7 +160,7 @@ package com.junkbyte.console.core {
 					if(index>=0) _groups.splice(index, 1);
 					_memGroup = null;
 				}
-				_master.panels.mainPanel.updateMenu();
+				console.panels.mainPanel.updateMenu();
 			}
 		}
 		private function memRequest(b:Boolean):void{
@@ -218,7 +217,7 @@ package com.junkbyte.console.core {
 								v = i.getCurrentValue();
 								i.setValue(v, averaging);
 							}catch(e:Error){
-								_master.report("Error with graph value for key ["+i.key+"] in ["+group.name+"]. "+e, 10);
+								report("Error with graph value for key ["+i.key+"] in ["+group.name+"]. "+e, 10);
 								remove(group.name, i.obj, i.prop);
 							}
 							group.updateMinMax(v);

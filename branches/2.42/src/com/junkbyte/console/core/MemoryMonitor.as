@@ -31,18 +31,17 @@ package com.junkbyte.console.core
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 
-	public class MemoryMonitor{
+	public class MemoryMonitor extends ConsoleCore{
 		
 		private static const GC:String = "gc";
 		
 		private var _namesList:Object;
 		private var _objectsList:Dictionary;
 		private var _count:uint;
-		private var _master:Console;
 		//
 		//
 		public function MemoryMonitor(m:Console) {
-			_master = m;
+			super(m);
 			_namesList = new Object();
 			_objectsList = new Dictionary(true);
 		}
@@ -65,7 +64,7 @@ package com.junkbyte.console.core
 			_namesList[n] = true;
 			_count++;
 			_objectsList[obj] = n;
-			if(!_master.config.quiet) _master.report("Watching <b>"+className+"</b> as <p5>"+ n +"</p5>.",-1);
+			if(!config.quiet) report("Watching <b>"+className+"</b> as <p5>"+ n +"</p5>.",-1);
 			return n;
 		}
 		public function unwatch(n:String):void{
@@ -97,7 +96,7 @@ package com.junkbyte.console.core
 					_count--;
 				}
 			}
-			_master.report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
+			report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
 		}
 		
 		public function get count():uint{
@@ -105,12 +104,12 @@ package com.junkbyte.console.core
 		}
 		
 		public function gc():void {
-			if(_master.remote){
+			if(console.remote){
 				try{
-					_master.report("Sending garbage collection request to client",-1);
-					_master.remoter.send(GC);
+					report("Sending garbage collection request to client",-1);
+					console.remoter.send(GC);
 				}catch(e:Error){
-					_master.report(e,10);
+					report(e,10);
 				}
 			}else{
 				var ok:Boolean;
@@ -123,7 +122,7 @@ package com.junkbyte.console.core
 				}catch(e:Error){ }
 				
 				var str:String = "Manual garbage collection "+(ok?"successful.":"FAILED. You need debugger version of flash player.");
-				_master.report(str,(ok?-1:10));
+				report(str,(ok?-1:10));
 			}
 		}
 	}
