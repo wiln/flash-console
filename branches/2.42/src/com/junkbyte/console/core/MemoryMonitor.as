@@ -104,10 +104,10 @@ package com.junkbyte.console.core
 		}
 		
 		public function gc():void {
-			if(console.remote){
+			if(remoter.remoting == Remoting.RECIEVER){
 				try{
 					report("Sending garbage collection request to client",-1);
-					console.remoter.send(GC);
+					remoter.send(GC);
 				}catch(e:Error){
 					report(e,10);
 				}

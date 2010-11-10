@@ -60,8 +60,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.5;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 523;
-		public static const BUILD_DATE:String = "2010/11/08 01:26";
+		public static const BUILD:int = 528;
+		public static const BUILD_DATE:String = "2010/11/10 00:48";
 		//
 		public static const NAME:String = "Console";
 		//
@@ -105,8 +105,8 @@ package com.junkbyte.console
 			_config = config?config:new ConsoleConfig();
 			//
 			_remoter = new Remoting(this, pass);
-			_logs = new Logs(_config);
-			_ud = new UserData(_config.sharedObjectName, _config.sharedObjectPath);
+			_logs = new Logs(this);
+			_ud = new UserData(this);
 			_links = new LogReferences(this);
 			_cl = new CommandLine(this);
 			_mapper =  new DisplayMapper(this);
@@ -194,11 +194,7 @@ package com.junkbyte.console
 		// This should only be used for development purposes only.
 		//
 		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):void{
-			if(!_kb.bindKey(key, fun, args)){
-				report("Warning: bindKey character ["+key.char+"] is conflicting with Console password.",8);
-			}else if(!config.quiet) {
-				report((fun ==null?"Unbined":"Bined")+" "+key.toString(),-1);
-			}
+			_kb.bindKey(key, fun, args);
 		}
 		//
 		// Panel settings
@@ -212,12 +208,12 @@ package com.junkbyte.console
 		}
 		public function setRollerCaptureKey(char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false):void{
 			if(_rollerKey){
-				_kb.bindKey(_rollerKey, null);
+				bindKey(_rollerKey, null);
 				_rollerKey = null;
 			}
 			if(char && char.length==1) {
 				_rollerKey = new KeyBind(char, shift, ctrl, alt);
-				_kb.bindKey(_rollerKey, onRollerCaptureKey);
+				bindKey(_rollerKey, onRollerCaptureKey);
 			}
 		}
 		public function get rollerCaptureKey():KeyBind{
@@ -309,8 +305,9 @@ package com.junkbyte.console
 			_logs.tick();
 			_mm.update();
 			var graphsList:Array;
-			if(!_remoter.isRemote){
-			 	//om = _om.update();
+			if(remoter.remoting != Remoting.RECIEVER)
+			{
+				//om = _om.update();
 			 	graphsList = _graphing.update(stage?stage.frameRate:0);
 			}
 			_remoter.update(graphsList);
@@ -331,17 +328,10 @@ package com.junkbyte.console
 		// REMOTING
 		//
 		public function get remoting():Boolean{
-			return _remoter.remoting;
+			return _remoter.remoting == Remoting.SENDER;
 		}
-		public function set remoting(newV:Boolean):void{
-			_remoter.remoting = newV;
-		}
-		public function get remote():Boolean{
-			return _remoter.isRemote;
-		}
-		public function set remote(newV:Boolean):void{
-			_remoter.isRemote = newV;
-			_panels.updateMenu();
+		public function set remoting(b:Boolean):void{
+			_remoter.remoting = b?Remoting.SENDER:Remoting.NONE;
 		}
 		public function set remotingPassword(str:String):void{
 			_remoter.remotingPassword = str;
@@ -384,7 +374,7 @@ package com.junkbyte.console
 			}
 			
 			_lineAdded = true;
-			_remoter.addLineQueue(line);
+			_remoter.queueLog(line);
 		}
 		private function getStack(depth:int, priority:int):String{
 			var e:Error = new Error();
@@ -414,7 +404,6 @@ package com.junkbyte.console
 		// COMMAND LINE
 		//
 		public function set commandLine(b:Boolean):void{
-			if(b) _config.commandLineAllowed = true;
 			_panels.mainPanel.commandLine = b;
 		}
 		public function get commandLine ():Boolean{

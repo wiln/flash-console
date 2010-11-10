@@ -33,7 +33,7 @@ package com.junkbyte.console.core
 
 	public class CommandLine extends ConsoleCore{
 		
-		private static const DISABLED:String = "CommandLine is disabled.";
+		private static const DISABLED:String = "<b>Advanced CommandLine is disabled.</b>\nEnable by setting `Cc.config.commandLineAllowed = true;´\nType <b>/commands</b> for permitted commands.";
 		
 		private static const INTSTACKS:int = 1; // max number of internal (commandLine) stack traces
 		private static const CMD:String = "cmd";
@@ -64,15 +64,12 @@ package com.junkbyte.console.core
 			addCLCmd("savestrong|storestrong", saveStrongCmd, "Save current scope as strong reference");
 			addCLCmd("saved|stored", savedCmd, "Show a list of all saved references");
 			addCLCmd("string", stringCmd, "Create String, useful to paste complex strings without worrying about \" or \'");
-			addCLCmd("commands", cmdsCmd, "Show a list of all slash commands");
-			addCLCmd("filter", filterCmd, "Filter console logs to matching string. When done, click on the * (global channel) at top.");
-			addCLCmd("filterexp", filterexpCmd, "Filter console logs to matching regular expression");
+			addCLCmd("commands", cmdsCmd, "Show a list of all slash commands", true);
 			addCLCmd("inspect", inspectCmd, "Inspect current scope");
 			addCLCmd("explode", explodeCmd, "Explode current scope to its properties and values (similar to JSON)");
 			addCLCmd("map", mapCmd, "Get display list map starting from current scope");
 			addCLCmd("function", funCmd, "Create function. param is the commandline string to create as function. (experimental)");
 			addCLCmd("autoscope", autoscopeCmd, "Toggle autoscoping.");
-			addCLCmd("clearhistory", clearhisCmd, "Clear history of commands you have entered.");
 			addCLCmd("base", baseCmd, "Return to base scope");
 			addCLCmd("/", prevCmd, "Return to previous scope");
 			
@@ -95,12 +92,13 @@ package com.junkbyte.console.core
 			_scope = null;
 		}
 		public function store(n:String, obj:Object, strong:Boolean = false):void {
-			// if it is a function it needs to be strong reference atm, 
-			// otherwise it fails if the function passed is from a dynamic class/instance
 			if(!n) {
 				report("ERROR: Give a name to save.",10);
 				return;
 			}
+			// if it is a function it needs to be strong reference atm, 
+			// otherwise it fails if the function passed is from a dynamic class/instance
+			if(obj is Function) strong = true;
 			n = n.replace(/[^\w]*/g, "");
 			if(RESERVED.indexOf(n)>=0){
 				report("ERROR: The name ["+n+"] is reserved",10);
@@ -110,25 +108,24 @@ package com.junkbyte.console.core
 			}
 			if(!config.quiet){
 				var str:String = strong?"STRONG":"WEAK";
-				
 				report("Stored <p5>$"+n+"</p5> for <b>"+console.links.makeRefTyped(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
 			}
 		}
 		public function get scopeString():String{
 			return LogReferences.ShortClassName(_scope);
 		}
-		private function addCLCmd(n:String, callback:Function, desc:String):void{
+		public function addCLCmd(n:String, callback:Function, desc:String, allow:Boolean = false):void{
 			var split:Array = n.split("|");
 			for(var i:int = 0; i<split.length; i++){
 				n = split[i];
-				_slashCmds[n] = new SlashCommand(n, callback, desc, false);
+				_slashCmds[n] = new SlashCommand(n, callback, desc, false, allow);
 				if(i>0) _slashCmds.setPropertyIsEnumerable(n, false);
 			}
 		}
 		public function addSlashCommand(n:String, callback:Function, desc:String = ""):void{
 			if(_slashCmds[n] != null){
 				var prev:SlashCommand = _slashCmds[n];
-				if(!prev.c) {
+				if(!prev.user) {
 					throw new Error("Can not alter build-in slash command ["+n+"]");
 				}
 			}
@@ -136,7 +133,7 @@ package com.junkbyte.console.core
 			else _slashCmds[n] = new SlashCommand(n, callback, desc);
 		}
 		public function run(str:String):* {
-			if(console.remote){
+			if(remoter.remoting == Remoting.RECIEVER){
 				if(str && str.charAt(0) == "~"){
 					str = str.substring(1);
 				}else{
@@ -147,16 +144,16 @@ package com.junkbyte.console.core
 					return null;
 				}
 			}
-			if(!config.commandLineAllowed) {
-				report(DISABLED,10);
-				return null;
-			}
 			report("&gt; "+str, 4, false);
 			var v:* = null;
 			try{
 				if(str.charAt(0) == "/"){
 					execCommand(str);
 				}else{
+					if(!config.commandLineAllowed) {
+						report(DISABLED, 9);
+						return null;
+					}
 					var exe:Executer = new Executer();
 					exe.addEventListener(Event.COMPLETE, onExecLineComplete, false, 0, true);
 					exe.setStored(_saved);
@@ -190,6 +187,11 @@ package com.junkbyte.console.core
 			if(_slashCmds[cmd] != null){
 				try{
 					var slashcmd:SlashCommand = _slashCmds[cmd];
+					if(!config.commandLineAllowed && !slashcmd.allow)
+					{
+						report(DISABLED, 9);
+						return;
+					}
 					if(param.length == 0){
 						slashcmd.f();
 					}else{
@@ -199,27 +201,28 @@ package com.junkbyte.console.core
 					report("ERROR slash command: "+console.links.makeString(err), 10);
 				}
 			} else{
-				report("Undefined command <b>/cmds</b> for list of all commands.",10);
+				report("Undefined command <b>/commands</b> for list of all commands.",10);
 			}
 		}
 		public function setReturned(returned:*, changeScope:Boolean = false):void{
 			if(!config.commandLineAllowed) {
-				report(DISABLED,10);
+				report(DISABLED, 9);
+				return;
 			}
 			if(returned !== undefined)
 			{
 				var rtext:String = console.links.makeString(returned);
+				_saved.set(Executer.RETURNED, returned, true);
 				if(changeScope && returned !== _scope){
-					_saved.set(Executer.RETURNED, returned, true);
 					_prevScope.reference = _scope;
 					_scope = returned;
 					report("Changed to "+rtext, -1);
 					console.panels.mainPanel.updateCLScope(scopeString);
 				}else{
-					report("Returned "+rtext, -2);
+					report("Returned "+rtext, -1);
 				}
 			}else{
-				report("Exec successful, undefined return.", -2);
+				report("Exec successful, undefined return.", -1);
 			}
 		}
 		private function reportError(e:Error):void{
@@ -273,11 +276,11 @@ package com.junkbyte.console.core
 			var buildin:Array = [];
 			var custom:Array = [];
 			for each(var cmd:SlashCommand in _slashCmds){
-				if(cmd.c) custom.push(cmd);
-				else buildin.push(cmd);
+				if(config.commandLineAllowed && cmd.user) custom.push(cmd);
+				else if(config.commandLineAllowed || cmd.allow) buildin.push(cmd);
 			}
 			buildin = buildin.sortOn("n");
-			report("build-in commands:", 4);
+			report("Build-in commands:"+(!config.commandLineAllowed?" (limited permission)":""), 4);
 			for each(cmd in buildin){
 				report("<b>/"+cmd.n+"</b> <p-1>" + cmd.d+"</p-1>", -2);
 			}
@@ -288,12 +291,6 @@ package com.junkbyte.console.core
 					report("<b>/"+cmd.n+"</b> <p-1>" + cmd.d+"</p-1>", -2);
 				}
 			}
-		}
-		private function filterCmd(param:String = ""):void{
-			console.panels.mainPanel.filterText = param;
-		}
-		private function filterexpCmd(param:String = ""):void{
-			console.panels.mainPanel.filterRegExp = param;
 		}
 		private function inspectCmd(...args:Array):void{
 			console.links.focus(_scope);
@@ -320,10 +317,6 @@ package com.junkbyte.console.core
 		private function prevCmd(...args:Array):void
 		{
 			setReturned(_prevScope.reference, true);
-		}
-		private function clearhisCmd(...args:Array):void
-		{
-			console.panels.mainPanel.clearCommandLineHistory();
 		}
 		private function printHelp():void {
 			report("____Command Line Help___",10);
@@ -355,11 +348,13 @@ internal class SlashCommand{
 	public var n:String;
 	public var f:Function;
 	public var d:String;
-	public var c:Boolean;
-	public function SlashCommand(nn:String, ff:Function, dd:String = "", cus:Boolean = true){
+	public var user:Boolean;
+	public var allow:Boolean;
+	public function SlashCommand(nn:String, ff:Function, dd:String = "", cus:Boolean = true, permit:Boolean = false){
 		n = nn;
 		f = ff;
 		d = dd?dd:"";
-		c = cus;
+		user = cus;
+		allow = permit;
 	}
 }

@@ -34,13 +34,15 @@ http://code.google.com/p/flash-console/issues/
 == Change Log ==
 
 ===2.41===
-  * No longer force store function references as strong in Cc.store(). This may break some dynamic functions so please manually store using strong.
+  * Pressing Enter while console is visible will auto focus to commandLine
+  * added /keybinds command to list all used key binds
   * added ability to add custom slash commands. using Cc.addSlashCommand();
   * commandLine autoScoping can be set from Cc.config.commandLineAutoScope
   * Cc.stack() no longer accept channel name. use Cc.stackch() for channel
   * Top menu can now be hidden from UI OR ConsoleStyle.topMenu = false;
   * Fixed bug with channel name generation from non-string param in Cc.logch, Cc.warnch, etc...
   * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
+  * Removed Cc.remote as it is a special use case.
   * Remote: to run local command line on remote, prefix string with ~, e.g. `~stage.frameRate=100;`
   * Remoting now use ByteArray data format which will break with older clients but is faster and more efficent
   * Simplied sourcecode where possible while keeping compile size down

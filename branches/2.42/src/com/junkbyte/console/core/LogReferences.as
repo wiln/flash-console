@@ -60,7 +60,7 @@ package com.junkbyte.console.core
 			_refMap = new WeakObject();
 			_refRev = new Dictionary(true);
 			
-			console.remoter.registerClient(REF, handleString);
+			remoter.registerClient(REF, handleString);
 		}
 		public function setLogRef(o:*):uint{
 			if(!console.config.useObjectLinking) return 0;
@@ -158,8 +158,8 @@ package com.junkbyte.console.core
 			}
 		}
 		public function handleRefEvent(str:String):void{
-			if(console.remote){
-				console.remoter.send(REF, str);
+			if(remoter.remoting == Remoting.RECIEVER){
+				remoter.send(REF, str);
 			}else{
 				handleString(str);
 			}
@@ -206,14 +206,16 @@ package com.junkbyte.console.core
 			
 			if(!_history) _history = new Array();
 			
-			_dofull = full;
-			inspect(o, _dofull);
+			
+			
 			if(_current != o){
 				_current = o; // current is kept as hard reference so that it stays...
 				if(_history.length <= _hisIndex) _history.push(o);
 				else _history[_hisIndex] = o;
 				_hisIndex++;
 			}
+			_dofull = full;
+			inspect(o, _dofull);
 		}
 		
 		public function exitFocus():void{
@@ -221,8 +223,8 @@ package com.junkbyte.console.core
 			_dofull = false;
 			_history = null;
 			_hisIndex = 0;
-			if(console.remote){
-				console.remoter.send(REF, "");
+			if(remoter.remoting == Remoting.RECIEVER){
+				remoter.send(REF, "");
 			}
 			console.clear(LogReferences.INSPECTING_CHANNEL);
 		}
@@ -237,10 +239,10 @@ package com.junkbyte.console.core
 			var menuStr:String;
 			if(_history){
 				menuStr = "<b>[<a href='event:channel_"+console.config.globalChannel+ "'>Exit</a>]";
-				if(_hisIndex>0){
+				if(_hisIndex>1){
 					menuStr += " [<a href='event:refprev'>Previous</a>]";
 				}
-				if(_history && _hisIndex < _history.length-1){
+				if(_history && _hisIndex < _history.length){
 					menuStr += " [<a href='event:reffwd'>Forward</a>]";
 				}
 				menuStr += "</b> || [<a href='event:ref_"+refIndex+"'>refresh</a>]";
@@ -268,7 +270,7 @@ package com.junkbyte.console.core
 			var cls:Object = obj is Class?obj:obj.constructor;
 			var clsV:XML = describeType(cls);
 			var self:String = V.@name;
-			var str:String = "<b>"+self+"</b>";
+			var str:String = "<b>{"+genLinkString(obj, null, EscHTML(self))+"}</b>";
 			var props:Array = [];
 			var nodes:XMLList;
 			if(V.@isDynamic=="true"){
@@ -518,7 +520,7 @@ package com.junkbyte.console.core
 		public static function ShortClassName(cls:Object):String{
 			var str:String = getQualifiedClassName(cls);
 			var ind:int = str.lastIndexOf("::");
-			return str.substring(ind>=0?(ind+2):0);
+			return EscHTML(str.substring(ind>=0?(ind+2):0));
 		}
 	}
 }

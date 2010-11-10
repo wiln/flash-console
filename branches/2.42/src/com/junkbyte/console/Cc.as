@@ -487,30 +487,15 @@ package com.junkbyte.console {
 		// Remoting
 		//
 		/**
-		 * Accessor for remoting (sender).
-		 * When turned on, Console will periodically broadcast logs, FPS history and memory usage
-		 * for another Console remote to receive. 
-		 * <p>
-		 * Can not be remoting (sender) and remote (reciever) at the same time.
-		 * The broadcast interval can be changed through ConsoleConfig -> remoteDelay.
-		 * </p>
+		 * Turn on/off remoting feature.
+		 * Console will periodically broadcast logs, FPS history and memory usage
+		 * for another Console remote to receive.
 		 */
 		public static function get remoting():Boolean{
 			return getter("remoting") as Boolean;
 		}
 		public static function set remoting(v:Boolean):void{
 			setter("remoting",v);
-		}
-		/**
-		 * Accessor for remote (reciever).
-		 * When turned on, Console will listen for broadcast of logs/FPS/memory usage from another Console.
-		 * Can not be remoting (sender) and remote (reciever) at the same time
-		 */
-		public static function get remote():Boolean{
-			return getter("remote") as Boolean;
-		}
-		public static function set remote(v:Boolean):void{
-			setter("remote",v);
 		}
 		/**
 		 * Set Password required to connect from remote.
@@ -796,7 +781,6 @@ package com.junkbyte.console {
 		 * @param (optional) line splitter, default is '\n'
 		 * @return All log lines in console
 		 */
-		[Inspectable(environment="none")]
 		public static function getAllLog(splitter:String = "\n"):String{
 			if(_console)return _console.getAllLog(splitter);
 			else return "";
@@ -808,7 +792,6 @@ package com.junkbyte.console {
 		 * 
 		 * @return Console class instance
 		 */
-		[Inspectable(environment="none")]
 		public static function get instance():Console{
 			return _console;
 		}

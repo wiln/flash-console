@@ -22,19 +22,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.view {
-	import flash.geom.Rectangle;
-	import flash.events.MouseEvent;
-	import flash.events.Event;
-	import flash.text.TextField;
+package com.junkbyte.console.view 
+{
 	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.geom.Rectangle;
 
 	public class TextScroller extends Sprite {
 		
 		private var _scroller:Sprite;
 		private var _scrolldelay:uint;
 		private var _scrolldir:int;
-		private var _field:TextField;
+		
 		private var _h:Number = 100;
 		private var _scrolling:Boolean;
 		
@@ -42,9 +42,7 @@ package com.junkbyte.console.view {
 		
 		public var targetIncrement:Number;
 		
-		public function TextScroller(target:TextField = null, color:Number = 0xFF0000) {
-			_field = target;
-			if(_field != null) _field.addEventListener(Event.SCROLL, onFieldScroll, false, 0, true);
+		public function TextScroller(color:Number) {
 			_color = color;
 			name = "scroller";
 			buttonMode = true;
@@ -54,6 +52,7 @@ package com.junkbyte.console.view {
 			_scroller.name = "scrollbar";
 			_scroller.y = 5;
 			_scroller.graphics.beginFill(_color, 1);
+			
 			_scroller.graphics.drawRect(-5, 0, 5, 30);
 			_scroller.graphics.beginFill(0, 0);
 			_scroller.graphics.drawRect(-10, 0, 10, 30);
@@ -72,16 +71,9 @@ package com.junkbyte.console.view {
 				graphics.drawRect(-5, n-5, 5, 5);
 				graphics.beginFill(_color, 0.25);
 				graphics.drawRect(-5, 5, 5, n-10);
+				graphics.beginFill(0, 0);
+				graphics.drawRect(-10, 10, 10, n-10);
 				graphics.endFill();
-			}
-		}
-		private function onFieldScroll(e:Event):void{
-			if(_scrolling) return;
-			if(_field.maxScrollV<=1 || _h<10){
-				visible = false;
-			}else{
-				visible = true;
-				scrollPercent = (_field.scrollV-1)/(_field.maxScrollV-1);
 			}
 		}
 		public function get scrollPercent():Number{
@@ -91,11 +83,8 @@ package com.junkbyte.console.view {
 			_scroller.y = 5+((_h-40)*per);
 		}
 		private function incScroll(i:int):void{
-			if(_field == null) {
-				targetIncrement = i;
-				dispatchEvent(new Event(Event.CHANGE));
-			}
-			else _field.scrollV += i;
+			targetIncrement = i;
+			dispatchEvent(new Event(Event.CHANGE));
 		}
 		private function onScrollbarDown(e:MouseEvent):void{
 			if((_scroller.visible && _scroller.mouseY>0) || (!_scroller.visible && mouseY>_h/2)) {
@@ -133,11 +122,7 @@ package com.junkbyte.console.view {
 			e.stopPropagation();
 		}
 		private function onScrollerMove(e:MouseEvent):void{
-			if(_field==null){
-				dispatchEvent(new Event(Event.SCROLL));
-			}else {
-				_field.scrollV = Math.round((scrollPercent*(_field.maxScrollV-1))+1);
-			}
+			dispatchEvent(new Event(Event.SCROLL));
 		}
 		private function onScrollerUp(e:MouseEvent):void{
 			_scroller.stopDrag();

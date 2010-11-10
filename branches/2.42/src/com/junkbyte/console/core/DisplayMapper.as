@@ -40,7 +40,7 @@ package com.junkbyte.console.core
 		
 		public function DisplayMapper(console:Console) {
 			super(console);
-			console.remoter.registerClient(RMAP, reMap);
+			remoter.registerClient(RMAP, reMap);
 			_mapBases = new WeakObject();
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
@@ -120,8 +120,8 @@ package com.junkbyte.console.core
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
 		public function reMap(path:String):void{
-			if(console.remote){
-				console.remoter.send(RMAP, path);
+			if(remoter.remoting == Remoting.RECIEVER){
+				remoter.send(RMAP, path);
 				return;
 			}
 			var mc:DisplayObjectContainer = console.stage;

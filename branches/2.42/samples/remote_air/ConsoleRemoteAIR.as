@@ -23,6 +23,7 @@
 * 
 */
 package {
+	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleConfig;
 	import com.junkbyte.console.view.AbstractPanel;
@@ -51,7 +52,7 @@ package {
 			_c = new Console(null, config);
 			addChild(_c);
 			_c.visible = true;
-			_c.remote = true;
+			_c.remoter.remoting = Remoting.RECIEVER;
 			_c.commandLine = true;
 			_c.x = 10;
 			_c.y = 10;

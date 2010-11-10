@@ -41,6 +41,9 @@ package com.junkbyte.console.core
 		public function KeyBinder(console:Console, pass:String) {
 			super(console);
 			_pass = pass == ""?null:pass;
+			
+			
+			console.cl.addCLCmd("keybinds", printBinds, "List all keybinds used");
 		}
 		public function keyDownHandler(e:KeyboardEvent):void{
 			var char:String = String.fromCharCode(e.charCode);
@@ -62,6 +65,15 @@ package com.junkbyte.console.core
 				}
 			}
 		}
+		private function printBinds(...args:Array):void{
+			report("Key binds:", -2);
+			var i:uint = 0;
+			for (var X:String in _binds){
+				i++;
+				report(X, -2);
+			}
+			report("--- Found "+i, -2);
+		}
 		private function passwordEnteredHandle():void{
 			if(console.visible && !console.panels.mainPanel.visible){
 				console.panels.mainPanel.visible = true;
@@ -74,18 +86,18 @@ package com.junkbyte.console.core
 				(a[0] as Function).apply(this, a[1]);
 			}
 		}
-		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):Boolean{
-			if(_pass && (key.useChar &&  key.char == _pass.charAt(0)))
-			{
-				return false;
+		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):void{
+			if(_pass && (!key.useKeyCode && key.key.charAt(0) == _pass.charAt(0))){
+				report("Error: KeyBind ["+key.key+"] is conflicting with Console password.",9);
+				return;
 			}
-			var keystr:String = key.key;
 			if(fun == null){
-				delete _binds[keystr];
+				delete _binds[key.key];
+				if(!config.quiet) report("Unbined key "+key.key+".", -1);
 			}else{
-				_binds[keystr] = [fun, args];
+				_binds[key.key] = [fun, args];
+				if(!config.quiet) report("Bined key "+key.key+" to a function.", -1);
 			}
-			return true;
 		}
 	}
 }

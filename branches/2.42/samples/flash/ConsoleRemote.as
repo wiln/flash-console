@@ -24,6 +24,7 @@
 */
 package 
 {
+	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleConfig;
 
@@ -44,10 +45,10 @@ package
 			config.maxLines = 2000;
 			
 			Cc.start(this, "", config);
-			Cc.remote = true;
 			Cc.commandLine = true;
 			Cc.config.maxRepeats = 200;
 			
+			Cc.instance.remoter.remoting = Remoting.RECIEVER;
 			//
 			// This is special case for remote to disable scaling and moving
 			Cc.instance.panels.mainPanel.moveable = false;

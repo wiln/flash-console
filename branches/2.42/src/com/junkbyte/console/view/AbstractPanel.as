@@ -44,7 +44,7 @@ package com.junkbyte.console.view {
 		public static const DRAGGING:String = "DRAGGING";
 		public static const SCALING:String = "SCALING";
 		
-		[Event(name="TEXT_ROLL", type="flash.events.TextEvent")]
+		//[Event(name="TEXT_ROLL", type="flash.events.TextEvent")]
 		private static const TEXT_ROLL:String = "TEXT_ROLL";
 		
 		private var _snaps:Array;
@@ -182,7 +182,11 @@ package com.junkbyte.console.view {
 			if(b && !scaler){
 				scaler = new Sprite();
 				scaler.name = "scaler";
+				scaler.graphics.beginFill(0, 0);
+				scaler.graphics.drawRect(-15, -15, 15, 15);
+	            scaler.graphics.endFill();
 				scaler.graphics.beginFill(style.controlColor, style.backgroundAlpha);
+	            scaler.graphics.moveTo(0, 0);
 	            scaler.graphics.lineTo(-10, 0);
 	            scaler.graphics.lineTo(0, -10);
 	            scaler.graphics.endFill();

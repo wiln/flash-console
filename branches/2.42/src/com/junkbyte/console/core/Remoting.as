@@ -72,12 +72,8 @@ package com.junkbyte.console.core
 			_client[LOGINSUCCESS] = loginSuccess;
 			_client[SYNC] = remoteSync;
 		}
-		public function set remotingPassword(str:String):void{
-			_password = str;
-			if(remoting && !str) login();
-		}
-		public function addLineQueue(line:Log):void{
-			if(!(remoting && _loggedIn)) return;
+		public function queueLog(line:Log):void{
+			if(_mode != SENDER || !_loggedIn) return;
 			_queue.push(line.toBytes());
 			var maxlines:int = config.maxLines;
 			if(_queue.length > maxlines && maxlines > 0 ){
@@ -85,7 +81,7 @@ package com.junkbyte.console.core
 			}
 		}
 		public function update(graphs:Array):void{
-			if(remoting){
+			if(_mode == SENDER){
 				if(!_loggedIn) return;
 				// graphs
 				var ga:ByteArray = new ByteArray();
@@ -122,7 +118,7 @@ package com.junkbyte.console.core
 			}
 		}
 		private function remoteSync(bytes:ByteArray):void{
-			if(!isRemote || !bytes) return;
+			if(remoting != Remoting.RECIEVER || !bytes) return;
 			bytes.position = 0;
 			var logs:ByteArray = bytes.readObject();
 			logs.position = 0;
@@ -150,7 +146,7 @@ package com.junkbyte.console.core
 			}
 		}
 		public function send(command:String, ...args):Boolean{
-			var target:String = config.remotingConnectionName+(isRemote?SENDER:RECIEVER);
+			var target:String = config.remotingConnectionName+(remoting == Remoting.RECIEVER?SENDER:RECIEVER);
 			args = [target, command].concat(args);
 			try{
 				_connection.send.apply(this, args);
@@ -159,14 +155,12 @@ package com.junkbyte.console.core
 			}
 			return true;
 		}
-		public function get remoting():Boolean{
-			return _mode == SENDER;
+		public function get remoting():uint{
+			return _mode;
 		}
-		public function set remoting(newV:Boolean):void{
-			if(newV == remoting) return;
-			_queue = null;
-			if(newV){
-				//_delayed = 0;
+		public function set remoting(newMode:uint):void{
+			if(newMode == _mode) return;
+			if(newMode == SENDER){
 				_queue = new Array();
 				if(!startSharedConnection(SENDER)){
 					report("Could not create remoting client service. You will not be able to control this console with remote.", 10);
@@ -180,25 +174,7 @@ package com.junkbyte.console.core
 				}else{
 					send(LOGINREQUEST);
 				}
-			}else{
-				close();
-			}
-		}
-		private function onRemotingStatus(e:StatusEvent):void{
-			if(e.level == "error") {
-				_loggedIn = false;
-			}
-		}
-		private function onRemotingSecurityError(e:SecurityErrorEvent):void{
-			report("Remoting security error.", 9);
-			printHowToGlobalSetting();
-		}
-		public function get isRemote():Boolean{
-			return _mode == RECIEVER;
-		}
-		public function set isRemote(newV:Boolean):void{
-			if(newV == isRemote) return;
-			if(newV){
+			}else if(newMode == RECIEVER){
 				if(startSharedConnection(RECIEVER)){
 					_connection.addEventListener(AsyncErrorEvent.ASYNC_ERROR , onRemoteAsyncError, false, 0, true);
 					_connection.addEventListener(StatusEvent.STATUS, onRemoteStatus, false, 0, true);
@@ -212,16 +188,30 @@ package com.junkbyte.console.core
 				}else{
 					report("Could not create remote service. You might have a console remote already running.", 10);
 				}
-			}else {
+			}else{
 				close();
 			}
+			console.panels.updateMenu();
+		}
+		public function set remotingPassword(str:String):void{
+			_password = str;
+			if(_mode == SENDER && !str) login();
+		}
+		private function onRemotingStatus(e:StatusEvent):void{
+			if(e.level == "error") {
+				_loggedIn = false;
+			}
+		}
+		private function onRemotingSecurityError(e:SecurityErrorEvent):void{
+			report("Remoting security error.", 9);
+			printHowToGlobalSetting();
 		}
 		private function onRemoteAsyncError(e:AsyncErrorEvent):void{
 			report("Problem with remote sync. [<a href='event:remote'>Click here</a>] to restart.", 10);
-			isRemote = false;
+			remoting = NONE;
 		}
 		private function onRemoteStatus(e:StatusEvent):void{
-			if(isRemote && e.level=="error"){
+			if(remoting == Remoting.RECIEVER && e.level=="error"){
 				report("Problem communicating to client.", 10);
 			}
 		}
@@ -257,7 +247,7 @@ package com.junkbyte.console.core
 			_client[key] = fun;
 		}
 		private function loginFail():void{
-			if(!isRemote) return;
+			if(remoting != Remoting.RECIEVER) return;
 			report("Login Failed", 10);
 			console.panels.mainPanel.requestLogin();
 		}
@@ -265,7 +255,7 @@ package com.junkbyte.console.core
 			report("Login Successful", -1);
 		}
 		private function requestLogin():void{
-			if(!isRemote) return;
+			if(remoting != Remoting.RECIEVER) return;
 			if(_lastLogin){
 				login(_lastLogin);
 			}else{
@@ -273,7 +263,7 @@ package com.junkbyte.console.core
 			}
 		}
 		public function login(pass:String = null):void{
-			if(isRemote){
+			if(remoting == Remoting.RECIEVER){
 				_lastLogin = pass;
 				report("Attempting to login...", -1);
 				send(LOGIN, pass);
@@ -288,7 +278,7 @@ package com.junkbyte.console.core
 				}
 			}
 		}
-		public function checkLogin(pass:String):Boolean{
+		private function checkLogin(pass:String):Boolean{
 			return (!_password || _password == pass);
 		}
 		public function close():void{
@@ -301,6 +291,7 @@ package com.junkbyte.console.core
 			}
 			_mode = NONE;
 			_connection = null;
+			_queue = null;
 		}
 		//
 		//

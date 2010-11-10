@@ -47,8 +47,8 @@ package com.junkbyte.console.core {
 		
 		public function Graphing(m:Console){
 			super(m);
-			console.remoter.registerClient(FPS, fpsRequest);
-			console.remoter.registerClient(MEM, memRequest);
+			remoter.registerClient(FPS, fpsRequest);
+			remoter.registerClient(MEM, memRequest);
 		}
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			var group:GraphGroup = _map[n];
@@ -119,12 +119,12 @@ package com.junkbyte.console.core {
 			delete _map[n];
 		}
 		public function get fpsMonitor():Boolean{
-			if(console.remote) return console.panels.fpsMonitor;
+			if(remoter.remoting == Remoting.RECIEVER) return console.panels.fpsMonitor;
 			return _fpsGroup!=null;
 		}
 		public function set fpsMonitor(b:Boolean):void{
-			if(console.remote) {
-				console.remoter.send(FPS, b);
+			if(remoter.remoting == Remoting.RECIEVER) {
+				remoter.send(FPS, b);
 			}else if(b != fpsMonitor){
 				if(b) {
 					_fpsGroup = addSpecialGroup(GraphGroup.FPS);
@@ -145,12 +145,12 @@ package com.junkbyte.console.core {
 		}
 		//
 		public function get memoryMonitor():Boolean{
-			if(console.remote) return console.panels.memoryMonitor;
+			if(remoter.remoting == Remoting.RECIEVER) return console.panels.memoryMonitor;
 			return _memGroup!=null;
 		}
 		public function set memoryMonitor(b:Boolean):void{
-			if(console.remote) {
-				console.remoter.send(MEM, b);
+			if(remoter.remoting == Remoting.RECIEVER) {
+				remoter.send(MEM, b);
 			}else if(b != memoryMonitor){
 				if(b) {
 					_memGroup = addSpecialGroup(GraphGroup.MEM);

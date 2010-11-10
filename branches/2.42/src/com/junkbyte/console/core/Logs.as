@@ -22,13 +22,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 * 
 */
-package com.junkbyte.console.core {
+package com.junkbyte.console.core 
+{
+	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.Log;
-	import com.junkbyte.console.ConsoleConfig;
-	public class Logs{
+
+	public class Logs extends ConsoleCore{
 		
 		private var _channels:Object;
-		private var _config:ConsoleConfig;
 		private var _repeating:uint;
 		private var _lastRepeat:Log;
 		private var _newRepeat:Log;
@@ -38,8 +39,8 @@ package com.junkbyte.console.core {
 		
 		private var _length:uint;
 		
-		public function Logs(config:ConsoleConfig){
-			_config = config;
+		public function Logs(console:Console){
+			super(console);
 			_channels = new Object();
 		}
 		
@@ -59,13 +60,13 @@ package com.junkbyte.console.core {
 					_newRepeat = line;
 					return false;
 				}else{
-					_repeating = _config.maxRepeats;
+					_repeating = config.maxRepeats;
 					_lastRepeat = line;
 				}
 			}
 			push(line);
-			if(_config.maxLines > 0 ){
-				var off:int = _length - _config.maxLines;
+			if(config.maxLines > 0 ){
+				var off:int = _length - config.maxLines;
 				if(off > 0){
 					shift(off);
 				}
@@ -108,11 +109,11 @@ package com.junkbyte.console.core {
 			return str;
 		}
 		public function getChannels():Array{
-			var arr:Array = new Array(_config.globalChannel);
-			addIfexist(_config.defaultChannel, arr);
-			addIfexist(_config.filteredChannel, arr);
+			var arr:Array = new Array(config.globalChannel);
+			addIfexist(config.defaultChannel, arr);
+			addIfexist(config.filteredChannel, arr);
 			addIfexist(LogReferences.INSPECTING_CHANNEL, arr);
-			addIfexist(_config.consoleChannel, arr);
+			addIfexist(config.consoleChannel, arr);
 			var others:Array = new Array();
 			for(var X:String in _channels){
 				if(arr.indexOf(X)<0){

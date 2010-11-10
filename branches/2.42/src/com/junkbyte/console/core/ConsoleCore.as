@@ -30,12 +30,13 @@ package com.junkbyte.console.core
 	{
 		protected var console:Console;
 		protected var config:ConsoleConfig;
-		
 		public function ConsoleCore(c:Console){
 			console = c;
 			config = console.config;
 		}
-		
+		protected function get remoter():Remoting{
+			return console.remoter;
+		}
 		protected function report(obj:* = "", priority:int = 0, skipSafe:Boolean = true):void{
 			console.report(obj, priority, skipSafe);
 		}

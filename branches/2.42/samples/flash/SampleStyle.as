@@ -42,6 +42,7 @@ package
 			config.style.big(); // BIGGER text. this modifies the config variables such as traceFontSize, menuFontSize
 			config.style.whiteBase(); // Black on white. this modifies the config variables such as priority0, priority1, etc
 			
+			config.commandLineAllowed = true;
 			config.style.backgroundAlpha = 1; // makes it non-transparent background.
 			
 			//// Alternatively you can modify the style variables directly:

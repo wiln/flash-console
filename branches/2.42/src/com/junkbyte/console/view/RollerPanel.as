@@ -91,7 +91,7 @@ package com.junkbyte.console.view
 			var stg:Stage = _base.stage;
 			var str:String = "";
 			if(!dolink){
-				var key:String = master.rollerCaptureKey?master.rollerCaptureKey.toString():"unassigned";
+				var key:String = master.rollerCaptureKey?master.rollerCaptureKey.key:"unassigned";
 				str = "<menu> <a href=\"event:close\"><b>X</b></a></menu> Capture key: <menu><a href=\"event:capture\">"+key+"</a></menu><br/>";
 			}
 			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
@@ -117,7 +117,7 @@ package com.junkbyte.console.view
 						
 						var n:String = obj.name;
 						if(dolink) n = "<a href='event:sclip_"+mapUpward(obj)+"'>"+n+"</a> "+master.links.makeString(obj);
-						n = n+" ("+LogReferences.ShortClassName(obj)+")";
+						else n = n+" ("+LogReferences.ShortClassName(obj)+")";
 			
 						if(obj == stg){
 							str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";
@@ -154,7 +154,7 @@ package com.junkbyte.console.view
 			}else if(txt == "capture"){
 				var key:KeyBind = master.rollerCaptureKey;
 				if(key){
-					txt = "Unassign key ::"+key.toString();
+					txt = "Unassign key ::"+key.key;
 				}else{
 					txt = "Assign key";
 				}

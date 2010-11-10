@@ -25,6 +25,7 @@
 
 package com.junkbyte.console.view 
 {
+	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
 	import com.junkbyte.console.core.DisplayMapper;
@@ -78,6 +79,10 @@ package com.junkbyte.console.view
 			var fsize:int = style.menuFontSize;
 			_viewingChannels = new Array();
 			_cmdsHistory = m.ud.commandLineHistory;
+			
+			master.cl.addCLCmd("filter", setFilterText, "Filter console logs to matching string. When done, click on the * (global channel) at top.", true);
+			master.cl.addCLCmd("filterexp", setFilterRegExp, "Filter console logs to matching regular expression", true);
+			master.cl.addCLCmd("clearhistory", clearCommandLineHistory, "Clear history of commands you have entered.", true);
 			
 			name = NAME;
 			minWidth = 50;
@@ -133,7 +138,7 @@ package com.junkbyte.console.view
 			_bottomLine.alpha = 0.2;
 			addChild(_bottomLine);
 			//
-			_txtscroll = new TextScroller(null, style.controlColor);
+			_txtscroll = new TextScroller(style.controlColor);
 			_txtscroll.y = fsize+4;
 			_txtscroll.addEventListener(Event.INIT, startedScrollingHandle, false, 0, true);
 			_txtscroll.addEventListener(Event.COMPLETE, stoppedScrollingHandle,  false, 0, true);
@@ -184,8 +189,12 @@ package com.junkbyte.console.view
 		private function keyUpHandler(e:KeyboardEvent):void{
 			if(e.keyCode == Keyboard.SHIFT){
 				_shift = false;
+			}else if(e.keyCode == Keyboard.ENTER && parent.visible && visible && _cmdField.visible){
+				stage.focus = _cmdField;
+				_cmdField.setSelection(0, _cmdField.text.length);
 			}
 		}
+		
 		public function requestLogin(on:Boolean = true):void{
 			var ct:ColorTransform = new ColorTransform();
 			if(on){
@@ -322,7 +331,7 @@ package com.junkbyte.console.view
 			master.panels.updateMenu();
 		}
 		//
-		public function set filterText(str:String):void{
+		private function setFilterText(str:String = ""):void{
 			if(str){
 				_filterRegExp = null;
 				_filterText = LogReferences.EscHTML(str.toLowerCase());
@@ -331,7 +340,7 @@ package com.junkbyte.console.view
 				endFilter();
 			}
 		}
-		public function set filterRegExp(expstr:String):void{
+		private function setFilterRegExp(expstr:String = ""):void{
 			if(expstr){
 				_filterText = null;
 				_filterRegExp = new RegExp("("+LogReferences.EscHTML(expstr)+")", "gi");
@@ -339,9 +348,6 @@ package com.junkbyte.console.view
 			}else{
 				endFilter();
 			}
-		}
-		public function get filterText():String{
-			return _filterText?_filterText:(_filterRegExp?String(_filterRegExp):null);
 		}
 		private function startFilter():void{
 			master.clear(config.filteredChannel);
@@ -431,7 +437,7 @@ package com.junkbyte.console.view
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
 			_txtscroll.x = n;
-			if(!master.remote) updateCLScope(master.cl.scopeString);
+			if(master.remoter.remoting != Remoting.RECIEVER) updateCLScope(master.cl.scopeString);
 			_atBottom = true;
 			_needUpdateMenu = true;
 			_needUpdateTrace = true;
@@ -492,10 +498,10 @@ package com.junkbyte.console.view
 				
 				str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
 				str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
-				if(config.commandLineAllowed){
-					str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
-				}
-				if(!master.remote){
+				
+				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
+				
+				if(master.remoter.remoting != Remoting.RECIEVER){
 					str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
 					str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
 				}
@@ -540,7 +546,8 @@ package com.junkbyte.console.view
 			}else if(txt == "channel_"+ config.consoleChannel) {
 				txt = "Console's channel::Logs generated from Console";
 			}else if(txt == "channel_"+ config.filteredChannel) {
-				txt = "Filtering channel"+"::*"+filterText+"*";
+				txt = _filterRegExp?String(_filterRegExp):_filterText;
+				txt = "Filtering channel"+"::*"+txt+"*";
 			}else if(txt == "channel_"+LogReferences.INSPECTING_CHANNEL) {
 				txt = "Inspecting channel";
 			}else if(txt.indexOf("channel_")==0) {
@@ -620,7 +627,7 @@ package com.junkbyte.console.view
 				master.report("A new window should open in browser. If not, try searching for 'Flash Player Global Security Settings panel' online :)", -1);
 				Security.showSettings(SecurityPanel.SETTINGS_MANAGER);
 			}else if(t == "remote"){
-				master.remote = true;
+				master.remoter.remoting = Remoting.RECIEVER;
 			}else if(t.indexOf("ref")==0){
 				master.links.handleRefEvent(t);
 			}else if(t.indexOf("channel_")==0){
@@ -697,7 +704,7 @@ package com.junkbyte.console.view
 		//
 		// COMMAND LINE
 		//
-		public function clearCommandLineHistory():void
+		private function clearCommandLineHistory(...args:Array):void
 		{
 			_cmdsHistory.splice(0);
 			_cmdsInd = -1;
@@ -783,7 +790,7 @@ package com.junkbyte.console.view
 			_cmdField.width = width-15-_cmdField.x;
 		}
 		public function set commandLine (b:Boolean):void{
-			if(b && config.commandLineAllowed){
+			if(b){
 				_cmdField.visible = true;
 				_cmdPrefx.visible = true;
 				_cmdBG.visible = true;

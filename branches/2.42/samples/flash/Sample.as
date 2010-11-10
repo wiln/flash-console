@@ -51,6 +51,7 @@ package
 			Cc.visible = true; // show console, because having password hides console.
 			Cc.config.tracing = true; // trace on flash's normal trace
 			Cc.commandLine = true; // enable command line
+			Cc.config.commandLineAllowed = true;
 			
 			Cc.height = 220;
 			Cc.remotingPassword = null; // Just so that remote don't ask for password
