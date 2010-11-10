@@ -60,8 +60,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.5;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 528;
-		public static const BUILD_DATE:String = "2010/11/10 00:48";
+		public static const BUILD:int = 531;
+		public static const BUILD_DATE:String = "2010/11/10 22:25";
 		//
 		public static const NAME:String = "Console";
 		//
@@ -359,10 +359,7 @@ package com.junkbyte.console
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
 			
 			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
-			if(channel == LogReferences.INSPECTING_CHANNEL && viewingChannels[0] != LogReferences.INSPECTING_CHANNEL){
-				viewingChannels = [LogReferences.INSPECTING_CHANNEL];
-			}
-			
+
 			if(!html && stacks>0){
 				txt += getStack(stacks, priority);
 			}

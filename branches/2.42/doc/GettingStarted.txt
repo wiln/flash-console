@@ -1,100 +1,137 @@
 #labels Phase-Deploy,Featured,Phase-Implementation
+#summary for v2.4
+
 =Getting started=
 
 ==Introduction==
 
-The main class need to use for console is `Cc`, (`com.junkbyte.console.Cc`). `Cc` stands for Console controller which acts as a static / singleton adapter for `Console` (`com.junkbyte.console.Console`). 
+The main class you need to use for console is `Cc`, (`com.junkbyte.console.Cc`). `Cc` stands for Console controller which acts as a static / singleton adapter for `Console` (`com.junkbyte.console.Console`). 
 
 In a later date when you don't need console in your flash project, you can just remove `Cc.startOnStage(..)` OR `Cc.start(..)` from your code and the rest of console related codes will stop executing to save memory and performance.
 
 
 ==Basics==
 
+For easy reference, please see `samples/flash/Sample.as` for working sample.
+
 Start console on stage... 
 {{{
 import com.junkbyte.console.Cc;
 Cc.startOnStage(this, "");
 }}}
-First parameter is any DisplayObject which is already on stage or to be added.
-If you want to set a keyword for console to start, assign at second parameter. 
-Use letters and numbers only. Console will start hidden if you set a password (you can set `Cc.visible = true;` to force display console)
-You will need to type the keyword in correct sequence to show the console.
-Recommended keyword: ` or ~ or debug (remember to have keyboard short cuts disabled in flash test authoring for some keys to be captured)
-If you want to assign custom style or configuration, pass the modified ConsoleConfig as third param.
+  # First parameter is any DisplayObject which is already on stage or to be added.
+  # If you want to set a keyword for console to start, assign at second parameter. You will need to type the keyword in correct sequence to show the console. Recommended keyword: ` or ~ or debug. Use letters and numbers only. Console will start hidden if you set a password (you can set `Cc.visible = true;` to force display console). Entering the keyword while console is visible with hide it.
 
 Logging...
 
 {{{
+
+Cc.log("Hello world.");
+Cc.info("An info message.", "Optionally there", "can be", "multiple arguments.");
+Cc.debug("A debug level log.", "You can also pass an object and it'll become a link to inspect:", this);
+Cc.warn("This is a warning log.", "Lets try the object linking again:", stage, " <- click it! (press 'exit' when done)");
+Cc.error("This is an error log.", "This link might not work because it can get garbage collected:", new Sprite());
+Cc.fatal("This is a fatal error log with high visibility.", "You will get a short stack trace of where it's called from (configurable)");
 //
-// BASICS
-//
-Cc.info("Hello world.");
-Cc.log("A log message for console.", "optionally there", "can be", "multiple arguments.");
-Cc.debug("A debug level log.");
-Cc.warn("This is a warning log.");
-Cc.error("This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
-Cc.fatal("This is a fatal error log", "with high visibility");
-//
-// basic channel logging
+// Basic channel logging
 //
 Cc.infoch("myChannel", "Hello myChannel.");
-Cc.logch("myChannel", "A log message at myChannel.", "optionally there", "can be", "multiple arguments.");
-Cc.debugch("myChannel", "A debug level log.");
-Cc.warnch("myChannel", "This is a warning log.");
-Cc.errorch("myChannel", "This is an error log.", "multiple arguments are supported", "for above basic logging methods.");
+Cc.debugch("myChannel", "A debug level log.", "There is also Cc.errorch() and Cc.fatalch(). Skipping that for demo.");
 //
-// instanced channel
+// Instanced channel
 //
-var _ch:ConsoleChannel = new ConsoleChannel('myCh'); // already declared above.
-_ch.log("Hello instanced channel.");
-_ch.info("Works just like other logging methods","but this way you keep the channel name as a class instance");
+var ch:ConsoleChannel = new ConsoleChannel('myCh');
+ch.info("Hello!", "Works just like other logging methods but this way you keep the channel as an instance.");
+
 //
-// advanced logging
+// Stack tracing
 //
-Cc.add("My advanced log in priority 7.", 7);
-Cc.add("My advanced log in priority 2, 1 (no repeats)", 2, true);
-Cc.add("My advanced log in priority 2, 2 (no repeats)", 2, true);
-Cc.add("My advanced log in priority 2, 3 (no repeats)", 2, true);
+Cc.stack("Stack trace called from...");
+// It will add the stack trace under your string to show where this function is being called from.
+// Use Cc.stackch(...) to have channel name.
+//
+// Advanced logging
+//
+Cc.add("My advanced log in priority 2, 1st call", 2, true);
+Cc.add("My advanced log in priority 2, 2nd call", 2, true);
+Cc.add("My advanced log in priority 2, 3rd call", 2, true);
+Cc.add("My advanced log in priority 2, 4th call", 2, true);
+Cc.add("My advanced log in priority 2, 5th call", 2, true);
 // When 'no repeat' (3rd param) is set to true, it will not generate new lines for each log.
-// It will keep replacing the previous line untill a certain count is passed.
+// It will keep replacing the previous line with repeat turned on until a certain count is passed.
 // For example, if you are tracing download progress and you don't want to flood console with it.
-//
-// Advanced channel logging
-//
-Cc.ch("chn", "Advanced log in priority 7.", 7);
-Cc.ch("chn", "Advanced log in priority 3, 1 (no repeats)", 3, true);
-Cc.ch("chn", "Advanced log in priority 3, 2 (no repeats)", 3, true);
-Cc.ch("chn", "Advanced log in priority 3, 3 (no repeats)", 3, true);
+
+// If you want to specify the channel, use:
+// Use Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
+
 }}}
 
 ===UI===
 
-Console interface menu is at the top of main panel. Roll over each name to find out what it is.
+[http://www.junkbyte.com/flash-console/console_controls.png]
 
-  * F = Show/Hide Frames per second monitor
-  * M = Show/Hide memory usage monitor
-  * CL = Show/Hide commandLine. Command line appears at the bottom of main panel.
-  * Ro = Show/Hide display Roller
-  * RL = Start ruler tool (measure distance/angle between 2 points)
+see: doc/console_controls.png
 
-  * T = Toggle use 'trace()' - only visible in debugger or test player, can call a different function in place of trace(), see: ConsoleConfig -> traceCall.
-  * Cc = Copy all log to clipboard as plain text.
-  * P0 = Priority filter level. For example when set to P5, you will only see logs with priority 5 or above
-  * P = pause logging. (it will still silently log but will not update in display)
-  * C = clear log
-  * X = close panel. (if you have not set a password, there is no way to reopen this panel)
+===Configuration===
+Console start with minimal features so you will need to use `Cc.config` to fit your needs.
+It is recommended to set them before starting console. 
+Example:
+{{{
+Cc.config.commandLineAllowed = true // Enables real commandLine features
+Cc.config.tracing = true; // also send traces to flash's normal trace()
+Cc.config.maxLines = 5000; // change maximum log lines to 5000, default is 1000
 
-You can move panels by dragging from top.
-You can scale panels by dragging the arrow on the bttom right.
+Cc.startOnStage(this); // finally start with these config
+}}}
+
+Asdoc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleConfig.html
+
+===Custom Style===
+You *must* set them before starting console. Example:
+{{{
+Cc.config.style.big(); // BIGGER text.
+Cc.config.style.whiteBase(); // Black on white.
+Cc.config.style.backgroundAlpha = 1; // makes it non-transparent background.
+
+Cc.startOnStage(this); // finally start with these styles
+}}}
+
+example: bin/sampleStyle.swf for demo. (src: samples/flash/SampleStyle.as).
+
+Asdoc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleStyle.html
 
 
-==Advanced==
+==Useful Features==
+
+
+====Keyboard Binding====
+
+Cc.bindKey
+
+
+====Object inspection====
+
 
 ====Command line====
+
+ slash commands
+ storing commands and calling it.
 
   * Command line appears at the bottom of main panel (press CL).
   * Write `/help` in command line area for help.
   * Read CommandLineHelp for detailed info on how to take advantage of Command Line.
+
+
+====Display Roller====
+
+ use capture key to capture back to log and get references for commandLine
+
+
+====Graphing====
+
+ Similar to FPS and memory, you can supply your own property to graph.
+
+
 
 ====Garbage collection monitor====
 {{{
@@ -108,42 +145,7 @@ If you have a debugger version of flash player installed, you can press G in con
 If you start using this in fairly big flash project, you will see that objects that have lost reference to will properly get collected and notified in console.
 
 
-==Optionals==
-{{{
+====Remoting====
 
-// enable remoting broadcast
-// start broadcasting logs. It will also keep logging for it self
-// it can not be a remote while it is remoting...
-Cc.remoting = true;
-
-// Show/hide commandLine (hidden by default)
-Cc.commandLine= true;
-
-// Show/hide fpxMonitor  (hidden by default)
-Cc.fpsMonitor= true;
-
-// show/hide console
-// It will keep logging but will stop all update processes
-Cc.visible = false;
-
-}}}
-Please see ASDoc for more usage document.
-
-==Others==
-If you want to start console in a custom display container, use the following:
-{{{
-import com.junkbyte.console.Cc;
-Cc.start(this);
-}}}
-
-
-You can manage your own instance of Console by directly managing it (`C` is designed to manage it for you ). 
-{{{
-import com.junkbyte.console.Console;
-
-private var _c:Console;
-
-_c = new Console();
-addChild(_c);
-_c.log("Hello my custom Console instance.");
-}}}
+ Cc.remoting.
+use swf or the one online , or use the AIR file in download / svn.

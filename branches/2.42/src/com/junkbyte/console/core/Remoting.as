@@ -252,6 +252,7 @@ package com.junkbyte.console.core
 			console.panels.mainPanel.requestLogin();
 		}
 		private function loginSuccess():void{
+			console.viewingChannels = [];
 			report("Login Successful", -1);
 		}
 		private function requestLogin():void{

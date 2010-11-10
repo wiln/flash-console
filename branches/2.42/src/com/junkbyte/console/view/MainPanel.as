@@ -640,7 +640,7 @@ package com.junkbyte.console.view
 				var ind:int = t.indexOf("_", 3);
 				var v:* = master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind)));
 				if(v){
-					master.cl.setReturned(v, true);
+					master.cl.setReturned(v, true, false);
 					if(ind>=0){
 						_cmdField.text = t.substring(ind+1);
 					}

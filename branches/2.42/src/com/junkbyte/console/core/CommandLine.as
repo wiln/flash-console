@@ -204,7 +204,7 @@ package com.junkbyte.console.core
 				report("Undefined command <b>/commands</b> for list of all commands.",10);
 			}
 		}
-		public function setReturned(returned:*, changeScope:Boolean = false):void{
+		public function setReturned(returned:*, changeScope:Boolean = false, say:Boolean = true):void{
 			if(!config.commandLineAllowed) {
 				report(DISABLED, 9);
 				return;
@@ -219,10 +219,10 @@ package com.junkbyte.console.core
 					report("Changed to "+rtext, -1);
 					console.panels.mainPanel.updateCLScope(scopeString);
 				}else{
-					report("Returned "+rtext, -1);
+					if(say) report("Returned "+rtext, -1);
 				}
 			}else{
-				report("Exec successful, undefined return.", -1);
+				if(say) report("Exec successful, undefined return.", -1);
 			}
 		}
 		private function reportError(e:Error):void{

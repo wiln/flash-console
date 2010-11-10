@@ -39,7 +39,7 @@ package com.junkbyte.console {
 		/** Font size for trace field */
 		public var traceFontSize:int = 11;
 		
-		/** Panels backround color */
+		/** Panels background color */
 		public var backgroundColor:uint;
 		
 		/** Panels background alpha */
@@ -148,27 +148,6 @@ package com.junkbyte.console {
 			traceFontSize = 12;
 			menuFontSize = 14;
 		}
-		/** Use opaque background */
-		public function opaque():void{
-			backgroundAlpha = 1;
-		}
-		/** Use black and white traces */
-		public function blackAndWhiteTrace():void{
-			priority0 = 0x808080;
-			priority1 = 0x888888;
-			priority2 = 0x999999;
-			priority3 = 0x9F9F9F;
-			priority4 = 0xAAAAAA;
-			priority5 = 0xAAAAAA;
-			priority6 = 0xCCCCCC;
-			priority7 = 0xCCCCCC;
-			priority8 = 0xDDDDDD;
-			priority9 = 0xFFFFFF;
-			priority10 = 0xFFFFFF;
-			priorityC1 = 0xBBC0CC;
-			priorityC2 = 0xFFEEDD;
-		}
-		
 		
 		/////////////////////
 		//                 //

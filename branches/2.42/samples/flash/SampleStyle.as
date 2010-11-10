@@ -46,8 +46,8 @@ package
 			config.style.backgroundAlpha = 1; // makes it non-transparent background.
 			
 			//// Alternatively you can modify the style variables directly:
-			//config.traceFontSize = 16;
-			//config.menuColor = 0xFF0000;
+			//config.style.traceFontSize = 16;
+			//config.style.menuColor = 0xFF0000;
 			//
 			
 			Cc.startOnStage(this, "`", config); // "`" - change for password. This will start hidden

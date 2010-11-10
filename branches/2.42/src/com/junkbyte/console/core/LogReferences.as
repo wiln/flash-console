@@ -43,6 +43,7 @@ package com.junkbyte.console.core
 		
 		private static const MAX_VAL_LENGTH:uint = 100;
 		public static const REF:String = "ref";
+		public static const FOCUS:String = "focus";
 		
 		private var _refMap:WeakObject;
 		private var _refRev:Dictionary;
@@ -61,6 +62,7 @@ package com.junkbyte.console.core
 			_refRev = new Dictionary(true);
 			
 			remoter.registerClient(REF, handleString);
+			remoter.registerClient(FOCUS, handleFocused);
 		}
 		public function setLogRef(o:*):uint{
 			if(!console.config.useObjectLinking) return 0;
@@ -201,11 +203,11 @@ package com.junkbyte.console.core
 			}
 		}
 		public function focus(o:*, full:Boolean = false):void{
+			remoter.send(FOCUS);
 			console.clear(LogReferences.INSPECTING_CHANNEL);
 			console.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
 			
 			if(!_history) _history = new Array();
-			
 			
 			
 			if(_current != o){
@@ -217,7 +219,10 @@ package com.junkbyte.console.core
 			_dofull = full;
 			inspect(o, _dofull);
 		}
-		
+		private function handleFocused():void{
+			console.clear(LogReferences.INSPECTING_CHANNEL);
+			console.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
+		}
 		public function exitFocus():void{
 			_current = null;
 			_dofull = false;
