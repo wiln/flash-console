@@ -49,6 +49,7 @@ package {
 			var config:ConsoleConfig = new ConsoleConfig();
 			config.maxLines = 2000;
 			config.style.backgroundAlpha = 0.55;
+			config.commandLineAllowed = true;
 			_c = new Console(null, config);
 			addChild(_c);
 			_c.visible = true;
