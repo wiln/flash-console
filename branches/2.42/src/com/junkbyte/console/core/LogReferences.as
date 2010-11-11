@@ -174,8 +174,7 @@ package com.junkbyte.console.core
 			}else if(str == "reffwd"){
 				historyInc(0);
 			}else if(str == "refi"){
-				_dofull = !_dofull;
-				historyInc(-1);
+				focus(_current, !_dofull);
 			}else{
 				var ind1:int = str.indexOf("_")+1;
 				if(ind1>0){
@@ -277,17 +276,19 @@ package com.junkbyte.console.core
 			var cls:Object = obj is Class?obj:obj.constructor;
 			var clsV:XML = describeType(cls);
 			var self:String = V.@name;
-			var str:String = "<b>{"+genLinkString(obj, null, EscHTML(self))+"}</b>";
+			var isClass:Boolean = obj is Class;
+			var st:String = isClass?"*":"";
+			var str:String = "<b>{"+st+genLinkString(obj, null, EscHTML(self))+st+"}</b>";
 			var props:Array = [];
 			var nodes:XMLList;
+			if(V.@isStatic=="true"){
+				props.push("<b>static</b>");
+			}
 			if(V.@isDynamic=="true"){
 				props.push("dynamic");
 			}
 			if(V.@isFinal=="true"){
 				props.push("final");
-			}
-			if(V.@isStatic=="true"){
-				props.push("static");
 			}
 			if(props.length > 0){
 				str += " <p-1>"+props.join(" | ")+"</p-1>";
@@ -390,7 +391,12 @@ package com.junkbyte.console.core
 					for each(var paraX:XML in mparamsList){
 						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
 					}
-					str += "<a href='event:cl_"+refIndex+"_"+methodX.@name+"()'><p3>"+methodX.@name+"</p3></a>(<i>"+params.join(",")+"</i>):"+methodX.@returnType;
+					if((isstatic || !isClass)){
+						str += "<a href='event:cl_"+refIndex+"_"+methodX.@name+"()'><p3>"+methodX.@name+"</p3></a>";
+					}else{
+						str += "<p3>"+methodX.@name+"</p3>";
+					}
+					str += "(<i>"+params.join(",")+"</i>):"+methodX.@returnType;
 					report(str, 1);
 				}else{
 					inherit++;
@@ -418,10 +424,15 @@ package com.junkbyte.console.core
 					if(access == "readonly") str+= "get";
 					else if(access == "writeonly") str+= "set";
 					else str += "assign";
-					str += " <a href='event:cl_"+refIndex+"_"+accessorX.@name+"'><p3>"+accessorX.@name+"</p3></a>:"+accessorX.@type;
-					if(access != "writeonly" && (isstatic || !(obj is Class))){
-						var t:Object = isstatic?cls:obj;
-						str += " = "+makeValue(t, accessorX.@name);
+					
+					if(isstatic || !isClass){
+						str += " <a href='event:cl_"+refIndex+"_"+accessorX.@name+"'><p3>"+accessorX.@name+"</p3></a>:"+accessorX.@type;
+					}else{
+						str += " <p3>"+accessorX.@name+"</p3>:"+accessorX.@type;
+					}
+					if(access != "writeonly" && (isstatic || !isClass))
+					{
+						str += " = "+makeValue(isstatic?cls:obj, accessorX.@name);
 					}
 					report(str, 1);
 				}else{
@@ -472,17 +483,15 @@ package com.junkbyte.console.core
 		public function getPossibleCalls(obj:*):Array{
 			var list:Array = new Array();
 			var V:XML = describeType(obj);
-			var cls:Object = obj is Class?obj:obj.constructor;
-			var clsV:XML = describeType(cls);
-			var nodes:XMLList = clsV..method;
+			var nodes:XMLList = V.method;
 			for each (var methodX:XML in nodes) {
 				list.push(methodX.@name+"(");
 			}
-			nodes = clsV..accessor;
+			nodes = V.accessor;
 			for each (var accessorX:XML in nodes) {
 				list.push(accessorX.@name);
 			}
-			nodes = clsV..variable;
+			nodes = V.variable;
 			for each (var variableX:XML in nodes) {
 				list.push(variableX.@name);
 			}
@@ -543,10 +552,11 @@ package com.junkbyte.console.core
 		 * Produces class name without package path
 		 * e.g: flash.display.Sprite => Sprite
 		 */	
-		public static function ShortClassName(cls:Object):String{
-			var str:String = getQualifiedClassName(cls);
+		public static function ShortClassName(obj:Object):String{
+			var str:String = getQualifiedClassName(obj);
 			var ind:int = str.lastIndexOf("::");
-			return EscHTML(str.substring(ind>=0?(ind+2):0));
+			var st:String = obj is Class?"*":"";
+			return EscHTML(st+str.substring(ind>=0?(ind+2):0)+st);
 		}
 	}
 }

@@ -24,7 +24,6 @@
 */
 package com.junkbyte.console.core 
 {
-	import flash.utils.describeType;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.vos.WeakRef;
@@ -123,10 +122,10 @@ package com.junkbyte.console.core
 				all.push("this");
 				all = all.concat(console.links.getPossibleCalls(_scope));
 			}
-			
+			str = str.toLowerCase();
 			var hints:Array = new Array();
 			for each(var canadate:String in all){
-				if(canadate.indexOf(str) == 0)
+				if(canadate.toLowerCase().indexOf(str) == 0)
 				{
 					hints.push(canadate);
 				}
@@ -269,9 +268,6 @@ package com.junkbyte.console.core
 			}
 			report(parts.join("\n"), 9);
 		}
-		//private function debug(...args):void{
-		//	_master.report(_master.joinArgs(args), 2, false);
-		//}
 		private function saveCmd(param:String = null):void{
 			store(param, _scope, false);
 		}
