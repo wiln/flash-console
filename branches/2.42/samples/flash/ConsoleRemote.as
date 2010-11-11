@@ -47,6 +47,7 @@ package
 			Cc.start(this, "", config);
 			Cc.commandLine = true;
 			Cc.config.maxRepeats = 200;
+			Cc.config.commandLineAllowed = true;
 			
 			Cc.instance.remoter.remoting = Remoting.RECIEVER;
 			//

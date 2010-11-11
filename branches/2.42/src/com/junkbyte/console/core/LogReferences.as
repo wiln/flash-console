@@ -241,6 +241,8 @@ package com.junkbyte.console.core
 				return;
 			}
 			var refIndex:uint = setLogRef(obj);
+			var showInherit:String = "";
+			if(!viewAll) showInherit = " [<a href='event:refi'>Show inherited</a>]";
 			var menuStr:String;
 			if(_history){
 				menuStr = "<b>[<a href='event:channel_"+console.config.globalChannel+ "'>Exit</a>]";
@@ -257,7 +259,7 @@ package com.junkbyte.console.core
 				}
 				
 				if(viewAll) menuStr += " [<a href='event:refi'>Hide inherited</a>]";
-				else menuStr += " [<a href='event:refi'>Show inherited</a>]";
+				else menuStr += showInherit;
 				report(menuStr, -1, true);
 				report();
 			}
@@ -395,7 +397,7 @@ package com.junkbyte.console.core
 				}
 			}
 			if(inherit){
-				report("   \t + "+inherit+" inherited methods.", 1);
+				report("   \t + "+inherit+" inherited methods."+showInherit, 1);
 			}else if(hasstuff){
 				report();
 			}
@@ -427,7 +429,7 @@ package com.junkbyte.console.core
 				}
 			}
 			if(inherit){
-				report("   \t + "+inherit+" inherited accessors.", 1);
+				report("   \t + "+inherit+" inherited accessors."+showInherit, 1);
 			}else if(hasstuff){
 				report();
 			}
@@ -466,6 +468,25 @@ package com.junkbyte.console.core
 				report();
 				report(menuStr, -1, true);
 			}
+		}
+		public function getPossibleCalls(obj:*):Array{
+			var list:Array = new Array();
+			var V:XML = describeType(obj);
+			var cls:Object = obj is Class?obj:obj.constructor;
+			var clsV:XML = describeType(cls);
+			var nodes:XMLList = clsV..method;
+			for each (var methodX:XML in nodes) {
+				list.push(methodX.@name+"(");
+			}
+			nodes = clsV..accessor;
+			for each (var accessorX:XML in nodes) {
+				list.push(accessorX.@name);
+			}
+			nodes = clsV..variable;
+			for each (var variableX:XML in nodes) {
+				list.push(variableX.@name);
+			}
+			return list;
 		}
 		private function makeValue(obj:*, prop:String = null):String{
 			return makeString(obj, prop, false, MAX_VAL_LENGTH);

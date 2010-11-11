@@ -38,6 +38,7 @@ package
 			//
 			// SETUP - only required once
 			//
+			// You can modify Cc.config as well. This is just to show alternative (choose one or another)
 			var config:ConsoleConfig = new ConsoleConfig();
 			config.style.big(); // BIGGER text. this modifies the config variables such as traceFontSize, menuFontSize
 			config.style.whiteBase(); // Black on white. this modifies the config variables such as priority0, priority1, etc

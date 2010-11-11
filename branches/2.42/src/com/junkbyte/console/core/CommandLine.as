@@ -24,6 +24,7 @@
 */
 package com.junkbyte.console.core 
 {
+	import flash.utils.describeType;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.vos.WeakRef;
@@ -110,6 +111,27 @@ package com.junkbyte.console.core
 				var str:String = strong?"STRONG":"WEAK";
 				report("Stored <p5>$"+n+"</p5> for <b>"+console.links.makeRefTyped(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
 			}
+		}
+		public function getHintsFor(str:String):Array
+		{
+			var all:Array = new Array();
+			for (var X:String in _slashCmds){
+				all.push("/"+X+" ");
+			}
+			
+			if(_scope){
+				all.push("this");
+				all = all.concat(console.links.getPossibleCalls(_scope));
+			}
+			
+			var hints:Array = new Array();
+			for each(var canadate:String in all){
+				if(canadate.indexOf(str) == 0)
+				{
+					hints.push(canadate);
+				}
+			}
+			return hints;
 		}
 		public function get scopeString():String{
 			return LogReferences.ShortClassName(_scope);

@@ -69,8 +69,6 @@ package com.junkbyte.console {
 		/** Font color for current channel name */
 		public var channelColor:uint = 0x0099CC;
 		
-		/** Font color for tool tips */
-		public var tooltipColor:uint = 0xDD5500;
 		//
 		
 		/** Color of log priority level 0.*/
@@ -127,7 +125,6 @@ package com.junkbyte.console {
 			menuHighlightColor = 0x881100;
 			channelsColor = 0x000000;
 			channelColor = 0x0066AA;
-			tooltipColor = 0xAA3300;
 			//
 			priority0 = 0x44A044;
 			priority1 = 0x339033;
@@ -178,7 +175,7 @@ package com.junkbyte.console {
 			_css.setStyle("menu",{color:hesh(menuColor), display:'inline'});
 			_css.setStyle("chs",{color:hesh(channelsColor), fontSize:menuFontSize, leading:'2', display:'inline'});
 			_css.setStyle("ch",{color:hesh(channelColor), display:'inline'});
-			_css.setStyle("tt",{color:hesh(tooltipColor),fontFamily:menuFont,fontSize:menuFontSize, textAlign:'center'});
+			_css.setStyle("tt",{color:hesh(menuColor),fontFamily:menuFont,fontSize:menuFontSize, textAlign:'center'});
 			_css.setStyle("p",{fontFamily:traceFont, fontSize:traceFontSize});
 			_css.setStyle("p0",{color:hesh(priority0), display:'inline'});
 			_css.setStyle("p1",{color:hesh(priority1), display:'inline'});

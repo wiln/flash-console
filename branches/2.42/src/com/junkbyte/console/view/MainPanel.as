@@ -25,6 +25,7 @@
 
 package com.junkbyte.console.view 
 {
+	import flash.events.FocusEvent;
 	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
@@ -55,6 +56,7 @@ package com.junkbyte.console.view
 		private var _traceField:TextField;
 		private var _cmdPrefx:TextField;
 		private var _cmdField:TextField;
+		private var _hintField:TextField;
 		private var _cmdBG:Shape;
 		private var _bottomLine:Shape;
 		private var _mini:Boolean;
@@ -74,6 +76,8 @@ package com.junkbyte.console.view
 		private var _atBottom:Boolean = true;
 		private var _enteringLogin:Boolean;
 		
+		private var _hint:String;
+		
 		public function MainPanel(m:Console) {
 			super(m);
 			var fsize:int = style.menuFontSize;
@@ -92,7 +96,7 @@ package com.junkbyte.console.view
 			_traceField.wordWrap = true;
 			_traceField.multiline = true;
 			_traceField.y = fsize;
-			_traceField.addEventListener(Event.SCROLL, onTraceScroll, false, 0, true);
+			_traceField.addEventListener(Event.SCROLL, onTraceScroll);
 			addChild(_traceField);
 			//
 			txtField = makeTF("menuField");
@@ -114,10 +118,24 @@ package com.junkbyte.console.view
 			_cmdField.type  = TextFieldType.INPUT;
 			_cmdField.x = 40;
 			_cmdField.height = fsize+6;
-			_cmdField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown, false, 0, true);
-			_cmdField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp, false, 0, true);
+			_cmdField.addEventListener(KeyboardEvent.KEY_DOWN, commandKeyDown);
+			_cmdField.addEventListener(KeyboardEvent.KEY_UP, commandKeyUp);
+			_cmdField.addEventListener(FocusEvent.FOCUS_IN, updateCmdHint);
+			_cmdField.addEventListener(FocusEvent.FOCUS_OUT, onCmdFocusOut);
 			_cmdField.defaultTextFormat = tf;
 			addChild(_cmdField);
+			
+			_hintField = new TextField();
+			_hintField.name = "commandField";
+			_hintField.mouseEnabled = false;
+			_hintField.background = true;
+            _hintField.backgroundColor = style.backgroundColor;
+			_hintField.defaultTextFormat = new TextFormat(style.menuFont, style.menuFontSize-1, style.lowColor);
+			_hintField.x = _cmdField.x;
+			_hintField.width = 300;
+			_hintField.autoSize = TextFieldAutoSize.LEFT;
+			addChild(_hintField);
+			setHints();
 			
 			tf.color = style.commandLineColor;
 			_cmdPrefx = new TextField();
@@ -128,9 +146,9 @@ package com.junkbyte.console.view
 			_cmdPrefx.selectable = false;
 			_cmdPrefx.defaultTextFormat = tf;
 			_cmdPrefx.text = " ";
-			_cmdPrefx.addEventListener(MouseEvent.MOUSE_DOWN, onCmdPrefMouseDown, false, 0, true);
-			_cmdPrefx.addEventListener(MouseEvent.MOUSE_MOVE, onCmdPrefRollOverOut, false, 0, true);
-			_cmdPrefx.addEventListener(MouseEvent.ROLL_OUT, onCmdPrefRollOverOut, false, 0, true);
+			_cmdPrefx.addEventListener(MouseEvent.MOUSE_DOWN, onCmdPrefMouseDown);
+			_cmdPrefx.addEventListener(MouseEvent.MOUSE_MOVE, onCmdPrefRollOverOut);
+			_cmdPrefx.addEventListener(MouseEvent.ROLL_OUT, onCmdPrefRollOverOut);
 			addChild(_cmdPrefx);
 			//
 			_bottomLine = new Shape();
@@ -140,10 +158,10 @@ package com.junkbyte.console.view
 			//
 			_txtscroll = new TextScroller(style.controlColor);
 			_txtscroll.y = fsize+4;
-			_txtscroll.addEventListener(Event.INIT, startedScrollingHandle, false, 0, true);
-			_txtscroll.addEventListener(Event.COMPLETE, stoppedScrollingHandle,  false, 0, true);
-			_txtscroll.addEventListener(Event.SCROLL, onScrolledHandle,  false, 0, true);
-			_txtscroll.addEventListener(Event.CHANGE, onScrollIncHandle,  false, 0, true);
+			_txtscroll.addEventListener(Event.INIT, startedScrollingHandle);
+			_txtscroll.addEventListener(Event.COMPLETE, stoppedScrollingHandle);
+			_txtscroll.addEventListener(Event.SCROLL, onScrolledHandle);
+			_txtscroll.addEventListener(Event.CHANGE, onScrollIncHandle);
 			addChild(_txtscroll);
 			//
 			_cmdField.visible = false;
@@ -458,6 +476,7 @@ package com.junkbyte.console.view
 			var cmdy:Number = n-(fsize+6);
 			_cmdField.y = cmdy;
 			_cmdPrefx.y = cmdy;
+			_hintField.y = _cmdField.y-_hintField.height;
 			_cmdBG.y = cmdy;
 			_bottomLine.y = _cmdField.visible?cmdy:n;
 			//
@@ -765,7 +784,50 @@ package com.junkbyte.console.view
 					_cmdField.text = "";
 				}
 			}
+			else if(e.keyCode == Keyboard.SPACE){
+				if(_hint) 
+				{
+					_cmdField.text = _hint;
+					_cmdField.setSelection(_cmdField.text.length, _cmdField.text.length);
+					setHints();
+				}
+			}
+			else updateCmdHint();
 			e.stopPropagation();
+		}
+		private function updateCmdHint(e:Event = null):void{
+			var hints:Array;
+			var str:String = _cmdField.text;
+			if(str){
+				if(master.remoter.remoting == Remoting.RECIEVER) str = str.substring(1);
+				
+				hints = master.cl.getHintsFor(str);
+				if(hints.length>3){
+					hints.splice(3);
+					hints.push("...");
+				}
+			}else if(master.remoter.remoting == Remoting.RECIEVER){
+				hints = new Array("~");
+			}
+			setHints(hints);
+		}
+		private function onCmdFocusOut(e:Event):void{
+			setHints();
+		}
+		private function setHints(a:Array = null):void{
+			if(a && a.length)
+			{
+				a = a.reverse();
+				_hintField.text = a.join("\n");
+				_hintField.visible = true;
+				var r:Rectangle = _cmdField.getCharBoundaries(_cmdField.text.length-1);
+				_hintField.x = _cmdField.x + r.x + r.width+20;
+				_hintField.y = height-_hintField.height;
+				_hint = a[0];
+			}else{
+				_hintField.visible = false;
+				_hint = null;
+			}
 		}
 		public function get commandLineText():String{
 			return _cmdField.text;
@@ -788,6 +850,7 @@ package com.junkbyte.console.view
 			}
 			_cmdField.x = _cmdPrefx.width+2;
 			_cmdField.width = width-15-_cmdField.x;
+			_hintField.x = _cmdField.x;
 		}
 		public function set commandLine (b:Boolean):void{
 			if(b){

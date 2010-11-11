@@ -49,21 +49,6 @@ ch.info("Hello!", "Works just like other logging methods but this way you keep t
 Cc.stack("Stack trace called from...");
 // It will add the stack trace under your string to show where this function is being called from.
 // Use Cc.stackch(...) to have channel name.
-//
-// Advanced logging
-//
-Cc.add("My advanced log in priority 2, 1st call", 2, true);
-Cc.add("My advanced log in priority 2, 2nd call", 2, true);
-Cc.add("My advanced log in priority 2, 3rd call", 2, true);
-Cc.add("My advanced log in priority 2, 4th call", 2, true);
-Cc.add("My advanced log in priority 2, 5th call", 2, true);
-// When 'no repeat' (3rd param) is set to true, it will not generate new lines for each log.
-// It will keep replacing the previous line with repeat turned on until a certain count is passed.
-// For example, if you are tracing download progress and you don't want to flood console with it.
-
-// If you want to specify the channel, use:
-// Use Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
-
 }}}
 
 ===UI===
@@ -90,8 +75,8 @@ Asdoc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleConfi
 You *must* set them before starting console. Example:
 {{{
 Cc.config.style.big(); // BIGGER text.
-Cc.config.style.whiteBase(); // Black on white.
-Cc.config.style.backgroundAlpha = 1; // makes it non-transparent background.
+Cc.config.style.whiteBase(); // Black on white. - NOT the way for stealth coders!
+Cc.config.style.backgroundAlpha = 1; // opaque background.
 
 Cc.startOnStage(this); // finally start with these styles
 }}}
@@ -100,20 +85,22 @@ example: bin/sampleStyle.swf for demo. (src: samples/flash/SampleStyle.as).
 
 Asdoc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleStyle.html
 
-
 ==Useful Features==
 
 
 ====Keyboard Binding====
 
+TODO:
 Cc.bindKey
 
 
 ====Object inspection====
 
+TODO:
 
 ====Command line====
 
+TODO:
  slash commands
  storing commands and calling it.
 
@@ -124,14 +111,39 @@ Cc.bindKey
 
 ====Display Roller====
 
+TODO:
  use capture key to capture back to log and get references for commandLine
 
 
 ====Graphing====
 
+TODO:
  Similar to FPS and memory, you can supply your own property to graph.
 
 
+====Advanced Logging====
+
+Yes, lets go back to logging... here are some extra features:
+
+
+TODO:
+{{{
+Cc.explode();
+}}
+
+Non-repetitive logging...
+It will keep replacing the previous line with repeat turned on until a certain count is passed.
+For example, if you are tracing download progress and you don't want to flood console with it.
+{{
+Cc.add("My advanced log in priority 2, 1st call", 2, true);
+Cc.add("My advanced log in priority 2, 2nd call", 2, true);
+Cc.add("My advanced log in priority 2, 3rd call", 2, true);
+Cc.add("My advanced log in priority 2, 4th call", 2, true);
+Cc.add("My advanced log in priority 2, 5th call", 2, true);
+// You will only see the last line in console.
+// If you want to specify the channel, use:
+// Use Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
+}}
 
 ====Garbage collection monitor====
 {{{
@@ -141,7 +153,7 @@ Cc.watch(aSprite, "aSprite");
 aSprite = null;
 }}}
 Above example creates a Sprite and then remove its reference. This marks the Sprite to be garbage collected, but it might not get collected straight away.
-If you have a debugger version of flash player installed, you can press G in console menu (press @ at top) to force garbage collect. 
+If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
 If you start using this in fairly big flash project, you will see that objects that have lost reference to will properly get collected and notified in console.
 
 
