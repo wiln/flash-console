@@ -25,16 +25,17 @@
 
 package com.junkbyte.console.view 
 {
-	import flash.events.FocusEvent;
-	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
 	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.core.LogReferences;
+	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.vos.Log;
 
 	import flash.display.Shape;
+	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TextEvent;
@@ -61,7 +62,13 @@ package com.junkbyte.console.view
 		private var _bottomLine:Shape;
 		private var _mini:Boolean;
 		private var _shift:Boolean;
-		private var _txtscroll:TextScroller;
+		
+		private var _scroll:Sprite;
+		private var _scroller:Sprite;
+		private var _scrolldelay:uint;
+		private var _scrolldir:int;
+		private var _scrolling:Boolean;
+		private var _scrollHeight:Number;
 		
 		private var _viewingChannels:Array;
 		private var _cmdsHistory:Array = [];
@@ -156,13 +163,22 @@ package com.junkbyte.console.view
 			_bottomLine.alpha = 0.2;
 			addChild(_bottomLine);
 			//
-			_txtscroll = new TextScroller(style.controlColor);
-			_txtscroll.y = fsize+4;
-			_txtscroll.addEventListener(Event.INIT, startedScrollingHandle);
-			_txtscroll.addEventListener(Event.COMPLETE, stoppedScrollingHandle);
-			_txtscroll.addEventListener(Event.SCROLL, onScrolledHandle);
-			_txtscroll.addEventListener(Event.CHANGE, onScrollIncHandle);
-			addChild(_txtscroll);
+			_scroll = new Sprite();
+			_scroll.y = fsize+4;
+			_scroll.name = "scroller";
+			_scroll.buttonMode = true;
+			_scroll.addEventListener(MouseEvent.MOUSE_DOWN, onScrollbarDown, false, 0, true);
+			_scroller = new Sprite();
+			_scroller.name = "scrollbar";
+			_scroller.y = 5;
+			_scroller.graphics.beginFill(style.controlColor, 1);
+			_scroller.graphics.drawRect(-5, 0, 5, 30);
+			_scroller.graphics.beginFill(0, 0);
+			_scroller.graphics.drawRect(-10, 0, 10, 30);
+			_scroller.graphics.endFill();
+			_scroller.addEventListener(MouseEvent.MOUSE_DOWN, onScrollerDown, false, 0, true);
+			_scroll.addChild(_scroller);
+			addChild(_scroll);
 			//
 			_cmdField.visible = false;
 			_cmdPrefx.visible = false;
@@ -196,8 +212,10 @@ package com.junkbyte.console.view
 			master.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?"Current scope::(CommandLine)":"", this);
 		}
 		private function onCmdPrefMouseDown(e : MouseEvent) : void {
-			stage.focus = _cmdField;
-			_cmdField.setSelection(_cmdField.text.length, _cmdField.text.length);
+			try{
+				stage.focus = _cmdField;
+				_cmdField.setSelection(_cmdField.text.length, _cmdField.text.length);
+			} catch(err:Error) {}
 		}
 		private function keyDownHandler(e:KeyboardEvent):void{
 			if(e.keyCode == Keyboard.SHIFT){
@@ -208,8 +226,10 @@ package com.junkbyte.console.view
 			if(e.keyCode == Keyboard.SHIFT){
 				_shift = false;
 			}else if(e.keyCode == Keyboard.ENTER && parent.visible && visible && _cmdField.visible){
-				stage.focus = _cmdField;
-				_cmdField.setSelection(0, _cmdField.text.length);
+				try{
+					stage.focus = _cmdField;
+					_cmdField.setSelection(0, _cmdField.text.length);
+				} catch(err:Error) {}
 			}
 		}
 		
@@ -253,13 +273,6 @@ package com.junkbyte.console.view
 			_atBottom = true;
 			_needUpdateTrace = true;
 		}
-		public function updateTraces(instant:Boolean = false):void{
-			if(instant){
-				_updateTraces();
-			}else{
-				_needUpdateTrace = true;
-			}
-		}
 		private function _updateTraces(onlyBottom:Boolean = false):void{
 			if(_atBottom) {
 				updateBottom(); 
@@ -284,7 +297,7 @@ package com.junkbyte.console.view
 		public function setPaused(b:Boolean):void{
 			if(b && _atBottom){
 				_atBottom = false;
-				updateTraces(true);
+				_updateTraces();
 				_traceField.scrollV = _traceField.maxScrollV;
 			}else if(!b){
 				_atBottom = true;
@@ -400,6 +413,9 @@ package com.junkbyte.console.view
 			str += "<p><"+ptag+">" + txt + "</"+ptag+"></p>";
 			return str;
 		}
+		//
+		// START OF SCROLL BAR STUFF
+		//
 		private function onTraceScroll(e:Event = null):void{
 			if(_lockScrollUpdate) return;
 			var atbottom:Boolean = _traceField.scrollV >= _traceField.maxScrollV;
@@ -413,35 +429,78 @@ package com.junkbyte.console.view
 		}
 		private function updateScroller():void{
 			if(_traceField.maxScrollV <= 1){
-				_txtscroll.visible = false;
+				_scroll.visible = false;
 			}else{
-				_txtscroll.visible = true;
+				_scroll.visible = true;
 				if(_atBottom) {
-					_txtscroll.scrollPercent = 1;
+					scrollPercent = 1;
 				}else{
-					_txtscroll.scrollPercent = (_traceField.scrollV-1)/(_traceField.maxScrollV-1);
+					scrollPercent = (_traceField.scrollV-1)/(_traceField.maxScrollV-1);
 				}
 			}
 		}
-		private function startedScrollingHandle(e:Event):void{
-			if(!master.paused){
-				_atBottom = false;
-				var p:Number = _txtscroll.scrollPercent;
-				_updateTraces();
-				_txtscroll.scrollPercent = p;
+		private function onScrollbarDown(e:MouseEvent):void{
+			if((_scroller.visible && _scroller.mouseY>0) || (!_scroller.visible && _scroll.mouseY>_scrollHeight/2)) {
+				_scrolldir = 3;
+			}else {
+				_scrolldir = -3;
+			}
+			_traceField.scrollV += _scrolldir;
+			_scrolldelay = 0;
+			addEventListener(Event.ENTER_FRAME, onScrollBarFrame, false, 0, true);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onScrollBarUp, false, 0, true);
+		}
+		private function onScrollBarFrame(e:Event):void{
+			_scrolldelay++;
+			if(_scrolldelay>10){
+				_scrolldelay = 9;
+				if((_scrolldir<0 && _scroller.y>_scroll.mouseY)||(_scrolldir>0 && _scroller.y+_scroller.height<_scroll.mouseY)){
+					_traceField.scrollV += _scrolldir;
+				}
 			}
 		}
-		private function onScrolledHandle(e:Event):void{
+		private function onScrollBarUp(e:Event):void{
+			removeEventListener(Event.ENTER_FRAME, onScrollBarFrame);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, onScrollBarUp);
+		}
+		//
+		//
+		private function get scrollPercent():Number{
+			return (_scroller.y-5)/(_scrollHeight-40);
+		}
+		private function set scrollPercent(per:Number):void{
+			_scroller.y = 5+((_scrollHeight-40)*per);
+		}
+		private function onScrollerDown(e:MouseEvent):void{
+			_scrolling = true;
+			
+			if(!master.paused && _atBottom){
+				_atBottom = false;
+				var p:Number = scrollPercent;
+				_updateTraces();
+				scrollPercent = p;
+			}
+			
+			_scroller.startDrag(false, new Rectangle(0,5, 0, (_scrollHeight-40)));
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onScrollerMove, false, 0, true);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onScrollerUp, false, 0, true);
+			e.stopPropagation();
+		}
+		private function onScrollerMove(e:MouseEvent):void{
 			_lockScrollUpdate = true;
-			_traceField.scrollV = Math.round((_txtscroll.scrollPercent*(_traceField.maxScrollV-1))+1);
+			_traceField.scrollV = Math.round((scrollPercent*(_traceField.maxScrollV-1))+1);
 			_lockScrollUpdate = false;
 		}
-		private function onScrollIncHandle(e:Event):void{
-			_traceField.scrollV += _txtscroll.targetIncrement;
-		}
-		private function stoppedScrollingHandle(e:Event):void{
+		private function onScrollerUp(e:MouseEvent):void{
+			_scroller.stopDrag();
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onScrollerMove);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, onScrollerUp);
+			_scrolling = false;
 			onTraceScroll();
 		}
+		//
+		// END OF SCROLL BAR STUFF
+		//
 		override public function set width(n:Number):void{
 			_lockScrollUpdate = true;
 			super.width = n;
@@ -454,7 +513,7 @@ package com.junkbyte.console.view
 			_bottomLine.graphics.lineStyle(1, style.controlColor);
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
-			_txtscroll.x = n;
+			_scroll.x = n;
 			if(master.remoter.remoting != Remoting.RECIEVER) updateCLScope(master.cl.scopeString);
 			_atBottom = true;
 			_needUpdateMenu = true;
@@ -480,8 +539,20 @@ package com.junkbyte.console.view
 			_cmdBG.y = cmdy;
 			_bottomLine.y = _cmdField.visible?cmdy:n;
 			//
-			_txtscroll.y = mini?6:fsize+4;
-			_txtscroll.height = (_bottomLine.y-(_cmdField.visible?0:10))-_txtscroll.y;
+			_scroll.y = mini?6:fsize+4;
+			_scrollHeight = (_bottomLine.y-(_cmdField.visible?0:10))-_scroll.y;
+			_scroller.visible = _scrollHeight>40;
+			_scroll.graphics.clear();
+			if(_scrollHeight>=10){
+				_scroll.graphics.beginFill(style.controlColor, 0.7);
+				_scroll.graphics.drawRect(-5, 0, 5, 5);
+				_scroll.graphics.drawRect(-5, _scrollHeight-5, 5, 5);
+				_scroll.graphics.beginFill(style.controlColor, 0.25);
+				_scroll.graphics.drawRect(-5, 5, 5, _scrollHeight-10);
+				_scroll.graphics.beginFill(0, 0);
+				_scroll.graphics.drawRect(-10, 10, 10, _scrollHeight-10);
+				_scroll.graphics.endFill();
+			}
 			//
 			_atBottom = true;
 			_needUpdateTrace = true;
@@ -498,7 +569,6 @@ package com.junkbyte.console.view
 			}
 		}
 		private function _updateMenu():void{
-			
 			var str:String = "<r><w>";
 			if(_mini || !style.topMenu){
 				str += "<menu><b> <a href=\"event:show\">‹</a> </b></menu>";
@@ -557,7 +627,6 @@ package com.junkbyte.console.view
 		public function onMenuRollOver(e:TextEvent, src:AbstractPanel = null):void{
 			if(src==null) src = this;
 			var txt:String = e.text?e.text.replace("event:",""):"";
-			
 			if(txt == "channel_"+config.globalChannel){
 				txt = "View all channels";
 			}else if(txt == "channel_"+config.defaultChannel) {
@@ -572,10 +641,8 @@ package com.junkbyte.console.view
 			}else if(txt.indexOf("channel_")==0) {
 				txt = "Change channel::Hold shift to select multiple channels";
 			}else if(txt == "pause"){
-				if(master.paused)
-					txt = "Resume updates";
-				else
-					txt = "Pause updates";
+				if(master.paused) txt = "Resume updates";
+				else txt = "Pause updates";
 			}else if(txt == "close" && src == this){
 				txt = "Close::Type password to show again";
 			}else{
@@ -736,7 +803,7 @@ package com.junkbyte.console.view
 			if( e.keyCode == Keyboard.ENTER){
 				updateToBottom();
 				if(_enteringLogin){
-					master.remoter.login(commandLineText);
+					master.remoter.login(_cmdField.text);
 					_cmdField.text = "";
 					requestLogin(false);
 				}else{
@@ -758,7 +825,7 @@ package com.junkbyte.console.view
 					_cmdField.text = "";
 					master.cl.run(txt);
 				}
-			}if( e.keyCode == Keyboard.ESCAPE){
+			}else if( e.keyCode == Keyboard.ESCAPE){
 				if(stage) stage.focus = null;
 			}else if( e.keyCode == Keyboard.UP){
 				// if its back key for first time, store the current key
@@ -817,23 +884,17 @@ package com.junkbyte.console.view
 		private function setHints(a:Array = null):void{
 			if(a && a.length)
 			{
+				_hint = a[0];
 				a = a.reverse();
 				_hintField.text = a.join("\n");
 				_hintField.visible = true;
 				var r:Rectangle = _cmdField.getCharBoundaries(_cmdField.text.length-1);
 				_hintField.x = _cmdField.x + r.x + r.width+20;
 				_hintField.y = height-_hintField.height;
-				_hint = a[0];
 			}else{
 				_hintField.visible = false;
 				_hint = null;
 			}
-		}
-		public function get commandLineText():String{
-			return _cmdField.text;
-		}
-		public function set  commandLineText(str:String):void{
-			_cmdField.text = str?str:"";
 		}
 		public function updateCLScope(str:String):void{
 			if(_enteringLogin) {
@@ -852,7 +913,7 @@ package com.junkbyte.console.view
 			_cmdField.width = width-15-_cmdField.x;
 			_hintField.x = _cmdField.x;
 		}
-		public function set commandLine (b:Boolean):void{
+		public function set commandLine(b:Boolean):void{
 			if(b){
 				_cmdField.visible = true;
 				_cmdPrefx.visible = true;
@@ -865,7 +926,7 @@ package com.junkbyte.console.view
 			_needUpdateMenu = true;
 			this.height = height;
 		}
-		public function get commandLine ():Boolean{
+		public function get commandLine():Boolean{
 			return _cmdField.visible;
 		}
 	}

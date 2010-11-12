@@ -74,7 +74,7 @@ package
 			Cc.debug("A debug level log.", "You can also pass an object and it'll become a link to inspect:", this);
 			Cc.warn("This is a warning log.", "Lets try the object linking again:", stage, " <- click it! (press 'exit' when done)");
 			Cc.error("This is an error log.", "This link might not work because it can get garbage collected:", new Sprite());
-			Cc.fatal("This is a fatal error log with high visibility.", "You will get a short stack trace of where it's called from (configurable)");
+			Cc.fatal("This is a fatal error log with high visibility.", "Also gets a stack trace on debug player...");
 			//
 			// Basic channel logging
 			//
@@ -89,7 +89,7 @@ package
 			//
 			// Stack tracing
 			//
-			Cc.stack("Stack trace called from...");
+			Cc.stack("Stack trace called from... (need debug player)");
 			// It will add the stack trace under your string to show where this function is being called from.
 			// Use Cc.stackch(...) to have channel name.
 
