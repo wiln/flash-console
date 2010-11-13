@@ -27,7 +27,6 @@ package com.junkbyte.console.view
 {
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
-	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.vos.Log;
@@ -91,9 +90,9 @@ package com.junkbyte.console.view
 			_viewingChannels = new Array();
 			_cmdsHistory = m.ud.commandLineHistory;
 			
-			master.cl.addCLCmd("filter", setFilterText, "Filter console logs to matching string. When done, click on the * (global channel) at top.", true);
-			master.cl.addCLCmd("filterexp", setFilterRegExp, "Filter console logs to matching regular expression", true);
-			master.cl.addCLCmd("clearhistory", clearCommandLineHistory, "Clear history of commands you have entered.", true);
+			console.cl.addCLCmd("filter", setFilterText, "Filter console logs to matching string. When done, click on the * (global channel) at top.", true);
+			console.cl.addCLCmd("filterexp", setFilterRegExp, "Filter console logs to matching regular expression", true);
+			console.cl.addCLCmd("clearhistory", clearCommandLineHistory, "Clear history of commands you have entered.", true);
 			
 			name = NAME;
 			minWidth = 50;
@@ -209,7 +208,7 @@ package com.junkbyte.console.view
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
 		private function onCmdPrefRollOverOut(e : MouseEvent) : void {
-			master.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?"Current scope::(CommandLine)":"", this);
+			console.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?"Current scope::(CommandLine)":"", this);
 		}
 		private function onCmdPrefMouseDown(e : MouseEvent) : void {
 			try{
@@ -236,9 +235,9 @@ package com.junkbyte.console.view
 		public function requestLogin(on:Boolean = true):void{
 			var ct:ColorTransform = new ColorTransform();
 			if(on){
-				master.commandLine = true;
-				master.report("//", -2);
-				master.report("// <b>Enter remoting password</b> in CommandLine below...", -2);
+				console.commandLine = true;
+				console.report("//", -2);
+				console.report("// <b>Enter remoting password</b> in CommandLine below...", -2);
 				updateCLScope("Password");
 				ct.color = style.controlColor;
 				_cmdBG.transform.colorTransform = ct;
@@ -282,7 +281,7 @@ package com.junkbyte.console.view
 		}
 		private function updateFull():void{
 			var str:String = "";
-			var line:Log = master.logs.last;
+			var line:Log = console.logs.last;
 			while(line){
 				if(lineShouldShow(line)){
 					str = makeLine(line)+str;
@@ -310,7 +309,7 @@ package com.junkbyte.console.view
 			var linesLeft:int = Math.round(_traceField.height/style.traceFontSize);
 			var maxchars:int = Math.round(_traceField.width*5/style.traceFontSize);
 			
-			var line:Log = master.logs.last;
+			var line:Log = console.logs.last;
 			while(line){
 				if(lineShouldShow(line)){
 					var numlines:int = Math.ceil(line.text.length/ maxchars);
@@ -351,7 +350,7 @@ package com.junkbyte.console.view
 		}
 		public function set viewingChannels(a:Array):void{
 			if(a[0] != _viewingChannels[0] && _viewingChannels[0] == LogReferences.INSPECTING_CHANNEL){
-				master.links.exitFocus();
+				console.links.exitFocus();
 			}
 			_viewingChannels.splice(0);
 			if(a && a.length) {
@@ -359,7 +358,7 @@ package com.junkbyte.console.view
 				for each(var item:Object in a) _viewingChannels.push(item is ConsoleChannel?(ConsoleChannel(item).name):String(item));
 			}
 			updateToBottom();
-			master.panels.updateMenu();
+			console.panels.updateMenu();
 		}
 		//
 		private function setFilterText(str:String = ""):void{
@@ -381,8 +380,8 @@ package com.junkbyte.console.view
 			}
 		}
 		private function startFilter():void{
-			master.clear(config.filteredChannel);
-			master.logs.addChannel(config.filteredChannel);
+			console.clear(config.filteredChannel);
+			console.logs.addChannel(config.filteredChannel);
 			viewingChannels = [config.filteredChannel];
 		}
 		private function endFilter():void{
@@ -419,7 +418,7 @@ package com.junkbyte.console.view
 		private function onTraceScroll(e:Event = null):void{
 			if(_lockScrollUpdate) return;
 			var atbottom:Boolean = _traceField.scrollV >= _traceField.maxScrollV;
-			if(!master.paused && _atBottom !=atbottom){
+			if(!console.paused && _atBottom !=atbottom){
 				var diff:int = _traceField.maxScrollV-_traceField.scrollV;
 				_atBottom = atbottom;
 				_updateTraces();
@@ -474,7 +473,7 @@ package com.junkbyte.console.view
 		private function onScrollerDown(e:MouseEvent):void{
 			_scrolling = true;
 			
-			if(!master.paused && _atBottom){
+			if(!console.paused && _atBottom){
 				_atBottom = false;
 				var p:Number = scrollPercent;
 				_updateTraces();
@@ -514,7 +513,7 @@ package com.junkbyte.console.view
 			_bottomLine.graphics.moveTo(10, -1);
 			_bottomLine.graphics.lineTo(n-10, -1);
 			_scroll.x = n;
-			if(master.remoter.remoting != Remoting.RECIEVER) updateCLScope(master.cl.scopeString);
+			if(console.remoter.remoting != Remoting.RECIEVER) updateCLScope(console.cl.scopeString);
 			_atBottom = true;
 			_needUpdateMenu = true;
 			_needUpdateTrace = true;
@@ -573,7 +572,7 @@ package com.junkbyte.console.view
 			if(_mini || !style.topMenu){
 				str += "<menu><b> <a href=\"event:show\">‹</a> </b></menu>";
 			}else {
-				if(!master.panels.channelsPanel){
+				if(!console.panels.channelsPanel){
 					str += getChannelsLink(true);
 				}
 				str += "<menu> <b>";
@@ -585,19 +584,19 @@ package com.junkbyte.console.view
 					}
 				}*/
 				
-				str += doActive("<a href=\"event:fps\">F</a>", master.fpsMonitor>0);
-				str += doActive(" <a href=\"event:mm\">M</a>", master.memoryMonitor>0);
+				str += doActive("<a href=\"event:fps\">F</a>", console.fpsMonitor>0);
+				str += doActive(" <a href=\"event:mm\">M</a>", console.memoryMonitor>0);
 				
 				str += doActive(" <a href=\"event:command\">CL</a>", commandLine);
 				
-				if(master.remoter.remoting != Remoting.RECIEVER){
-					str += doActive(" <a href=\"event:roller\">Ro</a>", master.displayRoller);
-					str += doActive(" <a href=\"event:ruler\">RL</a>", master.panels.rulerActive);
+				if(console.remoter.remoting != Remoting.RECIEVER){
+					str += doActive(" <a href=\"event:roller\">Ro</a>", console.displayRoller);
+					str += doActive(" <a href=\"event:ruler\">RL</a>", console.panels.rulerActive);
 				}
 				str += " ¦</b>";
 				str += " <a href=\"event:copy\">Cc</a>";
 				str += " <a href=\"event:priority\">P"+_priority+"</a>";
-				str += doActive(" <a href=\"event:pause\">P</a>", master.paused);
+				str += doActive(" <a href=\"event:pause\">P</a>", console.paused);
 				str += " <a href=\"event:clear\">C</a> <a href=\"event:close\">X</a> <a href=\"event:hide\">›</a> </b></menu>";
 			}
 			str += "</w></r>";
@@ -606,7 +605,7 @@ package com.junkbyte.console.view
 		}
 		public function getChannelsLink(limited:Boolean = false):String{
 			var str:String = "<chs>";
-			var channels:Array = master.logs.getChannels();
+			var channels:Array = console.logs.getChannels();
 			var len:int = channels.length;
 			if(limited && len>style.maxChannelsInMenu) len = style.maxChannelsInMenu;
 			for(var i:int = 0; i<len;  i++){
@@ -641,7 +640,7 @@ package com.junkbyte.console.view
 			}else if(txt.indexOf("channel_")==0) {
 				txt = "Change channel::Hold shift to select multiple channels";
 			}else if(txt == "pause"){
-				if(master.paused) txt = "Resume updates";
+				if(console.paused) txt = "Resume updates";
 				else txt = "Pause updates";
 			}else if(txt == "close" && src == this){
 				txt = "Close::Type password to show again";
@@ -660,78 +659,69 @@ package com.junkbyte.console.view
 					};
 				txt = obj[txt];
 			}
-			master.panels.tooltip(txt, src);
+			console.panels.tooltip(txt, src);
 		}
 		private function linkHandler(e:TextEvent):void{
 			txtField.setSelection(0, 0);
 			stopDrag();
 			var t:String = e.text;
 			if(t == "pause"){
-				if(master.paused){
-					master.paused = false;
+				if(console.paused){
+					console.paused = false;
 				}else{
-					master.paused = true;
+					console.paused = true;
 				}
-				master.panels.tooltip(null);
+				console.panels.tooltip(null);
 			}else if(t == "hide"){
-				master.panels.tooltip();
+				console.panels.tooltip();
 				_mini = true;
-				master.config.style.topMenu = false;
+				console.config.style.topMenu = false;
 				height = height;
 				updateMenu();
 			}else if(t == "show"){
-				master.panels.tooltip();
+				console.panels.tooltip();
 				_mini = false;
-				master.config.style.topMenu = true;
+				console.config.style.topMenu = true;
 				height = height;
 				updateMenu();
 			}else if(t == "close"){
-				master.panels.tooltip();
+				console.panels.tooltip();
 				visible = false;
 				dispatchEvent(new Event(Event.CLOSE));
 			}else if(t == "channels"){
-				master.panels.channelsPanel = !master.panels.channelsPanel;
+				console.panels.channelsPanel = !console.panels.channelsPanel;
 			}else if(t == "fps"){
-				master.fpsMonitor = !master.fpsMonitor;
+				console.fpsMonitor = !console.fpsMonitor;
 			}else if(t == "priority"){
 				incPriority(_shift);
 			}else if(t == "mm"){
-				master.memoryMonitor = !master.memoryMonitor;
+				console.memoryMonitor = !console.memoryMonitor;
 			}else if(t == "roller"){
-				master.displayRoller = !master.displayRoller;
+				console.displayRoller = !console.displayRoller;
 			}else if(t == "ruler"){
-				master.panels.tooltip();
-				master.panels.startRuler();
+				console.panels.tooltip();
+				console.panels.startRuler();
 			}else if(t == "command"){
 				commandLine = !commandLine;
 			}else if(t == "copy") {
-				System.setClipboard(master.getAllLog());
-				master.report("Copied log to clipboard.", -1);
+				System.setClipboard(console.getAllLog());
+				console.report("Copied log to clipboard.", -1);
 			}else if(t == "clear"){
-				master.clear();
+				console.clear();
 			}else if(t == "settings"){
-				master.report("A new window should open in browser. If not, try searching for 'Flash Player Global Security Settings panel' online :)", -1);
+				console.report("A new window should open in browser. If not, try searching for 'Flash Player Global Security Settings panel' online :)", -1);
 				Security.showSettings(SecurityPanel.SETTINGS_MANAGER);
 			}else if(t == "remote"){
-				master.remoter.remoting = Remoting.RECIEVER;
+				console.remoter.remoting = Remoting.RECIEVER;
 			}else if(t.indexOf("ref")==0){
-				master.links.handleRefEvent(t);
+				console.links.handleRefEvent(t);
 			}else if(t.indexOf("channel_")==0){
 				onChannelPressed(t.substring(8));
-			}else if(t.indexOf("clip_")==0){
-				master.mapper.reMap(t.substring(5));
-			}else if(t.indexOf("sclip_")==0){
-				master.mapper.reMap("0"+DisplayMapper.SPLITTER+t.substring(6));
 			}else if(t.indexOf("cl_")==0){
 				var ind:int = t.indexOf("_", 3);
-				var v:* = master.links.getRefById(uint(t.substring(3, ind<0?t.length:ind)));
-				if(v){
-					master.cl.setReturned(v, true, false);
-					if(ind>=0){
-						_cmdField.text = t.substring(ind+1);
-					}
-				}else{
-					master.report("Reference no longer exist.", -2);
+				console.cl.handleScopeEvent(uint(t.substring(3, ind<0?t.length:ind)));
+				if(ind>=0){
+					_cmdField.text = t.substring(ind+1);
 				}
 			}
 			txtField.setSelection(0, 0);
@@ -766,7 +756,7 @@ package com.junkbyte.console.view
 		private function incPriority(down:Boolean):void{
 			var top:uint = 10;
 			var bottom:uint;
-			var line:Log = master.logs.last;
+			var line:Log = console.logs.last;
 			var p:int = _priority;
 			_priority = 0;
 			var i:uint = 32000; // just for crash safety, it wont look more than 32000 lines.
@@ -794,7 +784,7 @@ package com.junkbyte.console.view
 		{
 			_cmdsHistory.splice(0);
 			_cmdsInd = -1;
-			master.ud.commandLineHistoryChanged();
+			console.ud.commandLineHistoryChanged();
 		}
 		private function commandKeyDown(e:KeyboardEvent):void{
 			e.stopPropagation();
@@ -802,8 +792,9 @@ package com.junkbyte.console.view
 		private function commandKeyUp(e:KeyboardEvent):void{
 			if( e.keyCode == Keyboard.ENTER){
 				updateToBottom();
+				setHints();
 				if(_enteringLogin){
-					master.remoter.login(_cmdField.text);
+					console.remoter.login(_cmdField.text);
 					_cmdField.text = "";
 					requestLogin(false);
 				}else{
@@ -820,10 +811,10 @@ package com.junkbyte.console.view
 						if(_cmdsHistory.length>20){
 							_cmdsHistory.splice(20);
 						}
-						master.ud.commandLineHistoryChanged();
+						console.ud.commandLineHistoryChanged();
 					}
 					_cmdField.text = "";
-					master.cl.run(txt);
+					console.cl.run(txt);
 				}
 			}else if( e.keyCode == Keyboard.ESCAPE){
 				if(stage) stage.focus = null;
@@ -859,21 +850,21 @@ package com.junkbyte.console.view
 					setHints();
 				}
 			}
-			else updateCmdHint();
+			else if(!_enteringLogin) updateCmdHint();
 			e.stopPropagation();
 		}
 		private function updateCmdHint(e:Event = null):void{
 			var hints:Array;
 			var str:String = _cmdField.text;
 			if(str){
-				if(master.remoter.remoting == Remoting.RECIEVER) str = str.substring(1);
+				if(console.remoter.remoting == Remoting.RECIEVER) str = str.substring(1);
 				
-				hints = master.cl.getHintsFor(str);
+				hints = console.cl.getHintsFor(str);
 				if(hints.length>3){
 					hints.splice(3);
 					hints.push("...");
 				}
-			}else if(master.remoter.remoting == Remoting.RECIEVER){
+			}else if(console.remoter.remoting == Remoting.RECIEVER){
 				hints = new Array("~");
 			}
 			setHints(hints);
@@ -889,6 +880,7 @@ package com.junkbyte.console.view
 				_hintField.text = a.join("\n");
 				_hintField.visible = true;
 				var r:Rectangle = _cmdField.getCharBoundaries(_cmdField.text.length-1);
+				if(!r) r = new Rectangle();
 				_hintField.x = _cmdField.x + r.x + r.width+20;
 				_hintField.y = height-_hintField.height;
 			}else{

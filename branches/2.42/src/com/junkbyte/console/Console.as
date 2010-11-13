@@ -60,8 +60,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.5;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 535;
-		public static const BUILD_DATE:String = "2010/11/12 00:04";
+		public static const BUILD:int = 536;
+		public static const BUILD_DATE:String = "2010/11/13 02:49";
 		//
 		public static const NAME:String = "Console";
 		//
@@ -221,7 +221,7 @@ package com.junkbyte.console
 		}
 		private function onRollerCaptureKey():void{
 			if(displayRoller){
-				report("Display Roller Capture:<br/>"+RollerPanel(_panels.getPanel(RollerPanel.NAME)).capture(), -1);
+				report("Display Roller Capture:<br/>"+RollerPanel(_panels.getPanel(RollerPanel.NAME)).getMapString(true), -1);
 			}
 		}
 		//
@@ -349,11 +349,11 @@ package com.junkbyte.console
 			var cn:String = viewingChannels.length == 1?viewingChannels[0]:config.consoleChannel;
 			addLine([obj], priority, cn, false, skipSafe);
 		}
-		public function addLine(arr:Array, priority:int = 0,channel:String = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
+		public function addLine(lineParts:Array, priority:int = 0,channel:String = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
 			var txt:String = "";
-			var len:int = arr.length;
+			var len:int = lineParts.length;
 			for(var i:int = 0; i < len; i++){
-				txt += (i?" ":"")+_links.makeString(arr[i], null, html);
+				txt += (i?" ":"")+_links.makeString(lineParts[i], null, html);
 			}
 			
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
@@ -460,12 +460,12 @@ package com.junkbyte.console
 		public function fatalch(channel:*, ...args):void{
 			addCh(channel, args, FATAL);
 		}
-		private function addCh(channel:*, newLine:Array, priority:int = 2, isRepeating:Boolean = false):void{
+		public function addCh(channel:*, lineParts:Array, priority:int = 2, isRepeating:Boolean = false):void{
 			var chn:String;
 			if(channel is String) chn = channel as String;
 			else if(channel) chn = LogReferences.ShortClassName(channel);
 			else chn = _config.defaultChannel;
-			addLine(newLine, priority,chn, isRepeating);
+			addLine(lineParts, priority,chn, isRepeating);
 		}
 		//
 		//

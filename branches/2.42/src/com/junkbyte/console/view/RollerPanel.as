@@ -26,7 +26,6 @@ package com.junkbyte.console.view
 {
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.KeyBind;
-	import com.junkbyte.console.core.DisplayMapper;
 	import com.junkbyte.console.core.LogReferences;
 
 	import flash.display.DisplayObject;
@@ -44,8 +43,6 @@ package com.junkbyte.console.view
 		
 		public static const NAME:String = "rollerPanel";
 		
-		private var _base:DisplayObjectContainer;
-		
 		private var _settingKey:Boolean;
 		
 		public function RollerPanel(m:Console) {
@@ -59,8 +56,7 @@ package com.junkbyte.console.view
 			registerDragger(txtField);
 			addChild(txtField);
 		}
-		public function start(base:DisplayObjectContainer):void{
-			_base = base;
+		public function start():void{
 			addEventListener(Event.ENTER_FRAME, _onFrame);
 			addEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
 		}
@@ -69,29 +65,26 @@ package com.junkbyte.console.view
 			removeEventListener(Event.REMOVED_FROM_STAGE, removeListeners);
 			if(stage) stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
-		public function capture():String{
-			return getMapString(true);
-		}
 		private function _onFrame(e:Event):void{
-			if(!_base.stage){
+			if(!console.stage){
 				close();
 				return;
 			}
 			if(_settingKey){
 				txtField.htmlText = "<w><menu>Press a key to set [ <a href=\"event:cancel\"><b>cancel</b></a> ]</menu></w>";
 			}else{
-				txtField.htmlText = "<s>"+getMapString()+"</s>";
+				txtField.htmlText = "<s>"+getMapString(false)+"</s>";
 				txtField.autoSize = TextFieldAutoSize.LEFT;
 				txtField.setSelection(0, 0);
 			}
 			width = txtField.width+4;
 			height = txtField.height;
 		}
-		private function getMapString(dolink:Boolean = false):String{
-			var stg:Stage = _base.stage;
+		public function getMapString(dolink:Boolean):String{
+			var stg:Stage = console.stage;
 			var str:String = "";
 			if(!dolink){
-				var key:String = master.rollerCaptureKey?master.rollerCaptureKey.key:"unassigned";
+				var key:String = console.rollerCaptureKey?console.rollerCaptureKey.key:"unassigned";
 				str = "<menu> <a href=\"event:close\"><b>X</b></a></menu> Capture key: <menu><a href=\"event:capture\">"+key+"</a></menu><br/>";
 			}
 			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
@@ -116,11 +109,18 @@ package com.junkbyte.console.view
 						}
 						
 						var n:String = obj.name;
-						if(dolink) n = "<a href='event:sclip_"+mapUpward(obj)+"'>"+n+"</a> "+master.links.makeString(obj);
+						var ind:uint;
+						if(dolink && console.config.useObjectLinking) {
+							ind = console.links.setLogRef(obj);
+							n = "<a href='event:cl_"+ind+"'>"+n+"</a> "+console.links.makeString(obj);
+						}
 						else n = n+" ("+LogReferences.ShortClassName(obj)+")";
 			
 						if(obj == stg){
-							str +=  "<p3><a href='event:sclip_'><i>Stage</i></a> ["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";
+							ind = console.links.setLogRef(stg);
+							if(ind) str +=  "<p3><a href='event:cl_"+ind+"'><i>Stage</i></a> ";
+							else str += "<p3><i>Stage</i> ";
+							str +=  "["+stg.mouseX+","+stg.mouseY+"]</p3><br/>";
 						}else if(i == len-1){
 							str +=  "<p5>"+n+"</p5><br/>";
 						}else {
@@ -131,28 +131,18 @@ package com.junkbyte.console.view
 			}
 			return str;
 		}
-		private function mapUpward(mc:DisplayObject):String{
-			var arr:Array = [mc.name];
-			mc = mc.parent;
-			while(mc && mc!=mc.stage){
-				arr.push(mc.name);
-				mc = mc.parent;
-			}
-			return arr.reverse().join(DisplayMapper.SPLITTER);
-		}
 		public override function close():void {
 			cancelCaptureKeySet();
 			removeListeners();
-			_base = null;
 			super.close();
-			master.panels.updateMenu(); // should be black boxed :/
+			console.panels.updateMenu(); // should be black boxed :/
 		}
 		private function onMenuRollOver(e:TextEvent):void{
 			var txt:String = e.text?e.text.replace("event:",""):"";
 			if(txt == "close"){
 				txt = "Close";
 			}else if(txt == "capture"){
-				var key:KeyBind = master.rollerCaptureKey;
+				var key:KeyBind = console.rollerCaptureKey;
 				if(key){
 					txt = "Unassign key ::"+key.key;
 				}else{
@@ -163,23 +153,23 @@ package com.junkbyte.console.view
 			}else{
 				txt = null;
 			}
-			master.panels.tooltip(txt, this);
+			console.panels.tooltip(txt, this);
 		}
 		protected function linkHandler(e:TextEvent):void{
 			TextField(e.currentTarget).setSelection(0, 0);
 			if(e.text == "close"){
 				close();
 			}else if(e.text == "capture"){
-				if(master.rollerCaptureKey){
-					master.setRollerCaptureKey(null);
+				if(console.rollerCaptureKey){
+					console.setRollerCaptureKey(null);
 				}else{
 					_settingKey = true;
 					stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
 				}
-				master.panels.tooltip(null);
+				console.panels.tooltip(null);
 			}else if(e.text == "cancel"){
 				cancelCaptureKeySet();
-				master.panels.tooltip(null);
+				console.panels.tooltip(null);
 			}
 			e.stopPropagation();
 		}
@@ -191,8 +181,8 @@ package com.junkbyte.console.view
 			if(!e.charCode) return;
 			var char:String = String.fromCharCode(e.charCode);
 			cancelCaptureKeySet();
-			master.setRollerCaptureKey(char, e.shiftKey, e.ctrlKey, e.altKey);
-			master.panels.tooltip(null);
+			console.setRollerCaptureKey(char, e.shiftKey, e.ctrlKey, e.altKey);
+			console.panels.tooltip(null);
 		}
 	}
 }

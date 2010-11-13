@@ -48,7 +48,7 @@ package com.junkbyte.console.view {
 		public function update():void{
 			txtField.wordWrap = false;
 			txtField.width = 80;
-			var str:String = "<w><menu> <b><a href=\"event:close\">X</a></b></menu> "+ master.panels.mainPanel.getChannelsLink();
+			var str:String = "<w><menu> <b><a href=\"event:close\">X</a></b></menu> "+ console.panels.mainPanel.getChannelsLink();
 			txtField.htmlText = str+"</w>";
 			if(txtField.width>160){
 				txtField.wordWrap = true;
@@ -58,14 +58,14 @@ package com.junkbyte.console.view {
 			height = txtField.height;
 		}
 		private function onMenuRollOver(e:TextEvent):void{
-			master.panels.mainPanel.onMenuRollOver(e, this);
+			console.panels.mainPanel.onMenuRollOver(e, this);
 		}
 		protected function linkHandler(e:TextEvent):void{
 			txtField.setSelection(0, 0);
 			if(e.text == "close"){
-				master.panels.channelsPanel = false;
+				console.panels.channelsPanel = false;
 			}else if(e.text.substring(0,8) == "channel_"){
-				master.panels.mainPanel.onChannelPressed(e.text.substring(8));
+				console.panels.mainPanel.onChannelPressed(e.text.substring(8));
 			}
 			txtField.setSelection(0, 0);
 			e.stopPropagation();

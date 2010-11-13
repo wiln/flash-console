@@ -93,18 +93,6 @@ package com.junkbyte.console {
 		private static var _config:ConsoleConfig;
 		
 		/**
-		 * Do not construct.
-		 * Please use Cc.start(..); or Cc.startOnStage(...);
-		 * 
-		 * @throws Error error
-		 * @see #start()
-		 * @see #startOnStage()
-		 */
-		public function Cc() {
-			throw new Error("[Cc] Do not construct. Please use Cc.start() or Cc.startOnStage()");
-		}
-		
-		/**
 		 * Returns ConsoleConfig used or to be used - to start console. 
 		 * Creates a new one if it previously does not exist and get passed on the next Cc.start (if a different config instance was not passed into start)
 		 */
@@ -128,7 +116,9 @@ package com.junkbyte.console {
 		 * @param  ConsoleConfig to use. if passed null it will generate a default one or use the one thats already set by Cc.config.
 		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = "", cfg:ConsoleConfig = null):void{
-			if(!_console){
+			if(_console){
+				if(!_console.parent) mc.addChild(_console);
+			}else{
 				if(cfg) _config = cfg;
 				_console = new Console(pass, config);
 				// if no parent display, console will always be hidden, but using Cc.remoting is still possible so its not the end.
@@ -151,7 +141,9 @@ package com.junkbyte.console {
 		 * 			
 		 */
 		public static function startOnStage(mc:DisplayObject, pass:String = "", config:ConsoleConfig = null):void{
-			if(!_console){
+			if(_console){
+				if(mc && mc.stage && _console.parent != mc.stage) mc.stage.addChild(_console);
+			}else{
 				if(mc && mc.stage){
 					start(mc.stage, pass, config);
 				}else{
@@ -162,7 +154,7 @@ package com.junkbyte.console {
 			}
 		}
 		//
-		//
+		// LOGGING 
 		//
 		/**
 		 * Add log line to default channel
@@ -172,36 +164,7 @@ package com.junkbyte.console {
 		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
 		 */
 		public static function add(str:*, priority:int = 2, isRepeating:Boolean = false):void{
-			if(_console){
-				_console.add(str, priority, isRepeating);
-			}
-		}
-		/**
-		 * Stack log
-		 *
-		 * @param  String to add
-		 * @param  The depth of stack trace
-		 * @param  Priority of line. 0-10 (optional, default: 5)
-		 * 
-		 */
-		public static function stack(str:*, depth:int = -1, priority:int = 5):void{
-			if(_console){
-				_console.stack(str,depth,priority);
-			}
-		}
-		/**
-		 * Stack log to channel
-		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param  String to add
-		 * @param  The depth of stack trace
-		 * @param  Priority of line. 0-10 (optional, default: 5)
-		 * 
-		 */
-		public static function stackch(ch:String, str:*, depth:int = -1, priority:int = 5):void{
-			if(_console){
-				_console.stackch(ch, str, depth, priority);
-			}
+			if(_console) _console.add(str, priority, isRepeating);
 		}
 		/**
 		 * Add log line to channel.
@@ -213,9 +176,7 @@ package com.junkbyte.console {
 		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
 		 */
 		public static function ch(channel:*, str:*, priority:int = 2, isRepeating:Boolean = false):void{
-			if(_console){
-				_console.ch(channel,str, priority, isRepeating);
-			}
+			if(_console) _console.ch(channel,str, priority, isRepeating);
 		}
 		/**
 		 * Add log line with priority 1
@@ -224,9 +185,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function log(...args):void{
-			if(_console){
-				_console.log.apply(null, args);
-			}
+			if(_console) _console.log.apply(null, args);
 		}
 		/**
 		 * Add log line with priority 3
@@ -235,9 +194,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function info(...args):void{
-			if(_console){
-				_console.info.apply(null, args);
-			}
+			if(_console) _console.info.apply(null, args);
 		}
 		/**
 		 * Add log line with priority 5
@@ -246,9 +203,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function debug(...args):void{
-			if(_console){
-				_console.debug.apply(null, args);
-			}
+			if(_console) _console.debug.apply(null, args);
 		}
 		/**
 		 * Add log line with priority 7
@@ -257,9 +212,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function warn(...args):void{
-			if(_console){
-				_console.warn.apply(null, args);
-			}
+			if(_console) 	_console.warn.apply(null, args);
 		}
 		/**
 		 * Add log line with priority 9
@@ -268,9 +221,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function error(...args):void{
-			if(_console){
-				_console.error.apply(null, args);
-			}
+			if(_console) _console.error.apply(null, args);
 		}
 		/**
 		 * Add log line with priority 10
@@ -279,9 +230,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function fatal(...args):void{
-			if(_console){
-				_console.fatal.apply(null, args);
-			}
+			if(_console) _console.fatal.apply(null, args);
 		}
 		/**
 		 * Add log line with priority 1 to channel
@@ -291,7 +240,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function logch(channel:*, ...args):void{
-			chcall("logch", channel, args);
+			if(_console) _console.addCh(channel, args, Console.LOG);
 		}
 		/**
 		 * Add log line with priority 3 to channel
@@ -301,7 +250,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function infoch(channel:*, ...args):void{
-			chcall("infoch", channel, args);
+			if(_console) _console.addCh(channel, args, Console.INFO);
 		}
 		/**
 		 * Add log line with priority 5 to channel
@@ -311,7 +260,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function debugch(channel:*, ...args):void{
-			chcall("debugch", channel, args);
+			if(_console) _console.addCh(channel, args, Console.DEBUG);
 		}
 		/**
 		 * Add log line with priority 7 to channel
@@ -321,7 +270,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function warnch(channel:*, ...args):void{
-			chcall("warnch", channel, args);
+			if(_console) _console.addCh(channel, args, Console.WARN);
 		}
 		/**
 		 * Add log line with priority 9 to channel
@@ -331,7 +280,7 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function errorch(channel:*, ...args):void{
-			chcall("errorch", channel, args);
+			if(_console) _console.addCh(channel, args, Console.ERROR);
 		}
 		/**
 		 * Add log line with priority 10 to channel
@@ -341,175 +290,31 @@ package com.junkbyte.console {
 		 * @param String to be logged, any type can be passed and will be converted to string
 		 */
 		public static function fatalch(channel:*, ...args):void{
-			chcall("fatalch", channel, args);
-		}
-		private static function chcall(callname:String, ch:*, args:Array):void{
-			if(_console){
-				args.unshift(ch);
-				_console[callname].apply(null, args);
-			}
+			if(_console) _console.addCh(channel, args, Console.FATAL);
 		}
 		/**
-		 * Remove console from it's parent display and clean up
+		 * Stack log
+		 *
+		 * @param  String to add
+		 * @param  The depth of stack trace
+		 * @param  Priority of line. 0-10 (optional, default: 5)
+		 * 
 		 */
-		public static function remove():void{
-			if(_console){
-				if(_console.parent){
-					_console.parent.removeChild(_console);
-				}
-				_console = null;
-			}
+		public static function stack(str:*, depth:int = -1, priority:int = 5):void{
+			if(_console) _console.stack(str,depth,priority);
 		}
 		/**
-		 * Pauses output log and graphs in Console.
-		 * It still record and print back out on resume.
+		 * Stack log to channel
+		 *
+		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param  String to add
+		 * @param  The depth of stack trace
+		 * @param  Priority of line. 0-10 (optional, default: 5)
+		 * 
 		 */
-		public static function get paused():Boolean{
-			return getter("paused") as Boolean;
+		public static function stackch(ch:String, str:*, depth:int = -1, priority:int = 5):void{
+			if(_console) _console.stackch(ch, str, depth, priority);
 		}
-		public static function set paused(v:Boolean):void{
-			setter("paused",v);
-		}
-		//
-		// Logging settings
-		//
-		/**
-		 * Clear console logs.
-		 * @param  (optional) name of log channel to clear, leave blank to clear all.
-		 */
-		public static function clear(channel:String = null):void{
-			if(_console){
-				_console.clear(channel);
-			}
-		}
-		
-		/**
-		 * Listen for uncaught errors from loaderInfo instance
-		 * Only works for flash player target 10.1 or later
-		 * @param  loaderInfo instance that can dispatch errors
-		 */
-		public static function listenUncaughtErrors(loaderinfo:LoaderInfo):void{
-			if(_console){
-				_console.listenUncaughtErrors(loaderinfo);
-			}
-		}
-		
-		/**
-		 * Accessor for currently viewing channels.
-		 * <p>
-		 * Set to null or empty array to view all channels (global channel).
-		 * </p>
-		 */
-		public static function get viewingChannels():Array{
-			return getter("viewingChannels") as Array;
-		}
-		public static function set viewingChannels(v:Array):void{
-			setter("viewingChannels",v);
-		}
-
-		/**
-		 * Start/stop FPS monitor graph.
-		 */
-		public static function get fpsMonitor():Boolean{
-			return getter("fpsMonitor") as Boolean;
-		}
-		public static function set fpsMonitor(v:Boolean):void{
-			setter("fpsMonitor", v);
-		}
-		/**
-		 * Start/stop Memory monitor graph.
-		 */
-		public static function get memoryMonitor():Boolean{
-			return getter("memoryMonitor") as Boolean;
-		}
-		public static function set memoryMonitor(v:Boolean):void{
-			setter("memoryMonitor", v);
-		}
-		/**
-		 * Start/stop Display Roller.
-		 */
-		public static function get displayRoller():Boolean{
-			return getter("displayRoller") as Boolean;
-		}
-		public static function set displayRoller(v:Boolean):void{
-			setter("displayRoller", v);
-		}
-		/**
-		 * width of main console panel
-		 */
-		public static function get width():Number{
-			return getter("width") as Number;
-		}
-		public static function set width(v:Number):void{
-			setter("width",v);
-		}
-		/**
-		 * height of main console panel
-		 */
-		public static function get height():Number{
-			return getter("height") as Number;
-		}
-		public static function set height(v:Number):void{
-			setter("height",v);
-		}
-		/**
-		 * x position of main console panel
-		 */
-		public static function get x():Number{
-			return getter("x") as Number;
-		}
-		public static function set x(v:Number):void{
-			setter("x",v);
-		}
-		/**
-		 * y position of main console panel
-		 */
-		public static function get y():Number{
-			return getter("y") as Number;
-		}
-		public static function set y(v:Number):void{
-			setter("y",v);
-		}
-		/**
-		 * visibility of all console panels
-		 * <p>
-		 * If you have closed the main console by pressing the X button, setting true here will not turn it back on.
-		 * You will need to press the password key to turn that panel back on instead.
-		 * </p>
-		 */
-		public static function get visible():Boolean{
-			return getter("visible") as Boolean;
-		}
-		public static function set visible(v:Boolean):void{
-			setter("visible",v);
-		}
-		//
-		// Remoting
-		//
-		/**
-		 * Turn on/off remoting feature.
-		 * Console will periodically broadcast logs, FPS history and memory usage
-		 * for another Console remote to receive.
-		 */
-		public static function get remoting():Boolean{
-			return getter("remoting") as Boolean;
-		}
-		public static function set remoting(v:Boolean):void{
-			setter("remoting",v);
-		}
-		/**
-		 * Set Password required to connect from remote.
-		 * <p>
-		 * By default this is the same as the password used in Cc.start() / Cc.startOnStage();
-		 * If you set this to null, remote will no longer need a password to connect.
-		 * </p>
-		 */
-		public static function set remotingPassword(v:String):void{
-			setter("remotingPassword",v);
-		}
-		//
-		// Command line tools
-		//
 		/**
 		 * Output an object's info such as it's variables, methods (if any), properties,
 		 * superclass, children displays (if Display), parent displays (if Display), etc.
@@ -520,9 +325,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function inspect(obj:Object, detail:Boolean = true):void {
-			if(_console){
-				_console.inspect(obj,detail);
-			}
+			if(_console) _console.inspect(obj,detail);
 		}
 		/**
 		 * Expand object values and print in console log channel
@@ -532,33 +335,219 @@ package com.junkbyte.console {
 		 * @param Depth of explosion, -1 = unlimited (default = 3)
 		 */
 		public static function explode(obj:Object, depth:int = 3):void {
-			if(_console){
-				_console.explode(obj,depth);
-			}
+			if(_console) _console.explode(obj,depth);
 		}
-		/*
-		 * WORK IN PROGRESS... Brings up a panel to monitor values of the object
+		/**
+		 * Print the display list map
+		 * (same as /map in commandLine)
 		 * 
-		 * @param Object to monitor
-		 * @param name of panel (optional)
+		 * @param  Display object to start mapping from
+		 * @param  (optional) maximum child depth. 0 = unlimited
+		 */
+		public static function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
+			if(_console ) _console.map(base, maxstep);
+		}
+		/**
+		 * Clear console logs.
+		 * @param  (optional) name of log channel to clear, leave blank to clear all.
+		 */
+		public static function clear(channel:String = null):void{
+			if(_console) _console.clear(channel);
+		}
+		//
+		// UTILS
+		//
+		/**
+		 * Bind keyboard key to a function.
+		 * <p>
+		 * WARNING: key binding hard references the function. 
+		 * This should only be used for development purposes.
+		 * Pass null Function to unbind.
+		 * </p>
+		 *
+		 * @param  KeyBind (char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false)
+		 * @param  Function to call on trigger. pass null to unbind previous.
+		 * @param  Arguments to pass when calling the Function.
 		 * 
-		public static function monitor(obj:Object, n:String = null):void {
-			// WORK IN PROGRESS
-			if(_console){
-			// WORK IN PROGRESS
-				_console.monitor(obj, n);
-			}
-			// WORK IN PROGRESS
-		}*/
+		 */
+		public static function bindKey(key:KeyBind, fun:Function = null,args:Array = null):void{
+			if(_console) _console.bindKey(key, fun ,args);
+		}
+		/**
+		 * Listen for uncaught errors from loaderInfo instance
+		 * Only works for flash player target 10.1 or later
+		 * @param  loaderInfo instance that can dispatch errors
+		 */
+		public static function listenUncaughtErrors(loaderinfo:LoaderInfo):void{
+			if(_console) _console.listenUncaughtErrors(loaderinfo);
+		}
+		//
+		// VIEW SETTINGS
+		//
+		/**
+		 * Accessor for currently viewing channels.
+		 * <p>
+		 * Set to null or empty array to view all channels (global channel).
+		 * </p>
+		 */
+		public static function get viewingChannels():Array{
+			if(_console) return _console.viewingChannels;
+			return null;
+		}
+		public static function set viewingChannels(v:Array):void{
+			if(_console) _console.viewingChannels = v;
+		}
+		/**
+		 * Start/stop FPS monitor graph.
+		 */
+		public static function get fpsMonitor():Boolean{
+			if(_console) return _console.fpsMonitor;
+			return false;
+		}
+		public static function set fpsMonitor(v:Boolean):void{
+			if(_console) _console.fpsMonitor = v;
+		}
+		/**
+		 * Start/stop Memory monitor graph.
+		 */
+		public static function get memoryMonitor():Boolean{
+			if(_console) return _console.memoryMonitor;
+			return false;
+		}
+		public static function set memoryMonitor(v:Boolean):void{
+			if(_console) _console.memoryMonitor = v;
+		}
+		/**
+		 * Start/stop Display Roller.
+		 */
+		public static function get displayRoller():Boolean{
+			if(_console) return _console.displayRoller;
+			return false;
+		}
+		public static function set displayRoller(v:Boolean):void{
+			if(_console) _console.displayRoller = v;
+		}
+		/**
+		 * Assign key binding to capture Display roller's display mapping.
+		 * <p>
+		 * Pressing the key will output whatever display roller is mapping into console.
+		 * You can then press on each display name in Console to get reference to that display for CommandLine use.
+		 * Only activates when Display Roller is enabled.
+		 * Default: null (not assigned)
+		 * </p>
+		 *
+		 * @param  Keyboard character, must be ASCII. (pass null to remove binding)
+		 * @param  Set to true if CTRL key press is required to trigger.
+		 * @param  Set to true if ALT key press is required to trigger.
+		 * @param  Set to true if SHIFT key press is required to trigger.
+		 * 
+		 */
+		public static function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
+			if(_console) _console.setRollerCaptureKey(char, shift, ctrl, alt);
+		}
+		/**
+		 * width of main console panel
+		 */
+		public static function get width():Number{
+			if(_console) return _console.width;
+			return 0;
+		}
+		public static function set width(v:Number):void{
+			if(_console) _console.width = v;
+		}
+		/**
+		 * height of main console panel
+		 */
+		public static function get height():Number{
+			if(_console) return _console.height;
+			return 0;
+		}
+		public static function set height(v:Number):void{
+			if(_console) _console.height = v;
+		}
+		/**
+		 * x position of main console panel
+		 */
+		public static function get x():Number{
+			if(_console) return _console.x;
+			return 0;
+		}
+		public static function set x(v:Number):void{
+			if(_console) _console.x = v;
+		}
+		/**
+		 * y position of main console panel
+		 */
+		public static function get y():Number{
+			if(_console) return _console.y;
+			return 0;
+		}
+		public static function set y(v:Number):void{
+			if(_console) _console.y = v;
+		}
+		/**
+		 * visibility of all console panels
+		 * <p>
+		 * If you have closed the main console by pressing the X button, setting true here will not turn it back on.
+		 * You will need to press the password key to turn that panel back on instead.
+		 * </p>
+		 */
+		public static function get visible():Boolean{
+			if(_console) return _console.visible;
+			return false;
+		}
+		public static function set visible(v:Boolean):void{
+			if(_console) _console.visible = v;
+		}
+		/**
+		 * Pauses output log and graphs in Console.
+		 * It still record and print back out on resume.
+		 */
+		public static function get paused():Boolean{
+			if(_console) return _console.paused;
+			return false;
+		}
+		public static function set paused(v:Boolean):void{
+			if(_console) _console.paused = v;
+		}
+		//
+		// Remoting
+		//
+		/**
+		 * Turn on/off remoting feature.
+		 * Console will periodically broadcast logs, FPS history and memory usage
+		 * for another Console remote to receive.
+		 */
+		public static function get remoting():Boolean{
+			if(_console) return _console.remoting;
+			return false;
+		}
+		public static function set remoting(v:Boolean):void{
+			if(_console) _console.remoting = v;
+		}
+		/**
+		 * Set Password required to connect from remote.
+		 * <p>
+		 * By default this is the same as the password used in Cc.start() / Cc.startOnStage();
+		 * If you set this to null, remote will no longer need a password to connect.
+		 * </p>
+		 */
+		public static function set remotingPassword(v:String):void{
+			if(_console) _console.remotingPassword = v;
+		}
+		//
+		// Command line tools
+		//
 		/**
 		 * CommandLine UI's visibility.
 		 * When this is set to true, it will also automatically set ConsoleConfig->commandLineAllowed to true.
 		 */
 		public static function get commandLine ():Boolean{
-			return getter("commandLine") as Boolean;
+			if(_console) return _console.commandLine;
+			return false;
 		}
 		public static function set commandLine (v:Boolean):void{
-			setter("commandLine",v);
+			if(_console) _console.commandLine = v;
 		}
 		/**
 		 * Store a reference in Console for use in CommandLine.
@@ -569,9 +558,7 @@ package com.junkbyte.console {
 		 * @param  (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
 		 */
 		public static function store(n:String, obj:Object, strong:Boolean = false):void{
-			if(_console ){
-				_console.store(n, obj, strong);
-			}
+			if(_console ) _console.store(n, obj, strong);
 		}
 		/**
 		 * Add custom slash command
@@ -591,21 +578,7 @@ package com.junkbyte.console {
 		 * @param  Function to call on trigger. pass null to remove previous.
 		 */
 		public static function addSlashCommand(n:String, callback:Function):void{
-			if(_console ){
-				_console.addSlashCommand(n, callback);
-			}
-		}
-		/**
-		 * Print the display list map
-		 * (same as /map in commandLine)
-		 * 
-		 * @param  Display object to start mapping from
-		 * @param  (optional) maximum child depth. 0 = unlimited
-		 */
-		public static function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			if(_console ){
-				_console.map(base, maxstep);
-			}
+			if(_console ) _console.addSlashCommand(n, callback);
 		}
 		//
 		// Memory management tools
@@ -619,9 +592,7 @@ package com.junkbyte.console {
 		 * @return	Name console used to identify the object - this can be different to param n if another object of the same name is already being watched
 		 */
 		public static function watch(obj:Object,n:String = null):String{
-			if(_console){
-				return _console.watch(obj,n);
-			}
+			if(_console) return _console.watch(obj,n);
 			return null;
 		}
 		/**
@@ -630,9 +601,7 @@ package com.junkbyte.console {
 		 * @param	identification/name given to the object for watch
 		 */
 		public static function unwatch(n:String):void{
-			if(_console){
-				_console.unwatch(n);
-			}
+			if(_console) _console.unwatch(n);
 		}
 		//
 		// Graphing utilites
@@ -661,9 +630,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			if(_console){
-				_console.addGraph(n,obj,prop,col,key,rect,inverse);
-			}
+			if(_console) _console.addGraph(n,obj,prop,col,key,rect,inverse);
 		}
 		/**
 		 * Fix graph's range.
@@ -681,9 +648,7 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
-			if(_console){
-				_console.fixGraphRange(n, min, max);
-			}
+			if(_console) _console.fixGraphRange(n, min, max);
 		}
 		/**
 		 * Remove graph.
@@ -695,84 +660,30 @@ package com.junkbyte.console {
 		 * 
 		 */
 		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
-			if(_console){
-				_console.removeGraph(n, obj, prop);
-			}
+			if(_console) _console.removeGraph(n, obj, prop);
 		}
-		/**
-		 * Bind keyboard key to a function.
-		 * <p>
-		 * WARNING: key binding hard references the function. 
-		 * This should only be used for development purposes.
-		 * Pass null Function to unbind.
-		 * </p>
-		 *
-		 * @param  KeyBind (char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false)
-		 * @param  Function to call on trigger. pass null to unbind previous.
-		 * @param  Arguments to pass when calling the Function.
-		 * 
-		 */
-		public static function bindKey(key:KeyBind, fun:Function = null,args:Array = null):void{
-			if(_console){
-				_console.bindKey(key, fun ,args);
-			}
-		}
-		/**
-		 * Assign key binding to capture Display roller's display mapping.
-		 * <p>
-		 * Pressing the key will output whatever display roller is mapping into console.
-		 * You can then press on each display name in Console to get reference to that display for CommandLine use.
-		 * Only activates when Display Roller is enabled.
-		 * Default: null (not assigned)
-		 * </p>
-		 *
-		 * @param  Keyboard character, must be ASCII. (pass null to remove binding)
-		 * @param  Set to true if CTRL key press is required to trigger.
-		 * @param  Set to true if ALT key press is required to trigger.
-		 * @param  Set to true if SHIFT key press is required to trigger.
-		 * 
-		 */
-		public static function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
-			if(_console){
-				_console.setRollerCaptureKey(char, shift, ctrl, alt);
-			}
-		}
+		//
+		// Others
+		//
 		/**
 		 * Console already exists?
 		 * @return true if console is already running
 		 * 
 		 */
 		public static function get exists():Boolean{
-			return _console? true: false;
+			return _console!=null;
 		}
-		//
-		private static function addedToStageHandle(e:Event):void{
-			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
-			mc.removeEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
-			if(_console && _console.parent == null){
-				mc.stage.addChild(_console);
-			}
-		}
-		/*private static function canRunWithBrowserSetup(s:Stage, setup:uint):Boolean{
-			if(setup>0 && s && (Capabilities.playerType == "PlugIn" || Capabilities.playerType == "ActiveX")){
-				var flashVars:Object = s.loaderInfo.parameters;
-				if(flashVars["allowConsole"] != "true" && (setup == 1 || (setup == 2 && !Remoting.RemoteIsRunning)) ){
-					return false;
-				}
-			}
-			return true;
-		}*/
-		private static function getter(str:String):*{
-			if(_console)return _console[str];
-			else return null;
-		}
-		private static function setter(str:String,v:*):void{
+		/**
+		 * Remove console from it's parent display and clean up
+		 */
+		public static function remove():void{
 			if(_console){
-				_console[str] = v;
+				if(_console.parent){
+					_console.parent.removeChild(_console);
+				}
+				_console = null;
 			}
 		}
-		
-		
 		/**
 		 * Get all logs
 		 * This is incase you want all logs for use somewhere.
@@ -781,8 +692,8 @@ package com.junkbyte.console {
 		 * @param (optional) line splitter, default is '\n'
 		 * @return All log lines in console
 		 */
-		public static function getAllLog(splitter:String = "\n"):String{
-			if(_console)return _console.getAllLog(splitter);
+		public static function getAllLog(splitter:String = "\r\n"):String{
+			if(_console) return _console.getAllLog(splitter);
 			else return "";
 		}
 		/**
@@ -794,6 +705,15 @@ package com.junkbyte.console {
 		 */
 		public static function get instance():Console{
 			return _console;
+		}
+		
+		//
+		private static function addedToStageHandle(e:Event):void{
+			var mc:DisplayObjectContainer = e.currentTarget as DisplayObjectContainer;
+			mc.removeEventListener(Event.ADDED_TO_STAGE, addedToStageHandle);
+			if(_console && _console.parent == null){
+				mc.stage.addChild(_console);
+			}
 		}
 	}
 }

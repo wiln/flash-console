@@ -111,9 +111,21 @@ package
 			Cc.log("___");
 			Cc.info("Try the new search highlighting... Type '/filter link' in commandline below.");
 			
-			var test:Vector.<int> = new Vector.<int>();
-			test.push(1000);
-			Cc.inspect(test);
+			var test:Vector.<String> = new Vector.<String>();
+			test.push("sadfasdf asdf asdf asdf sdf a");
+			test.push("tryertyadf adf xzcvf a");
+			test.push("asdf xv xczvzx ");
+			test.push("sadfasdf asdf asdf asdf sdf a");
+			test.push("tryertyadf adf xzcvf a");
+			test.push("asdf xv xczvzx ");
+			test.push("sadfasdf asdf asdf asdf sdf a");
+			test.push("tryertyadf adf xzcvf a");
+			test.push("asdf xv xczvzx ");
+			test.push("sadfasdf asdf asdf asdf sdf a");
+			test.push("tryertyadf adf xzcvf a");
+			test.push("asdf xv xczvzx ");
+			temp.test = test;
+			Cc.inspect(temp);
 		}
 	}
 }

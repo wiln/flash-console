@@ -52,7 +52,7 @@ package com.junkbyte.console.view {
 		
 		private var _resizeTxt:TextField;
 		//
-		protected var master:Console;
+		protected var console:Console;
 		protected var bg:Sprite;
 		protected var scaler:Sprite;
 		protected var txtField:TextField;
@@ -62,21 +62,21 @@ package com.junkbyte.console.view {
 		public var moveable:Boolean = true;
 		
 		public function AbstractPanel(m:Console) {
-			master = m;
+			console = m;
 			bg = new Sprite();
 			bg.name = "background";
 			addChild(bg);
 		}
 		
-		public function get config() : ConsoleConfig {
-			return master.config;
+		protected function get config() : ConsoleConfig {
+			return console.config;
 		}
 		
-		public function get style() : ConsoleStyle {
-			return master.config.style;
+		protected function get style() : ConsoleStyle {
+			return console.config.style;
 		}
 		
-		public function init(w:Number,h:Number,resizable:Boolean = false, col:Number = -1, a:Number = -1, rounding:int = -1):void{
+		protected function init(w:Number,h:Number,resizable:Boolean = false, col:Number = -1, a:Number = -1, rounding:int = -1):void{
 			
 			bg.graphics.clear();
 			bg.graphics.beginFill(col>=0?col:style.backgroundColor, a>=0?a:style.backgroundAlpha);
@@ -96,7 +96,7 @@ package com.junkbyte.console.view {
 		}
 		public function close():void {
 			stopDragging();
-			master.panels.tooltip();
+			console.panels.tooltip();
 			if(parent){
 				parent.removeChild(this);
 			}
@@ -126,7 +126,7 @@ package com.junkbyte.console.view {
 		public function registerSnaps(X:Array, Y:Array):void{
 			_snaps = [X,Y];
 		}
-		public function registerDragger(mc:DisplayObject, dereg:Boolean = false):void{
+		protected function registerDragger(mc:DisplayObject, dereg:Boolean = false):void{
 			if(dereg){
 				mc.removeEventListener(MouseEvent.MOUSE_DOWN, onDraggerMouseDown);
 			}else{
@@ -268,7 +268,7 @@ package com.junkbyte.console.view {
 			return v;
 		}
 		
-		public function registerTFRoller(field:TextField, overhandle:Function, linkHandler:Function = null):void{
+		protected function registerTFRoller(field:TextField, overhandle:Function, linkHandler:Function = null):void{
 			field.addEventListener(MouseEvent.MOUSE_MOVE, onTextFieldMouseMove, false, 0, true);
 			field.addEventListener(MouseEvent.ROLL_OUT, onTextFieldMouseOut, false, 0, true);
 			field.addEventListener(TEXT_ROLL, overhandle, false, 0, true);

@@ -301,7 +301,8 @@ package com.junkbyte.console.core
 			if(nodes.length()){
 				props = [];
 				for each (var extendX:XML in nodes) {
-					props.push(makeValue(getDefinitionByName(extendX.@type.toString())));
+					st = extendX.@type.toString();
+					props.push(st.indexOf("*")<0?makeValue(getDefinitionByName(st)):EscHTML(st));
 					if(!viewAll) break;
 				}
 				report("<p10>Extends:</p10> "+props.join(" &gt; "));
@@ -328,7 +329,8 @@ package com.junkbyte.console.core
 					var mn:XMLList = metadataX.arg;
 					var en:String = mn.(@key=="name").@value;
 					var et:String = mn.(@key=="type").@value;
-					props.push("<a href='event:cl_"+refIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
+					if(refIndex) props.push("<a href='event:cl_"+refIndex+"_dispatchEvent(new "+et+"(\""+en+"\"))'>"+en+"</a><p0>("+et+")</p0>");
+					else props.push(en+"<p0>("+et+")</p0>");
 				}
 				report("<p10>Events:</p10> "+props.join("<p-1>; </p-1>"));
 				report();
@@ -391,7 +393,7 @@ package com.junkbyte.console.core
 					for each(var paraX:XML in mparamsList){
 						params.push(paraX.@optional=="true"?("<i>"+paraX.@type+"</i>"):paraX.@type);
 					}
-					if((isstatic || !isClass)){
+					if(refIndex && (isstatic || !isClass)){
 						str += "<a href='event:cl_"+refIndex+"_"+methodX.@name+"()'><p3>"+methodX.@name+"</p3></a>";
 					}else{
 						str += "<p3>"+methodX.@name+"</p3>";
@@ -425,7 +427,7 @@ package com.junkbyte.console.core
 					else if(access == "writeonly") str+= "set";
 					else str += "assign";
 					
-					if(isstatic || !isClass){
+					if(refIndex && (isstatic || !isClass)){
 						str += " <a href='event:cl_"+refIndex+"_"+accessorX.@name+"'><p3>"+accessorX.@name+"</p3></a>:"+accessorX.@type;
 					}else{
 						str += " <p3>"+accessorX.@name+"</p3>:"+accessorX.@type;
@@ -449,11 +451,12 @@ package com.junkbyte.console.core
 			//
 			nodes = clsV..variable;
 			for each (var variableX:XML in nodes) {
-				if(variableX.parent().name()=="factory"){
-					report(" var <a href='event:cl_"+refIndex+"_"+variableX.@name+" = '><p3>"+variableX.@name+"</p3></a>:"+variableX.@type+" = "+makeValue(obj, variableX.@name), 1);
-				}else{
-					report(" static var <a href='event:cl_"+refIndex+"_"+variableX.@name+" = '><p3>"+variableX.@name+"</p3></a>:"+variableX.@type+" = "+makeValue(cls, variableX.@name), 1);
-				}
+				isstatic = variableX.parent().name()!="factory";
+				str = isstatic?" static":"";
+				if(refIndex) str += " var <p3><a href='event:cl_"+refIndex+"_"+variableX.@name+" = '>"+variableX.@name+"</a>";
+				else str += " var <p3>"+variableX.@name;
+				str += "</p3>:"+variableX.@type+" = "+makeValue(isstatic?cls:obj, variableX.@name);
+				report(str, 1);
 			}
 			//
 			// dynamic values
@@ -461,7 +464,9 @@ package com.junkbyte.console.core
 			try{
 				props = [];
 				for (var X:String in obj) {
-					report(" dynamic var <a href='event:cl_"+refIndex+"_"+X+" = '><p3>"+X+"</p3></a> = "+makeValue(obj, X), 1);
+					if(refIndex) str = "<a href='event:cl_"+refIndex+"_"+X+" = '>"+X+"</a>";
+					else str = X;
+					report(" dynamic var <p3>"+str+"</p3> = "+makeValue(obj, X), 1);
 				}
 			}catch(e:Error){
 				report("Could not get values due to: "+e, 9);

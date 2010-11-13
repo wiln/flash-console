@@ -24,6 +24,7 @@
 */
 package com.junkbyte.console.core 
 {
+	import flash.utils.getQualifiedClassName;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 	import com.junkbyte.console.vos.WeakRef;
@@ -37,6 +38,7 @@ package com.junkbyte.console.core
 		
 		private static const INTSTACKS:int = 1; // max number of internal (commandLine) stack traces
 		private static const CMD:String = "cmd";
+		private static const SCOPE:String = "scope";
 		
 		public static const BASE:String = "base";
 		
@@ -58,6 +60,7 @@ package com.junkbyte.console.core
 			_saved.set("C", m);
 			
 			console.remoter.registerClient(CMD, run);
+			console.remoter.registerClient(SCOPE, handleScopeEvent);
 			
 			addCLCmd("help", printHelp, "How to use command line");
 			addCLCmd("save|store", saveCmd, "Save current scope as weak reference. (same as Cc.store(...))");
@@ -91,6 +94,15 @@ package com.junkbyte.console.core
 			_saved = null;
 			_scope = null;
 		}
+		public function handleScopeEvent(id:uint):void{
+			if(remoter.remoting == Remoting.RECIEVER){
+				remoter.send(SCOPE, id);
+			}else{
+				var v:* = console.links.getRefById(id);
+				if(v) console.cl.setReturned(v, true, false);
+				else console.report("Reference no longer exist.", -2);
+			}
+		}
 		public function store(n:String, obj:Object, strong:Boolean = false):void {
 			if(!n) {
 				report("ERROR: Give a name to save.",10);
@@ -117,7 +129,9 @@ package com.junkbyte.console.core
 			for (var X:String in _slashCmds){
 				all.push("/"+X+" ");
 			}
-			
+			for (var Y:String in _saved){
+				all.push("$"+Y);
+			}
 			if(_scope){
 				all.push("this");
 				all = all.concat(console.links.getPossibleCalls(_scope));
@@ -219,7 +233,7 @@ package com.junkbyte.console.core
 						slashcmd.f(param);
 					}
 				}catch(err:Error){
-					report("ERROR slash command: "+console.links.makeString(err), 10);
+					reportError(err);
 				}
 			} else{
 				report("Undefined command <b>/commands</b> for list of all commands.",10);
@@ -253,7 +267,7 @@ package com.junkbyte.console.core
 			var internalerrs:int = 0;
 			var len:int = lines.length;
 			var parts:Array = [];
-			var reg:RegExp = new RegExp("\\s*at\\s+("+Executer.CLASSES+")");
+			var reg:RegExp = new RegExp("\\s*at\\s+("+Executer.CLASSES+"|"+getQualifiedClassName(this)+")");
 			for (var i:int = 0; i < len; i++){
 				var line:String = lines[i];
 				if(INTSTACKS >=0 && (line.search(reg) == 0)){

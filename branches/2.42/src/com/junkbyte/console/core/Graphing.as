@@ -35,7 +35,7 @@ package com.junkbyte.console.core {
 	public class Graphing extends ConsoleCore{
 		
 		private static const FPS:String = "fps";
-		public static const MEM:String = "mem";
+		private static const MEM:String = "mem";
 		
 		private var _groups:Array = [];
 		private var _map:Object = {};

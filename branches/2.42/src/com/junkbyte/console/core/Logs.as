@@ -99,7 +99,7 @@ package com.junkbyte.console.core
 			}
 			return a;
 		}
-		public function getLogsAsString(splitter:String = "\r\n"):String{
+		public function getLogsAsString(splitter:String):String{
 			var str:String = "";
 			var line:Log = first;
 			while(line){

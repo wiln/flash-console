@@ -25,32 +25,20 @@
 package com.junkbyte.console.core 
 {
 	import com.junkbyte.console.Console;
-	import com.junkbyte.console.vos.WeakObject;
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 
 	public class DisplayMapper extends ConsoleCore{
 		
-		public static const SPLITTER:String = "|";
-		private static const RMAP:String = "remap";
-		
-		private var _mapBases:WeakObject;
-		private var _mapBaseIndex:uint = 1;
-		
 		public function DisplayMapper(console:Console) {
 			super(console);
-			remoter.registerClient(RMAP, reMap);
-			_mapBases = new WeakObject();
 		}
 		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(!base){
 				report("It is not a DisplayObjectContainer", 10);
 				return;
 			}
-			_mapBases[_mapBaseIndex] = base;
-			var basestr:String = _mapBaseIndex+SPLITTER;
-			
 			var list:Array = new Array();
 			var index:int = 0;
 			list.push(base);
@@ -101,7 +89,9 @@ package com.junkbyte.console.core
 				}
 				if(maxstep<=0 || steps<=maxstep){
 					wasHiding = false;
-					var n:String = "<a href='event:clip_"+basestr+indexes.join(SPLITTER)+"'>"+mcDO.name+"</a>";
+					var ind:uint = console.links.setLogRef(mcDO);
+					var n:String = mcDO.name;
+					if(ind) n = "<a href='event:cl_"+ind+"'>"+n+"</a>";
 					if(mcDO is DisplayObjectContainer){
 						n = "<b>"+n+"</b>";
 					}else{
@@ -115,35 +105,8 @@ package com.junkbyte.console.core
 				}
 				lastmcDO = mcDO;
 			}
-			_mapBaseIndex++;
-			report(base.name+":"+console.links.makeString(base)+" has "+list.length+" children/sub-children.", 10);
+			report(base.name+":"+console.links.makeString(base)+" has "+(list.length-1)+" children/sub-children.", 10);
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
-		}
-		public function reMap(path:String):void{
-			if(remoter.remoting == Remoting.RECIEVER){
-				remoter.send(RMAP, path);
-				return;
-			}
-			var mc:DisplayObjectContainer = console.stage;
-			var pathArr:Array = path.split(SPLITTER);
-			var first:String = pathArr.shift();
-			if(first != "0") mc = _mapBases[first];
-			var child:DisplayObject = mc as DisplayObject;
-			try{
-				for each(var nn:String in pathArr){
-					if(!nn) break;
-					child = mc.getChildByName(nn);
-					if(child is DisplayObjectContainer){
-						mc = child as DisplayObjectContainer;;
-					}else{
-						// assume it reached to end since there can no longer be a child
-						break;
-					}
-				}
-				console.cl.setReturned(child, true);
-			} catch (e:Error) {
-				report("Problem getting the clip reference. Display list must have changed since last map request",10);
-			}
 		}
 	}
 }
