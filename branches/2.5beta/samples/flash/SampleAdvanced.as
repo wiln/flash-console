@@ -24,6 +24,7 @@
 */
 package 
 {
+	import flash.geom.Point;
 	import com.junkbyte.console.KeyBind;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleConfig;
@@ -128,6 +129,8 @@ package
 			temp.test = test;
 			Cc.inspect(temp);
 			Cc.log(test);
+			
+			Cc.log(new Point(100,200));
 			Cc.bindKey(new KeyBind("g"), Cc.explode, ["NICE"]);
 		}
 	}

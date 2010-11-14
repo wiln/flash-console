@@ -25,6 +25,7 @@
 
 package com.junkbyte.console.core 
 {
+	import flash.geom.Point;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 
@@ -116,11 +117,11 @@ package com.junkbyte.console.core
 				return str+"]";
 			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
-				if(v is ByteArray){
-					add = " position:"+ByteArray(v).position+" length:"+ByteArray(v).length;
-				}
+				if(v is ByteArray) add = " position:"+ByteArray(v).position+" length:"+ByteArray(v).length;
+				if(v is Point) add = " x:"+Point(v).x+" y:"+Point(v).y;
 				txt = "{"+genLinkString(o, prop, ShortClassName(v))+add+"}";
 			}else{
+				// special case cause it'll break the html if it does bytearray.toString();
 				if(v is ByteArray) txt = "[ByteArray position:"+ByteArray(v).position+" length:"+ByteArray(v).length+"]";
 				else txt = String(v);
 				if(!html){

@@ -399,13 +399,15 @@ package com.junkbyte.console.view
 			}
 			var index:int;
 			if(_filterRegExp){
-				// need to look into every match to make sure there no half way HTML tags in the match.
+				// need to look into every match to make sure there no half way HTML tags and not inside the HTML tags it self in the match.
 				_filterRegExp.lastIndex = 0;
 				var result:Object = _filterRegExp.exec(txt);
 				while (result != null) {
 					index = result.index;
 					var match:String = result[0];
-					if(match.search("<|>")<0){
+					if(match.search("<|>")>=0){
+						_filterRegExp.lastIndex -= match.length-match.search("<|>");
+					}else if(txt.lastIndexOf("<", index)<=txt.lastIndexOf(">", index)){
 						txt = txt.substring(0, index)+"<u>"+txt.substring(index, index+match.length)+"</u>"+txt.substring(index+match.length);
 						_filterRegExp.lastIndex+=7; // need to add to satisfy the fact that we added <u> and </u>
 					}

@@ -147,7 +147,7 @@ package com.junkbyte.console.core
 			return hints;
 		}
 		public function get scopeString():String{
-			return LogReferences.ShortClassName(scope, false);
+			return LogReferences.ShortClassName(_scope, false);
 		}
 		public function addCLCmd(n:String, callback:Function, desc:String, allow:Boolean = false):void{
 			var split:Array = n.split("|");
