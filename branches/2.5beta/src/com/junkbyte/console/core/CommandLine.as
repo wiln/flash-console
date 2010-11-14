@@ -147,7 +147,7 @@ package com.junkbyte.console.core
 			return hints;
 		}
 		public function get scopeString():String{
-			return LogReferences.ShortClassName(_scope);
+			return LogReferences.ShortClassName(scope, false);
 		}
 		public function addCLCmd(n:String, callback:Function, desc:String, allow:Boolean = false):void{
 			var split:Array = n.split("|");
@@ -246,15 +246,14 @@ package com.junkbyte.console.core
 			}
 			if(returned !== undefined)
 			{
-				var rtext:String = console.links.makeString(returned);
 				_saved.set(Executer.RETURNED, returned, true);
 				if(changeScope && returned !== _scope){
 					_prevScope.reference = _scope;
 					_scope = returned;
-					report("Changed to "+rtext, -1);
+					report("Changed to "+console.links.makeRefTyped(returned), -1);
 					console.panels.mainPanel.updateCLScope(scopeString);
 				}else{
-					if(say) report("Returned "+rtext, -1);
+					if(say) report("Returned "+console.links.makeString(returned), -1);
 				}
 			}else{
 				if(say) report("Exec successful, undefined return.", -1);

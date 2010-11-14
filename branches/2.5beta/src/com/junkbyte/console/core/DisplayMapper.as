@@ -97,7 +97,7 @@ package com.junkbyte.console.core
 					}else{
 						n = "<i>"+n+"</i>";
 					}
-					str += n+" "+console.links.makeString(mcDO);
+					str += n+" "+console.links.makeRefTyped(mcDO);
 					report(str,mcDO is DisplayObjectContainer?5:2);
 				}else if(!wasHiding){
 					wasHiding = true;
@@ -105,7 +105,7 @@ package com.junkbyte.console.core
 				}
 				lastmcDO = mcDO;
 			}
-			report(base.name+":"+console.links.makeString(base)+" has "+(list.length-1)+" children/sub-children.", 10);
+			report(base.name+":"+console.links.makeRefTyped(base)+" has "+(list.length-1)+" children/sub-children.", 10);
 			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
 		}
 	}

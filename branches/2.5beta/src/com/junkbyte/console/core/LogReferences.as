@@ -41,7 +41,6 @@ package com.junkbyte.console.core
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
 		
-		private static const MAX_VAL_LENGTH:uint = 100;
 		public static const REF:String = "ref";
 		public static const FOCUS:String = "focus";
 		
@@ -65,7 +64,7 @@ package com.junkbyte.console.core
 			remoter.registerClient(FOCUS, handleFocused);
 		}
 		public function setLogRef(o:*):uint{
-			if(!console.config.useObjectLinking) return 0;
+			if(!config.useObjectLinking) return 0;
 			var ind:uint = _refRev[o];
 			if(!ind){
 				ind = _refIndex;
@@ -115,19 +114,28 @@ package com.junkbyte.console.core
 					}
 				}
 				return str+"]";
-			}else if(v && typeof v == "object") {
+			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
 				if(v is ByteArray){
 					add = " position:"+ByteArray(v).position+" length:"+ByteArray(v).length;
 				}
 				txt = "{"+genLinkString(o, prop, ShortClassName(v))+add+"}";
 			}else{
-				txt = String(v);
+				if(v is ByteArray) txt = "[ByteArray position:"+ByteArray(v).position+" length:"+ByteArray(v).length+"]";
+				else txt = String(v);
 				if(!html){
 					return shortenString(EscHTML(txt), maxlen, o, prop);
 				}
 			}
 			return txt;
+		}
+		public function makeRefTyped(v:*):String
+		{
+			if(v && typeof v == "object")
+			{
+				return "{"+genLinkString(v, null, ShortClassName(v))+"}";
+			}
+			return ShortClassName(v);
 		}
 		private function genLinkString(o:*, prop:String, str:String):String{
 			var ind:uint = setLogRef(o);
@@ -143,14 +151,6 @@ package com.junkbyte.console.core
 				return str+genLinkString(o, prop, " ...");
 			}
 			return str;
-		}
-		public function makeRefTyped(v:*):String
-		{
-			if(v && typeof v == "object")
-			{
-				return "{"+genLinkString(v, null, ShortClassName(v))+"}";
-			}
-			return "{"+ShortClassName(v)+"}";
 		}
 		private function historyInc(i:int):void{
 			_hisIndex+=i;
@@ -244,7 +244,7 @@ package com.junkbyte.console.core
 			if(!viewAll) showInherit = " [<a href='event:refi'>Show inherited</a>]";
 			var menuStr:String;
 			if(_history){
-				menuStr = "<b>[<a href='event:channel_"+console.config.globalChannel+ "'>Exit</a>]";
+				menuStr = "<b>[<a href='event:channel_"+config.globalChannel+ "'>Exit</a>]";
 				if(_hisIndex>1){
 					menuStr += " [<a href='event:refprev'>Previous</a>]";
 				}
@@ -253,7 +253,7 @@ package com.junkbyte.console.core
 				}
 				menuStr += "</b> || [<a href='event:ref_"+refIndex+"'>refresh</a>]";
 				menuStr += "</b> [<a href='event:refe_"+refIndex+"'>explode</a>]";
-				if(console.config.commandLineAllowed){
+				if(config.commandLineAllowed){
 					menuStr += " [<a href='event:cl_"+refIndex+"'>Set scope</a>]";
 				}
 				
@@ -503,7 +503,7 @@ package com.junkbyte.console.core
 			return list;
 		}
 		private function makeValue(obj:*, prop:String = null):String{
-			return makeString(obj, prop, false, MAX_VAL_LENGTH);
+			return makeString(obj, prop, false, config.useObjectLinking?100:-1);
 		}
 		public function explode(obj:Object, depth:int = 3, p:int = 9):String{
 			var t:String = typeof obj;
@@ -557,11 +557,13 @@ package com.junkbyte.console.core
 		 * Produces class name without package path
 		 * e.g: flash.display.Sprite => Sprite
 		 */	
-		public static function ShortClassName(obj:Object):String{
+		public static function ShortClassName(obj:Object, eschtml:Boolean = true):String{
 			var str:String = getQualifiedClassName(obj);
 			var ind:int = str.lastIndexOf("::");
 			var st:String = obj is Class?"*":"";
-			return EscHTML(st+str.substring(ind>=0?(ind+2):0)+st);
+			str = st+str.substring(ind>=0?(ind+2):0)+st;
+			if(eschtml) return EscHTML(str);
+			return str;
 		}
 	}
 }

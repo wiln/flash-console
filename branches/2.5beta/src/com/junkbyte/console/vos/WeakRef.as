@@ -30,7 +30,6 @@ package com.junkbyte.console.vos {
 		private var _val:*;
 		private var _strong:Boolean; // strong flag
 		
-		//
 		// Known issue: storing a function reference that's on timeline don't seem to work on next frame. fix = manually store as strong ref.
 		// There is abilty to use strong reference incase you need to mix - 
 		// weak and strong references together somewhere

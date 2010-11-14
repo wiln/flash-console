@@ -35,6 +35,7 @@ http://code.google.com/p/flash-console/issues/
 ===2.5 ALPHA ===
   * Added object linking feature where you can click on the object in the log and it'll inspect the details
   * Classes now get a `*` around the name to signify that its a class and not an instance of a class. eg. `*Sprite*`
+  * Key bindings and password will not trigger if you have focus on an input textfield.
   * Remoting now use ByteArray data format which will break older clients but is faster and more efficent
   * Remote: to run local command line on remote, prefix string with ~, e.g. `~stage.frameRate=100;`
   * Commandline can set to visible even if Cc.config.commandLineAllowed is set to false, however user will not be able to use the security sensitive features.

@@ -112,7 +112,7 @@ package com.junkbyte.console.view
 						var ind:uint;
 						if(dolink && console.config.useObjectLinking) {
 							ind = console.links.setLogRef(obj);
-							n = "<a href='event:cl_"+ind+"'>"+n+"</a> "+console.links.makeString(obj);
+							n = "<a href='event:cl_"+ind+"'>"+n+"</a> "+console.links.makeRefTyped(obj);
 						}
 						else n = n+" ("+LogReferences.ShortClassName(obj)+")";
 			

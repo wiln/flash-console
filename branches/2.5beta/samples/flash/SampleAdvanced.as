@@ -24,6 +24,7 @@
 */
 package 
 {
+	import com.junkbyte.console.KeyBind;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleConfig;
 	import com.junkbyte.console.vos.Log;
@@ -123,9 +124,11 @@ package
 			test.push("asdf xv xczvzx ");
 			test.push("sadfasdf asdf asdf asdf sdf a");
 			test.push("tryertyadf adf xzcvf a");
-			test.push("asdf xv xczvzx ");
+			test.push("asdf xv xczvzx");
 			temp.test = test;
 			Cc.inspect(temp);
+			Cc.log(test);
+			Cc.bindKey(new KeyBind("g"), Cc.explode, ["NICE"]);
 		}
 	}
 }

@@ -373,7 +373,7 @@ package com.junkbyte.console.view
 		private function setFilterRegExp(expstr:String = ""):void{
 			if(expstr){
 				_filterText = null;
-				_filterRegExp = new RegExp("("+LogReferences.EscHTML(expstr)+")", "gi");
+				_filterRegExp = new RegExp(LogReferences.EscHTML(expstr), "gi");
 				startFilter();
 			}else{
 				endFilter();
@@ -397,12 +397,24 @@ package com.junkbyte.console.view
 			if(line.ch != config.defaultChannel && (_viewingChannels.length == 0 || _viewingChannels.length>1)){
 				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+txt;
 			}
+			var index:int;
 			if(_filterRegExp){
-				txt = txt.replace(_filterRegExp, "<u>$1</u>");
+				// need to look into every match to make sure there no half way HTML tags in the match.
+				_filterRegExp.lastIndex = 0;
+				var result:Object = _filterRegExp.exec(txt);
+				while (result != null) {
+					index = result.index;
+					var match:String = result[0];
+					if(match.search("<|>")<0){
+						txt = txt.substring(0, index)+"<u>"+txt.substring(index, index+match.length)+"</u>"+txt.substring(index+match.length);
+						_filterRegExp.lastIndex+=7; // need to add to satisfy the fact that we added <u> and </u>
+					}
+					result = _filterRegExp.exec(txt);
+				}
 			}else if(_filterText){
 				// could have been simple if txt.replace replaces every match.
 				var lowercase:String = txt.toLowerCase();
-				var index:int = lowercase.lastIndexOf(_filterText);
+				index = lowercase.lastIndexOf(_filterText);
 				while(index>=0){
 					txt = txt.substring(0, index)+"<u>"+txt.substring(index, index+_filterText.length)+"</u>"+txt.substring(index+_filterText.length);
 					index = lowercase.lastIndexOf(_filterText, index-2);
@@ -819,6 +831,7 @@ package com.junkbyte.console.view
 			}else if( e.keyCode == Keyboard.ESCAPE){
 				if(stage) stage.focus = null;
 			}else if( e.keyCode == Keyboard.UP){
+				setHints();
 				// if its back key for first time, store the current key
 				if(_cmdField.text && _cmdsInd<0){
 					_cmdsHistory.unshift(_cmdField.text);
@@ -833,6 +846,7 @@ package com.junkbyte.console.view
 					_cmdField.text = "";
 				}
 			}else if( e.keyCode == Keyboard.DOWN){
+				setHints();
 				if(_cmdsInd>0){
 					_cmdsInd--;
 					_cmdField.text = _cmdsHistory[_cmdsInd];
