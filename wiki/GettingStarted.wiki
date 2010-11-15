@@ -94,7 +94,7 @@ Cc.bindKey(new KeyBind("h"), Cc.log, ["Hello!"]);
 ====Command line====
   * CommandLine let you execute actionscript 3 code at run time
   * Command line appears at the bottom of main panel (press CL at top menu)
-  * You must set `Cc.config.commandLineAllowed = true;` to be able to run full features.
+  * You must set `Cc.commandLine = true;` to be able to use commandLine.
 
   * You can *store references* for use in commandline
   * Cc.store() use weak reference by default but you can specify to be strong
