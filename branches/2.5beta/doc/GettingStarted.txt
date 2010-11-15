@@ -51,7 +51,7 @@ ch.info("Hello!", "Works just like other logging methods but this way you keep t
 // Stack tracing
 //
 Cc.stack("Stack trace called from...");
-// It will add the stack trace under your string to show where this function is being called from.
+// It will add the stack trace under your string to show where this function is called from. (requires debug player)
 // Use Cc.stackch(...) to have channel name.
 }}}
 
@@ -130,7 +130,9 @@ Cc.store("load", function(id:uint){Cc.log("Do some loading with id", id)});
 Cc.store("stage", this.stage); // assuming there is this.stage
 //User manipulate frame rate by typing '$stage.frameRate = 60'
 }}}
-  * You can go crazy with commandline. Example: `stage.getChildByName("Console").filters = new Array(new flash.filters.GlowFilter());` - adds glow filter on Console.
+  * You can go crazy with commandline. Example:
+   * `stage.getChildByName("Console").filters = new Array(new flash.filters.GlowFilter());`
+   * Adds glow filter on Console.
   * For full commandLine features, see CommandLineHelp
  
 ====Display Roller====
@@ -144,7 +146,11 @@ Cc.store("stage", this.stage); // assuming there is this.stage
    * Clicking on the name will set that display (Sprite/MovieClip etc) as commandLine's scope
    * Clicking on the link inside the {..} will inspect the object showing you the detailed info 
    * NOTE: You can also use Cc.setRollerCaptureKey(...) to assign the capture key
-  
+  * Example use: You got an item thats behaving weirdly on screen...
+   * Use the Roller tool to get reference to that object
+   * Use link inspection to find out whats wrong with the values
+   * Use commandline to change and experiment with different property values on the fly
+
 ====Graphing====
   * Graphing lets you view number graphs similar to the FPS and memory monitor. (F and M buttons on top menu)
   * Example as seen in samples/SampleAdvanced.as:
@@ -182,7 +188,7 @@ Cc.explode(stage);
 Non-repetitive logging...
 It will keep replacing the previous line with repeat turned on until certain count is passed.
 For example, if you are tracing download progress and you don't want to flood console with it.
-{{
+{{{
 Cc.add("My advanced log in priority 2, 1st call", 2, true);
 Cc.add("My advanced log in priority 2, 2nd call", 2, true);
 Cc.add("My advanced log in priority 2, 3rd call", 2, true);
@@ -200,11 +206,11 @@ var aSprite = new Sprite();
 Cc.watch(aSprite, "aSprite");
 aSprite = null;
 }}}
-Above example creates a Sprite and then remove its reference. This marks the Sprite to be garbage collected, but it might not get collected straight away.
-If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
-If you start using this in fairly big flash project, you will see that objects that have lost reference to will properly get collected and notified in console.
-
-
+  * Above example creates a Sprite and then remove its reference.
+  * This marks the Sprite to be garbage collected, but it might not get collected straight away.
+  * If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
+  * You will see that objects you are watching will get notified in console when they are garbage collected.
+  
 ====Remoting====
   * Remoting sends log data for a remote console to use
   * The advantage is that you do not need to keep console open on your flash
