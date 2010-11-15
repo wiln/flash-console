@@ -84,7 +84,6 @@ For easy reference, please see samples/flash/SampleAdvanced.as for working sampl
   * Key binding should only be used for development purposes
   * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * The function you pass get STRONG referenced
-  * Key Binding will not trigger if user have focus on an input TextField
   * Example below logs "Hello!" in console when user press the key H in keyboard.
 {{{
 import com.junkbyte.console.Cc;
