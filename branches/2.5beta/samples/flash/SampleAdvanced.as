@@ -131,6 +131,7 @@ package
 			Cc.log(test);
 			
 			Cc.log(new Point(100,200));
+			Cc.log(new Date());
 			Cc.bindKey(new KeyBind("g"), Cc.explode, ["NICE"]);
 		}
 	}

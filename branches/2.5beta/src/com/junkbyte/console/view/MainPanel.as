@@ -67,6 +67,8 @@ package com.junkbyte.console.view
 		private var _scrolldir:int;
 		private var _scrolling:Boolean;
 		private var _scrollHeight:Number;
+		private var _selectionStart:int;
+		private var _selectionEnd:int;
 		
 		private var _viewingChannels:Array;
 		private var _extraMenus:Object = new Object();
@@ -91,7 +93,7 @@ package com.junkbyte.console.view
 			console.cl.addCLCmd("filter", setFilterText, "Filter console logs to matching string. When done, click on the * (global channel) at top.", true);
 			console.cl.addCLCmd("filterexp", setFilterRegExp, "Filter console logs to matching regular expression", true);
 			console.cl.addCLCmd("clearhistory", clearCommandLineHistory, "Clear history of commands you have entered.", true);
-			
+
 			name = NAME;
 			minWidth = 50;
 			minHeight = 18;
@@ -200,7 +202,6 @@ package com.junkbyte.console.view
 				_needUpdateMenu = true;
 			}else console.report("ERROR: Invalid add menu params.", 9);
 		}
-
 		private function stageAddedHandle(e:Event=null):void{
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler, false, 0, true);
@@ -280,6 +281,15 @@ package com.junkbyte.console.view
 			}else if(!onlyBottom){
 				updateFull();
 			}
+			if(_selectionStart != _selectionEnd){
+				if(_atBottom){
+					_traceField.setSelection(_traceField.text.length-_selectionStart, _traceField.text.length-_selectionEnd);
+				}else{
+					_traceField.setSelection(_traceField.text.length-_selectionEnd, _traceField.text.length-_selectionStart);
+				}
+				_selectionEnd = -1;
+				_selectionStart = -1;
+			}
 		}
 		private function updateFull():void{
 			var str:String = "";
@@ -355,7 +365,7 @@ package com.junkbyte.console.view
 				console.links.exitFocus();
 			}
 			_viewingChannels.splice(0);
-			if(a.indexOf(config.globalChannel) < 0){
+			if(a.indexOf(config.globalChannel) < 0 && a.indexOf(null) < 0){
 				for each(var ch:String in a) _viewingChannels.push(ch);
 			}
 			updateToBottom();
@@ -435,6 +445,8 @@ package com.junkbyte.console.view
 			var atbottom:Boolean = _traceField.scrollV >= _traceField.maxScrollV;
 			if(!console.paused && _atBottom !=atbottom){
 				var diff:int = _traceField.maxScrollV-_traceField.scrollV;
+				_selectionStart = _traceField.text.length-_traceField.selectionBeginIndex;
+				_selectionEnd = _traceField.text.length-_traceField.selectionEndIndex;
 				_atBottom = atbottom;
 				_updateTraces();
 				_traceField.scrollV = _traceField.maxScrollV-diff;

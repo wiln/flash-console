@@ -90,7 +90,11 @@ package
 			// Stack tracing
 			//
 			Cc.stack("Stack trace called from... (need debug player)");
-			// It will add the stack trace under your string to show where this function is being called from.
+			/* //If you have debug player, it'll show up in console as:
+			   Stack trace called from... (need debug player)
+			    @ Sample/demoBasics()
+			    @ Sample()
+			*/
 			// Use Cc.stackch(...) to have channel name.
 
 			//
@@ -174,7 +178,7 @@ package
 					str = "voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis";
 				}
 				_spamcount++;
-				Cc.ch("ch"+Math.round(Math.random()*5), _spamcount+" "+str, Math.round(Math.random()*10));
+				Cc.ch("ch"+Math.round(Math.random()*5), _spamcount+" "+str, Math.round(Math.random()*4));
 			}
 		}
 		

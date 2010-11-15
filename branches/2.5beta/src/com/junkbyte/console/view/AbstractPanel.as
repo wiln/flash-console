@@ -59,6 +59,7 @@ package com.junkbyte.console.view {
 		protected var minWidth:int = 18;
 		protected var minHeight:int = 18;
 		
+		private var _movedFrom:Point;
 		public var moveable:Boolean = true;
 		
 		public function AbstractPanel(m:Console) {
@@ -142,6 +143,7 @@ package com.junkbyte.console.view {
 			addChild(_resizeTxt);
 			updateDragText();
 			//
+			_movedFrom = new Point(x, y);
 			_dragOffset = new Point(mouseX,mouseY); // using this way instead of startDrag, so that it can control snapping.
 			_snaps = [[],[]];
 			dispatchEvent(new Event(DRAGGING));
@@ -172,6 +174,16 @@ package com.junkbyte.console.view {
 				_resizeTxt.parent.removeChild(_resizeTxt);
 			}
 			_resizeTxt = null;
+		}
+		public function moveBackSafePosition():void{
+			if(_movedFrom != null){
+				// This will only work if stage size is not altered OR stage.align is top left
+				if(x+width<10 || (stage && stage.stageWidth<x+10) || y+height<10 || (stage && stage.stageHeight<y+20)) {
+					x = _movedFrom.x;
+					y = _movedFrom.y;
+				}
+				_movedFrom = null;
+			}
 		}
 		//
 		// SCALING

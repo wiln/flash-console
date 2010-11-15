@@ -123,8 +123,7 @@ package com.junkbyte.console.core
 				report("Stored <p5>$"+n+"</p5> for <b>"+console.links.makeRefTyped(obj)+"</b> using <b>"+ str +"</b> reference.",-1);
 			}
 		}
-		public function getHintsFor(str:String):Array
-		{
+		public function getHintsFor(str:String):Array{
 			var all:Array = new Array();
 			for (var X:String in _slashCmds){
 				all.push("/"+X+" ");
@@ -144,6 +143,11 @@ package com.junkbyte.console.core
 					hints.push(canadate);
 				}
 			}
+			hints = hints.sort(function(a:String, b:String):int{
+				if(a.length < b.length) return -1;
+				if(a.length > b.length) return 1;
+				return 0;
+			});
 			return hints;
 		}
 		public function get scopeString():String{

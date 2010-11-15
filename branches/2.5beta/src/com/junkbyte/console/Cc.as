@@ -527,7 +527,7 @@ package com.junkbyte.console {
 		//
 		/**
 		 * Set currently viewing channels.
-		 * @param  Array of channels to view. Set to null or empty array to view all channels (global channel).
+		 * @param  Channels to view. Send empty to view all channels (global channel).
 		 */
 		public static function setViewingChannels(...args:Array):void{
 			if(_console) _console.setViewingChannels.apply(null, args);

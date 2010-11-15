@@ -117,8 +117,9 @@ package com.junkbyte.console.core
 				return str+"]";
 			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
-				if(v is ByteArray) add = " position:"+ByteArray(v).position+" length:"+ByteArray(v).length;
-				if(v is Point) add = " x:"+Point(v).x+" y:"+Point(v).y;
+				if(v is ByteArray) add = " position:"+v.position+" length:"+v.length;
+				if(v is Point) add = " x:"+v.x+" y:"+v.y;
+				if(v is Date) add = " "+v.toString();
 				txt = "{"+genLinkString(o, prop, ShortClassName(v))+add+"}";
 			}else{
 				// special case cause it'll break the html if it does bytearray.toString();

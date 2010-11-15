@@ -70,7 +70,12 @@ package com.junkbyte.console.core
 				if(_passInd >= _pass.length){
 					_passInd = 0;
 					if(canTrigger()){
-						passwordEnteredHandle();
+						if(console.visible && !console.panels.mainPanel.visible){
+							console.panels.mainPanel.visible = true;
+						}else {
+							console.visible = !console.visible;
+						}
+						console.panels.mainPanel.moveBackSafePosition();
 					}else if(_warns < MAX_WARNS){
 						_warns++;
 						report("Password did not trigger because you have focus on an input TextField.", 8);
@@ -96,11 +101,6 @@ package com.junkbyte.console.core
 				report(X, -2);
 			}
 			report("--- Found "+i, -2);
-		}
-		private function passwordEnteredHandle():void{
-			if(console.visible && !console.panels.mainPanel.visible){
-				console.panels.mainPanel.visible = true;
-			}else console.visible = !console.visible;
 		}
 		private function tryRunKey(key:String):void
 		{
