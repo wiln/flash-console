@@ -150,7 +150,7 @@ Cc.explode(stage);
 Non-repetitive logging...
 It will keep replacing the previous line with repeat turned on until certain count is passed.
 For example, if you are tracing download progress and you don't want to flood console with it.
-{{
+{{{
 Cc.add("My advanced log in priority 2, 1st call", 2, true);
 Cc.add("My advanced log in priority 2, 2nd call", 2, true);
 Cc.add("My advanced log in priority 2, 3rd call", 2, true);
