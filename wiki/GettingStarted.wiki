@@ -169,10 +169,10 @@ var aSprite = new Sprite();
 Cc.watch(aSprite, "aSprite");
 aSprite = null;
 }}}
-Above example creates a Sprite and then remove its reference. This marks the Sprite to be garbage collected, but it might not get collected straight away.
-If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
-If you start using this in fairly big flash project, you will see that objects that have lost reference to will properly get collected and notified in console.
-
+  * Above example creates a Sprite and then remove its reference.
+  * This marks the Sprite to be garbage collected, but it might not get collected straight away.
+  * If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
+  * You will see that objects that have lost reference gets garbage collected and notified in console.
 
 ====Remoting====
   * Remoting sends log data for a remote console to use
