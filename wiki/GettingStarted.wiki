@@ -108,7 +108,8 @@ Cc.store("stage", this.stage); // assuming there is this.stage
 //User manipulate frame rate by typing '$stage.frameRate = 60'
 }}}
   * You can go crazy with commandline. Example:
-   * `stage.getChildByName("Console").filters = new Array(new flash.filters.GlowFilter());` - adds glow filter on Console.
+   * `stage.getChildByName("Console").filters = new Array(new flash.filters.GlowFilter());`
+   * Adds glow filter on Console.
   * For full commandLine features, see CommandLineHelp
  
 ====Display Roller====
