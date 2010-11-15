@@ -21,10 +21,10 @@ Cc.startOnStage(this, "");
 }}}
   # First parameter is any DisplayObject which is already on stage or to be added.
   # If you want to set a keyword for console to start, assign at second parameter. 
-  You will need to type the keyword in correct sequence to show the console. 
-  Recommended keyword: ``` or ~ or debug. Use letters and numbers only. 
-  Console will start hidden if you set a password (you can set `Cc.visible = true;` to force display console). 
-  Entering the keyword while console is visible with hide it.
+   * You will need to type the keyword in correct sequence to show the console. 
+   * Recommended keyword: ``` or ~ or debug. Use letters and numbers only. 
+   * Console will start hidden if you set a password (you can set `Cc.visible = true;` to force display console). 
+   * Entering the keyword while console is visible with hide it.
 
 Logging...
 
