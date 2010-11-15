@@ -5,11 +5,10 @@
 
 ==Introduction==
 
-The main class you need to use for console is `Cc`, (`com.junkbyte.console.Cc`). 
-`Cc` stands for Console controller which acts as singleton adapter for `Console` (`com.junkbyte.console.Console`). 
+  * The main class you need to use for console is `Cc`, (`com.junkbyte.console.Cc`).
+  * `Cc` stands for Console controller which acts as singleton adapter for `Console` (`com.junkbyte.console.Console`). 
 
-In a later date when you don't need console in your project, you can just remove `Cc.startOnStage(..)` OR `Cc.start(..)` from your code and the rest of console related codes will stop executing.
-
+  * In a later date when you don't need console in your project, you can just remove `Cc.startOnStage(..)` from your code and the rest of console related codes will stop executing.
 
 ==Basics==
 
