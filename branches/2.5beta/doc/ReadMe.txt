@@ -53,7 +53,8 @@ http://code.google.com/p/flash-console/issues/
   * Simplied sourcecode where possible while keeping compile size down
   * Fixed not being able to keep selection while scrolling up. You may sometimes still have problem keeping selecting while scrolling down
   * After dragging the main panel outside screen, it will snap back to view if you toggle it by entering the password
-  
+  * You can no longer change the name of global/console/default/filtered channels.
+
 ===2.4===
   * Renamed source package name to com.junkbyte.console - to be less personal
   * Renamed C to Cc so that FlashBuilder pick up as auto complete. Cc stands for Console controller.

@@ -32,18 +32,6 @@ package com.junkbyte.console {
 		//                  //
 		//////////////////////
 		
-		/** Global channel name (where it prints all logs) */
-		public var globalChannel:String = " * ";
-		
-		/** Default channel name (logs without channel name) */
-		public var defaultChannel:String = "-";
-		
-		/** Console's channel name */
-		public var consoleChannel:String = "C";
-		
-		/** Filtered channel name */
-		public var filteredChannel:String = "~";
-		
 		/**
 		 * Maximum number of logs Console should remember.
 		 * 0 = unlimited. Setting to very high will take up more memory and potentially slow down.

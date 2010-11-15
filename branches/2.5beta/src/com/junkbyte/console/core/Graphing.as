@@ -34,9 +34,6 @@ package com.junkbyte.console.core {
 
 	public class Graphing extends ConsoleCore{
 		
-		private static const FPS:String = "fps";
-		private static const MEM:String = "mem";
-		
 		private var _groups:Array = [];
 		private var _map:Object = {};
 		
@@ -47,8 +44,8 @@ package com.junkbyte.console.core {
 		
 		public function Graphing(m:Console){
 			super(m);
-			remoter.registerClient(FPS, fpsRequest);
-			remoter.registerClient(MEM, memRequest);
+			remoter.registerClient("fps", fpsRequest);
+			remoter.registerClient("mem", memRequest);
 		}
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			var group:GraphGroup = _map[n];
@@ -124,7 +121,7 @@ package com.junkbyte.console.core {
 		}
 		public function set fpsMonitor(b:Boolean):void{
 			if(remoter.remoting == Remoting.RECIEVER) {
-				remoter.send(FPS, b);
+				remoter.send("fps", b);
 			}else if(b != fpsMonitor){
 				if(b) {
 					_fpsGroup = addSpecialGroup(GraphGroup.FPS);
@@ -150,7 +147,7 @@ package com.junkbyte.console.core {
 		}
 		public function set memoryMonitor(b:Boolean):void{
 			if(remoter.remoting == Remoting.RECIEVER) {
-				remoter.send(MEM, b);
+				remoter.send("mem", b);
 			}else if(b != memoryMonitor){
 				if(b) {
 					_memGroup = addSpecialGroup(GraphGroup.MEM);

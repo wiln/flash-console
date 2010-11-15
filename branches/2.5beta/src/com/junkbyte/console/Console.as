@@ -60,8 +60,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.5;
 		public static const VERSION_STAGE:String = "beta";
-		public static const BUILD:int = 545;
-		public static const BUILD_DATE:String = "2010/11/15 21:53";
+		public static const BUILD:int = 547;
+		public static const BUILD_DATE:String = "2010/11/15 22:27";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -69,6 +69,11 @@ package com.junkbyte.console
 		public static const WARN:uint = 8;
 		public static const ERROR:uint = 9;
 		public static const FATAL:uint = 10;
+		//
+		public static const GLOBAL_CHANNEL:String = " * ";
+		public static const DEFAULT_CHANNEL:String = "-";
+		public static const CONSOLE_CHANNEL:String = "C";
+		public static const FILTER_CHANNEL:String = "~";
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
@@ -343,7 +348,7 @@ package com.junkbyte.console
 			_panels.mainPanel.viewingChannels = a;
 		}
 		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true):void{
-			var cn:String = viewingChannels.length == 1?viewingChannels[0]:config.consoleChannel;
+			var cn:String = viewingChannels.length == 1?viewingChannels[0]:Console.CONSOLE_CHANNEL;
 			addLine([obj], priority, cn, false, skipSafe);
 		}
 		public function addLine(lineParts:Array, priority:int = 0,channel:String = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
@@ -355,7 +360,7 @@ package com.junkbyte.console
 			
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
 			
-			if(!channel || channel == _config.globalChannel) channel = _config.defaultChannel;
+			if(!channel || channel == GLOBAL_CHANNEL) channel = Console.DEFAULT_CHANNEL;
 
 			if(!html && stacks>0){
 				txt += getStack(stacks, priority);
@@ -410,10 +415,10 @@ package com.junkbyte.console
 		// LOGGING
 		//
 		public function add(newLine:*, priority:int = 2, isRepeating:Boolean = false):void{
-			addLine(new Array(newLine), priority, _config.defaultChannel, isRepeating);
+			addLine(new Array(newLine), priority, DEFAULT_CHANNEL, isRepeating);
 		}
 		public function stack(newLine:*, depth:int = -1, priority:int = 5):void{
-			addLine(new Array(newLine), priority, _config.defaultChannel, false, false, depth>=0?depth:_config.defaultStackDepth);
+			addLine(new Array(newLine), priority, DEFAULT_CHANNEL, false, false, depth>=0?depth:_config.defaultStackDepth);
 		}
 		public function stackch(ch:String, newLine:*, depth:int = -1, priority:int = 5):void{
 			addLine(new Array(newLine), priority, ch, false, false, depth>=0?depth:_config.defaultStackDepth);
@@ -464,7 +469,7 @@ package com.junkbyte.console
 			if(obj is String) return obj as String;
 			else if(obj is ConsoleChannel) return ConsoleChannel(obj).name;
 			else if(obj) return LogReferences.ShortClassName(obj);
-			else return _config.defaultChannel;
+			else return DEFAULT_CHANNEL;
 		}
 		//
 		//

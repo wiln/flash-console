@@ -41,14 +41,6 @@ package com.junkbyte.console.core
 		public static const SENDER:uint = 1;
 		public static const RECIEVER:uint = 2;
 		
-		private static const MAXSIZE:uint = 36000; // real limit is 40kb
-
-		private static const LOGIN:String = "login";
-		private static const LOGINREQUEST:String = "requestLogin";
-		private static const LOGINFAIL:String = "loginFail";
-		private static const LOGINSUCCESS:String = "loginSuccess";
-		private static const SYNC:String = "sync";
-		
 		private var _client:Object;
 		private var _mode:uint;
 		private var _connection:LocalConnection;
@@ -66,11 +58,11 @@ package com.junkbyte.console.core
 			super(m);
 			_password = pass;
 			_client = new Object();
-			_client[LOGIN] = login;
-			_client[LOGINREQUEST] = requestLogin;
-			_client[LOGINFAIL] = loginFail;
-			_client[LOGINSUCCESS] = loginSuccess;
-			_client[SYNC] = remoteSync;
+			_client.login = login;
+			_client.requestLogin = requestLogin;
+			_client.loginFail = loginFail;
+			_client.loginSuccess = loginSuccess;
+			_client.sync = remoteSync;
 		}
 		public function queueLog(line:Log):void{
 			if(_mode != SENDER || !_loggedIn) return;
@@ -97,7 +89,8 @@ package com.junkbyte.console.core
 				for(var i:uint = 0 ; i<len; i++){
 					var line:ByteArray = _queue[i];
 					size += line.length;
-					if(size <= MAXSIZE || i == 0){
+					// real limit is 40,000
+					if(size <= 36000 || i == 0){
 						logs.writeBytes(line);
 					}else break;
 				}
@@ -111,7 +104,7 @@ package com.junkbyte.console.core
 				{
 					_prevG = ga.length?true:false;
 					_prevScope = console.cl.scopeString;
-					send(SYNC, bytes);
+					send("sync", bytes);
 				}
 			}else if(!console.paused){
 				_canDraw = true;
@@ -170,9 +163,9 @@ package com.junkbyte.console.core
 				_loggedIn = checkLogin("");
 				if(_loggedIn){
 					_queue = console.logs.getLogsAsBytes();
-					send(LOGINSUCCESS);
+					send("loginSuccess");
 				}else{
-					send(LOGINREQUEST);
+					send("requestLogin");
 				}
 			}else if(newMode == RECIEVER){
 				if(startSharedConnection(RECIEVER)){
@@ -267,15 +260,15 @@ package com.junkbyte.console.core
 			if(remoting == Remoting.RECIEVER){
 				_lastLogin = pass;
 				report("Attempting to login...", -1);
-				send(LOGIN, pass);
+				send("login", pass);
 			}else{
 				// once logged in, next login attempts will always be success
 				if(_loggedIn || checkLogin(pass)){
 					_loggedIn = true;
 					_queue = console.logs.getLogsAsBytes();
-					send(LOGINSUCCESS);
+					send("loginSuccess");
 				}else{
-					send(LOGINFAIL);
+					send("loginFail");
 				}
 			}
 		}

@@ -36,8 +36,6 @@ package com.junkbyte.console.core
 	 */
 	public class KeyBinder extends ConsoleCore{
 		
-		private static const MAX_WARNS:uint = 3;
-		
 		private var _pass:String;
 		private var _passInd:int;
 		private var _binds:Object = {};
@@ -76,7 +74,7 @@ package com.junkbyte.console.core
 							console.visible = !console.visible;
 						}
 						console.panels.mainPanel.moveBackSafePosition();
-					}else if(_warns < MAX_WARNS){
+					}else if(_warns < 3){
 						_warns++;
 						report("Password did not trigger because you have focus on an input TextField.", 8);
 					}
@@ -108,7 +106,7 @@ package com.junkbyte.console.core
 			if(a){
 				if(canTrigger()){
 					(a[0] as Function).apply(null, a[1]);
-				}else if(_warns < MAX_WARNS){
+				}else if(_warns < 3){
 					_warns++;
 					report("Key bind ["+key+"] did not trigger because you have focus on an input TextField.", 8);
 				}

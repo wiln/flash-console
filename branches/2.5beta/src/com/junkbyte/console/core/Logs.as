@@ -109,11 +109,11 @@ package com.junkbyte.console.core
 			return str;
 		}
 		public function getChannels():Array{
-			var arr:Array = new Array(config.globalChannel);
-			addIfexist(config.defaultChannel, arr);
-			addIfexist(config.filteredChannel, arr);
+			var arr:Array = new Array(Console.GLOBAL_CHANNEL);
+			addIfexist(Console.DEFAULT_CHANNEL, arr);
+			addIfexist(Console.FILTER_CHANNEL, arr);
 			addIfexist(LogReferences.INSPECTING_CHANNEL, arr);
-			addIfexist(config.consoleChannel, arr);
+			addIfexist(Console.CONSOLE_CHANNEL, arr);
 			var others:Array = new Array();
 			for(var X:String in _channels){
 				if(arr.indexOf(X)<0){

@@ -351,8 +351,8 @@ package com.junkbyte.console.view
 				(
 					_viewingChannels.length == 0
 			 		|| _viewingChannels.indexOf(line.ch)>=0 
-			 		|| (_filterText && _viewingChannels.indexOf(config.filteredChannel) >= 0 && line.text.toLowerCase().indexOf(_filterText)>=0 )
-			 		|| (_filterRegExp && _viewingChannels.indexOf(config.filteredChannel)>=0 && line.text.search(_filterRegExp)>=0 )
+			 		|| (_filterText && _viewingChannels.indexOf(Console.FILTER_CHANNEL) >= 0 && line.text.toLowerCase().indexOf(_filterText)>=0 )
+			 		|| (_filterRegExp && _viewingChannels.indexOf(Console.FILTER_CHANNEL)>=0 && line.text.search(_filterRegExp)>=0 )
 			 	) 
 			 	&& ( _priority <= 0 || line.priority >= _priority)
 			);
@@ -365,7 +365,7 @@ package com.junkbyte.console.view
 				console.links.exitFocus();
 			}
 			_viewingChannels.splice(0);
-			if(a.indexOf(config.globalChannel) < 0 && a.indexOf(null) < 0){
+			if(a.indexOf(Console.GLOBAL_CHANNEL) < 0 && a.indexOf(null) < 0){
 				for each(var ch:String in a) _viewingChannels.push(ch);
 			}
 			updateToBottom();
@@ -391,21 +391,21 @@ package com.junkbyte.console.view
 			}
 		}
 		private function startFilter():void{
-			console.clear(config.filteredChannel);
-			console.logs.addChannel(config.filteredChannel);
-			viewingChannels = [config.filteredChannel];
+			console.clear(Console.FILTER_CHANNEL);
+			console.logs.addChannel(Console.FILTER_CHANNEL);
+			viewingChannels = [Console.FILTER_CHANNEL];
 		}
 		private function endFilter():void{
 			_filterRegExp = null;
 			_filterText = null;
-			if(_viewingChannels.length == 1 && _viewingChannels[0] == config.filteredChannel){
-				viewingChannels = [config.globalChannel];
+			if(_viewingChannels.length == 1 && _viewingChannels[0] == Console.FILTER_CHANNEL){
+				viewingChannels = [Console.GLOBAL_CHANNEL];
 			}
 		}
 		private function makeLine(line:Log):String{
 			var str:String = "";
 			var txt:String = line.text;
-			if(line.ch != config.defaultChannel && (_viewingChannels.length == 0 || _viewingChannels.length>1)){
+			if(line.ch != Console.DEFAULT_CHANNEL && (_viewingChannels.length == 0 || _viewingChannels.length>1)){
 				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+txt;
 			}
 			var index:int;
@@ -653,13 +653,13 @@ package com.junkbyte.console.view
 		public function onMenuRollOver(e:TextEvent, src:AbstractPanel = null):void{
 			if(src==null) src = this;
 			var txt:String = e.text?e.text.replace("event:",""):"";
-			if(txt == "channel_"+config.globalChannel){
+			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
 				txt = "View all channels";
-			}else if(txt == "channel_"+config.defaultChannel) {
+			}else if(txt == "channel_"+Console.DEFAULT_CHANNEL) {
 				txt = "Default channel::Logs with no channel";
-			}else if(txt == "channel_"+ config.consoleChannel) {
+			}else if(txt == "channel_"+ Console.CONSOLE_CHANNEL) {
 				txt = "Console's channel::Logs generated from Console";
-			}else if(txt == "channel_"+ config.filteredChannel) {
+			}else if(txt == "channel_"+ Console.FILTER_CHANNEL) {
 				txt = _filterRegExp?String(_filterRegExp):_filterText;
 				txt = "Filtering channel"+"::*"+txt+"*";
 			}else if(txt == "channel_"+LogReferences.INSPECTING_CHANNEL) {
@@ -762,12 +762,12 @@ package com.junkbyte.console.view
 		}
 		public function onChannelPressed(chn:String):void{
 			var current:Array = _viewingChannels.concat();
-			if(_shift && chn != config.globalChannel && current[0] != LogReferences.INSPECTING_CHANNEL){
+			if(_shift && chn != Console.GLOBAL_CHANNEL && current[0] != LogReferences.INSPECTING_CHANNEL){
 				var ind:int = current.indexOf(chn);
 				if(ind>=0){
 					current.splice(ind,1);
 					if(current.length == 0){
-						current.push(config.globalChannel);
+						current.push(Console.GLOBAL_CHANNEL);
 					}
 				}else{
 					current.push(chn);

@@ -36,13 +36,7 @@ package com.junkbyte.console.core
 		
 		private static const DISABLED:String = "<b>Advanced CommandLine is disabled.</b>\nEnable by setting `Cc.config.commandLineAllowed = true;´\nType <b>/commands</b> for permitted commands.";
 		
-		private static const INTSTACKS:int = 1; // max number of internal (commandLine) stack traces
-		private static const CMD:String = "cmd";
-		private static const SCOPE:String = "scope";
-		
-		public static const BASE:String = "base";
-		
-		private static const RESERVED:Array = [Executer.RETURNED, BASE, "C"];
+		private static const RESERVED:Array = [Executer.RETURNED, "base", "C"];
 		
 		private var _saved:WeakObject;
 		
@@ -59,8 +53,8 @@ package com.junkbyte.console.core
 			_prevScope = new WeakRef(m);
 			_saved.set("C", m);
 			
-			console.remoter.registerClient(CMD, run);
-			console.remoter.registerClient(SCOPE, handleScopeEvent);
+			console.remoter.registerClient("cmd", run);
+			console.remoter.registerClient("scope", handleScopeEvent);
 			
 			addCLCmd("help", printHelp, "How to use command line");
 			addCLCmd("save|store", saveCmd, "Save current scope as weak reference. (same as Cc.store(...))");
@@ -85,10 +79,10 @@ package com.junkbyte.console.core
 				_scope = obj;
 				console.panels.mainPanel.updateCLScope(scopeString);
 			}
-			_saved.set(BASE, obj);
+			_saved.set("base", obj);
 		}
 		public function get base():Object {
-			return _saved.get(BASE);
+			return _saved.get("base");
 		}
 		public function destory():void {
 			_saved = null;
@@ -96,7 +90,7 @@ package com.junkbyte.console.core
 		}
 		public function handleScopeEvent(id:uint):void{
 			if(remoter.remoting == Remoting.RECIEVER){
-				remoter.send(SCOPE, id);
+				remoter.send("scope", id);
 			}else{
 				var v:* = console.links.getRefById(id);
 				if(v) console.cl.setReturned(v, true, false);
@@ -177,7 +171,7 @@ package com.junkbyte.console.core
 					str = str.substring(1);
 				}else{
 					report("Run command at remote: "+str,-2);
-					if(!console.remoter.send(CMD, str)){
+					if(!console.remoter.send("cmd", str)){
 						report("Command could not be sent to client.", 10);
 					}
 					return null;
@@ -273,9 +267,9 @@ package com.junkbyte.console.core
 			var reg:RegExp = new RegExp("\\s*at\\s+("+Executer.CLASSES+"|"+getQualifiedClassName(this)+")");
 			for (var i:int = 0; i < len; i++){
 				var line:String = lines[i];
-				if(INTSTACKS >=0 && (line.search(reg) == 0)){
-					// don't trace too many internal errors :)
-					if(internalerrs>=INTSTACKS && i > 0) {
+				if(line.search(reg) == 0){
+					// don't trace more than one internal errors :)
+					if(internalerrs>0 && i > 0) {
 						break;
 					}
 					internalerrs++;

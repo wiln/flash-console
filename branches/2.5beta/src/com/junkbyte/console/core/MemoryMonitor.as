@@ -33,8 +33,6 @@ package com.junkbyte.console.core
 
 	public class MemoryMonitor extends ConsoleCore{
 		
-		private static const GC:String = "gc";
-		
 		private var _namesList:Object;
 		private var _objectsList:Dictionary;
 		private var _count:uint;
@@ -44,6 +42,8 @@ package com.junkbyte.console.core
 			super(m);
 			_namesList = new Object();
 			_objectsList = new Dictionary(true);
+			
+			console.remoter.registerClient("gc", gc);
 		}
 		public function watch(obj:Object, n:String):String{
 			var className:String = getQualifiedClassName(obj);
@@ -107,7 +107,7 @@ package com.junkbyte.console.core
 			if(remoter.remoting == Remoting.RECIEVER){
 				try{
 					report("Sending garbage collection request to client",-1);
-					remoter.send(GC);
+					remoter.send("gc");
 				}catch(e:Error){
 					report(e,10);
 				}

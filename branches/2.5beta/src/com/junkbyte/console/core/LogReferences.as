@@ -245,7 +245,7 @@ package com.junkbyte.console.core
 			if(!viewAll) showInherit = " [<a href='event:refi'>Show inherited</a>]";
 			var menuStr:String;
 			if(_history){
-				menuStr = "<b>[<a href='event:channel_"+config.globalChannel+ "'>Exit</a>]";
+				menuStr = "<b>[<a href='event:channel_"+Console.GLOBAL_CHANNEL+ "'>Exit</a>]";
 				if(_hisIndex>1){
 					menuStr += " [<a href='event:refprev'>Previous</a>]";
 				}
