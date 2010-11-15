@@ -136,7 +136,8 @@ package com.junkbyte.console.view {
 		private function onDraggerMouseDown(e:MouseEvent):void{
 			if(!stage || !moveable) return;
 			//
-			_resizeTxt = makeTF("positioningField", false, true);
+			_resizeTxt = makeTF("positioningField", true);
+			_resizeTxt.mouseEnabled = false;
 			_resizeTxt.autoSize = TextFieldAutoSize.LEFT;
 			addChild(_resizeTxt);
 			updateDragText();
@@ -202,7 +203,8 @@ package com.junkbyte.console.view {
 			}
 		}
 		private function onScalerMouseDown(e:Event):void{
-			_resizeTxt = makeTF("resizingField", false, true);
+			_resizeTxt = makeTF("resizingField", true);
+			_resizeTxt.mouseEnabled = false;
 			_resizeTxt.autoSize = TextFieldAutoSize.RIGHT;
 			_resizeTxt.x = -4;
 			_resizeTxt.y = -17;
@@ -240,12 +242,11 @@ package com.junkbyte.console.view {
 		}
 		//
 		//
-		public function makeTF(n:String, mouse:Boolean = true, back:Boolean = false):TextField
+		public function makeTF(n:String, back:Boolean = false):TextField
 		{
 			var txt:TextField = new TextField();
 			txt.name = n;
 			txt.styleSheet = style.styleSheet;
-			if(!mouse) txt.mouseEnabled = mouse;
 			if(back){
           	 	txt.background = true;
             	txt.backgroundColor = style.backgroundColor;

@@ -38,22 +38,20 @@ package
 			//
 			// SETUP - only required once
 			//
-			// You can modify Cc.config as well. This is just to show alternative (choose one or another)
-			var config:ConsoleConfig = new ConsoleConfig();
-			config.style.big(); // BIGGER text. this modifies the config variables such as traceFontSize, menuFontSize
-			config.style.whiteBase(); // Black on white. this modifies the config variables such as priority0, priority1, etc
-			
-			config.commandLineAllowed = true;
-			config.style.backgroundAlpha = 1; // makes it non-transparent background.
+			// you must modify the styles before starting console.
+			Cc.config.style.big(); // BIGGER text. this modifies the config variables such as traceFontSize, menuFontSize
+			Cc.config.style.whiteBase(); // Black on white. this modifies the config variables such as priority0, priority1, etc
+			Cc.config.style.backgroundAlpha = 1; // makes it non-transparent background.
 			
 			//// Alternatively you can modify the style variables directly:
 			//config.style.traceFontSize = 16;
 			//config.style.menuColor = 0xFF0000;
 			//
 			
-			Cc.startOnStage(this, "`", config); // "`" - change for password. This will start hidden
+			Cc.startOnStage(this, "`"); // "`" - change for password. This will start hidden
 			Cc.visible = true; // show console, because having password hides console.
 			Cc.commandLine = true; // enable command line
+			Cc.config.commandLineAllowed = true;
 			
 			Cc.width = 640;
 			Cc.height = 320;

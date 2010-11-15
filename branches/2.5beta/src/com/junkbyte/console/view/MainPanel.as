@@ -26,7 +26,6 @@
 package com.junkbyte.console.view 
 {
 	import com.junkbyte.console.Console;
-	import com.junkbyte.console.ConsoleChannel;
 	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.vos.Log;
@@ -70,7 +69,7 @@ package com.junkbyte.console.view
 		private var _scrollHeight:Number;
 		
 		private var _viewingChannels:Array;
-		private var _cmdsHistory:Array = [];
+		private var _extraMenus:Object = new Object();
 		private var _cmdsInd:int = -1;
 		private var _priority:int;
 		private var _filterText:String;
@@ -88,7 +87,6 @@ package com.junkbyte.console.view
 			super(m);
 			var fsize:int = style.menuFontSize;
 			_viewingChannels = new Array();
-			_cmdsHistory = m.ud.commandLineHistory;
 			
 			console.cl.addCLCmd("filter", setFilterText, "Filter console logs to matching string. When done, click on the * (global channel) at top.", true);
 			console.cl.addCLCmd("filterexp", setFilterRegExp, "Filter console logs to matching regular expression", true);
@@ -190,14 +188,18 @@ package com.junkbyte.console.view
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
 		}
-		/*
-		public function addMenu(key:String, f:Function, rollover:String):void{
-			_extraMenus.push(new ExternalMenu(key, rollover, f));
-			_needUpdateMenu = true;
+		public function addMenu(key:String, f:Function, args:Array, rollover:String):void{
+			if(key){
+				key = key.replace(/[^\w]*/g, "");
+				if(f == null){
+					delete _extraMenus[key];
+				}else{
+					// used to use ExternalMenu Class, but that adds extra 0.3kb.
+					_extraMenus[key] = new Array(f, args, rollover);
+				}
+				_needUpdateMenu = true;
+			}else console.report("ERROR: Invalid add menu params.", 9);
 		}
-		public function removeMenu(key:String):void{
-			_needUpdateMenu = true;
-		}*/
 
 		private function stageAddedHandle(e:Event=null):void{
 			stage.addEventListener(KeyboardEvent.KEY_UP, keyUpHandler, false, 0, true);
@@ -349,13 +351,12 @@ package com.junkbyte.console.view
 			return _viewingChannels;
 		}
 		public function set viewingChannels(a:Array):void{
-			if(a[0] != _viewingChannels[0] && _viewingChannels[0] == LogReferences.INSPECTING_CHANNEL){
+			if(_viewingChannels[0] == LogReferences.INSPECTING_CHANNEL && (!a || a[0] != _viewingChannels[0])){
 				console.links.exitFocus();
 			}
 			_viewingChannels.splice(0);
-			if(a && a.length) {
-				if(a.indexOf(config.globalChannel) >= 0) a = [];
-				for each(var item:Object in a) _viewingChannels.push(item is ConsoleChannel?(ConsoleChannel(item).name):String(item));
+			if(a.indexOf(config.globalChannel) < 0){
+				for each(var ch:String in a) _viewingChannels.push(ch);
 			}
 			updateToBottom();
 			console.panels.updateMenu();
@@ -591,12 +592,12 @@ package com.junkbyte.console.view
 				}
 				str += "<menu> <b>";
 				
-				/*var extras:uint = _extraMenus.length;
-				if(extras){
-					for(var i:uint = 0; i<extras; i++){
-						str += " <a href=\"event:external_"+i+"\">"+_extraMenus[i].key+"</a>";
-					}
-				}*/
+				var extra:Boolean;
+				for (var X:String in _extraMenus){
+					str += "<a href=\"event:external_"+X+"\">"+X+"</a> ";
+					extra = true;
+				}
+				if(extra) str += "¦ ";
 				
 				str += doActive("<a href=\"event:fps\">F</a>", console.fpsMonitor>0);
 				str += doActive(" <a href=\"event:mm\">M</a>", console.memoryMonitor>0);
@@ -658,6 +659,9 @@ package com.junkbyte.console.view
 				else txt = "Pause updates";
 			}else if(txt == "close" && src == this){
 				txt = "Close::Type password to show again";
+			}else if(txt.indexOf("external_")==0){
+				var menu:Array = _extraMenus[txt.substring(9)];
+				if(menu) txt = menu[2];
 			}else{
 				var obj:Object = {
 					fps:"Frames Per Second",
@@ -737,6 +741,9 @@ package com.junkbyte.console.view
 				if(ind>=0){
 					_cmdField.text = t.substring(ind+1);
 				}
+			}else if(t.indexOf("external_")==0){
+				var menu:Array = _extraMenus[t.substring(9)];
+				if(menu) menu[0].apply(null, menu[1]);
 			}
 			txtField.setSelection(0, 0);
 			e.stopPropagation();
@@ -755,7 +762,7 @@ package com.junkbyte.console.view
 				}
 				viewingChannels = current;
 			}else{
-				viewingChannels = [chn];
+				console.setViewingChannels(chn);
 			}
 		}
 		public function set priority(p:int):void{
@@ -796,7 +803,7 @@ package com.junkbyte.console.view
 		//
 		private function clearCommandLineHistory(...args:Array):void
 		{
-			_cmdsHistory.splice(0);
+			console.ud.commandLineHistory.splice(0);
 			_cmdsInd = -1;
 			console.ud.commandLineHistoryChanged();
 		}
@@ -804,6 +811,7 @@ package com.junkbyte.console.view
 			e.stopPropagation();
 		}
 		private function commandKeyUp(e:KeyboardEvent):void{
+			var cmdshistory:Array = console.ud.commandLineHistory;
 			if( e.keyCode == Keyboard.ENTER){
 				updateToBottom();
 				setHints();
@@ -814,16 +822,16 @@ package com.junkbyte.console.view
 				}else{
 					var txt:String = _cmdField.text;
 					if(txt.length > 2){
-						var i:int = _cmdsHistory.indexOf(txt);
+						var i:int = cmdshistory.indexOf(txt);
 						while(i>=0){
-							_cmdsHistory.splice(i,1);
-							i = _cmdsHistory.indexOf(txt);
+							cmdshistory.splice(i,1);
+							i = cmdshistory.indexOf(txt);
 						}
-						_cmdsHistory.unshift(txt);
+						cmdshistory.unshift(txt);
 						_cmdsInd = -1;
 						// maximum 20 commands history
-						if(_cmdsHistory.length>20){
-							_cmdsHistory.splice(20);
+						if(cmdshistory.length>20){
+							cmdshistory.splice(20);
 						}
 						console.ud.commandLineHistoryChanged();
 					}
@@ -836,22 +844,22 @@ package com.junkbyte.console.view
 				setHints();
 				// if its back key for first time, store the current key
 				if(_cmdField.text && _cmdsInd<0){
-					_cmdsHistory.unshift(_cmdField.text);
+					cmdshistory.unshift(_cmdField.text);
 					_cmdsInd++;
 				}
-				if(_cmdsInd<(_cmdsHistory.length-1)){
+				if(_cmdsInd<(cmdshistory.length-1)){
 					_cmdsInd++;
-					_cmdField.text = _cmdsHistory[_cmdsInd];
+					_cmdField.text = cmdshistory[_cmdsInd];
 					_cmdField.setSelection(_cmdField.text.length, _cmdField.text.length);
 				}else{
-					_cmdsInd = _cmdsHistory.length;
+					_cmdsInd = cmdshistory.length;
 					_cmdField.text = "";
 				}
 			}else if( e.keyCode == Keyboard.DOWN){
 				setHints();
 				if(_cmdsInd>0){
 					_cmdsInd--;
-					_cmdField.text = _cmdsHistory[_cmdsInd];
+					_cmdField.text = cmdshistory[_cmdsInd];
 					_cmdField.setSelection(_cmdField.text.length, _cmdField.text.length);
 				}else{
 					_cmdsInd = -1;

@@ -53,10 +53,12 @@ package com.junkbyte.console.view {
 			registerDragger(bg);
 			minHeight = 26;
 			//
-			lowTxt = makeTF("lowestField", false, false);
+			lowTxt = makeTF("lowestField", false);
+			lowTxt.mouseEnabled = false;
 			lowTxt.height = style.menuFontSize+2;
 			addChild(lowTxt);
-			highTxt = makeTF("highestField", false, false);
+			highTxt = makeTF("highestField", false);
+			highTxt.mouseEnabled = false;
 			highTxt.height = style.menuFontSize+2;
 			highTxt.y = style.menuFontSize-4;
 			addChild(highTxt);

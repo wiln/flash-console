@@ -57,7 +57,7 @@ package {
 			_c.commandLine = true;
 			_c.x = 10;
 			_c.y = 10;
-			
+			_c.addMenu("top", toggleOnTop, null, "Toggle always in front");
 			var menu:TextField = _c.panels.mainPanel.getChildByName("menuField") as TextField;
 			menu.doubleClickEnabled = true;
 			menu.addEventListener(MouseEvent.DOUBLE_CLICK, ondouble);
@@ -75,6 +75,10 @@ package {
 			stage.align = StageAlign.TOP_LEFT;
 			stage.addEventListener(Event.RESIZE, onStageResize);
 			onStageResize();
+		}
+		private function toggleOnTop():void {
+			stage.nativeWindow.alwaysInFront = !stage.nativeWindow.alwaysInFront;
+			_c.report("Always in front "+(stage.nativeWindow.alwaysInFront?"enabled.":"disabled"),-1);
 		}
 		private function onMainPanelClose(e:Event):void{
 			stage.nativeWindow.close();	

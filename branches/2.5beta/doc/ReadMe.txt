@@ -46,8 +46,10 @@ http://code.google.com/p/flash-console/issues/
   * Cc.stack() no longer accept channel name. use Cc.stackch() for channel
   * Top menu can now be hidden from UI OR Cc.config.style.topMenu = false;
   * Fixed bug with channel name generation from non-string param in Cc.logch, Cc.warnch, etc...
-  * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
+  * Removed Cc.viewingChannel. use Cc.setViewingChannel to set
+  * Removed Cc.paused. If you want to pause, press P in top menu
   * Removed Cc.remote as it is a special use case
+  * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
   * Simplied sourcecode where possible while keeping compile size down
   
 ===2.4===

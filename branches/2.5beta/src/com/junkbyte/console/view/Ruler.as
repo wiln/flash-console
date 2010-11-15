@@ -74,7 +74,7 @@ package com.junkbyte.console.view {
 			graphics.drawRect(_area.x, _area.y, _area.width, _area.height);
 			graphics.endFill();
 			//
-			_posTxt = _master.panels.mainPanel.makeTF("positionText", false, true);
+			_posTxt = _master.panels.mainPanel.makeTF("positionText", true);
 			_posTxt.autoSize = TextFieldAutoSize.LEFT;
 			addChild(_posTxt);
 			//

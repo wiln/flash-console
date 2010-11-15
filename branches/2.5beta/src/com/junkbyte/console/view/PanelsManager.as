@@ -36,7 +36,6 @@ package com.junkbyte.console.view
 		
 		
 		private static const USRGRAPH:String = "graph_";
-		//private static const USER_OBJECTMONITOR_PREFIX:String = "objMonitor_";
 		
 		private var console:Console;
 		private var _mainPanel:MainPanel;
@@ -55,7 +54,8 @@ package com.junkbyte.console.view
 		public function PanelsManager(master:Console) {
 			console = master;
 			_mainPanel = new MainPanel(console);
-			_tooltipField = mainPanel.makeTF("tooltip", false, true);
+			_tooltipField = mainPanel.makeTF("tooltip", true);
+			_tooltipField.mouseEnabled = false;
 			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
 			_tooltipField.multiline = true;
 			addPanel(_mainPanel);

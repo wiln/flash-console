@@ -166,8 +166,7 @@ package com.junkbyte.console {
 		 * If you ever changed the style settings after console have already started, 
 		 * calling this method have a good chance of updating console style on the fly as well - not guarantee tho.
 		 */
-		public function updateStyleSheet():void
-		{
+		public function updateStyleSheet():void {
 			_css.setStyle("r",{textAlign:'right', display:'inline'});
 			_css.setStyle("w",{color:hesh(highColor), fontFamily:menuFont, fontSize:menuFontSize, display:'inline'});
 			_css.setStyle("s",{color:hesh(lowColor), fontFamily:menuFont, fontSize:menuFontSize-2, display:'inline'});

@@ -60,10 +60,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.5;
 		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 540;
-		public static const BUILD_DATE:String = "2010/11/14 03:31";
-		//
-		public static const NAME:String = "Console";
+		public static const BUILD:int = 543;
+		public static const BUILD_DATE:String = "2010/11/15 00:58";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -71,7 +69,6 @@ package com.junkbyte.console
 		public static const WARN:uint = 8;
 		public static const ERROR:uint = 9;
 		public static const FATAL:uint = 10;
-		//
 		//
 		private var _config:ConsoleConfig;
 		private var _panels:PanelsManager;
@@ -83,8 +80,8 @@ package com.junkbyte.console
 		private var _graphing:Graphing;
 		private var _remoter:Remoting;
 		private var _mapper:DisplayMapper;
-		private var _topTries:int = 50;
 		//
+		private var _topTries:int = 50;
 		private var _paused:Boolean;
 		private var _rollerKey:KeyBind;
 		private var _logs:Logs;
@@ -100,7 +97,7 @@ package com.junkbyte.console
 		 * @see http://code.google.com/p/flash-console/
 		 */
 		public function Console(pass:String = "", config:ConsoleConfig = null) {
-			name = NAME;
+			name = "Console";
 			tabChildren = false; // Tabbing is not supported
 			_config = config?config:new ConsoleConfig();
 			//
@@ -143,14 +140,6 @@ package com.junkbyte.console
 		private function onStageMouseLeave(e:Event):void{
 			_panels.tooltip(null);
 		}
-		public function destroy():void{
-			_remoter.close();
-			removeEventListener(Event.ENTER_FRAME, _onEnterFrame);
-			removeEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
-			removeEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
-			_cl.destory();
-		}
-		
 		// requires flash player target to be 10.1
 		public function listenUncaughtErrors(loaderinfo:LoaderInfo):void {
 			try{
@@ -190,11 +179,17 @@ package com.junkbyte.console
 			_graphing.remove(n, obj, prop);
 		}
 		//
-		// WARNING: key binding hard references the function. 
+		// WARNING: key binding hard references the functoin and arguments.
 		// This should only be used for development purposes only.
 		//
 		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):void{
-			_kb.bindKey(key, fun, args);
+			if(key) _kb.bindKey(key, fun, args);
+		}
+		//
+		// WARNING: Add menu hard references the functoin and arguments.
+		//
+		public function addMenu(key:String, f:Function, args:Array = null, rollover:String = null):void{
+			panels.mainPanel.addMenu(key, f, args, rollover);
 		}
 		//
 		// Panel settings
@@ -342,7 +337,9 @@ package com.junkbyte.console
 		public function get viewingChannels():Array{
 			return _panels.mainPanel.viewingChannels;
 		}
-		public function set viewingChannels(a:Array):void{
+		public function setViewingChannels(...args:Array):void{
+			var a:Array = new Array();
+			for each(var item:Object in args) a.push(makeChannelName(item));
 			_panels.mainPanel.viewingChannels = a;
 		}
 		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true):void{
@@ -440,32 +437,34 @@ package com.junkbyte.console
 			addLine(args, FATAL);
 		}
 		public function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
-			addCh(channel, new Array(newLine), priority, isRepeating);
+			addLine(new Array(newLine), priority, makeChannelName(channel), isRepeating);
 		}
 		public function logch(channel:*, ...args):void{
-			addCh(channel, args, LOG);
+			addLine(args, LOG, makeChannelName(channel));
 		}
 		public function infoch(channel:*, ...args):void{
-			addCh(channel, args, INFO);
+			addLine(args, INFO, makeChannelName(channel));
 		}
 		public function debugch(channel:*, ...args):void{
-			addCh(channel, args, DEBUG);
+			addLine(args, DEBUG, makeChannelName(channel));
 		}
 		public function warnch(channel:*, ...args):void{
-			addCh(channel, args, WARN);
+			addLine(args, WARN, makeChannelName(channel));
 		}
 		public function errorch(channel:*, ...args):void{
-			addCh(channel, args, ERROR);
+			addLine(args, ERROR, makeChannelName(channel));
 		}
 		public function fatalch(channel:*, ...args):void{
-			addCh(channel, args, FATAL);
+			addLine(args, FATAL, makeChannelName(channel));
 		}
 		public function addCh(channel:*, lineParts:Array, priority:int = 2, isRepeating:Boolean = false):void{
-			var chn:String;
-			if(channel is String) chn = channel as String;
-			else if(channel) chn = LogReferences.ShortClassName(channel);
-			else chn = _config.defaultChannel;
-			addLine(lineParts, priority,chn, isRepeating);
+			addLine(lineParts, priority, makeChannelName(channel), isRepeating);
+		}
+		private function makeChannelName(obj:*):String{
+			if(obj is String) return obj as String;
+			else if(obj is ConsoleChannel) return ConsoleChannel(obj).name;
+			else if(obj) return LogReferences.ShortClassName(obj);
+			else return _config.defaultChannel;
 		}
 		//
 		//

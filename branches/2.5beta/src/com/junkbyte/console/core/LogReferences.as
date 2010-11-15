@@ -130,8 +130,7 @@ package com.junkbyte.console.core
 			}
 			return txt;
 		}
-		public function makeRefTyped(v:*):String
-		{
+		public function makeRefTyped(v:*):String{
 			if(v && typeof v == "object")
 			{
 				return "{"+genLinkString(v, null, ShortClassName(v))+"}";
@@ -205,7 +204,7 @@ package com.junkbyte.console.core
 		public function focus(o:*, full:Boolean = false):void{
 			remoter.send(FOCUS);
 			console.clear(LogReferences.INSPECTING_CHANNEL);
-			console.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
+			console.setViewingChannels(LogReferences.INSPECTING_CHANNEL);
 			
 			if(!_history) _history = new Array();
 			
@@ -221,7 +220,7 @@ package com.junkbyte.console.core
 		}
 		private function handleFocused():void{
 			console.clear(LogReferences.INSPECTING_CHANNEL);
-			console.viewingChannels = [LogReferences.INSPECTING_CHANNEL];
+			console.setViewingChannels(LogReferences.INSPECTING_CHANNEL);
 		}
 		public function exitFocus():void{
 			_current = null;
@@ -560,7 +559,7 @@ package com.junkbyte.console.core
 		 */	
 		public static function ShortClassName(obj:Object, eschtml:Boolean = true):String{
 			var str:String = getQualifiedClassName(obj);
-			var ind:int = str.lastIndexOf("::");
+			var ind:int = str.indexOf("::");
 			var st:String = obj is Class?"*":"";
 			str = st+str.substring(ind>=0?(ind+2):0)+st;
 			if(eschtml) return EscHTML(str);

@@ -153,7 +153,7 @@ package com.junkbyte.console {
 		
 		
 		/**
-		 * Command line usage allowance.
+		 * Full Command line features usage allowance.
 		 * <p>
 		 * CommandLine is a big security risk for your code and flash. 
 		 * It is a very good practice to disable it after development phase.
