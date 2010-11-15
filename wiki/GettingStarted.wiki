@@ -172,7 +172,7 @@ aSprite = null;
   * Above example creates a Sprite and then remove its reference.
   * This marks the Sprite to be garbage collected, but it might not get collected straight away.
   * If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
-  * You will see that objects that have lost reference gets garbage collected and notified in console.
+  * You will see that objects you are watching will get notified in console when they are garbage collected.
 
 ====Remoting====
   * Remoting sends log data for a remote console to use
