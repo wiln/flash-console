@@ -106,7 +106,7 @@ package com.junkbyte.console.core
 				lastmcDO = mcDO;
 			}
 			report(base.name+":"+console.links.makeRefTyped(base)+" has "+(list.length-1)+" children/sub-children.", 10);
-			report("Click on the name to return a reference to the child clip. <br/>Note that clip references will be broken when display list is changed",-2);
+			report("Click on the name to return a reference to the child clip.",-2);
 		}
 	}
 }

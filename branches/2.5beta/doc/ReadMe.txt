@@ -6,7 +6,7 @@
 
 ==Flash Console==
 
-  * Version: 2.4 (Sept 2010)
+  * Version: 2.5 beta (Nov 2010)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -32,7 +32,7 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.5 ALPHA ===
+===2.5 BETA ===
   * Added object linking feature where you can click on the object in the log and it'll inspect the details
   * Classes now get a `*` around the name to signify that its a class and not an instance of a class. eg. `*Sprite*`
   * Key bindings and password will not trigger if you have focus on an input textfield.
