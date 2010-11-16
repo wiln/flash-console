@@ -25,6 +25,10 @@
 
 package com.junkbyte.console.core 
 {
+	import flash.events.Event;
+	import flash.geom.Matrix;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 
@@ -40,6 +44,13 @@ package com.junkbyte.console.core
 	{
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
+		
+		private static const TO_STRINGS:Array = new Array(
+														getQualifiedClassName(Date),
+														getQualifiedClassName(Rectangle),
+														getQualifiedClassName(Point),
+														getQualifiedClassName(Matrix),
+														getQualifiedClassName(Event));
 		
 		
 		private var _refMap:WeakObject;
@@ -115,8 +126,7 @@ package com.junkbyte.console.core
 			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
 				if(v is ByteArray) add = " position:"+v.position+" length:"+v.length;
-				else if(v is Date) add = " "+v.toString();// For some reason date return false on hasOwnProperty("toString")
-				else if(v.hasOwnProperty("toString")) add = " "+String(v); // basically String() will call toString()
+				else if(TO_STRINGS.indexOf(getQualifiedClassName(v))>=0) add = " "+String(v);
 				txt = "{"+genLinkString(o, prop, ShortClassName(v))+EscHTML(add)+"}";
 			}else{
 				// special case cause it'll break the html if it does bytearray.toString();
