@@ -96,7 +96,7 @@ package com.junkbyte.console.core
 					_count--;
 				}
 			}
-			report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
+			if(arr.length) report("<b>GARBAGE COLLECTED "+arr.length+" item(s): </b>"+arr.join(", "),-2);
 		}
 		
 		public function get count():uint{

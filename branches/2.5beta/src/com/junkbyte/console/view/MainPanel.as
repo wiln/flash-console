@@ -893,7 +893,7 @@ package com.junkbyte.console.view
 			var hints:Array;
 			var str:String = _cmdField.text;
 			if(str){
-				if(console.remoter.remoting == Remoting.RECIEVER) str = str.substring(1);
+				if(console.remoter.remoting == Remoting.RECIEVER && str.charAt(0)=="~") str = str.substring(1);
 				
 				hints = console.cl.getHintsFor(str);
 				if(hints.length>3){

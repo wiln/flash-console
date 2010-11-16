@@ -26,10 +26,9 @@ package
 {
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.ConsoleChannel;
-	import com.junkbyte.console.ConsoleConfig;
 
 	import flash.display.*;
-	import flash.events.MouseEvent;
+	import flash.events.*;
 	import flash.text.*;
 	import flash.utils.*;
 
@@ -53,6 +52,7 @@ package
 			
 			Cc.remotingPassword = null; // Just so that remote don't ask for password
 			Cc.remoting = true; // Start sending logs to remote (using LocalConnection)
+			
 			Cc.commandLine = true; // Show command line
 			
 			Cc.height = 220; // change height. You can set x y width height to position/size the main panel
@@ -62,7 +62,6 @@ package
 			
 			// show the demo logging stuff there...
 			demoBasics();
-			
 			
 			setupUI();
 		}
@@ -108,10 +107,8 @@ package
 			// When 'no repeat' (3rd param) is set to true, it will not generate new lines for each log.
 			// It will keep replacing the previous line with repeat turned on until a certain count is passed.
 			// For example, if you are tracing download progress and you don't want to flood console with it.
-			
 			// If you want to specify the channel, use:
 			// Use Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
-
 		}
 		//
 		//

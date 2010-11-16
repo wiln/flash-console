@@ -175,8 +175,9 @@ package com.junkbyte.console.core
 			}
 		}
 		private function handleString(str:String):void{
-			if(str == ""){
+			if(str == "refexit"){
 				exitFocus();
+				console.setViewingChannels();
 			}else if(str == "refprev"){
 				historyInc(-2);
 			}else if(str == "reffwd"){
@@ -235,8 +236,8 @@ package com.junkbyte.console.core
 			_dofull = false;
 			_history = null;
 			_hisIndex = 0;
-			if(remoter.remoting == Remoting.RECIEVER){
-				remoter.send("ref", "");
+			if(remoter.remoting == Remoting.SENDER){
+				remoter.send("ref", "refexit");
 			}
 			console.clear(LogReferences.INSPECTING_CHANNEL);
 		}
@@ -252,7 +253,7 @@ package com.junkbyte.console.core
 			if(!viewAll) showInherit = " [<a href='event:refi'>Show inherited</a>]";
 			var menuStr:String;
 			if(_history){
-				menuStr = "<b>[<a href='event:channel_"+Console.GLOBAL_CHANNEL+ "'>Exit</a>]";
+				menuStr = "<b>[<a href='event:refexit'>Exit</a>]";
 				if(_hisIndex>1){
 					menuStr += " [<a href='event:refprev'>Previous</a>]";
 				}

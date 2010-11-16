@@ -25,7 +25,6 @@
 package 
 {
 	import com.junkbyte.console.Cc;
-	import com.junkbyte.console.ConsoleConfig;
 
 	import flash.display.*;
 
