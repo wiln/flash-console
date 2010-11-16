@@ -1,7 +1,5 @@
 #summary for v2.5
 
-=Getting started=
-
 <wiki:toc max_depth="2" />
 
 =Introduction=
