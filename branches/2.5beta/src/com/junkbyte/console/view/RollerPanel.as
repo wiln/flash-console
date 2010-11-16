@@ -49,7 +49,7 @@ package com.junkbyte.console.view
 			super(m);
 			name = NAME;
 			init(60,100,false);
-			txtField = makeTF("rollerprints");
+			txtField = makeTF("rollerPrints");
 			txtField.multiline = true;
 			txtField.autoSize = TextFieldAutoSize.LEFT;
 			registerTFRoller(txtField, onMenuRollOver, linkHandler);
@@ -87,7 +87,12 @@ package com.junkbyte.console.view
 				var key:String = console.rollerCaptureKey?console.rollerCaptureKey.key:"unassigned";
 				str = "<menu> <a href=\"event:close\"><b>X</b></a></menu> Capture key: <menu><a href=\"event:capture\">"+key+"</a></menu><br/>";
 			}
-			var objs:Array = stg.getObjectsUnderPoint(new Point(stg.mouseX, stg.mouseY));
+			var p:Point = new Point(stg.mouseX, stg.mouseY);
+			if(stg.areInaccessibleObjectsUnderPoint(p)){
+				str += "<p9>Inaccessible objects detected</p9><br/>";
+			}
+			var objs:Array = stg.getObjectsUnderPoint(p);
+			
 			var stepMap:Dictionary = new Dictionary(true);
 			if(objs.length == 0){
 				objs.push(stg);// if nothing at least have stage.

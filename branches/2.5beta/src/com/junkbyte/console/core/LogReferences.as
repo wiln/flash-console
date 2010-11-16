@@ -25,7 +25,6 @@
 
 package com.junkbyte.console.core 
 {
-	import flash.geom.Point;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 
@@ -42,8 +41,6 @@ package com.junkbyte.console.core
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
 		
-		public static const REF:String = "ref";
-		public static const FOCUS:String = "focus";
 		
 		private var _refMap:WeakObject;
 		private var _refRev:Dictionary;
@@ -61,8 +58,8 @@ package com.junkbyte.console.core
 			_refMap = new WeakObject();
 			_refRev = new Dictionary(true);
 			
-			remoter.registerClient(REF, handleString);
-			remoter.registerClient(FOCUS, handleFocused);
+			remoter.registerClient("ref", handleString);
+			remoter.registerClient("focus", handleFocused);
 		}
 		public function setLogRef(o:*):uint{
 			if(!config.useObjectLinking) return 0;
@@ -118,9 +115,9 @@ package com.junkbyte.console.core
 			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
 				if(v is ByteArray) add = " position:"+v.position+" length:"+v.length;
-				if(v is Point) add = " x:"+v.x+" y:"+v.y;
-				if(v is Date) add = " "+v.toString();
-				txt = "{"+genLinkString(o, prop, ShortClassName(v))+add+"}";
+				else if(v is Date) add = " "+v.toString();// For some reason date return false on hasOwnProperty("toString")
+				else if(v.hasOwnProperty("toString")) add = " "+String(v); // basically String() will call toString()
+				txt = "{"+genLinkString(o, prop, ShortClassName(v))+EscHTML(add)+"}";
 			}else{
 				// special case cause it'll break the html if it does bytearray.toString();
 				if(v is ByteArray) txt = "[ByteArray position:"+ByteArray(v).position+" length:"+ByteArray(v).length+"]";
@@ -162,7 +159,7 @@ package com.junkbyte.console.core
 		}
 		public function handleRefEvent(str:String):void{
 			if(remoter.remoting == Remoting.RECIEVER){
-				remoter.send(REF, str);
+				remoter.send("ref", str);
 			}else{
 				handleString(str);
 			}
@@ -199,11 +196,11 @@ package com.junkbyte.console.core
 						return;
 					}
 				}
-				report("Reference no longer exist.", -2);
+				report("Reference no longer exist (garbage collected).", -2);
 			}
 		}
 		public function focus(o:*, full:Boolean = false):void{
-			remoter.send(FOCUS);
+			remoter.send("focus");
 			console.clear(LogReferences.INSPECTING_CHANNEL);
 			console.setViewingChannels(LogReferences.INSPECTING_CHANNEL);
 			
@@ -229,7 +226,7 @@ package com.junkbyte.console.core
 			_history = null;
 			_hisIndex = 0;
 			if(remoter.remoting == Remoting.RECIEVER){
-				remoter.send(REF, "");
+				remoter.send("ref", "");
 			}
 			console.clear(LogReferences.INSPECTING_CHANNEL);
 		}

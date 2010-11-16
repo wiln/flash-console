@@ -34,9 +34,6 @@ package com.junkbyte.console.view
 
 	public class PanelsManager{
 		
-		
-		private static const USRGRAPH:String = "graph_";
-		
 		private var console:Console;
 		private var _mainPanel:MainPanel;
 		private var _ruler:Ruler;
@@ -152,7 +149,7 @@ package com.junkbyte.console.view
 						panel = new GraphingPanel(console, rect.width,rect.height);
 						panel.x = rect.x;
 						panel.y = rect.y;
-						panel.name = USRGRAPH+n;
+						panel.name = "graph_"+n;
 						_graphsMap[n] = panel;
 						addPanel(panel);
 					}
