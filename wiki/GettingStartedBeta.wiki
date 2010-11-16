@@ -2,7 +2,7 @@
 
 =Getting started=
 
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="2" />
 
 =Introduction=
 
@@ -76,7 +76,7 @@ Asdoc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleConfi
 
 For easy reference, please see samples/flash/SampleAdvanced.as for working sample.
 
-===Object inspection===
+==Object inspection==
   * When you log an object in console, it will keep a weak reference to the object
   * Example: `Cc.info("Stage is:", stage)` will show up in console as `Stage is: {Stage}`
   * Clicking on the link {Stage} will reveal detailed info about stage
@@ -85,7 +85,7 @@ For easy reference, please see samples/flash/SampleAdvanced.as for working sampl
   * You can click on '[set scope]' to set scope in commandLine (explained later)
   * You can manually print detailed info about an object by calling Cc.inspect(...);
 
-===Keyboard Binding===
+==Keyboard Binding==
   * Key binding lets you bind keyboard keys to your own function
   * Example usages: open a specific panel, give special items/cheats in a game
   * Key binding should only be used for development purposes
@@ -99,7 +99,7 @@ import com.junkbyte.console.KeyBind;
 Cc.bindKey(new KeyBind("h"), Cc.log, ["Hello!"]);
 }}}
 
-===Command line===
+==Command line==
   * CommandLine let you execute actionscript 3 code at run time
   * You must set `Cc.config.commandLineAllowed = true;` to be able to run full features.
   * Command line appears at the bottom of main panel (press CL at top menu)
@@ -139,7 +139,7 @@ Cc.store("stage", this.stage); // assuming there is this.stage
    * Adds glow filter on Console.
   * For better understanding of commandLine, see CommandLineHelp
  
-===Display Roller===
+==Display Roller==
   * Display roller shows the display tree of objects under your mouse
   * Start Display roller by pressing RL at the top menu
   * You can capture the display map to console for use in commandLine or for detail inspection
@@ -155,7 +155,7 @@ Cc.store("stage", this.stage); // assuming there is this.stage
    * Use link inspection to find out whats wrong with the values
    * Use commandline to change and experiment with different property values on the fly
 
-===Advanced Logging===
+==Advanced Logging==
 Yes, lets go back to logging... here are some extra features:
 
   * *Cc.stack()* Gives you a stack trace under your string to show where this method is called from (requires debug player)
@@ -193,7 +193,7 @@ Cc.add("My advanced log in priority 2, 5th call", 2, true);
 // Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
 }}}
 
-===Graphing===
+==Graphing==
   * Graphing lets you view number graphs similar to the FPS and memory monitor. (F and M buttons on top menu)
   * Example as seen in samples/SampleAdvanced.as:
 {{{
@@ -204,7 +204,7 @@ Cc.addGraph("mouse", this, "mouseY", 0x3333ff,"Y");
 Cc.addGraph("mouse", this, "(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x119911, "sine");
 }}}
 
-===Extra menu links===
+==Extra menu links==
   * You can add your own menu link at the top along with other console build in links.
 {{{
 Cc.addMenu("hi", Cc.log, ["Hello from top menu"], "Says hello!");
@@ -212,11 +212,11 @@ Cc.addMenu("hi", Cc.log, ["Hello from top menu"], "Says hello!");
    * This adds a link 'hi' on top menu. Rolling over the link will show the tooltip "Says hello!"
    * Clicking on the link will log in console "Hello from top menu".
 
-===Ruler tool===
+==Ruler tool==
   * Start ruler tool by pressing on RL at the top menu
   * Ruler tool let you measure the distance and angle between two points
 
-===Garbage collection monitor===
+==Garbage collection monitor==
 {{{
 import flash.display.Sprite;
 var aSprite = new Sprite();
@@ -228,7 +228,7 @@ aSprite = null;
   * If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
   * You will see that objects you are watching will get notified in console when they are garbage collected.
   
-===Remoting===
+==Remoting==
   * Remoting sends log data for a remote console to use
   * The advantage is that you do not need to keep console open on your flash
   * You can use commandline, view FPS and memory from remote
