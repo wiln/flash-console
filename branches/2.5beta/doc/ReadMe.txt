@@ -1,12 +1,12 @@
 #summary Read me and Changes log.
-#labels Featured,Phase-Requirements
 
 
 = READ ME =
 
 ==Flash Console==
 
-  * Version: 2.5 beta (Nov 2010)
+  * Version: 2.4 (Sept 2010)
+  * Version beta: 2.5 (Nov 2010)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -16,7 +16,7 @@
 
 
 ==Short description==
-Console is Actionscript 3 debugger/logger for flash, flex and AIR. It runs in the same flash you want to use logging on OR use remoting to print logs on a remote console.
+Console is an as3 logger, debugger which runs inside the flash app.
 Features include: priorities, channels, FPS display, memory/garbage collection monitor, graphing, remote logging, non-repeative tracing, ruler tool, display mapping, and many more!
 
 
@@ -28,34 +28,45 @@ http://code.google.com/p/flash-console/issues/
 == Credits ==
   * Created by Lu Aye Oo
   * Logo by Nick Holliday
+  * Special thanks to Joe Nash
 
 
 == Change Log ==
 
 ===2.5 BETA ===
-  * Added object linking feature where you can click on the object in the log and it'll inspect the details
-  * Classes now get a `*` around the name to signify that its a class and not an instance of a class. eg. `*Sprite*`
-  * Key bindings and password will not trigger if you have focus on an input textfield.
-  * Remoting now use ByteArray data format which will break older clients but is faster and more efficent
-  * Remote: to run local command line on remote, prefix string with ~, e.g. `~stage.frameRate=100;`
-  * Commandline can set to visible even if Cc.config.commandLineAllowed is set to false, however user will not be able to use the security sensitive features.
-  * Pressing Enter while console is visible will auto focus to commandLine
-  * added /keybinds command to list all used key binds
-  * added ability to add custom slash commands. use Cc.addSlashCommand();
-  * commandLine autoScoping can be set from Cc.config.commandLineAutoScope
-  * Cc.stack() no longer accept channel name. use Cc.stackch() for channel
-  * Top menu can now be hidden from UI OR Cc.config.style.topMenu = false;
-  * Fixed bug with channel name generation from non-string param in Cc.logch, Cc.warnch, etc...
-  * Removed Cc.viewingChannel. use Cc.setViewingChannel to set
-  * Removed Cc.paused. If you want to pause, press P in top menu
-  * Removed Cc.remote as it is a special use case
-  * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
-  * Simplied sourcecode where possible while keeping compile size down
-  * Fixed not being able to keep selection while scrolling up. You may sometimes still have problem keeping selecting while scrolling down
-  * After dragging the main panel outside screen, it will snap back to view if you toggle it by entering the password
-  * You can no longer change the name of global/console/default/filtered channels.
+  * Features
+   * *Object linking* where you can click on an object in the log to inspect or get scope for commandline
+   * *Custom slash commands* use Cc.addSlashCommand(...);
+   * *Custom top menu* use Cc.addMenu(...) to add your own menu on top
+   * *Commandline hinting* suggests possible first words
+   * */filter* and */filterexp* will also underline matching strings
+   * *Magnification* in ruller tool
+  * Major changes
+   * You must set Cc.config.commandLineAllowed = true; to be able to use full commandline features
+   * Commandline can set to visible even if Cc.config.commandLineAllowed is set to false so that /filter and /filterexp is available
+   * Cc.stack() no longer accept channel name. use Cc.stackch() for channel
+   * Key bindings and password will not trigger if you have focus on an input textfield
+   * Removed Cc.viewingChannel. use Cc.setViewingChannel to set
+   * Removed Cc.paused. If you want to pause, press P in top menu
+   * Removed Cc.remote as it is a special use case
+   * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
+   * Remoting now use ByteArray data format which will break older clients but is faster and more efficent
+   * Simplied sourcecode where possible while keeping compile size down
+  * Minor changes
+   * Top menu can now be hidden from UI OR Cc.config.style.topMenu = false;
+   * Remote: to run local command line on remote, prefix string with ~, e.g. `~stage.frameRate=100;`
+   * Classes now get a `*` around the name to signify that its a class and not an instance of a class. eg. `*Sprite*`
+   * Pressing Enter while console is visible will auto focus to commandLine
+   * added /keybinds command to list all used key binds
+   * commandLine autoScoping can be set from Cc.config.commandLineAutoScope
+   * You can no longer change the name of global/console/default/filtered channels
+  * Bug fixes
+   * Channel name generation from non-string param in Cc.logch, Cc.warnch, etc...
+   * Not being able to keep selection while scrolling up. You may sometimes still have problem selecting while scrolling down
+   * After dragging the main panel outside screen, it will snap back to view if you toggle it by entering the password
 
 ===2.4===
+
   * Renamed source package name to com.junkbyte.console - to be less personal
   * Renamed C to Cc so that FlashBuilder pick up as auto complete. Cc stands for Console controller.
   * Moved a lot of 'configuration' settings from Cc. to ConsoleConfig (that you pass at start)
@@ -69,12 +80,12 @@ http://code.google.com/p/flash-console/issues/
   * Added Cc.stack
   * Added Cc.autoStackPriority and defaultStackDepth in ConsoleConfig
   * Cc.fatal will get auto stack trace by default.
-  * External trace call will have channel name as first param, log text as second param and priority as third
+  * External trace call will have channel name as first param, log line as second param and priority as third
   * Removed tracingPriorty, prefixChannelNames, tracingChannels
   * Removed Cc.filterText and Cc.filterRegExp - use /filter in interface
   * Removed Cc.gc() - use memoryMonitor - G button in interface.
   * Removed Cc.remoteDelay. it is now always 1.
-  * Fixed bug with not being able to access array indexes in commandLine.
+  * Fixed bug with not being able to access array indexes.
   * Fixed bug with not sending too many log lines in remoting.
 
 ===2.35===
