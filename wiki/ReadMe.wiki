@@ -39,7 +39,7 @@ http://code.google.com/p/flash-console/issues/
    * *Custom slash commands* use Cc.addSlashCommand(...);
    * *Custom top menu* use Cc.addMenu(...) to add your own menu on top
    * *Commandline hinting* suggests possible first words
-   * /filter and /filterexp will also underline matching strings
+   * */filter* and */filterexp* will also underline matching strings
    * *Magnification* in ruller tool
   * Major changes
    * You must set Cc.config.commandLineAllowed = true; to be able to use full commandline features
