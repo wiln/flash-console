@@ -50,7 +50,7 @@ ch.info("Hello!", "Works just like other logging methods but this way you keep t
 
 ==UI==
 
-[http://www.junkbyte.com/flash-console/console_controls.png]
+[http://www.junkbyte.com/flash-console/2.5beta/console_controls.png]
 
 see: doc/console_controls.png
 
