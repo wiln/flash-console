@@ -4,3 +4,5 @@
 
 
 please see: http://junkbyte.com/flash-console/asdoc/
+
+For version *2.5* see: http://junkbyte.com/flash-console/asdoc2.5/
