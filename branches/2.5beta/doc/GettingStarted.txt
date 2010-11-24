@@ -80,16 +80,15 @@ For easy reference, please see samples/flash/SampleAdvanced.as for working sampl
   * Clicking on the link {Stage} will reveal detailed info about stage
   * Details shows up in an 'inspection' channel. When you are done, click 'Exit' to return to normal logging view
   * As references are stored as weak link, some objects may get garbage collected before you click
-  * You can click on '[set scope]' to set scope in commandLine (explained later)
+  * You can click on `[set scope]` to set scope in commandLine (explained later)
   * You can manually print detailed info about an object by calling Cc.inspect(...);
 
 ==Keyboard Binding==
   * Key binding lets you bind keyboard keys to your own function
   * Example usages: open a specific panel, give special items/cheats in a game
-  * Key binding should only be used for development purposes
-  * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * The function you pass get STRONG referenced
   * Key Binding will not trigger if user have focus on an input TextField
+  * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * Example below logs "Hello!" in console when user press the key H in keyboard.
 {{{
 import com.junkbyte.console.Cc;
@@ -104,7 +103,7 @@ Cc.bindKey(new KeyBind("h"), Cc.log, ["Hello!"]);
 
   * *Slash commands* run special functions on demand
   * An example of build in slash command: '/filter log'
-   * Typing this will filter console that match the string 'log'
+   * Typing this will filter to logs that match the string 'log'
    * You will also get underline under the exact match
    * When you are done, change the channel at top OR type '/filter'
 
@@ -208,7 +207,7 @@ Cc.addGraph("mouse", this, "(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x
 Cc.addMenu("hi", Cc.log, ["Hello from top menu"], "Says hello!");
 }}}
    * This adds a link 'hi' on top menu. Rolling over the link will show the tooltip "Says hello!"
-   * Clicking on the link will log in console "Hello from top menu".
+   * Clicking on the link will print in console "Hello from top menu".
 
 ==Ruler tool==
   * Start ruler tool by pressing on RL at the top menu

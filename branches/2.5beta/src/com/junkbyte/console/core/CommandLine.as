@@ -155,7 +155,7 @@ package com.junkbyte.console.core
 				if(i>0) _slashCmds.setPropertyIsEnumerable(n, false);
 			}
 		}
-		public function addSlashCommand(n:String, callback:Function, desc:String = ""):void{
+		public function addSlashCommand(n:String, callback:Function, desc:String = "", allow:Boolean = true):void{
 			if(_slashCmds[n] != null){
 				var prev:SlashCommand = _slashCmds[n];
 				if(!prev.user) {
@@ -163,7 +163,7 @@ package com.junkbyte.console.core
 				}
 			}
 			if(callback == null) delete _slashCmds[n];
-			else _slashCmds[n] = new SlashCommand(n, callback, desc);
+			else _slashCmds[n] = new SlashCommand(n, callback, desc, true, allow);
 		}
 		public function run(str:String):* {
 			if(remoter.remoting == Remoting.RECIEVER){
@@ -305,8 +305,10 @@ package com.junkbyte.console.core
 			var buildin:Array = [];
 			var custom:Array = [];
 			for each(var cmd:SlashCommand in _slashCmds){
-				if(config.commandLineAllowed && cmd.user) custom.push(cmd);
-				else if(config.commandLineAllowed || cmd.allow) buildin.push(cmd);
+				if(config.commandLineAllowed || cmd.allow){
+					if(cmd.user) custom.push(cmd);
+					else buildin.push(cmd);
+				}
 			}
 			buildin = buildin.sortOn("n");
 			report("Build-in commands:"+(!config.commandLineAllowed?" (limited permission)":""), 4);

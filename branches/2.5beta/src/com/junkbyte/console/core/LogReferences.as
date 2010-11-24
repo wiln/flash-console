@@ -45,14 +45,6 @@ package com.junkbyte.console.core
 		
 		public static const INSPECTING_CHANNEL:String = "⌂";
 		
-		private static const TO_STRINGS:Array = new Array(
-														getQualifiedClassName(Date),
-														getQualifiedClassName(Rectangle),
-														getQualifiedClassName(Point),
-														getQualifiedClassName(Matrix),
-														getQualifiedClassName(Event));
-		
-		
 		private var _refMap:WeakObject;
 		private var _refRev:Dictionary;
 		private var _refIndex:uint = 1;
@@ -80,6 +72,15 @@ package com.junkbyte.console.core
 				_refMap[ind] = o;
 				_refRev[o] = ind;
 				_refIndex++;
+				// Look through every 20th older _refMap ids and delete empty ones
+				// 50s rather than all to be faster.
+				var i:int = ind-50;
+				while(i>=0){
+					if(_refMap[i] === null){
+						delete _refMap[i];
+					}
+					i-=50;
+				}
 			}
 			return ind;
 		}
@@ -126,7 +127,8 @@ package com.junkbyte.console.core
 			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
 				if(v is ByteArray) add = " position:"+v.position+" length:"+v.length;
-				else if(TO_STRINGS.indexOf(getQualifiedClassName(v))>=0) add = " "+String(v);
+				else if(v is Date || v is Rectangle || v is Point || v is Matrix || v is Event) add = " "+String(v);
+				else if(v is DisplayObject && v.name) add = " "+v.name;
 				txt = "{"+genLinkString(o, prop, ShortClassName(v))+EscHTML(add)+"}";
 			}else{
 				// special case cause it'll break the html if it does bytearray.toString();
@@ -139,8 +141,7 @@ package com.junkbyte.console.core
 			return txt;
 		}
 		public function makeRefTyped(v:*):String{
-			if(v && typeof v == "object")
-			{
+			if(v && typeof v == "object"){
 				return "{"+genLinkString(v, null, ShortClassName(v))+"}";
 			}
 			return ShortClassName(v);
@@ -216,7 +217,6 @@ package com.junkbyte.console.core
 			console.setViewingChannels(LogReferences.INSPECTING_CHANNEL);
 			
 			if(!_history) _history = new Array();
-			
 			
 			if(_current != o){
 				_current = o; // current is kept as hard reference so that it stays...
@@ -407,7 +407,7 @@ package com.junkbyte.console.core
 					}else{
 						str += "<p3>"+methodX.@name+"</p3>";
 					}
-					str += "(<i>"+params.join(",")+"</i>):"+methodX.@returnType;
+					str += "("+params.join(", ")+"):"+methodX.@returnType;
 					report(str, 1);
 				}else{
 					inherit++;

@@ -37,9 +37,7 @@ package com.junkbyte.console.vos {
 			_strong = strong;
 			reference = ref;
 		}
-		//
-		//
-		//
+		
 		public function get reference():*{
 			if(_strong){
 				return _val;
@@ -59,18 +57,18 @@ package com.junkbyte.console.vos {
 				_val[ref] = null;
 			}
 		}
-		//
-		//
-		//
+		
 		public function get strong():Boolean{
 			return _strong;
 		}
+		/*
+		// Removed to save compile size
 		public function set strong(b:Boolean):void{
 			if(_strong != b){
 				var ref:* = reference;
 				_strong = b;
 				reference = ref;
 			}
-		}
+		}*/
 	}
 }

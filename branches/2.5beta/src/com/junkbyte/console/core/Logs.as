@@ -67,8 +67,13 @@ package com.junkbyte.console.core
 			push(line);
 			if(config.maxLines > 0 ){
 				var off:int = _length - config.maxLines;
-				if(off > 0){
-					shift(off);
+				//shift(off)
+				while(off>0 && first){
+					if(first == _lastRepeat) _lastRepeat = null;
+					first = first.next;
+					first.prev = null;
+					off--;
+					_length--;
 				}
 			}
 			return true;
@@ -149,21 +154,25 @@ package com.junkbyte.console.core
 			last = v;
 			_length++;
 		}
-		/*private function pop():void{
+		/*
+		 //Made code for these function part of another function to save compile size.
+		 private function pop():void{
 			if(last) {
 				if(last == _lastRepeat) _lastRepeat = null;
 				last = last.prev;
+				last.next = null;
 				_length--;
 			}
-		}*/
+		}
 		private function shift(count:uint = 1):void{
 			while(first != null && count>0){
 				if(first == _lastRepeat) _lastRepeat = null;
 				first = first.next;
+				first.prev = null;
 				count--;
 				_length--;
 			}
-		}
+		}*/
 		private function remove(log:Log):void{
 			if(first == log) first = log.next;
 			if(last == log) last = log.prev;

@@ -892,16 +892,12 @@ package com.junkbyte.console.view
 		private function updateCmdHint(e:Event = null):void{
 			var hints:Array;
 			var str:String = _cmdField.text;
-			if(str){
-				if(console.remoter.remoting == Remoting.RECIEVER && str.charAt(0)=="~") str = str.substring(1);
-				
+			if(str && console.remoter.remoting != Remoting.RECIEVER){
 				hints = console.cl.getHintsFor(str);
 				if(hints.length>3){
 					hints.splice(3);
 					hints.push("...");
 				}
-			}else if(console.remoter.remoting == Remoting.RECIEVER){
-				hints = new Array("~");
 			}
 			setHints(hints);
 		}

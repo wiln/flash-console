@@ -33,14 +33,14 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.5 BETA ===
+===2.5 BETA 2 ===
   * Features
    * *Object linking* where you can click on an object in the log to inspect or get scope for commandline
    * *Custom slash commands* use Cc.addSlashCommand(...);
    * *Custom top menu* use Cc.addMenu(...) to add your own menu on top
    * *Commandline hinting* suggests possible first words
    * */filter* and */filterexp* will also underline matching strings
-   * *Magnification* in ruller tool
+   * *Magnification* in ruler tool
   * Major changes
    * You must set Cc.config.commandLineAllowed = true; to be able to use full commandline features
    * Commandline can set to visible even if Cc.config.commandLineAllowed is set to false so that /filter and /filterexp is available
@@ -51,19 +51,22 @@ http://code.google.com/p/flash-console/issues/
    * Removed Cc.remote as it is a special use case
    * Removed Cc.setPanelArea, Cc.commandBase and Cc.runCommand for simplicity
    * Remoting now use ByteArray data format which will break older clients but is faster and more efficent
-   * Simplied sourcecode where possible while keeping compile size down
   * Minor changes
+   * Clicking on the priority filter P0 will now skip priorities that are not used. Shift click to go backwards
    * Top menu can now be hidden from UI OR Cc.config.style.topMenu = false;
    * Remote: to run local command line on remote, prefix string with ~, e.g. `~stage.frameRate=100;`
    * Classes now get a `*` around the name to signify that its a class and not an instance of a class. eg. `*Sprite*`
    * Pressing Enter while console is visible will auto focus to commandLine
+   * added /commands command to list all slash commands
    * added /keybinds command to list all used key binds
    * commandLine autoScoping can be set from Cc.config.commandLineAutoScope
    * You can no longer change the name of global/console/default/filtered channels
+   * Simplied sourcecode where possible while keeping compile size down
   * Bug fixes
    * Channel name generation from non-string param in Cc.logch, Cc.warnch, etc...
    * Not being able to keep selection while scrolling up. You may sometimes still have problem selecting while scrolling down
    * After dragging the main panel outside screen, it will snap back to view if you toggle it by entering the password
+   * Fixed memory leak from deleted logs
 
 ===2.4===
 

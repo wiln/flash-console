@@ -59,9 +59,9 @@ package com.junkbyte.console
 	public class Console extends Sprite {
 
 		public static const VERSION:Number = 2.5;
-		public static const VERSION_STAGE:String = "beta";
-		public static const BUILD:int = 550;
-		public static const BUILD_DATE:String = "2010/11/16 23:19";
+		public static const VERSION_STAGE:String = "beta2";
+		public static const BUILD:int = 551;
+		public static const BUILD_DATE:String = "2010/11/24 23:39";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -408,8 +408,8 @@ package com.junkbyte.console
 		public function get commandLine ():Boolean{
 			return _panels.mainPanel.commandLine;
 		}
-		public function addSlashCommand(n:String, callback:Function):void{
-			_cl.addSlashCommand(n, callback);
+		public function addSlashCommand(n:String, callback:Function, desc:String = "", allow:Boolean = true):void{
+			_cl.addSlashCommand(n, callback, desc, allow);
 		}
 		//
 		// LOGGING

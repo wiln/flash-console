@@ -129,7 +129,7 @@
 		</copy>
 	</target>
 
-
+	<!-- http://livedocs.adobe.com/flex/3/html/help.html?content=asdoc_9.html#142061 -->
 	<target name="compileASDoc">
 		<delete dir="${asdoc.dir}" failOnError="false" includeEmptyDirs="true" />
 		<mkdir dir="${asdoc.dir}" />

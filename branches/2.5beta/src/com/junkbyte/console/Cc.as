@@ -21,53 +21,6 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 * 
-* 
-
-	BASICc USAGE:
-		
-		import com.junkbyte.console.*;
-		Cc.start(this); // this = preferably the root or stage
-		
-		// OR  Cc.start(this,"debug");
-		// Start console, parameter "debug" (optional) sets the console's password.
-		// console will only open after you type "debug" in sequence at anytime on stage. 
-		// Leave blank to disable password, where console will launch straight away.
-		
-		Cc.add("Hello World"); 
-		// Output "Hello World" with default priority in defaultChannel
-		
-		Cc.add( ["Hello World" , "this is", "an array", "of arguments"] );
-		// Passes multiple arguments as array (for the time being this is the only alternative)
-		
-		Cc.add("Important Trace!", 10);
-		// Output "Important Trace!" with priority 10 in defaultChannel
-		
-		Cc.add("A Looping trace that I dont want to see a long list", 10, true);
-		// Output the text in defaultChannel, replacing the last 'repeating' line. preventing it from generating so many lines.
-		// good for tracing loops.
-		// use Cc.forceLine = # to force print the line on # frames. # = a number.
-		
-		Cc.ch("myChannel","Hello my Channel"); 
-		// Output "Hello my Channel" in "myChannel" channel.
-		// note: "global" channel show trace lines from all channels.
-		
-		Cc.ch("myChannel","Hello my Channel", 8); 
-		// Output "Hello my Channel" in "myChannel" channel with priority 8
-		// note: "global" channel show trace lines from all channels.
-		
-		Cc.ch("myChannel","Hello my Channel", 8, true); 
-		// Output "Hello my Channel" in "myChannel" channel with priority 8 replacing the last 'repeating' line
-		// note: "global" channel show trace lines from all channels.
-		
-		
-		// OPTIONAL USAGE
-		Cc.visible = false // (defauilt: true) set to change visibility. It will still record but will not update prints etc
-
-		Cc.tracing = true; // (default: false) when set, all console input will be re-traced during authoring
-		Cc.alwaysOnTop = false; // (default: true) when set this console will try to keep it self on top of its parent display container.
-
-		Cc.remoting = true; // (default: false) set to broadcast traces to LocalConnection
-		Cc.isRemote = true; // (default: false) set to recieve broadcasts from LocalConnection remote
 */
 package com.junkbyte.console {
 	import flash.display.LoaderInfo;
@@ -78,9 +31,11 @@ package com.junkbyte.console {
 
 	/**
 	 * Cc stands for Console Controller.
-	 * It is a static / singleton controller for Console (com.junkbyte.console.Console).
-	 * In a later date when Console is no longer needed, remove Cc.start(..) or Cc.startOnStage(..) 
-	 * and the rest of console related codes will stop executing to save memory and performance.
+	 * It is a singleton controller for <code>Console (com.junkbyte.console.Console)</code>.
+	 * <p>
+	 * In a later date when Console is no longer needed, remove <code>Cc.start(..)</code> or <code>Cc.startOnStage(..)</code> 
+	 * and all other calls through Cc will stop working silently.
+	 * </p>
 	 * @author  Lu Aye Oo
 	 * @version 2.4
 	 * @see http://code.google.com/p/flash-console/
@@ -93,8 +48,9 @@ package com.junkbyte.console {
 		private static var _config:ConsoleConfig;
 		
 		/**
-		 * Returns ConsoleConfig used or to be used - to start console. 
-		 * Creates a new one if it previously does not exist and get passed on the next Cc.start (if a different config instance was not passed into start)
+		 * Returns ConsoleConfig used or to be used - to start console.
+		 * It is recommended to set the values via <code>Cc.config</code> before starting console.
+		 * @see com.junkbyte.console.ConsoleConfig
 		 */
 		public static function get config():ConsoleConfig{
 			if(!_config) _config = new ConsoleConfig();
@@ -104,7 +60,7 @@ package com.junkbyte.console {
 		/**
 		 * Start Console inside given Display.
 		 * <p>
-		 * Calling any other C calls before this (or startOnStage(...)) will fail silently. (except Cc.config)
+		 * Calling any other C calls before this (or startOnStage(...)) will fail silently (except Cc.config).
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 * In flex, it is more convenient to use Cc.startOnStage() as it will avoid UIComponent typing issue.
 		 * </p>
@@ -113,6 +69,7 @@ package com.junkbyte.console {
 		 * @param  Display in which console should be added to. Preferably stage or root of your flash document.
 		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Set Cc.visible = ture to unhide at start.
 		 * 			Must be ASCII chars. Example passwords: ` OR debug.
+		 * 			Password will not trigger if you have focus on an input TextField.
 		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = ""):void{
 			if(_console){
@@ -128,13 +85,16 @@ package com.junkbyte.console {
 		 * Starting in stage makes sure console is added at the very top level.
 		 * <p>
 		 * It will look for stage of mc (first param), if mc isn't a Stage or on Stage, console will be added to stage when mc get added to stage.
-		 * Calling any other C calls before this will fail silently. (except Cc.config)
+		 * <p>
+		 * </p>
+		 * Calling any other C calls before this will fail silently (except Cc.config).
 		 * When Console is no longer needed, removing this line alone will stop console from working without having any other errors.
 		 * </p>
 		 * 
 		 * @param  Display which is Stage or will be added to Stage.
 		 * @param  Password sequence to toggle console's visibility. If password is set, console will start hidden. Set Cc.visible = ture to unhide at start.
-		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash.
+		 * 			Must be ASCII chars. Example passwords: ` OR debug. Make sure Controls > Disable Keyboard Shortcuts in Flash. 
+		 * 			Password will not trigger if you have focus on an input TextField.
 		 * 			
 		 */
 		public static function startOnStage(mc:DisplayObject, pass:String = ""):void{
@@ -156,9 +116,9 @@ package com.junkbyte.console {
 		/**
 		 * Add log line to default channel
 		 *
-		 * @param  String to add, any type can be passed and will be converted to string or a link if it is an object/class
-		 * @param  Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
-		 * @param  When set to true, log line will replace the previously repeated line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
+		 * @param str 	String to add, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param priority 	Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param isRepeating	When set to true, log line will replace the previously repeated line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
 		 */
 		public static function add(str:*, priority:int = 2, isRepeating:Boolean = false):void{
 			if(_console) _console.add(str, priority, isRepeating);
@@ -167,10 +127,10 @@ package com.junkbyte.console {
 		 * Add log line to channel
 		 * If channel name doesn't exist it creates one
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param  String to add, any type can be passed and will be converted to string or a link if it is an object/class
-		 * @param  Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
-		 * @param  When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param str	String to add, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param priority	Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param isRepeating	When set to true, log line will replace the previous line rather than making a new line (unless it has repeated more than ConsoleConfig -> maxRepeats)
 		 */
 		public static function ch(channel:*, str:*, priority:int = 2, isRepeating:Boolean = false):void{
 			if(_console) _console.ch(channel,str, priority, isRepeating);
@@ -179,7 +139,7 @@ package com.junkbyte.console {
 		 * Add log line with priority 1
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class
 		 */
 		public static function log(...args):void{
 			if(_console) _console.log.apply(null, args);
@@ -188,7 +148,7 @@ package com.junkbyte.console {
 		 * Add log line with priority 3
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param String to be logged, any type can be passed and will be converted to string  or a link if it is an object/class
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class
 		 */
 		public static function info(...args):void{
 			if(_console) _console.info.apply(null, args);
@@ -197,7 +157,7 @@ package com.junkbyte.console {
 		 * Add log line with priority 5
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class
 		 */
 		public static function debug(...args):void{
 			if(_console) _console.debug.apply(null, args);
@@ -206,7 +166,7 @@ package com.junkbyte.console {
 		 * Add log line with priority 7
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class
 		 */
 		public static function warn(...args):void{
 			if(_console) _console.warn.apply(null, args);
@@ -215,7 +175,7 @@ package com.junkbyte.console {
 		 * Add log line with priority 9
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class
 		 */
 		public static function error(...args):void{
 			if(_console) _console.error.apply(null, args);
@@ -224,7 +184,7 @@ package com.junkbyte.console {
 		 * Add log line with priority 10
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class
 		 */
 		public static function fatal(...args):void{
 			if(_console) _console.fatal.apply(null, args);
@@ -233,8 +193,8 @@ package com.junkbyte.console {
 		 * Add log line with priority 1 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
 		 */
 		public static function logch(channel:*, ...args):void{
 			if(_console) _console.addCh(channel, args, Console.LOG);
@@ -243,8 +203,8 @@ package com.junkbyte.console {
 		 * Add log line with priority 3 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
 		 */
 		public static function infoch(channel:*, ...args):void{
 			if(_console) _console.addCh(channel, args, Console.INFO);
@@ -253,8 +213,8 @@ package com.junkbyte.console {
 		 * Add log line with priority 5 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
 		 */
 		public static function debugch(channel:*, ...args):void{
 			if(_console) _console.addCh(channel, args, Console.DEBUG);
@@ -263,8 +223,8 @@ package com.junkbyte.console {
 		 * Add log line with priority 7 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
 		 */
 		public static function warnch(channel:*, ...args):void{
 			if(_console) _console.addCh(channel, args, Console.WARN);
@@ -273,8 +233,8 @@ package com.junkbyte.console {
 		 * Add log line with priority 9 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
 		 */
 		public static function errorch(channel:*, ...args):void{
 			if(_console) _console.addCh(channel, args, Console.ERROR);
@@ -283,8 +243,8 @@ package com.junkbyte.console {
 		 * Add log line with priority 10 to channel
 		 * Allows multiple arguments for convenience use.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param String to be logged, any type can be passed and will be converted to string or a link if it is an object/class
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
 		 */
 		public static function fatalch(channel:*, ...args):void{
 			if(_console) _console.addCh(channel, args, Console.FATAL);
@@ -292,9 +252,9 @@ package com.junkbyte.console {
 		/**
 		 * Add a stack trace of where it is called from at the end of the line. Requires debug player.
 		 *
-		 * @param  String to add
-		 * @param  The depth of stack trace
-		 * @param  Priority of line. 0-10 (optional, default: 5)
+		 * @param str	String to add
+		 * @param depth	The depth of stack trace
+		 * @param priority	Priority of line. 0-10
 		 * 
 		 */
 		public static function stack(str:*, depth:int = -1, priority:int = 5):void{
@@ -303,10 +263,10 @@ package com.junkbyte.console {
 		/**
 		 * Stack log to channel. Add a stack trace of where it is called from at the end of the line. Requires debug player.
 		 *
-		 * @param  Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
-		 * @param  String to add
-		 * @param  The depth of stack trace
-		 * @param  Priority of line. 0-10 (optional, default: 5)
+		 * @param ch	Name of channel, if a non-string param is passed, it will use the object's class name as channel name.
+		 * @param str	String to add
+		 * @param depth	The depth of stack trace
+		 * @param priority	Priority of line. 0-10
 		 * 
 		 */
 		public static function stackch(ch:String, str:*, depth:int = -1, priority:int = 5):void{
@@ -318,8 +278,8 @@ package com.junkbyte.console {
 		 * Similar to clicking on an object link or in commandLine: /inspect  OR  /inspectfull.
 		 * However this method does not go to 'inspection' channel but prints on the Console channel.
 		 * 
-		 * @param Object to inspect
-		 * @param Set true to ouput in more detailed, such as the value of properties and variables
+		 * @param obj		Object to inspect
+		 * @param detail	Set to true to show inherited values.
 		 * 
 		 */
 		public static function inspect(obj:Object, detail:Boolean = true):void {
@@ -328,8 +288,8 @@ package com.junkbyte.console {
 		/**
 		 * Expand object values and print in console log channel - similar to JSON encode
 		 * 
-		 * @param Object to explode
-		 * @param Depth of explosion, -1 = unlimited (default = 3)
+		 * @param obj	Object to explode
+		 * @param depth	Depth of explosion, -1 = unlimited
 		 */
 		public static function explode(obj:Object, depth:int = 3):void {
 			if(_console) _console.explode(obj,depth);
@@ -338,15 +298,15 @@ package com.junkbyte.console {
 		 * Print the display list map
 		 * (same as /map in commandLine)
 		 * 
-		 * @param  Display object to start mapping from
-		 * @param  (optional) maximum child depth. 0 = unlimited
+		 * @param base	Display object to start mapping from
+		 * @param maxstep	Maximum child depth. 0 = unlimited
 		 */
 		public static function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
 			if(_console ) _console.map(base, maxstep);
 		}
 		/**
 		 * Clear console logs.
-		 * @param  (optional) name of log channel to clear, leave blank to clear all.
+		 * @param channel Name of log channel to clear, leave blank to clear all.
 		 */
 		public static function clear(channel:String = null):void{
 			if(_console) _console.clear(channel);
@@ -362,9 +322,9 @@ package com.junkbyte.console {
 		 * Pass null Function to unbind.
 		 * </p>
 		 *
-		 * @param  KeyBind (char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false)
-		 * @param  Function to call on trigger. pass null to unbind previous.
-		 * @param  Arguments to pass when calling the Function.
+		 * @param key KeyBind (char:String, shift:Boolean = false, ctrl:Boolean = false, alt:Boolean = false)
+		 * @param fun Function to call on trigger. pass null to unbind previous.
+		 * @param args Arguments to pass when calling the Function.
 		 * 
 		 */
 		public static function bindKey(key:KeyBind, fun:Function = null,args:Array = null):void{
@@ -382,7 +342,7 @@ package com.junkbyte.console {
 		 *
 		 * @param  key Key string that will show up in top menu.
 		 * @param  fun Function to call on trigger. pass null to remove previous added menu.
-		 * @param  args Arguments to pass when calling the Function.
+		 * @param  args Array of arguments to pass when calling the Function.
 		 * @param  rollover String to show on rolling over the menu item.
 		 */
 		public static function addMenu(key:String, fun:Function, args:Array = null, rollover:String = null):void{
@@ -391,7 +351,7 @@ package com.junkbyte.console {
 		/**
 		 * Listen for uncaught errors from loaderInfo instance
 		 * Only works for flash player target 10.1 or later
-		 * @param  loaderInfo instance that can dispatch errors
+		 * @param loaderInfo LoaderInfo instance that can dispatch errors
 		 */
 		public static function listenUncaughtErrors(loaderinfo:LoaderInfo):void{
 			if(_console) _console.listenUncaughtErrors(loaderinfo);
@@ -403,42 +363,47 @@ package com.junkbyte.console {
 		 * Store a reference in Console for use in CommandLine.
 		 * (same as /save in commandLine)
 		 * 
-		 * Example 1 (storing functions)
-		 * Cc.store("load", function(id:uint){Cc.log("Do some loading with id", id)});
-		 * User call this function by typing '$load(123);' to load with id 123.
+		 * <ul>
+		 * <li>Example 1 (storing functions)</li>
+		 * <li><code>Cc.store("load", function(id:uint){Cc.log("Do some loading with id", id)});</code></li>
+		 * <li>User call this function by typing '$load(123);' to load with id 123.</li>
 		 * 
-		 * Example 2 (storing anything)
-		 * Cc.store("stage", this.stage); // assuming there is this.stage
-		 * User manipulate frame rate by typing '$stage.frameRate = 60'
+		 * <li>Example 2 (storing anything)</li>
+		 * <li><code>Cc.store("stage", this.stage); // assuming there is this.stage</code></li>
+		 * <li>User manipulate frame rate by typing '$stage.frameRate = 60'</li>
+		 * </ul>
 		 * NOTE: stage is likely to be your default scope so you wouldn't need to store it as in the example but call directly.
 		 * 
-		 * @param  name to save as
-		 * @param  Object reference to save, pass null to remove previous save.
-		 * @param  (optional) if set to true Console will hard reference the object, making sure it will not get garbage collected.
+		 * @param  n	name to save as
+		 * @param  obj	Object reference to save, pass null to remove previous save.
+		 * @param  strong	If set to true Console will hard reference the object, making sure it will not get garbage collected.
 		 */
 		public static function store(n:String, obj:Object, strong:Boolean = false):void{
 			if(_console ) _console.store(n, obj, strong);
 		}
 		/**
-		 * Add custom slash command
+		 * Add custom slash command.
 		 * WARNING: It will hard reference the function. 
 		 * 
-		 * Example 1: 
-		 * Cc.addSlashCommand("test", function():void{ Cc.log("Do the test!");} );
-		 * When user type "/test" in commandLine, it will call function with no params.
+		 * <ul>
+		 * <li>Example 1:</li>
+		 * <li><code>Cc.addSlashCommand("test", function():void{ Cc.log("Do the test!");} );</code></li>
+		 * <li>When user type "/test" in commandLine, it will call function with no params.</li>
 		 * 
-		 * Example 2:
-		 * Cc.addSlashCommand("test2", function(param:String):void{Cc.log("Do the test2 with param string:", param);} );
-		 * user type "/test2 abc 123" in commandLine to call function with param "abc 123".
-		 * 
+		 * <li>Example 2:</li>
+		 * <li><code>Cc.addSlashCommand("test2", function(param:String):void{Cc.log("Do the test2 with param string:", param);});</code></li>
+		 * <li>user type "/test2 abc 123" in commandLine to call function with param "abc 123".</li>
+		 * </ul>
 		 * If you need multiple params or non-string type, you will need to do the conversion inside your call back function.
 		 * If you are planning to use complex params, consider using Cc.store instead.
 		 * 
-		 * @param  name of command
-		 * @param  Function to call on trigger. pass null to remove previous.
+		 * @param  n	Name of command
+		 * @param  callback	Function to call on trigger. pass null to remove previous
+		 * @param  desc		Description of command. This shows up in /commands list
+		 * @param  alwaysAvailable	While set to false this command will NOT be avaviable when Cc.config.commandLineAllowed is false; default = true
 		 */
-		public static function addSlashCommand(n:String, callback:Function):void{
-			if(_console ) _console.addSlashCommand(n, callback);
+		public static function addSlashCommand(n:String, callback:Function, desc:String = "", alwaysAvailable:Boolean = true):void{
+			if(_console ) _console.addSlashCommand(n, callback, desc, alwaysAvailable);
 		}
 		//
 		// Memory management tools
@@ -446,8 +411,8 @@ package com.junkbyte.console {
 		/**
 		 * Watch an object to be notified in console when it is being garbage collected
 		 *
-		 * @param  Object to watch
-		 * @param  Object's identification/name
+		 * @param obj	Object to watch
+		 * @param n		Object's identification/name
 		 * 
 		 * @return	Name console used to identify the object - this can be different to param n if another object of the same name is already being watched
 		 */
@@ -458,7 +423,7 @@ package com.junkbyte.console {
 		/**
 		 * Stop watching an object from garbage collection
 		 *
-		 * @param	identification/name given to the object for watch
+		 * @param n	identification/name given to the object for watch
 		 */
 		public static function unwatch(n:String):void{
 			if(_console) _console.unwatch(n);
@@ -480,13 +445,13 @@ package com.junkbyte.console {
 		 * Cc.addGraph("mouse", stage, "mouseY", 0x0000FF, "y");
 		 * </p>
 		 *
-		 * @param  Name of graph, if same name already exist, graph line will be added to it.
-		 * @param  Object of interest.
-		 * @param  Property name of interest belonging to obj. If you wish to call a method, you can end it with (), example: "getValue()"; or it you could be any commandline supported syntex such as "Math.random()". Stored commandLine variables will not be available.
-		 * @param  (optional) Color of graph line (If not passed it will randomally generate).
-		 * @param  (optional) Key string to use as identifier (If not passed, it will use string from 'prop' param).
-		 * @param  (optional) Rectangle area for size and position of graph.
-		 * @param  (optional) invert the graph, meaning the highest value at the bottom and lowest at the top.
+		 * @param n Name of graph, if same name already exist, graph line will be added to it.
+		 * @param obj Object of interest.
+		 * @param prop Property name of interest belonging to obj. If you wish to call a method, you can end it with (), example: "getValue()"; or it you could be any commandline supported syntex such as "Math.random()". Stored commandLine variables will not be available.
+		 * @param col (optional) Color of graph line (If not passed it will randomally generate).
+		 * @param key (optional) Key string to use as identifier (If not passed, it will use string from 'prop' param).
+		 * @param rect (optional) Rectangle area for size and position of graph.
+		 * @param inverse (optional) invert the graph, meaning the highest value at the bottom and lowest at the top.
 		 * 
 		 */
 		public static function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
@@ -502,9 +467,9 @@ package com.junkbyte.console {
 		 * No effect if no graph of the name exists.
 		 * </p>
 		 *
-		 * @param  Name of graph
-		 * @param  Minimum value. pass NaN to unfix.
-		 * @param  Maximum value. pass NaN to unfix.
+		 * @param n Name of graph
+		 * @param min Minimum value. pass NaN to unfix.
+		 * @param max Maximum value. pass NaN to unfix.
 		 * 
 		 */
 		public static function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
@@ -514,9 +479,9 @@ package com.junkbyte.console {
 		 * Remove graph.
 		 * Leave obj and prop params blank to remove the whole graph.
 		 *
-		 * @param  Name of graph.
-		 * @param  Object of interest to remove (optional).
-		 * @param  Property name of interest to remove (optional).
+		 * @param n Name of graph.
+		 * @param obj Object of interest to remove (optional).
+		 * @param prop Property name of interest to remove (optional).
 		 * 
 		 */
 		public static function removeGraph(n:String, obj:Object = null, prop:String = null):void{
@@ -527,7 +492,7 @@ package com.junkbyte.console {
 		//
 		/**
 		 * Set currently viewing channels.
-		 * @param  Channels to view. Send empty to view all channels (global channel).
+		 * @param ...args Channels to view. Send empty to view all channels (global channel).
 		 */
 		public static function setViewingChannels(...args:Array):void{
 			if(_console) _console.setViewingChannels.apply(null, args);
@@ -635,10 +600,10 @@ package com.junkbyte.console {
 		 * Default: null (not assigned)
 		 * </p>
 		 *
-		 * @param  Keyboard character, must be ASCII. (pass null to remove binding)
-		 * @param  Set to true if CTRL key press is required to trigger.
-		 * @param  Set to true if ALT key press is required to trigger.
-		 * @param  Set to true if SHIFT key press is required to trigger.
+		 * @param char Keyboard character, must be ASCII. (pass null to remove binding)
+		 * @param ctrl Set to true if CTRL key press is required to trigger.
+		 * @param alt Set to true if ALT key press is required to trigger.
+		 * @param shift Set to true if SHIFT key press is required to trigger.
 		 * 
 		 */
 		public static function setRollerCaptureKey(char:String, ctrl:Boolean = false, alt:Boolean = false, shift:Boolean = false):void{
@@ -684,11 +649,13 @@ package com.junkbyte.console {
 			}
 		}
 		/**
-		 * Get all logs
+		 * Get all logs.
+		 * <p>
 		 * This is incase you want all logs for use somewhere.
 		 * For example, send logs to server or email to someone.
+		 * </p>
 		 * 
-		 * @param (optional) line splitter, default is '\n'
+		 * @param splitter Line splitter, default is <code>\r\n</code>
 		 * @return All log lines in console
 		 */
 		public static function getAllLog(splitter:String = "\r\n"):String{
