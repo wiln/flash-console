@@ -1,7 +1,7 @@
 #labels Featured,Phase-Implementation
 =Command Line: help and tutorial=
 
-==This document applies to v2.4 beta2 or above only==
+==This document applies to v2.4 only==
 
 == Introduction ==
   * Command line lets you execute ActionScript3 code during run-time (on the fly)...
