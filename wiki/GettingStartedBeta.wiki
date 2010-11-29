@@ -1,4 +1,5 @@
 #summary for v2.5
+#labels Featured,Phase-Deploy
 
 <wiki:toc max_depth="2" />
 
@@ -80,16 +81,15 @@ For easy reference, please see samples/flash/SampleAdvanced.as for working sampl
   * Clicking on the link {Stage} will reveal detailed info about stage
   * Details shows up in an 'inspection' channel. When you are done, click 'Exit' to return to normal logging view
   * As references are stored as weak link, some objects may get garbage collected before you click
-  * You can click on '[set scope]' to set scope in commandLine (explained later)
+  * You can click on `[set scope]` to set scope in commandLine (explained later)
   * You can manually print detailed info about an object by calling Cc.inspect(...);
 
 ==Keyboard Binding==
   * Key binding lets you bind keyboard keys to your own function
   * Example usages: open a specific panel, give special items/cheats in a game
-  * Key binding should only be used for development purposes
-  * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * The function you pass get STRONG referenced
   * Key Binding will not trigger if user have focus on an input TextField
+  * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * Example below logs "Hello!" in console when user press the key H in keyboard.
 {{{
 import com.junkbyte.console.Cc;
@@ -104,7 +104,7 @@ Cc.bindKey(new KeyBind("h"), Cc.log, ["Hello!"]);
 
   * *Slash commands* run special functions on demand
   * An example of build in slash command: '/filter log'
-   * Typing this will filter console that match the string 'log'
+   * Typing this will filter to logs that match the string 'log'
    * You will also get underline under the exact match
    * When you are done, change the channel at top OR type '/filter'
 
@@ -116,11 +116,20 @@ Cc.addSlashCommand("test", function():void{ Cc.log("Do the test!");} );
 
 // Slash command example 2
 Cc.addSlashCommand("test2", function(param:String):void{Cc.log("Do the test2 with param string:", param);} );
-//User type "/test2 abc 123" in commandLine to call function with param "abc 123".
+//User type "/test2 abc 123" in commandLine to call Cc.log with one param: "abc 123".
 }}}
-   * If you need multiple params or non-string type, you will need to do the conversion inside your call back function.
-   * If you are planning to use complex params, consider using Cc.store instead.
-   * Functions and arguments for slash command get stored as strong reference
+  * If you need multiple params, you will need to do the conversion inside your call back function.
+{{{
+// Slash command example 3 (multiple arguments trick)
+Cc.addSlashCommand("test3", function(param:String):void{ 
+		var args:Array = param.split(" ");
+		Cc.log.apply(null, args); // This is where you call a function that accept multiple arguments
+	});
+//User type "/test3 abc 123" in commandLine to call Cc.log with param 1: "abc", param 2: "123"
+}}}
+   * Functions and arguments you pass get STRONG referenced
+   * If you are planning to use complex params, consider using `Cc.store` instead
+
   * You can *store references* for use in commandline
 {{{
 //Example 1 (storing functions)
@@ -128,8 +137,8 @@ Cc.store("load", function(id:uint){Cc.log("Do some loading with id", id)});
 //User call this function by typing '$load(123);' to load with id 123.
 //
 //Example 2 (storing anything)
-Cc.store("stage", this.stage); // assuming there is this.stage
-//User manipulate frame rate by typing '$stage.frameRate = 60'
+Cc.store("mc", myMC); // assuming myMC is a MovieClip somewhere or could be anything, class, object, etc...
+//User manipulate the mc by typing `$mc.x = 100;`, `$mc.alpha = 0.5`, `$mc.parent.removeChild($mc);` etc...
 }}}
    * NOTE: Cc.store(...) use weak reference by default but you can specify to be strong
   * You can go crazy with commandline. Example:
@@ -208,7 +217,7 @@ Cc.addGraph("mouse", this, "(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x
 Cc.addMenu("hi", Cc.log, ["Hello from top menu"], "Says hello!");
 }}}
    * This adds a link 'hi' on top menu. Rolling over the link will show the tooltip "Says hello!"
-   * Clicking on the link will log in console "Hello from top menu".
+   * Clicking on the link will print in console "Hello from top menu".
 
 ==Ruler tool==
   * Start ruler tool by pressing on RL at the top menu
