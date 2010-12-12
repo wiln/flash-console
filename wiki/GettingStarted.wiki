@@ -1,5 +1,5 @@
 #summary for v2.4
-#labels Featured,Phase-Deploy,Phase-Implementation
+#labels Deprecated,Phase-Deploy,Phase-Implementation
 
 =Getting started=
 
