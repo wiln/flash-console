@@ -1,20 +1,20 @@
-#summary for v2.4
-#labels Deprecated,Phase-Deploy,Phase-Implementation
+#summary for v2.5
+#labels Featured,Phase-Deploy,Phase-Implementation
 
-=Getting started=
+<wiki:toc max_depth="2" />
 
-==Introduction==
+=Introduction=
 
   * The main class you need to use for console is `Cc`, (`com.junkbyte.console.Cc`).
   * `Cc` stands for Console controller which acts as singleton adapter for `Console` (`com.junkbyte.console.Console`). 
 
-  * In a later date when you don't need console in your project, you can just remove `Cc.startOnStage(..)` from your code and the rest of console related codes will stop executing.
+  * When you no longer need console in your project, you can remove `Cc.startOnStage(..)` and all other calls through Cc will stop working silently.
 
-==Basics==
+=Basics=
 
 For easy reference, please see `samples/flash/Sample.as` for working sample.
 
-Start console on stage... 
+==Start on stage==
 {{{
 import com.junkbyte.console.Cc;
 Cc.startOnStage(this, "");
@@ -24,17 +24,17 @@ Cc.startOnStage(this, "");
    * You will need to type the keyword in correct sequence to show the console. 
    * Recommended keyword: ``` or ~ or debug. Use letters and numbers only. 
    * Console will start hidden if you set a password (you can set `Cc.visible = true;` to force display console). 
-   * Entering the keyword while console is visible with hide it.
+   * Entering the keyword while console is visible with hide it
+   * Password will not trigger if user have focus on an input TextField
 
-Logging...
-
+==Logging==
 {{{
 
 Cc.log("Hello world.");
 Cc.info("An info message.", "Optionally there", "can be", "multiple arguments.");
-Cc.debug("A debug level log.");
-Cc.warn("This is a warning log.");
-Cc.error("This is an error log.");
+Cc.debug("A debug level log.", "You can also pass an object and it'll become a link to inspect:", this);
+Cc.warn("This is a warning log.", "Lets try the object linking again:", stage, " <- click it! (press 'exit' when done)");
+Cc.error("This is an error log.", "This link might not work because it can get garbage collected:", new Sprite());
 Cc.fatal("This is a fatal error log with high visibility.", "You will get a short stack trace of where it's called from (configurable)");
 //
 // Basic channel logging
@@ -47,43 +47,49 @@ Cc.debugch("myChannel", "A debug level log.", "There is also Cc.errorch() and Cc
 //
 var ch:ConsoleChannel = new ConsoleChannel('myCh');
 ch.info("Hello!", "Works just like other logging methods but this way you keep the channel as an instance.");
-//
-// Stack tracing
-//
-Cc.stack("Stack trace called from...");
-// It will add the stack trace under your string to show where this function is being called from.
 }}}
 
-===UI===
+==UI==
 
-[http://www.junkbyte.com/flash-console/console_controls.png]
+[http://www.junkbyte.com/flash-console/2.5beta/console_controls.png]
 
 see: doc/console_controls.png
 
-===Configuration===
+==Configuration==
 Console start with minimal features so you will need to use `Cc.config` to fit your needs.
 It is recommended to set them before starting console. 
 Example:
 {{{
 Cc.config.commandLineAllowed = true // Enables full commandLine features
 Cc.config.tracing = true; // also send traces to flash's normal trace()
-Cc.config.maxLines = 5000; // change maximum log lines to 5000, default is 1000
+Cc.config.maxLines = 2000; // change maximum log lines to 2000, default is 1000
 
 Cc.startOnStage(this); // finally start with these config
 }}}
 
 Asdoc: http://junkbyte.com/flash-console/asdoc/com/junkbyte/console/ConsoleConfig.html
 
-==Useful Features==
+----
+
+=Useful Features (Advanced)=
 
 For easy reference, please see samples/flash/SampleAdvanced.as for working sample.
 
-====Keyboard Binding====
+==Object inspection==
+  * When you log an object in console, it will keep a weak reference to the object
+  * Example: `Cc.info("Stage is:", stage)` will show up in console as `Stage is: {Stage}`
+  * Clicking on the link {Stage} will reveal detailed info about stage
+  * Details shows up in an 'inspection' channel. When you are done, click 'Exit' to return to normal logging view
+  * As references are stored as weak link, some objects may get garbage collected before you click
+  * You can click on `[set scope]` to set scope in commandLine (explained later)
+  * You can manually print detailed info about an object by calling Cc.inspect(...);
+
+==Keyboard Binding==
   * Key binding lets you bind keyboard keys to your own function
   * Example usages: open a specific panel, give special items/cheats in a game
-  * Key binding should only be used for development purposes
-  * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * The function you pass get STRONG referenced
+  * Key Binding will not trigger if user have focus on an input TextField
+  * If triggering something by keyboard is part of the actual project behaviour, it is recommended you write your own to avoid depending on console
   * Example below logs "Hello!" in console when user press the key H in keyboard.
 {{{
 import com.junkbyte.console.Cc;
@@ -91,39 +97,110 @@ import com.junkbyte.console.KeyBind;
 Cc.bindKey(new KeyBind("h"), Cc.log, ["Hello!"]);
 }}}
 
-====Command line====
+==Command line==
   * CommandLine let you execute actionscript 3 code at run time
+  * You must set `Cc.config.commandLineAllowed = true;` to be able to run full features.
   * Command line appears at the bottom of main panel (press CL at top menu)
-  * You must set `Cc.commandLine = true;` to be able to use commandLine.
+
+  * *Slash commands* run special functions on demand
+  * An example of build in slash command: '/filter log'
+   * Typing this will filter to logs that match the string 'log'
+   * You will also get underline under the exact match
+   * When you are done, change the channel at top OR type '/filter'
+
+  * You can also add your own custom slash commands
+{{{
+// Slash command example 1
+Cc.addSlashCommand("test", function():void{ Cc.log("Do the test!");} );
+//When user type "/test" in commandLine, it will call function with no params.
+
+// Slash command example 2
+Cc.addSlashCommand("test2", function(param:String):void{Cc.log("Do the test2 with param string:", param);} );
+//User type "/test2 abc 123" in commandLine to call Cc.log with one param: "abc 123".
+}}}
+  * If you need multiple params, you will need to do the conversion inside your call back function.
+{{{
+// Slash command example 3 (multiple arguments trick)
+Cc.addSlashCommand("test3", function(param:String):void{ 
+		var args:Array = param.split(" ");
+		Cc.log.apply(null, args); // This is where you call a function that accept multiple arguments
+	});
+//User type "/test3 abc 123" in commandLine to call Cc.log with param 1: "abc", param 2: "123"
+}}}
+   * Functions and arguments you pass get STRONG referenced
+   * If you are planning to use complex params, consider using `Cc.store` instead
 
   * You can *store references* for use in commandline
-  * Cc.store() use weak reference by default but you can specify to be strong
 {{{
 //Example 1 (storing functions)
 Cc.store("load", function(id:uint){Cc.log("Do some loading with id", id)});
 //User call this function by typing '$load(123);' to load with id 123.
 //
 //Example 2 (storing anything)
-Cc.store("stage", this.stage); // assuming there is this.stage
-//User manipulate frame rate by typing '$stage.frameRate = 60'
+Cc.store("mc", myMC); // assuming myMC is a MovieClip somewhere or could be anything, class, object, etc...
+//User manipulate the mc by typing `$mc.x = 100;`, `$mc.alpha = 0.5`, `$mc.parent.removeChild($mc);` etc...
 }}}
+   * NOTE: Cc.store(...) use weak reference by default but you can specify to be strong
   * You can go crazy with commandline. Example:
    * `stage.getChildByName("Console").filters = new Array(new flash.filters.GlowFilter());`
    * Adds glow filter on Console.
-  * For full commandLine features, see CommandLineHelp
+  * For better understanding of commandLine, see CommandLineHelp
  
-====Display Roller====
+==Display Roller==
   * Display roller shows the display tree of objects under your mouse
   * Start Display roller by pressing RL at the top menu
-  * You can capture the display map to console for use in commandLine
+  * You can capture the display map to console for use in commandLine or for detail inspection
    * To do this, click on 'Capture key: *unassigned*' in the RL panel
    * Press C on keyboard to bind the capture key to that key
    * Roll over to anything you want to capture and press the keyboard C key
    * You will get the display map printed on console
    * Clicking on the name will set that display (Sprite/MovieClip etc) as commandLine's scope
+   * Clicking on the link inside the {..} will inspect the object showing you the detailed info 
    * NOTE: You can also use Cc.setRollerCaptureKey(...) to assign the capture key
+  * Example use: You got an item thats behaving weirdly on screen...
+   * Use the Roller tool to get reference to that object
+   * Use link inspection to find out whats wrong with the values
+   * Use commandline to change and experiment with different property values on the fly
 
-====Graphing====
+==Advanced Logging==
+Yes, lets go back to logging... here are some extra features:
+
+  * *Cc.stack()* Gives you a stack trace under your string to show where this method is called from (requires debug player)
+   * Example if you need to clearify from which call to a specific function is causing the bug
+
+{{{
+Cc.stack("Stack trace called from...");
+/* //If you have debug player, it'll show up in console as:
+   Stack trace called from...
+    @ Sample/demoBasics()
+    @ Sample()
+*/
+}}}
+   * Use `Cc.stackch(ch:String, str:*, depth:int = -1, priority:int = 5)` to have channel name.
+
+  * *Cc.explode()* is similar to JSON where it explodes an object's value to bits so that you can see all in one line
+{{{
+Cc.explode(stage);
+// logs: {Stage quality:"HIGH", fullScreenWidth:1920, alpha:1, numChildren:2, width:700, height:303, etc...
+}}}
+   * The explosion also give you links to the sub objects
+
+  * *Non-repetitive logging*
+   * Keeps replacing the previous line that has repeat turned on until certain count is passed
+   * For example, if you are tracing download progress and you don't want to flood console with it
+
+{{{
+Cc.add("My advanced log in priority 2, 1st call", 2, true);
+Cc.add("My advanced log in priority 2, 2nd call", 2, true);
+Cc.add("My advanced log in priority 2, 3rd call", 2, true);
+Cc.add("My advanced log in priority 2, 4th call", 2, true);
+Cc.add("My advanced log in priority 2, 5th call", 2, true);
+// You will only see the last line in console.
+// If you want to specify the channel, use:
+// Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
+}}}
+
+==Graphing==
   * Graphing lets you view number graphs similar to the FPS and memory monitor. (F and M buttons on top menu)
   * Example as seen in samples/SampleAdvanced.as:
 {{{
@@ -134,35 +211,19 @@ Cc.addGraph("mouse", this, "mouseY", 0x3333ff,"Y");
 Cc.addGraph("mouse", this, "(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x119911, "sine");
 }}}
 
-====Ruler tool====
+==Extra menu links==
+  * You can add your own menu link at the top along with other console build in links.
+{{{
+Cc.addMenu("hi", Cc.log, ["Hello from top menu"], "Says hello!");
+}}}
+   * This adds a link 'hi' on top menu. Rolling over the link will show the tooltip "Says hello!"
+   * Clicking on the link will print in console "Hello from top menu".
+
+==Ruler tool==
   * Start ruler tool by pressing on RL at the top menu
   * Ruler tool let you measure the distance and angle between two points
 
-====Advanced Logging====
-
-Yes, lets go back to logging... here are some extra features:
-
-  * Cc.explode is similar to JSON where it explodes an object's value to bits so that you can see all in one line
-{{{
-Cc.explode(stage);
-// logs: {Stage quality:"HIGH", fullScreenWidth:1920, alpha:1, numChildren:2, width:700, height:303, etc...
-}}}
-
-Non-repetitive logging...
-It will keep replacing the previous line with repeat turned on until certain count is passed.
-For example, if you are tracing download progress and you don't want to flood console with it.
-{{{
-Cc.add("My advanced log in priority 2, 1st call", 2, true);
-Cc.add("My advanced log in priority 2, 2nd call", 2, true);
-Cc.add("My advanced log in priority 2, 3rd call", 2, true);
-Cc.add("My advanced log in priority 2, 4th call", 2, true);
-Cc.add("My advanced log in priority 2, 5th call", 2, true);
-// You will only see the last line in console.
-// If you want to specify the channel, use:
-// Use Cc.ch(channel:*, str:*, priority:int, isRepeating:Boolean)
-}}}
-
-====Garbage collection monitor====
+==Garbage collection monitor==
 {{{
 import flash.display.Sprite;
 var aSprite = new Sprite();
@@ -173,8 +234,8 @@ aSprite = null;
   * This marks the Sprite to be garbage collected, but it might not get collected straight away.
   * If you have a debugger version of flash player installed, you can open memory monitor (press M in console menu) and then press G in that panel to force garbage collect. 
   * You will see that objects you are watching will get notified in console when they are garbage collected.
-
-====Remoting====
+  
+==Remoting==
   * Remoting sends log data for a remote console to use
   * The advantage is that you do not need to keep console open on your flash
   * You can use commandline, view FPS and memory from remote
@@ -186,7 +247,9 @@ aSprite = null;
 Cc.remoting = true; // turns on remoting
 }}}
 
-===Custom Style===
+----
+
+==Custom Style==
 You *must* set them before starting console. Example:
 {{{
 Cc.config.style.big(); // BIGGER text.
