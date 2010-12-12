@@ -1,5 +1,5 @@
 #summary For version 2.5
-#labels Phase-Implementation
+#labels Phase-Implementation,Featured
 =Command Line: help and tutorial=
 
 ==This document applies to v2.5 or above only==
