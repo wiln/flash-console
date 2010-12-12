@@ -1,8 +1,4 @@
 #summary ASDoc
 #labels Phase-Deploy
 
-
-
-please see: http://junkbyte.com/flash-console/asdoc/
-
-For version *2.5* see: http://junkbyte.com/flash-console/asdoc2.5/
+please see: http://console.junkbyte.com/2.5/asdoc
