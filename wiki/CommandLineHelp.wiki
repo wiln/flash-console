@@ -1,4 +1,4 @@
-#summary For version 2.5
+#summary for v2.5
 #labels Featured,Phase-Implementation
 =Command Line: help and tutorial=
 
