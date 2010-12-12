@@ -1,4 +1,6 @@
-#labels Featured,Phase-Implementation
+#summary for v2.4
+#labels Deprecated,Phase-Implementation
+
 =Command Line: help and tutorial=
 
 ==This document applies to v2.4 only==
