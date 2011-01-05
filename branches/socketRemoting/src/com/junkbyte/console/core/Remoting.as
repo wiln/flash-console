@@ -24,6 +24,10 @@
 */
 package com.junkbyte.console.core 
 {
+	import flash.events.ProgressEvent;
+	import flash.events.IOErrorEvent;
+	import flash.events.Event;
+	import flash.net.Socket;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.GraphGroup;
 	import com.junkbyte.console.vos.Log;
@@ -44,6 +48,7 @@ package com.junkbyte.console.core
 		private var _client:Object;
 		private var _mode:uint;
 		private var _connection:LocalConnection;
+		private var _socket:Socket;
 		private var _queue:Array;
 		
 		private var _lastLogin:String = "";
@@ -64,6 +69,7 @@ package com.junkbyte.console.core
 			_client.loginSuccess = loginSuccess;
 			_client.sync = remoteSync;
 		}
+		
 		public function queueLog(line:Log):void{
 			if(_mode != SENDER || !_loggedIn) return;
 			_queue.push(line.toBytes());
@@ -139,10 +145,16 @@ package com.junkbyte.console.core
 			}
 		}
 		public function send(command:String, ...args):Boolean{
-			var target:String = config.remotingConnectionName+(remoting == Remoting.RECIEVER?SENDER:RECIEVER);
-			args = [target, command].concat(args);
 			try{
-				_connection.send.apply(this, args);
+				if(_socket){
+					_socket.writeUTF(command);
+					_socket.writeObject(args);
+					_socket.flush();
+				}else{
+					var target:String = config.remotingConnectionName+(remoting == Remoting.RECIEVER?SENDER:RECIEVER);
+					args = [target, command].concat(args);
+					_connection.send.apply(this, args);
+				}
 			}catch(e:Error){
 				return false;
 			}
@@ -190,6 +202,58 @@ package com.junkbyte.console.core
 			_password = str;
 			if(_mode == SENDER && !str) login();
 		}
+		public function remotingSocket(host:String, port:int = 0):void{
+			if(_socket && _socket.connected){
+				_socket.close();
+				_socket = null;
+			}
+			if(host && port)
+			{
+				_socket = new Socket();
+		        _socket.addEventListener(Event.CLOSE, socketCloseHandler);
+		        _socket.addEventListener(Event.CONNECT, socketConnectHandler);
+		        _socket.addEventListener(IOErrorEvent.IO_ERROR, socketIOErrorHandler);
+		        _socket.addEventListener(SecurityErrorEvent.SECURITY_ERROR, socketSecurityErrorHandler);
+		        _socket.addEventListener(ProgressEvent.SOCKET_DATA, socketDataHandler);
+		        _socket.connect(host, port);
+			}
+		}
+
+		private function socketCloseHandler(e:Event) : void {
+			if(e.currentTarget == _socket){
+				_socket = null;
+			}
+		}
+		private function socketConnectHandler(e:Event) : void {
+			// not needed yet
+		}
+		private function socketIOErrorHandler(e:Event) : void {
+			report("Remoting socket error." + e, 9);
+			remotingSocket(null);
+		}
+		private function socketSecurityErrorHandler(e:Event) : void {
+			report("Remoting security error." + e, 9);
+			remotingSocket(null);
+		}
+		private function socketDataHandler(e:Event) : void {
+			var socket:Socket = e.currentTarget as Socket;
+			var buffer : ByteArray = new ByteArray();
+			socket.readBytes(buffer, 0, socket.bytesAvailable);
+			handleSocketData(buffer);
+		}
+		public function handleSocketData(bytes:ByteArray):void{
+			try{
+				bytes.position = 0;
+				var cmd:Function = _client[bytes.readUTF()];
+				if(cmd != null){
+					var args:Object = bytes.readObject();
+					cmd.apply(null, args);
+				}
+			} catch(err:Error){
+				report("Remoting socket data error." + err, 9);
+			}
+		}
+		
 		private function onRemotingStatus(e:StatusEvent):void{
 			if(e.level == "error") {
 				_loggedIn = false;

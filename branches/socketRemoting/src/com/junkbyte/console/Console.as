@@ -345,6 +345,9 @@ package com.junkbyte.console
 		public function set remoting(b:Boolean):void{
 			_remoter.remoting = b?Remoting.SENDER:Remoting.NONE;
 		}
+		public function remotingSocket(host:String, port:int):void{
+			_remoter.remotingSocket(host, port);
+		}
 		public function set remotingPassword(str:String):void{
 			_remoter.remotingPassword = str;
 		}

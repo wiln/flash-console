@@ -56,6 +56,7 @@ package
 			Cc.height = 300;
 			Cc.remotingPassword = null; // Just so that remote don't ask for password
 			Cc.remoting = true;
+			Cc.remotingSocket("127.0.0.1", 200);
 			
 			Cc.addMenu("T1", Cc.log, ["Greetings 1"], "This is a test menu 1");
 			Cc.addMenu("T<2>", Cc.log, ["Greetings 2"], "This is a test menu 2");

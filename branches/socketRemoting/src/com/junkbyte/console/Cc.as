@@ -659,6 +659,9 @@ package com.junkbyte.console {
 		public static function set remoting(v:Boolean):void{
 			if(_console) _console.remoting = v;
 		}
+		public static function remotingSocket(host:String, port:int):void{
+			if(_console) _console.remotingSocket(host, port);
+		}
 		/**
 		 * Set Password required to connect from remote.
 		 * <p>
