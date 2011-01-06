@@ -146,7 +146,7 @@ package com.junkbyte.console.core
 		}
 		public function send(command:String, ...args):Boolean{
 			try{
-				if(_socket){
+				if(_socket && _socket.connected){
 					_socket.writeUTF(command);
 					_socket.writeObject(args);
 					_socket.flush();
@@ -209,6 +209,7 @@ package com.junkbyte.console.core
 			}
 			if(host && port)
 			{
+				report("Connecting socket " + host + ":" + port);
 				_socket = new Socket();
 		        _socket.addEventListener(Event.CLOSE, socketCloseHandler);
 		        _socket.addEventListener(Event.CONNECT, socketConnectHandler);
@@ -225,6 +226,14 @@ package com.junkbyte.console.core
 			}
 		}
 		private function socketConnectHandler(e:Event) : void {
+			report("Remoting socket connected.", -1);
+			if(_loggedIn || checkLogin("")){
+				_loggedIn = true;
+				_queue = console.logs.getLogsAsBytes();
+				send("loginSuccess");
+			}else{
+				send("requestLogin");
+			}
 			// not needed yet
 		}
 		private function socketIOErrorHandler(e:Event) : void {
@@ -255,7 +264,7 @@ package com.junkbyte.console.core
 		}
 		
 		private function onRemotingStatus(e:StatusEvent):void{
-			if(e.level == "error") {
+			if(e.level == "error" && !(_socket && _socket.connected)) {
 				_loggedIn = false;
 			}
 		}
