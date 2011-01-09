@@ -245,18 +245,16 @@ package com.junkbyte.console.core
 			remotingSocket(null);
 		}
 		private function socketDataHandler(e:Event) : void {
-			var socket:Socket = e.currentTarget as Socket;
-			var buffer : ByteArray = new ByteArray();
-			socket.readBytes(buffer, 0, socket.bytesAvailable);
-			handleSocketData(buffer);
+			handleSocket(e.currentTarget as Socket);
 		}
-		public function handleSocketData(bytes:ByteArray):void{
+		public function handleSocket(socket:Socket):void{
+			if(socket != _socket) _socket = socket;
 			try{
-				bytes.position = 0;
-				var cmd:Function = _client[bytes.readUTF()];
-				if(cmd != null){
-					var args:Object = bytes.readObject();
-					cmd.apply(null, args);
+				while(socket.bytesAvailable)
+				{
+					var cmd:Function = _client[socket.readUTF()];
+					var args:Object = socket.readObject();
+					if(cmd != null) cmd.apply(null, args);
 				}
 			} catch(err:Error){
 				report("Remoting socket data error." + err, 9);

@@ -112,6 +112,12 @@ package com.junkbyte.console
 			_mm = new MemoryMonitor(this);
 			_kb = new KeyBinder(this, pass);
 			
+			
+			cl.addCLCmd("remotingSocket", function(str:String = ""):void{
+				var args:Array = str.split(/\s+/);
+				remotingSocket(args[0], args[1]);
+			}, "Start socket remoting. /remotingSocket ip port");
+			
 			if(config.sharedObjectName){
 				try{
 					_so = SharedObject.getLocal(config.sharedObjectName, config.sharedObjectPath);

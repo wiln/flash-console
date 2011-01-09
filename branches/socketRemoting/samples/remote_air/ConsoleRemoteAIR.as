@@ -172,9 +172,7 @@ package {
 
 		private function onClientSocketData(event : ProgressEvent) : void {
 			var clientSocket : Socket = event.currentTarget as Socket;
-			var buffer : ByteArray = new ByteArray();
-			clientSocket.readBytes(buffer, 0, clientSocket.bytesAvailable);
-			_c.remoter.handleSocketData(buffer);
+			_c.remoter.handleSocket(clientSocket);
 		}
 	}
 }
