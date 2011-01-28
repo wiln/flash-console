@@ -209,7 +209,7 @@ package com.junkbyte.console.core
 			}
 			if(host && port)
 			{
-				report("Connecting socket " + host + ":" + port);
+				report("Connecting to socket " + host + ":" + port);
 				_socket = new Socket();
 		        _socket.addEventListener(Event.CLOSE, socketCloseHandler);
 		        _socket.addEventListener(Event.CONNECT, socketConnectHandler);

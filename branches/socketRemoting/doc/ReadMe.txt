@@ -31,6 +31,13 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
+===2.6 ===
+  * Socket remoting support
+  * ByteArray.toString() no longer brake console prints.
+  * TAB key focuses to command line if visible (in addition to previous ENTER key)
+  * TAB key to accept autocomplete suggestion in CL (in addition to previous SPACE key)
+
+
 ===2.5 ===
   * Features
    * *Object linking* where you can click on an object in the log to inspect or get scope for commandline

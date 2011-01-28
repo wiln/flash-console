@@ -73,7 +73,7 @@ package com.junkbyte.console {
 		 */
 		public static function start(mc:DisplayObjectContainer, pass:String = ""):void{
 			if(_console){
-				if(!_console.parent) mc.addChild(_console);
+				if(mc && !_console.parent) mc.addChild(_console);
 			}else{
 				_console = new Console(pass, config);
 				// if no parent display, console will always be hidden, but using Cc.remoting is still possible so its not the end.
