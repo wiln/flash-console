@@ -542,7 +542,7 @@ package com.junkbyte.console.core
 		
 		
 		public static function EscHTML(str:String):String{
-			return str.replace(/</g, "&lt;").replace(/\>/g, "&gt;").replace(/[\x00-\x1F]/g, "");
+			return str.replace(/</g, "&lt;").replace(/\>/g, "&gt;").replace(/\x00/g, "");
 		}
 		/*public static function UnEscHTML(str:String):String{
 	 		return str.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
