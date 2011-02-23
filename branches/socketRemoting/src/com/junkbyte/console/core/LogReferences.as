@@ -144,12 +144,12 @@ package com.junkbyte.console.core
 				return str+"]";
 			}else if(config.useObjectLinking && v && typeof v == "object") {
 				var add:String = "";
-				if(v is ByteArray) add = " position:"+v.position+" length:"+v.length+" data:"+v;
+				if(v is ByteArray) add = " position:"+v.position+" length:"+v.length;
 				else if(v is Date || v is Rectangle || v is Point || v is Matrix || v is Event) add = " "+String(v);
 				else if(v is DisplayObject && v.name) add = " "+v.name;
 				txt = "{"+genLinkString(o, prop, ShortClassName(v))+EscHTML(add)+"}";
 			}else{
-				if(v is ByteArray) txt = "[ByteArray position:"+ByteArray(v).position+" length:"+ByteArray(v).length+" data:"+v+"]";
+				if(v is ByteArray) txt = "[ByteArray position:"+ByteArray(v).position+" length:"+ByteArray(v).length+"]";
 				else txt = String(v);
 				if(!html){
 					return shortenString(EscHTML(txt), maxlen, o, prop);

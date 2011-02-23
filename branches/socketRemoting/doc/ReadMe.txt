@@ -5,7 +5,7 @@
 
 ==Flash Console==
 
-  * Version 2.5 (Jan 2011)
+  * Version 2.51 (Feb 2011)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -31,12 +31,13 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.6 ===
+===2.51 ===
   * Socket remoting support
   * ByteArray.toString() no longer brake console prints.
   * TAB key focuses to command line if visible (in addition to previous ENTER key)
   * TAB key to accept autocomplete suggestion in CL (in addition to previous SPACE key)
-
+  * SWC now include argument names. However it will no longer support importing in CS3 as a component
+  * Fixed not sending very long lines to remote
 
 ===2.5 ===
   * Features

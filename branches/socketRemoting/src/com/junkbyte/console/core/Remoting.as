@@ -55,6 +55,7 @@ package com.junkbyte.console.core
 		private var _password:String;
 		private var _loggedIn:Boolean;
 		private var _canDraw:Boolean;
+		private var _splitLineCache:ByteArray;
 		
 		private var _prevG:Boolean;
 		private var _prevScope:String;
@@ -68,6 +69,7 @@ package com.junkbyte.console.core
 			_client.loginFail = loginFail;
 			_client.loginSuccess = loginSuccess;
 			_client.sync = remoteSync;
+			_client.split = splitLineSync;
 		}
 		
 		public function queueLog(line:Log):void{
@@ -96,8 +98,17 @@ package com.junkbyte.console.core
 					var line:ByteArray = _queue[i];
 					size += line.length;
 					// real limit is 40,000
-					if(size <= 36000 || i == 0){
+					if(size <= 36000){
 						logs.writeBytes(line);
+					}else if(i == 0){
+						line.position = 0;
+						while(line.position < line.length){
+							var split:ByteArray = new ByteArray();
+							var splen:uint = Math.min(line.length-line.position, 36000);
+							split.writeBoolean(line.position+splen == line.length);
+							line.readBytes(split, 1, splen);
+							send("split", split);
+						}
 					}else break;
 				}
 				_queue = _queue.splice(i);
@@ -116,17 +127,24 @@ package com.junkbyte.console.core
 				_canDraw = true;
 			}
 		}
+		private function splitLineSync(bytes:ByteArray):void
+		{
+			if(!_splitLineCache) _splitLineCache = new ByteArray();
+			var end:Boolean = bytes.readBoolean();
+			_splitLineCache.writeBytes(bytes, 1);
+			if(end){
+				_splitLineCache.position = 0;
+				readLog(_splitLineCache);
+				_splitLineCache = null;
+			}
+		}
 		private function remoteSync(bytes:ByteArray):void{
 			if(remoting != Remoting.RECIEVER || !bytes) return;
 			bytes.position = 0;
 			var logs:ByteArray = bytes.readObject();
 			logs.position = 0;
 			while(logs.bytesAvailable){
-				var t:String = logs.readUTF();
-				var c:String = logs.readUTF();
-				var p:int = logs.readInt();
-				var r:Boolean = logs.readBoolean();
-				console.addLine(new Array(t), p, c, r, true);
+				readLog(logs);
 			}
 			try{
 				var a:Array = [];
@@ -143,6 +161,13 @@ package com.junkbyte.console.core
 			}catch(e:Error){
 				report(e);
 			}
+		}
+		private function readLog(bytes:ByteArray):void{
+			var t:String = bytes.readUTFBytes(bytes.readUnsignedInt());
+			var c:String = bytes.readUTF();
+			var p:int = bytes.readInt();
+			var r:Boolean = bytes.readBoolean();
+			console.addLine(new Array(t), p, c, r, true);
 		}
 		public function send(command:String, ...args):Boolean{
 			try{

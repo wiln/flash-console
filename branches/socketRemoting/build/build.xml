@@ -12,6 +12,8 @@
 	<property name="src.ver.file" value="${src.dir}/com/junkbyte/console/Console.as" />
 	<property name="src.air.config.file" value="${samples.dir}/remote_air/ConsoleRemoteAIR-app.xml" />
 	
+	<property name="swc.classes" value="com.junkbyte.console.Cc com.junkbyte.console.ConsoleChannel" />
+	
 	<property file="${build.dir}/local.properties" />
 
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
@@ -42,6 +44,7 @@
 		<exec executable="${FLASH}">
 			<arg line="'${build.dir}/exportswc.jsfl'" />
 		</exec>
+		<antcall target="swc" />
 		<antcall target="compileASDoc" />
 	</target>
 	
@@ -72,8 +75,9 @@
 
 	<!-- Parameters: class, output -->
 	<target name="swc">
-		<echo message="Compiling SWC: ${class} to ${output}" />
-		<compc output="${output}" include-classes="${class}">
+		<echo message="Compiling SWC" />
+		<property file="${build.dir}/build.properties"/>
+		<compc output="${bin.dir}/Console${build.version}.swc" include-classes="${swc.classes}">
 			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
 			<compiler.source-path path-element="${src.dir}" />
 		</compc>
