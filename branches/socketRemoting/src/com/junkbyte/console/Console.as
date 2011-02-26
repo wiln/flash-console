@@ -365,6 +365,9 @@ package com.junkbyte.console
 			for each(var item:Object in args) a.push(MakeChannelName(item));
 			_panels.mainPanel.viewingChannels = a;
 		}
+		public function set minimumPriority(level:uint):void{
+			_panels.mainPanel.priority = level;
+		}
 		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true, ch:String = null):void{
 			if(!ch) ch = _panels.mainPanel.reportChannel;
 			addLine([obj], priority, ch, false, skipSafe);

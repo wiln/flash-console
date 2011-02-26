@@ -76,7 +76,7 @@ package com.junkbyte.console.view
 		private var _viewingChannels:Array;
 		private var _extraMenus:Object = new Object();
 		private var _cmdsInd:int = -1;
-		private var _priority:int;
+		private var _priority:uint;
 		private var _filterText:String;
 		private var _filterRegExp:RegExp;
 		private var _clScope:String = "";
@@ -389,7 +389,7 @@ package com.junkbyte.console.view
 			 		|| (_filterText && _viewingChannels.indexOf(Console.FILTER_CHANNEL) >= 0 && line.text.toLowerCase().indexOf(_filterText)>=0 )
 			 		|| (_filterRegExp && _viewingChannels.indexOf(Console.FILTER_CHANNEL)>=0 && line.text.search(_filterRegExp)>=0 )
 			 	) 
-			 	&& ( _priority <= 0 || line.priority >= _priority)
+			 	&& ( _priority == 0 || line.priority >= _priority)
 			);
 		}
 		public function get reportChannel():String{
@@ -824,12 +824,12 @@ package com.junkbyte.console.view
 				console.setViewingChannels(chn);
 			}
 		}
-		public function set priority(p:int):void{
+		public function set priority(p:uint):void{
 			_priority = p;
 			updateToBottom();
 			updateMenu();
 		}
-		public function get priority():int{
+		public function get priority():uint{
 			return _priority;
 		}
 		//

@@ -533,6 +533,22 @@ package com.junkbyte.console {
 			if(_console) _console.setViewingChannels.apply(null, args);
 		}
 		/**
+		 * Set minimum viewing priority level.
+		 * @param Priority level. The level can be between 0 to 10, which maps back to more widely used info, debug, warn etc.
+		 * <ul>
+		 * <li>0 = All log levels including console event and status logs.</li>
+		 * <li>1 / Console.LOG = Cc.log(...)</li>
+		 * <li>3 / Console.INFO = Cc.info(...)</li>
+		 * <li>6 / Console.DEBUG = Cc.debug(...)</li>
+		 * <li>8 / Console.WARN = Cc.warn(...)</li>
+		 * <li>9 / Console.ERROR = Cc.error(...)</li>
+		 * <li>10 / Console.FATAL = Cc.fatal(...)</li>
+		 * </ul>
+		 */
+		public static function set minimumPriority(level:uint):void{
+			if(_console) _console.minimumPriority = level;
+		}
+		/**
 		 * width of main console panel
 		 */
 		public static function get width():Number{
