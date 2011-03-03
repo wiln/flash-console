@@ -319,7 +319,7 @@ package com.junkbyte.console.core
 				}
 			}
 			buildin = buildin.sortOn("n");
-			report("Build-in commands:"+(!config.commandLineAllowed?" (limited permission)":""), 4);
+			report("Built-in commands:"+(!config.commandLineAllowed?" (limited permission)":""), 4);
 			for each(cmd in buildin){
 				report("<b>/"+cmd.n+"</b> <p-1>" + cmd.d+"</p-1>", -2);
 			}
