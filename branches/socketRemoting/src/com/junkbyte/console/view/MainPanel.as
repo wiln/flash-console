@@ -99,7 +99,7 @@ package com.junkbyte.console.view
 			console.cl.addCLCmd("filter", setFilterText, "Filter console logs to matching string. When done, click on the * (global channel) at top.", true);
 			console.cl.addCLCmd("filterexp", setFilterRegExp, "Filter console logs to matching regular expression", true);
 			console.cl.addCLCmd("clearhistory", clearCommandLineHistory, "Clear history of commands you have entered.", true);
-
+			
 			name = NAME;
 			minWidth = 50;
 			minHeight = 18;
@@ -288,7 +288,7 @@ package com.junkbyte.console.view
 			if(_bottomLine.alpha>0){
 				_bottomLine.alpha -= 0.25;
 			}
-			if(_clScope != console.cl.scopeString && console.remoter.remoting != Remoting.RECIEVER){
+			if(_clScope != console.cl.scopeString){
 				_clScope = console.cl.scopeString;
 				updateCLScope(_clScope);
 			}

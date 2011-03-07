@@ -23,6 +23,7 @@
 * 
 */
 package com.junkbyte.console.core {
+	import flash.utils.ByteArray;
 	import com.junkbyte.console.Console;
 	import flash.system.System;
 	import flash.utils.getTimer;
@@ -47,6 +48,8 @@ package com.junkbyte.console.core {
 			remoter.registerClient("fps", fpsRequest);
 			remoter.registerClient("mem", memRequest);
 			remoter.registerClient("removeGroup", removeGroup);
+			remoter.registerClient("graph", handleRemoteGraph);
+			
 		}
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
 			if(obj == null) {
@@ -117,7 +120,9 @@ package com.junkbyte.console.core {
 		}
 		private function removeGroup(n:String):void{
 			if(remoter.remoting == Remoting.RECIEVER) {
-				remoter.send("removeGroup", n);
+				var bytes:ByteArray = new ByteArray();
+				bytes.writeUTF(n);
+				remoter.send("removeGroup", bytes);
 			}else{
 				var g:GraphGroup = _map[n];
 				var index:int = _groups.indexOf(g);
@@ -131,7 +136,9 @@ package com.junkbyte.console.core {
 		}
 		public function set fpsMonitor(b:Boolean):void{
 			if(remoter.remoting == Remoting.RECIEVER) {
-				remoter.send("fps", b);
+				var bytes:ByteArray = new ByteArray();
+				bytes.writeBoolean(b);
+				remoter.send("fps", bytes);
 			}else if(b != fpsMonitor){
 				if(b) {
 					_fpsGroup = addSpecialGroup(GraphGroup.FPS);
@@ -157,7 +164,9 @@ package com.junkbyte.console.core {
 		}
 		public function set memoryMonitor(b:Boolean):void{
 			if(remoter.remoting == Remoting.RECIEVER) {
-				remoter.send("mem", b);
+				var bytes:ByteArray = new ByteArray();
+				bytes.writeBoolean(b);
+				remoter.send("mem", bytes);
 			}else if(b != memoryMonitor){
 				if(b) {
 					_memGroup = addSpecialGroup(GraphGroup.MEM);
@@ -232,7 +241,27 @@ package com.junkbyte.console.core {
 					}
 				}
 			}
+			if(_groups.length && remoter.remoting == Remoting.SENDER && remoter.loggedIn){
+				var len:uint = _groups.length;
+				var ga:ByteArray = new ByteArray();
+				for(var j:uint = 0; j<len; j++){
+					ga.writeBytes(GraphGroup(_groups[j]).toBytes());
+				}
+				remoter.send("graph", ga);
+			}
 			return _groups;
+		}
+		private function handleRemoteGraph(bytes:ByteArray = null):void{
+			if(bytes && bytes.length){
+				bytes.position = 0;
+				var a:Array = new Array();
+				while(bytes.bytesAvailable){
+					a.push(GraphGroup.FromBytes(bytes));
+				}
+				console.panels.updateGraphs(a);
+			}else{
+				console.panels.updateGraphs(new Array());
+			}
 		}
 	}
 }

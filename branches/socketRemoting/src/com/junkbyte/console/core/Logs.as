@@ -34,7 +34,7 @@ package com.junkbyte.console.core
 		private var _lastRepeat:Log;
 		private var _newRepeat:Log;
 		
-		private var first:Log;
+		public var first:Log;
 		public var last:Log;
 		
 		private var _length:uint;
@@ -94,15 +94,6 @@ package com.junkbyte.console.core
 				_length = 0;
 				_channels = new Object();
 			}
-		}
-		public function getLogsAsBytes():Array{
-			var a:Array = [];
-			var line:Log = first;
-			while(line){
-				a.push(line.toBytes());
-				line = line.next;
-			}
-			return a;
 		}
 		public function getLogsAsString(splitter:String):String{
 			var str:String = "";

@@ -327,7 +327,7 @@ package com.junkbyte.console
 			{
 			 	graphsList = _graphing.update(stage?stage.frameRate:0);
 			}
-			_remoter.update(graphsList);
+			_remoter.update();
 			
 			// VIEW UPDATES ONLY
 			if(visible && parent){
@@ -338,7 +338,7 @@ package com.junkbyte.console
 					report("Moved console on top (alwaysOnTop enabled), "+_topTries+" attempts left.",-1);
 				}
 				_panels.update(_paused, _lineAdded);
-				if(graphsList) _panels.updateGraphs(graphsList, !_paused); 
+				if(graphsList) _panels.updateGraphs(graphsList); 
 				_lineAdded = false;
 			}
 		}
