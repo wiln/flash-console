@@ -240,16 +240,9 @@ package com.junkbyte.console.core
 		}
 		public function handleSocket(socket:Socket):void{
 			if(socket != _socket) _socket = socket;
-			try{
-				while(socket.bytesAvailable)
-				{
-					var cmd:Function = _client[socket.readUTF()];
-					var args:Object = socket.readObject();
-					if(cmd != null) cmd.apply(null, args);
-				}
-			} catch(err:Error){
-				report("Remoting socket data error." + err, 9);
-			}
+			var bytes:ByteArray = new ByteArray();
+			socket.readBytes(bytes);
+			synchronize(socket, bytes);
 		}
 		
 		private function onSenderStatus(e:StatusEvent):void{
