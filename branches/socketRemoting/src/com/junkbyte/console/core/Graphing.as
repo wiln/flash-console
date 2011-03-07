@@ -241,7 +241,7 @@ package com.junkbyte.console.core {
 					}
 				}
 			}
-			if(_groups.length && remoter.remoting == Remoting.SENDER && remoter.loggedIn){
+			if(_groups.length && remoter.canSend){
 				var len:uint = _groups.length;
 				var ga:ByteArray = new ByteArray();
 				for(var j:uint = 0; j<len; j++){

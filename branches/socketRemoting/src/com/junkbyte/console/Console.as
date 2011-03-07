@@ -384,13 +384,13 @@ package com.junkbyte.console
 			if(!html && stacks>0){
 				txt += _tools.getStack(stacks, priority);
 			}
-			var line:Log = new Log(txt, MakeChannelName(channel), priority, isRepeating, html);
-			
-			var cantrace:Boolean = _logs.add(line, isRepeating);
-			if( _config.tracing && cantrace && _config.traceCall != null){
-				_config.traceCall(line.ch, line.plainText(), priority);
+			addLogLine(new Log(txt, MakeChannelName(channel), priority, isRepeating, html));
+		}
+		public function addLogLine(line:Log):void{
+			var cantrace:Boolean = _logs.add(line);
+			if ( _config.tracing && cantrace && _config.traceCall != null) {
+				_config.traceCall(line.ch, line.plainText(), line.priority);
 			}
-			
 			_lineAdded = true;
 			_remoter.queueLog(line);
 		}

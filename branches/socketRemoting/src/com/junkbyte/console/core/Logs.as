@@ -53,9 +53,9 @@ package com.junkbyte.console.core
 				push(_lastRepeat);
 			}
 		}
-		public function add(line:Log, isRepeating:Boolean):Boolean{
+		public function add(line:Log):Boolean{
 			addChannel(line.ch);
-			if(isRepeating){
+			if (line.repeat) {
 				if(_repeating > 0 && _lastRepeat){
 					_newRepeat = line;
 					return false;
