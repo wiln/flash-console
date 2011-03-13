@@ -225,7 +225,7 @@ package com.junkbyte.console.view
 		}
 
 		private function onMouseWheel(e : MouseEvent) : void {
-			if(_ctrl){
+			if(_shift){
 				var s:int = console.config.style.traceFontSize + (e.delta>0?1:-1);
 				if(s > 10 && s < 20){
 					console.config.style.traceFontSize = s;
@@ -479,7 +479,7 @@ package com.junkbyte.console.view
 		// START OF SCROLL BAR STUFF
 		//
 		private function onTraceScroll(e:Event = null):void{
-			if(_lockScrollUpdate || _ctrl) return;
+			if(_lockScrollUpdate || _shift) return;
 			var atbottom:Boolean = _traceField.scrollV >= _traceField.maxScrollV;
 			if(!console.paused && _atBottom !=atbottom){
 				var diff:int = _traceField.maxScrollV-_traceField.scrollV;

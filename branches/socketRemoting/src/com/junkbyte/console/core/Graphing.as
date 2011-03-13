@@ -41,14 +41,21 @@ package com.junkbyte.console.core {
 		private var _fpsGroup:GraphGroup;
 		private var _memGroup:GraphGroup;
 		
+		private var _hadGraph:Boolean;
 		private var _previousTime:Number = -1;
 		
 		public function Graphing(m:Console){
 			super(m);
-			remoter.registerClient("fps", fpsRequest);
-			remoter.registerClient("mem", memRequest);
-			remoter.registerClient("removeGroup", removeGroup);
-			remoter.registerClient("graph", handleRemoteGraph);
+			remoter.registerClient("fps", function(bytes:ByteArray):void{
+				fpsMonitor = bytes.readBoolean();
+			});
+			remoter.registerClient("mem", function(bytes:ByteArray):void{
+				memoryMonitor = bytes.readBoolean();
+			});
+			remoter.registerClient("removeGroup", function(bytes:ByteArray):void{
+				removeGroup(bytes.readUTF());
+			});;
+			remoter.registerClient("graph", handleRemoteGraph, true);
 			
 		}
 		public function add(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
@@ -154,9 +161,6 @@ package com.junkbyte.console.core {
 				console.panels.mainPanel.updateMenu();
 			}
 		}
-		private function fpsRequest(b:Boolean):void{
-			fpsMonitor = b;
-		}
 		//
 		public function get memoryMonitor():Boolean{
 			if(remoter.remoting == Remoting.RECIEVER) return console.panels.memoryMonitor;
@@ -178,9 +182,6 @@ package com.junkbyte.console.core {
 				}
 				console.panels.mainPanel.updateMenu();
 			}
-		}
-		private function memRequest(b:Boolean):void{
-			memoryMonitor = b;
 		}
 		private function addSpecialGroup(type:int):GraphGroup{
 			var group:GraphGroup = new GraphGroup("special");
@@ -241,13 +242,14 @@ package com.junkbyte.console.core {
 					}
 				}
 			}
-			if(_groups.length && remoter.canSend){
+			if(remoter.canSend && (_hadGraph || _groups.length)){
 				var len:uint = _groups.length;
 				var ga:ByteArray = new ByteArray();
 				for(var j:uint = 0; j<len; j++){
 					ga.writeBytes(GraphGroup(_groups[j]).toBytes());
 				}
 				remoter.send("graph", ga);
+				_hadGraph = _groups.length>0;
 			}
 			return _groups;
 		}

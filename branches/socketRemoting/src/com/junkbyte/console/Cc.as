@@ -318,6 +318,12 @@ package com.junkbyte.console {
 		public static function explodech(channel:*, obj:Object, depth:int = 3):void {
 			if(_console) _console.explodech(channel, obj, depth);
 		}
+		public static function addHTML(html:XML, priority:int = 2, isRepeating:Boolean = false):void {
+			if(_console) _console.addHTML(html, priority, isRepeating);
+		}
+		public static function addHTMLch(channel:*, html:XML, priority:int = 2, isRepeating:Boolean = false):void {
+			if(_console) _console.addHTMLch(channel, html, priority, isRepeating);
+		}
 		/**
 		 * Print the display list map
 		 * (same as /map in commandLine)

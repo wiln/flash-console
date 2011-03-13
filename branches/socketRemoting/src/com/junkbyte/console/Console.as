@@ -418,6 +418,9 @@ package com.junkbyte.console
 		public function stackch(channel:*, newLine:*, depth:int = -1, priority:int = 5):void{
 			addLine(new Array(newLine), priority, channel, false, false, depth>=0?depth:_config.defaultStackDepth);
 		}
+		
+		
+		
 		public function log(...args):void{
 			addLine(args, LOG);
 		}
@@ -459,6 +462,15 @@ package com.junkbyte.console
 		}
 		public function addCh(channel:*, lineParts:Array, priority:int = 2, isRepeating:Boolean = false):void{
 			addLine(lineParts, priority, channel, isRepeating);
+		}
+		public function addHTML(html:XML, priority:int = 2, isRepeating:Boolean = false):void{
+			addLine(new Array(xmlToHTML(html)), priority, DEFAULT_CHANNEL, isRepeating, true);
+		}
+		public function addHTMLch(channel:*, html:XML, priority:Number = 2, isRepeating:Boolean = false):void{
+			addLine(new Array(xmlToHTML(html)), priority, channel, isRepeating, true);
+		}
+		private function xmlToHTML(xml:XML):String{
+			return xml.toXMLString().replace(/\>(\s*)\n(\s*)/g, ">").replace(/(\s*)\n(\s*)\</g, "<").replace(/\ﾠ/gi," ");
 		}
 		//
 		//
