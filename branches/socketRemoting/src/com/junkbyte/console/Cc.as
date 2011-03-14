@@ -318,11 +318,40 @@ package com.junkbyte.console {
 		public static function explodech(channel:*, obj:Object, depth:int = 3):void {
 			if(_console) _console.explodech(channel, obj, depth);
 		}
-		public static function addHTML(html:XML, priority:int = 2, isRepeating:Boolean = false):void {
-			if(_console) _console.addHTML(html, priority, isRepeating);
+		/**
+		 * Add html formated strings to log in default channel
+		 * 
+		 * <ul>
+		 * <li>Multiple Strings and objects are accepted.</li>
+		 * <li>If arguments do not make up a valid XML structure, it will print out as raw HTML text as safety.</li>
+		 * <li>Examples</li>
+		 * <li><code>Cc.addHTML("Here is HTML &lt;font color='#ff0000'&gt;red &lt;b&gt;bold&lt;/b&gt; &lt;b&gt;&lt;i&gt;and&lt;/i&gt;&lt;/b&gt; &lt;i&gt;italic&lt;/i&gt;&lt;/font&gt; text.");</code></li>
+		 * <li><code>Cc.addHTMLch("html", 8, "Mix objects inside html &lt;p9&gt;like this &lt;i&gt;&lt;b&gt;", this,"&lt;/b&gt;&lt;/i&gt;&lt;/p9&gt;");</code></li>
+		 * <li>If you need to assign channel or priority level, see Cc.addHTMLch</li>
+		 * </ul>
+		 * 
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
+		 */
+		public static function addHTML(...args):void {
+			if(_console) _console.addHTML.apply(null, args);
 		}
-		public static function addHTMLch(channel:*, html:XML, priority:int = 2, isRepeating:Boolean = false):void {
-			if(_console) _console.addHTMLch(channel, html, priority, isRepeating);
+		/**
+		 * Add html formated strings to channel with priority
+		 * 
+		 * <ul>
+		 * <li>Multiple Strings and objects are accepted.</li>
+		 * <li>If arguments do not make up a valid XML structure, it will print out as raw HTML text as safety.</li>
+		 * <li>Examples</li>
+		 * <li><code>Cc.addHTML("Here is HTML &lt;font color='#ff0000'&gt;red &lt;b&gt;bold&lt;/b&gt; &lt;b&gt;&lt;i&gt;and&lt;/i&gt;&lt;/b&gt; &lt;i&gt;italic&lt;/i&gt;&lt;/font&gt; text.");</code></li>
+		 * <li><code>Cc.addHTMLch("html", 8, "Mix objects inside html &lt;p9&gt;like this &lt;i&gt;&lt;b&gt;", this,"&lt;/b&gt;&lt;/i&gt;&lt;/p9&gt;");</code></li>
+		 * </ul>
+		 * 
+		 * @param channel	Name of channel, if a non-string param is passed, it will use the object's class name as channel name
+		 * @param priority 	Priority of line. 0-10, the higher the number the more visibilty it is in the log, and can be filtered through UI
+		 * @param ...args	Strings to be logged, any type can be passed and will be converted to string or a link if it is an object/class.
+		 */
+		public static function addHTMLch(channel:*, priority:int, ...args):void {
+			if(_console) _console.addHTMLch.apply(null, new Array(channel, priority).concat(args));
 		}
 		/**
 		 * Print the display list map

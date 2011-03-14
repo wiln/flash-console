@@ -24,6 +24,7 @@
 */
 package com.junkbyte.console.core 
 {
+	import flash.utils.Dictionary;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.Log;
 
@@ -50,13 +51,14 @@ package com.junkbyte.console.core
 		private var _socket:Socket;
 		private var _sendBuffer:ByteArray = new ByteArray();
 		private var _recBuffers:Object = new Object();
+		private var _senders:Dictionary = new Dictionary();
 		
 		private var _lastLogin:String = "";
 		private var _password:String;
 		private var _loggedIn:Boolean;
 		
 		private var _sendID:String;
-		private var _lastReciever:*;
+		private var _lastReciever:String;
 		
 		public function Remoting(m:Console, pass:String) {
 			super(m);
@@ -78,7 +80,6 @@ package com.junkbyte.console.core
 		public function update():void{
 			if(_sendBuffer.length){
 				if(_socket && _socket.connected){
-					_socket.writeUTF(_sendID);
 					_socket.writeBytes(_sendBuffer);
 					_socket.flush();
 					_sendBuffer = new ByteArray();
@@ -94,6 +95,47 @@ package com.junkbyte.console.core
 					_local.send(target, "synchronize", _sendID, packet);
 				}
 			}
+			for (var id:String in _recBuffers){
+				if(!_senders[id]){
+					_senders[id] = true;
+					if(_lastReciever){
+						report("Remote switched to new sender ["+id+"] as primary.", -2);
+					}
+					_lastReciever = id;
+				}
+				
+				var buffer:ByteArray = _recBuffers[id];
+				try{
+					var pointer:uint = buffer.position = 0;
+					while(buffer.bytesAvailable){
+						var cmd:String = buffer.readUTF();
+						var arg:ByteArray = null;
+						if(buffer.bytesAvailable == 0) break;
+						if(buffer.readBoolean()){
+							if(buffer.bytesAvailable == 0) break;
+							var blen:uint = buffer.readUnsignedInt();
+							if(buffer.bytesAvailable < blen) break;
+							arg = new ByteArray();
+							buffer.readBytes(arg, 0, blen);
+						}
+						var callbackData:Object = _client[cmd];
+						if(!callbackData.latest || id == _lastReciever){
+							if(arg) callbackData.fun(arg);
+							else callbackData.fun();
+						}
+						pointer = buffer.position;
+					}
+					if(pointer < buffer.length){
+						var recbuffer:ByteArray = new ByteArray();
+						recbuffer.writeBytes(buffer, pointer);
+						_recBuffers[id] = buffer = recbuffer;
+					}else{
+						delete _recBuffers[id];
+					}
+				}catch(err:Error){
+					report("Remoting sync error: "+err, 9);
+				}
+			}
 		}
 		private function synchronize(id:String, obj:Object):void{
 			if(!(obj is ByteArray)){
@@ -106,42 +148,7 @@ package com.junkbyte.console.core
 				buffer.position = buffer.length;
 				buffer.writeBytes(packet);
 			}else{
-				buffer = packet;
-				if(_lastReciever){
-					report("Switched to new sender ["+id+"] as primary.", -1);
-				}
-				_lastReciever = id;
-			}
-			buffer.position = 0;
-			try{
-				var pointer:uint = 0;
-				while(buffer.bytesAvailable){
-					var cmd:String = buffer.readUTF();
-					var arg:ByteArray = null;
-					if(buffer.bytesAvailable == 0) break;
-					if(buffer.readBoolean()){
-						if(buffer.bytesAvailable == 0) break;
-						var blen:uint = buffer.readUnsignedInt();
-						if(buffer.bytesAvailable < blen) break;
-						arg = new ByteArray();
-						buffer.readBytes(arg, 0, blen);
-					}
-					var callbackData:Object = _client[cmd];
-					if(!callbackData.latest || id == _lastReciever){
-						if(arg) callbackData.fun(arg);
-						else callbackData.fun();
-					}
-					pointer = buffer.position;
-				}
-				if(pointer < buffer.length){
-					var newbuffer:ByteArray = new ByteArray();
-					newbuffer.writeBytes(buffer, pointer);
-					_recBuffers[id] = buffer = newbuffer;
-				}else{
-					_recBuffers[id] = new ByteArray();
-				}
-			}catch(err:Error){
-				report("Remoting sync error: "+err, 9);
+				_recBuffers[id] = packet;
 			}
 		}
 		public function send(command:String, arg:ByteArray = null):Boolean{
@@ -164,7 +171,7 @@ package com.junkbyte.console.core
 		}
 		public function set remoting(newMode:uint):void{
 			if(newMode == _mode) return;
-			_sendID = new Date().time+"."+Math.floor(Math.random()*100000);
+			_sendID = generateId();
 			if(newMode == SENDER){
 				if(!startSharedConnection(SENDER)){
 					report("Could not create remoting client service. You will not be able to control this console with remote.", 10);
@@ -247,13 +254,14 @@ package com.junkbyte.console.core
 			handleSocket(e.currentTarget as Socket);
 		}
 		public function handleSocket(socket:Socket):void{
-			if(socket != _socket) _socket = socket;
-			var id:String = socket.readUTF();
+			if(!_senders[socket]){
+				_senders[socket] = generateId();
+				_socket = socket;
+			}
 			var bytes:ByteArray = new ByteArray();
 			socket.readBytes(bytes);
-			synchronize(id, bytes);
+			synchronize(_senders[socket], bytes);
 		}
-		
 		private function onSenderStatus(e:StatusEvent):void{
 			if(e.level == "error" && !(_socket && _socket.connected)) {
 				_loggedIn = false;
@@ -282,6 +290,9 @@ package com.junkbyte.console.core
 			report("Go to Settings Manager [<a href='event:settings'>click here</a>] &gt; 'Global Security Settings Panel' (on left) &gt; add the location of the local flash (swf) file.", -2);
 		}
 		
+		private function generateId():String{
+			return new Date().time+"."+Math.floor(Math.random()*100000);
+		}
 		private function startSharedConnection(targetmode:uint):Boolean{
 			close();
 			_mode = targetmode;
@@ -324,6 +335,7 @@ package com.junkbyte.console.core
 		}
 		private function requestLogin():void{
 			if(remoting != Remoting.RECIEVER) return;
+			_sendBuffer = new ByteArray();
 			if(_lastLogin){
 				login(_lastLogin);
 			}else{

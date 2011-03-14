@@ -54,9 +54,9 @@ package com.junkbyte.console
 	public class Console extends Sprite {
 
 		public static const VERSION:Number = 2.51;
-		public static const VERSION_STAGE:String = "alpha";
-		public static const BUILD:int = 572;
-		public static const BUILD_DATE:String = "2011/02/27 23:17";
+		public static const VERSION_STAGE:String = "beta";
+		public static const BUILD:int = 575;
+		public static const BUILD_DATE:String = "2011/03/14 01:19";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -114,7 +114,7 @@ package com.junkbyte.console
 			
 			
 			cl.addCLCmd("remotingSocket", function(str:String = ""):void{
-				var args:Array = str.split(/\s+/);
+				var args:Array = str.split(/\s+|\:/);
 				remotingSocket(args[0], args[1]);
 			}, "Connect to socket remote. /remotingSocket ip port");
 			
@@ -463,14 +463,19 @@ package com.junkbyte.console
 		public function addCh(channel:*, lineParts:Array, priority:int = 2, isRepeating:Boolean = false):void{
 			addLine(lineParts, priority, channel, isRepeating);
 		}
-		public function addHTML(html:XML, priority:int = 2, isRepeating:Boolean = false):void{
-			addLine(new Array(xmlToHTML(html)), priority, DEFAULT_CHANNEL, isRepeating, true);
+		public function addHTML(...args):void{
+			addLine(args, 2, DEFAULT_CHANNEL, false, testHTML(args));
 		}
-		public function addHTMLch(channel:*, html:XML, priority:Number = 2, isRepeating:Boolean = false):void{
-			addLine(new Array(xmlToHTML(html)), priority, channel, isRepeating, true);
+		public function addHTMLch(channel:*, priority:int, ...args):void{
+			addLine(args, priority, channel, false, testHTML(args));
 		}
-		private function xmlToHTML(xml:XML):String{
-			return xml.toXMLString().replace(/\>(\s*)\n(\s*)/g, ">").replace(/(\s*)\n(\s*)\</g, "<").replace(/\ﾠ/gi," ");
+		private function testHTML(args:Array):Boolean{
+			try{
+				new XML("<p>"+args.join("")+"</p>");
+			}catch(err:Error){
+				return false;
+			}
+			return true;
 		}
 		//
 		//
