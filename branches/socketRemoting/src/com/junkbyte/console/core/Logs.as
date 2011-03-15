@@ -44,7 +44,7 @@ package com.junkbyte.console.core
 			_channels = new Object();
 		}
 		
-		public function tick():void{
+		public function update():void{
 			if(_repeating > 0) _repeating--;
 			if(_newRepeat){
 				if(_lastRepeat) remove(_lastRepeat);

@@ -98,19 +98,19 @@ package com.junkbyte.console
 		 * @see com.junkbyte.console.Cc
 		 * @see http://code.google.com/p/flash-console/
 		 */
-		public function Console(pass:String = "", config:ConsoleConfig = null) {
+		public function Console(password:String = "", config:ConsoleConfig = null) {
 			name = "Console";
 			tabChildren = false; // Tabbing is not supported
 			_config = config?config:new ConsoleConfig();
 			//
-			_remoter = new Remoting(this, pass);
+			_remoter = new Remoting(this, password);
 			_logs = new Logs(this);
 			_links = new LogReferences(this);
 			_cl = new CommandLine(this);
 			_tools =  new ConsoleTools(this);
 			_graphing = new Graphing(this);
 			_mm = new MemoryMonitor(this);
-			_kb = new KeyBinder(this, pass);
+			_kb = new KeyBinder(this, password);
 			
 			
 			cl.addCLCmd("remotingSocket", function(str:String = ""):void{
@@ -133,7 +133,7 @@ package com.junkbyte.console
 			
 			report("<b>Console v"+VERSION+VERSION_STAGE+" b"+BUILD+". Happy coding!</b>", -2);
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
-			if(pass) visible = false;
+			if(password) visible = false;
 			// must have enterFrame here because user can start without a parent display and use remoting.
 			addEventListener(Event.ENTER_FRAME, _onEnterFrame);
 		}
@@ -182,27 +182,27 @@ package com.junkbyte.console
 			report(str, FATAL, false);
 		}
 		
-		public function addGraph(n:String, obj:Object, prop:String, col:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
-			_graphing.add(n,obj,prop,col,key,rect,inverse);
+		public function addGraph(name:String, obj:Object, property:String, color:Number = -1, key:String = null, rect:Rectangle = null, inverse:Boolean = false):void{
+			_graphing.add(name, obj, property, color, key, rect, inverse);
 		}
-		public function fixGraphRange(n:String, min:Number = NaN, max:Number = NaN):void{
-			_graphing.fixRange(n, min, max);
+		public function fixGraphRange(name:String, min:Number = NaN, max:Number = NaN):void{
+			_graphing.fixRange(name, min, max);
 		}
-		public function removeGraph(n:String, obj:Object = null, prop:String = null):void{
-			_graphing.remove(n, obj, prop);
+		public function removeGraph(name:String, obj:Object = null, property:String = null):void{
+			_graphing.remove(name, obj, property);
 		}
 		//
 		// WARNING: key binding hard references the functoin and arguments.
 		// This should only be used for development purposes only.
 		//
-		public function bindKey(key:KeyBind, fun:Function ,args:Array = null):void{
-			if(key) _kb.bindKey(key, fun, args);
+		public function bindKey(key:KeyBind, callback:Function ,args:Array = null):void{
+			if(key) _kb.bindKey(key, callback, args);
 		}
 		//
 		// WARNING: Add menu hard references the functoin and arguments.
 		//
-		public function addMenu(key:String, f:Function, args:Array = null, rollover:String = null):void{
-			panels.mainPanel.addMenu(key, f, args, rollover);
+		public function addMenu(key:String, callback:Function, args:Array = null, rollover:String = null):void{
+			panels.mainPanel.addMenu(key, callback, args, rollover);
 		}
 		//
 		// Panel settings
@@ -248,29 +248,29 @@ package com.junkbyte.console
 		}
 		
 		//
-		public function watch(o:Object,n:String = null):String{
-			return _mm.watch(o,n);
+		public function watch(object:Object,name:String = null):String{
+			return _mm.watch(object, name);
 		}
-		public function unwatch(n:String):void{
-			_mm.unwatch(n);
+		public function unwatch(name:String):void{
+			_mm.unwatch(name);
 		}
 		public function gc():void{
 			_mm.gc();
 		}
-		public function store(n:String, obj:Object, strong:Boolean = false):void{
-			_cl.store(n, obj, strong);
+		public function store(name:String, obj:Object, strong:Boolean = false):void{
+			_cl.store(name, obj, strong);
 		}
-		public function map(base:DisplayObjectContainer, maxstep:uint = 0):void{
-			_tools.map(base, maxstep, DEFAULT_CHANNEL);
+		public function map(container:DisplayObjectContainer, maxstep:uint = 0):void{
+			_tools.map(container, maxstep, DEFAULT_CHANNEL);
 		}
-		public function mapch(channel:*, base:DisplayObjectContainer, maxstep:uint = 0):void{
-			_tools.map(base, maxstep, MakeChannelName(channel));
+		public function mapch(channel:*, container:DisplayObjectContainer, maxstep:uint = 0):void{
+			_tools.map(container, maxstep, MakeChannelName(channel));
 		}
-		public function inspect(obj:Object, detail:Boolean = true):void{
-			_links.inspect(obj, detail, DEFAULT_CHANNEL);
+		public function inspect(obj:Object, showInherit:Boolean = true):void{
+			_links.inspect(obj, showInherit, DEFAULT_CHANNEL);
 		}
-		public function inspectch(channel:*, obj:Object, detail:Boolean = true):void{
-			_links.inspect(obj,detail, MakeChannelName(channel));
+		public function inspectch(channel:*, obj:Object, showInherit:Boolean = true):void{
+			_links.inspect(obj, showInherit, MakeChannelName(channel));
 		}
 		public function explode(obj:Object, depth:int = 3):void{
 			addLine(new Array(_tools.explode(obj, depth)), 1, null, false, true);
@@ -319,8 +319,8 @@ package com.junkbyte.console
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			_logs.tick();
-			_links.tick();
+			_logs.update();
+			_links.update();
 			_mm.update();
 			var graphsList:Array;
 			if(remoter.remoting != Remoting.RECIEVER)
@@ -354,29 +354,29 @@ package com.junkbyte.console
 		public function remotingSocket(host:String, port:int):void{
 			_remoter.remotingSocket(host, port);
 		}
-		public function set remotingPassword(str:String):void{
-			_remoter.remotingPassword = str;
+		public function set remotingPassword(password:String):void{
+			_remoter.remotingPassword = password;
 		}
 		//
 		//
 		//
-		public function setViewingChannels(...args:Array):void{
+		public function setViewingChannels(...channels:Array):void{
 			var a:Array = new Array();
-			for each(var item:Object in args) a.push(MakeChannelName(item));
+			for each(var item:Object in channels) a.push(MakeChannelName(item));
 			_panels.mainPanel.viewingChannels = a;
 		}
 		public function set minimumPriority(level:uint):void{
 			_panels.mainPanel.priority = level;
 		}
-		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true, ch:String = null):void{
-			if(!ch) ch = _panels.mainPanel.reportChannel;
+		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true, channel:String = null):void{
+			if(!channel) channel = _panels.mainPanel.reportChannel;
 			addLine([obj], priority, ch, false, skipSafe);
 		}
-		public function addLine(lineParts:Array, priority:int = 0, channel:* = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
+		public function addLine(strings:Array, priority:int = 0, channel:* = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
 			var txt:String = "";
-			var len:int = lineParts.length;
+			var len:int = strings.length;
 			for(var i:int = 0; i < len; i++){
-				txt += (i?" ":"")+_links.makeString(lineParts[i], null, html);
+				txt += (i?" ":"")+_links.makeString(strings[i], null, html);
 			}
 			
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
@@ -403,71 +403,71 @@ package com.junkbyte.console
 		public function get commandLine ():Boolean{
 			return _panels.mainPanel.commandLine;
 		}
-		public function addSlashCommand(n:String, callback:Function, desc:String = "", allow:Boolean = true):void{
-			_cl.addSlashCommand(n, callback, desc, allow);
+		public function addSlashCommand(name:String, callback:Function, desc:String = "", allow:Boolean = true):void{
+			_cl.addSlashCommand(name, callback, desc, allow);
 		}
 		//
 		// LOGGING
 		//
-		public function add(newLine:*, priority:int = 2, isRepeating:Boolean = false):void{
-			addLine(new Array(newLine), priority, DEFAULT_CHANNEL, isRepeating);
+		public function add(string:*, priority:int = 2, isRepeating:Boolean = false):void{
+			addLine(new Array(string), priority, DEFAULT_CHANNEL, isRepeating);
 		}
-		public function stack(newLine:*, depth:int = -1, priority:int = 5):void{
-			addLine(new Array(newLine), priority, DEFAULT_CHANNEL, false, false, depth>=0?depth:_config.defaultStackDepth);
+		public function stack(string:*, depth:int = -1, priority:int = 5):void{
+			addLine(new Array(string), priority, DEFAULT_CHANNEL, false, false, depth>=0?depth:_config.defaultStackDepth);
 		}
-		public function stackch(channel:*, newLine:*, depth:int = -1, priority:int = 5):void{
-			addLine(new Array(newLine), priority, channel, false, false, depth>=0?depth:_config.defaultStackDepth);
+		public function stackch(channel:*, string:*, depth:int = -1, priority:int = 5):void{
+			addLine(new Array(string), priority, channel, false, false, depth>=0?depth:_config.defaultStackDepth);
 		}
 		
 		
 		
-		public function log(...args):void{
-			addLine(args, LOG);
+		public function log(...strings):void{
+			addLine(strings, LOG);
 		}
-		public function info(...args):void{
-			addLine(args, INFO);
+		public function info(...strings):void{
+			addLine(strings, INFO);
 		}
-		public function debug(...args):void{
-			addLine(args, DEBUG);
+		public function debug(...strings):void{
+			addLine(strings, DEBUG);
 		}
-		public function warn(...args):void{
-			addLine(args, WARN);
+		public function warn(...strings):void{
+			addLine(strings, WARN);
 		}
-		public function error(...args):void{
-			addLine(args, ERROR);
+		public function error(...strings):void{
+			addLine(strings, ERROR);
 		}
-		public function fatal(...args):void{
-			addLine(args, FATAL);
+		public function fatal(...strings):void{
+			addLine(strings, FATAL);
 		}
-		public function ch(channel:*, newLine:*, priority:Number = 2, isRepeating:Boolean = false):void{
-			addLine(new Array(newLine), priority, channel, isRepeating);
+		public function ch(channel:*, string:*, priority:Number = 2, isRepeating:Boolean = false):void{
+			addLine(new Array(string), priority, channel, isRepeating);
 		}
-		public function logch(channel:*, ...args):void{
-			addLine(args, LOG, channel);
+		public function logch(channel:*, ...strings):void{
+			addLine(strings, LOG, channel);
 		}
-		public function infoch(channel:*, ...args):void{
-			addLine(args, INFO, channel);
+		public function infoch(channel:*, ...strings):void{
+			addLine(strings, INFO, channel);
 		}
-		public function debugch(channel:*, ...args):void{
-			addLine(args, DEBUG, channel);
+		public function debugch(channel:*, ...strings):void{
+			addLine(strings, DEBUG, channel);
 		}
-		public function warnch(channel:*, ...args):void{
-			addLine(args, WARN, channel);
+		public function warnch(channel:*, ...strings):void{
+			addLine(strings, WARN, channel);
 		}
-		public function errorch(channel:*, ...args):void{
-			addLine(args, ERROR, channel);
+		public function errorch(channel:*, ...strings):void{
+			addLine(strings, ERROR, channel);
 		}
-		public function fatalch(channel:*, ...args):void{
-			addLine(args, FATAL, channel);
+		public function fatalch(channel:*, ...strings):void{
+			addLine(strings, FATAL, channel);
 		}
-		public function addCh(channel:*, lineParts:Array, priority:int = 2, isRepeating:Boolean = false):void{
-			addLine(lineParts, priority, channel, isRepeating);
+		public function addCh(channel:*, strings:Array, priority:int = 2, isRepeating:Boolean = false):void{
+			addLine(strings, priority, channel, isRepeating);
 		}
-		public function addHTML(...args):void{
-			addLine(args, 2, DEFAULT_CHANNEL, false, testHTML(args));
+		public function addHTML(...strings):void{
+			addLine(strings, 2, DEFAULT_CHANNEL, false, testHTML(strings));
 		}
-		public function addHTMLch(channel:*, priority:int, ...args):void{
-			addLine(args, priority, channel, false, testHTML(args));
+		public function addHTMLch(channel:*, priority:int, ...strings):void{
+			addLine(strings, priority, channel, false, testHTML(strings));
 		}
 		private function testHTML(args:Array):Boolean{
 			try{

@@ -68,7 +68,7 @@ package com.junkbyte.console.core
 			});
 			remoter.registerClient("focus", handleFocused);
 		}
-		public function tick():void{
+		public function update():void{
 			if(_currentBank.length || _prevBank.length){
 				var time:int = getTimer();
 				if( time > _lastWithdraw+config.objectHardReferenceTimer*1000){
