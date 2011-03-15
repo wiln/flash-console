@@ -727,7 +727,7 @@ package com.junkbyte.console {
 		// Others
 		//
 		/**
-		 * Remove console from it's parent display and clean up
+		 * Remove console from it's parent display
 		 */
 		public static function remove():void{
 			if(_console){
