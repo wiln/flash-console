@@ -55,8 +55,8 @@ package com.junkbyte.console
 
 		public static const VERSION:Number = 2.51;
 		public static const VERSION_STAGE:String = "beta";
-		public static const BUILD:int = 576;
-		public static const BUILD_DATE:String = "2011/03/15 23:07";
+		public static const BUILD:int = 577;
+		public static const BUILD_DATE:String = "2011/03/15 23:20";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -370,7 +370,7 @@ package com.junkbyte.console
 		}
 		public function report(obj:*, priority:int = 0, skipSafe:Boolean = true, channel:String = null):void{
 			if(!channel) channel = _panels.mainPanel.reportChannel;
-			addLine([obj], priority, ch, false, skipSafe);
+			addLine([obj], priority, channel, false, skipSafe);
 		}
 		public function addLine(strings:Array, priority:int = 0, channel:* = null,isRepeating:Boolean = false, html:Boolean = false, stacks:int = -1):void{
 			var txt:String = "";
