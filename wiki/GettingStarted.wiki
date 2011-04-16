@@ -25,7 +25,7 @@ Cc.startOnStage(this, "");
    * You will need to type the keyword in correct sequence to show the console. 
    * Recommended keyword: ``` or ~ or debug. Use letters and numbers only. 
    * Console will start hidden if you set a password (you can set `Cc.visible = true;` to force display console). 
-   * Entering the keyword while console is visible with hide it
+   * Entering the keyword while console is visible will hide it
    * Password will not trigger if user have focus on an input `TextField`
 
 ==Logging==
