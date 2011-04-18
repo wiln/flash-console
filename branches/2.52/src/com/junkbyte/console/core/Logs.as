@@ -41,7 +41,7 @@ package com.junkbyte.console.core
 		public var last:Log;
 		
 		private var _length:uint;
-		//private var _lines:uint; // number of lines since start.
+		private var _lines:uint; // number of lines since start.
 		
 		public function Logs(console:Console){
 			super(console);
@@ -83,7 +83,7 @@ package com.junkbyte.console.core
 			send2Remote(line);
 			if (line.repeat) {
 				if(_repeating > 0 && _lastRepeat){
-					//line.line = _lastRepeat.line;
+					line.line = _lastRepeat.line;
 					_newRepeat = line;
 					return;
 				}else{
@@ -91,8 +91,8 @@ package com.junkbyte.console.core
 					_lastRepeat = line;
 				}
 			}
-			//_lines++;
-			//line.line = _lines;
+			_lines++;
+			line.line = _lines;
 			//
 			push(line);
 			while(_length > config.maxLines){

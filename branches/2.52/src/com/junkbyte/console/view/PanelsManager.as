@@ -52,7 +52,6 @@ package com.junkbyte.console.view
 			_mainPanel = new MainPanel(console);
 			_tooltipField = mainPanel.makeTF("tooltip", true);
 			_tooltipField.mouseEnabled = false;
-			_tooltipField.autoSize = TextFieldAutoSize.CENTER;
 			_tooltipField.multiline = true;
 			addPanel(_mainPanel);
 		}
@@ -270,19 +269,26 @@ package com.junkbyte.console.view
 		//
 		//
 		//
-		public function tooltip(str:String = null, panel:ConsolePanel = null):void{
+		public function tooltip(str:String = null, panel:ConsolePanel = null, centered:Boolean = true):void{
 			if(str && !rulerActive){
 				var split:Array = str.split("::");
 				str = split[0];
 				if(split.length > 1) str += "<br/><low>"+split[1]+"</low>";
 				console.addChild(_tooltipField);
 				_tooltipField.wordWrap = false;
-				_tooltipField.htmlText = "<tt>"+str+"</tt>";
-				if(_tooltipField.width>120){
-					_tooltipField.width = 120;
-					_tooltipField.wordWrap = true;
+				if(centered){
+					_tooltipField.htmlText = "<center><tt>"+str+"</tt></center>";
+					_tooltipField.autoSize = TextFieldAutoSize.CENTER;
+					if(_tooltipField.width>120){
+						_tooltipField.width = 120;
+						_tooltipField.wordWrap = true;
+					}
+					_tooltipField.x = console.mouseX-(_tooltipField.width/2);
+				}else{
+					_tooltipField.htmlText = "<tt>"+str+"</tt>";
+					_tooltipField.autoSize = TextFieldAutoSize.LEFT;
+					_tooltipField.x = console.mouseX - 10;
 				}
-				_tooltipField.x = console.mouseX-(_tooltipField.width/2);
 				_tooltipField.y = console.mouseY+20;
 				if(panel){
 					var txtRect:Rectangle = _tooltipField.getBounds(console);

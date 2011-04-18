@@ -173,7 +173,8 @@ package com.junkbyte.console {
 			_css.setStyle("menuHi",{color:hesh(menuHighlightColor), display:'inline'});
 			_css.setStyle("chs",{color:hesh(channelsColor), fontSize:menuFontSize, leading:'2', display:'inline'});
 			_css.setStyle("ch",{color:hesh(channelColor), display:'inline'});
-			_css.setStyle("tt",{color:hesh(menuColor),fontFamily:menuFont,fontSize:menuFontSize, textAlign:'center'});
+			_css.setStyle("tt",{color:hesh(menuColor),fontFamily:menuFont,fontSize:menuFontSize});
+			_css.setStyle("center",{textAlign:'center'});
 			_css.setStyle("r",{textAlign:'right', display:'inline'});
 			_css.setStyle("p",{fontFamily:traceFont, fontSize:traceFontSize});
 			_css.setStyle("p0",{color:hesh(priority0), display:'inline'});

@@ -95,6 +95,7 @@ package com.junkbyte.console.view
 		private var _hint:String;
 		
 		private var _cmdsHistory:Array;
+		private var _lines:Object;
 		
 		public function MainPanel(m:Console) {
 			super(m);
@@ -115,6 +116,7 @@ package com.junkbyte.console.view
 			_traceField.multiline = true;
 			_traceField.y = fsize;
 			_traceField.addEventListener(Event.SCROLL, onTraceScroll);
+			registerTFRoller(_traceField, onTraceRollOver);
 			addChild(_traceField);
 			//
 			txtField = makeTF("menuField");
@@ -356,12 +358,14 @@ package com.junkbyte.console.view
 		}
 		private function updateFull():void{
 			var str:String = "";
+			_lines = new Object();
 			var line:Log = console.logs.last;
 			var showch:Boolean = _viewingChannels.length != 1;
 			while(line){
 				if(lineShouldShow(line)){
 					str = makeLine(line, showch)+str;
 				}
+				_lines[line.line] = line;
 				line = line.prev;
 			}
 			_lockScrollUpdate = true;
@@ -381,6 +385,7 @@ package com.junkbyte.console.view
 			updateMenu();
 		}
 		private function updateBottom():void{
+			_lines = new Object();
 			var lines:Array = new Array();
 			var linesLeft:int = Math.round(_traceField.height/style.traceFontSize);
 			var maxchars:int = Math.round(_traceField.width*5/style.traceFontSize);
@@ -403,6 +408,7 @@ package com.junkbyte.console.view
 						break;
 					}
 				}
+				_lines[line.line] = line;
 				line = line.prev;
 			}
 			_lockScrollUpdate = true;
@@ -496,7 +502,7 @@ package com.junkbyte.console.view
 		}
 		private function makeLine(line:Log, showch:Boolean):String{
 			var str:String = "";
-			var txt:String = line.text;
+			var txt:String = "<a href=\"event:line_"+line.line+"\">"+line.text+"</a>";
 			if(showch && line.ch != Console.DEFAULT_CHANNEL){
 				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+txt;
 			}
@@ -783,6 +789,17 @@ package com.junkbyte.console.view
 				txt = obj[txt];
 			}
 			console.panels.tooltip(txt, src);
+		}
+		private function onTraceRollOver(e:TextEvent):void{
+			var txt:String = e.text?e.text.replace("event:",""):"";
+			if(config.rolloverStackToolTip && txt.indexOf("line_")==0){
+				var line:uint = uint(txt.substring(5));
+				if(_lines.hasOwnProperty(line)){
+					console.panels.tooltip(_lines[line].stack, this, false);
+					return;
+				}
+			}
+			console.panels.tooltip("");
 		}
 		private function linkHandler(e:TextEvent):void{
 			txtField.setSelection(0, 0);
