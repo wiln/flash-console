@@ -5,7 +5,7 @@
 
 ==Flash Console==
 
-  * Version 2.51 beta4 (April 2011)
+  * Version 2.51 (May 2011)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -31,7 +31,7 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.51 beta4 ===
+===2.51 ===
   * Major changes
    * HTML formatted logging support. see Cc.addHTML, Cc.addHTMLch
    * Socket remoting support
@@ -39,6 +39,7 @@ http://code.google.com/p/flash-console/issues/
    * Improved commandLine autocomplete / hinting
     * CommandLine autocomplete is now stepped so that it will stop completion at multiple matches
     * TAB key to accept autocomplete suggestion in CL (in REPLACEMENT of previous SPACE key)
+   * Cc.config.rememberFilterSettings to remember channel and priority level settings as SharedObject
   * Minor changes
    * *Cc* button on top menu changed to *Sv* with additional controls:
     * Normal click copies all text with channel names to clipboard
