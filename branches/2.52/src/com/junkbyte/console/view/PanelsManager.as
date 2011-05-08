@@ -271,7 +271,7 @@ package com.junkbyte.console.view
 		//
 		public function tooltip(str:String = null, panel:ConsolePanel = null, centered:Boolean = true):void{
 			if(str && !rulerActive){
-				var split:Array = str.split("::");
+				var split:Array = str.split("&&");
 				str = split[0];
 				if(split.length > 1) str += "<br/><low>"+split[1]+"</low>";
 				console.addChild(_tooltipField);
@@ -285,8 +285,8 @@ package com.junkbyte.console.view
 					}
 					_tooltipField.x = console.mouseX-(_tooltipField.width/2);
 				}else{
-					_tooltipField.htmlText = "<tt>"+str+"</tt>";
 					_tooltipField.autoSize = TextFieldAutoSize.LEFT;
+					_tooltipField.htmlText = "<tt>"+str+"</tt>";
 					_tooltipField.x = console.mouseX - 10;
 				}
 				_tooltipField.y = console.mouseY+20;

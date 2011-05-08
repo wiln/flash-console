@@ -119,7 +119,7 @@ package com.junkbyte.console {
 		};
 
 		// Work in progress
-		public var rolloverStackToolTip:Boolean = false;
+		public var rolloverToolTipStacks:uint;
 		
 		///////////////////////
 		//                   //

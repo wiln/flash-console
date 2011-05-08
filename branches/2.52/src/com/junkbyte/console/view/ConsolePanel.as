@@ -307,13 +307,11 @@ package com.junkbyte.console.view {
 			if(index>0){
 				// TextField.getXMLText(...) is not documented
 				try{
-					var X:XML = new XML(field.getXMLText(index,index+1));
-					if(X.hasOwnProperty("textformat")){
-						var txtformat:XML = X["textformat"][0] as XML;
-						if(txtformat){
-							url = txtformat.@url;
-							//txt = txtformat.toString();
-						}
+					var X:XML = new XML(field['getXMLText'](index,index+1));
+					var txtformat:XML = X["textformat"][0] as XML;
+					
+					if(txtformat){
+						url = txtformat.@url;
 					}
 				}catch(err:Error){
 					url = null;

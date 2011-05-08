@@ -264,7 +264,7 @@ package com.junkbyte.console.view
 			}
 		}
 		private function onCmdPrefRollOverOut(e : MouseEvent) : void {
-			console.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?"Current scope::(CommandLine)":"", this);
+			console.panels.tooltip(e.type==MouseEvent.MOUSE_MOVE?"Current scope&&(CommandLine)":"", this);
 		}
 		private function onCmdPrefMouseDown(e : MouseEvent) : void {
 			try{
@@ -501,11 +501,11 @@ package com.junkbyte.console.view
 			}
 		}
 		private function makeLine(line:Log, showch:Boolean):String{
-			var str:String = "";
-			var txt:String = "<a href=\"event:line_"+line.line+"\">"+line.text+"</a>";
+			var txt : String;
 			if(showch && line.ch != Console.DEFAULT_CHANNEL){
-				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+txt;
-			}
+				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+line.text;
+			}else txt = line.text;
+			
 			var index:int;
 			if(_filterRegExp){
 				// need to look into every match to make sure there no half way HTML tags and not inside the HTML tags it self in the match.
@@ -532,8 +532,13 @@ package com.junkbyte.console.view
 				}
 			}
 			var ptag:String = "p"+line.priority;
-			str += "<p><"+ptag+">" + txt + "</"+ptag+"></p>";
-			return str;
+			txt = "<"+ptag+">" + txt + "</"+ptag+">";
+			
+			if (config.rolloverToolTipStacks) {
+				if(line.stack) txt = "<menu><a href=\"event:line_" + line.line + "\">" + line.line + "</a>] </menu>"+txt;
+				else txt = "<menu>"+line.line + "] </menu>"+txt;
+			}
+			return "<p>"+txt+"</p>";
 		}
 		//
 		// START OF SCROLL BAR STUFF
@@ -755,21 +760,21 @@ package com.junkbyte.console.view
 			if(txt == "channel_"+Console.GLOBAL_CHANNEL){
 				txt = "View all channels";
 			}else if(txt == "channel_"+Console.DEFAULT_CHANNEL) {
-				txt = "Default channel::Logs with no channel";
+				txt = "Default channel&&Logs with no channel";
 			}else if(txt == "channel_"+ Console.CONSOLE_CHANNEL) {
-				txt = "Console's channel::Logs generated from Console";
+				txt = "Console's channel&&Logs generated from Console";
 			}else if(txt == "channel_"+ Console.FILTER_CHANNEL) {
 				txt = _filterRegExp?String(_filterRegExp):_filterText;
-				txt = "Filtering channel"+"::*"+txt+"*";
+				txt = "Filtering channel"+"&&*"+txt+"*";
 			}else if(txt == "channel_"+LogReferences.INSPECTING_CHANNEL) {
 				txt = "Inspecting channel";
 			}else if(txt.indexOf("channel_")==0) {
-				txt = "Change channel::shift: select multiple\nctrl: ignore channel";
+				txt = "Change channel&&shift: select multiple\nctrl: ignore channel";
 			}else if(txt == "pause"){
 				if(console.paused) txt = "Resume updates";
 				else txt = "Pause updates";
 			}else if(txt == "close" && src == this){
-				txt = "Close::Type password to show again";
+				txt = "Close&&Type password to show again";
 			}else if(txt.indexOf("external_")==0){
 				var menu:Array = _extraMenus[txt.substring(9)];
 				if(menu) txt = menu[2];
@@ -777,12 +782,12 @@ package com.junkbyte.console.view
 				var obj:Object = {
 					fps:"Frames Per Second",
 					mm:"Memory Monitor",
-					roller:"Display Roller::Map the display list under your mouse",
-					ruler:"Screen Ruler::Measure the distance and angle between two points on screen.",
+					roller:"Display Roller&&Map the display list under your mouse",
+					ruler:"Screen Ruler&&Measure the distance and angle between two points on screen.",
 					command:"Command Line",
-					copy:"Save to clipboard::shift: no channel name\nctrl: use viewing filters\nalt: save to file",
+					copy:"Save to clipboard&&shift: no channel name\nctrl: use viewing filters\nalt: save to file",
 					clear:"Clear log",
-					priority:"Priority filter::shift: previous priority\n(skips unused priorites)",
+					priority:"Priority filter&&shift: previous priority\n(skips unused priorites)",
 					channels:"Expand channels",
 					close:"Close"
 				};
@@ -792,7 +797,7 @@ package com.junkbyte.console.view
 		}
 		private function onTraceRollOver(e:TextEvent):void{
 			var txt:String = e.text?e.text.replace("event:",""):"";
-			if(config.rolloverStackToolTip && txt.indexOf("line_")==0){
+			if(config.rolloverToolTipStacks > 0 && txt.indexOf("line_")==0){
 				var line:uint = uint(txt.substring(5));
 				if(_lines.hasOwnProperty(line)){
 					console.panels.tooltip(_lines[line].stack, this, false);

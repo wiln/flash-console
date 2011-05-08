@@ -51,7 +51,7 @@ package
 			
 			Cc.config.commandLineAllowed = true; // enable advanced (but security risk) features.
 			Cc.config.tracing = true; // Also trace on flash's normal trace
-			Cc.config.rolloverStackToolTip = true;
+			Cc.config.rolloverToolTipStacks = 5;
 			
 			Cc.remotingPassword = null; // Just so that remote don't ask for password
 			Cc.remoting = true; // Start sending logs to remote (using LocalConnection)

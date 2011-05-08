@@ -30,6 +30,7 @@ package {
 			Cc.fpsMonitor = true;
 			Cc.memoryMonitor = true;
 			Cc.config.commandLineAllowed = true;
+			Cc.config.rolloverToolTipStacks = 2;
 			Cc.remoting = true;
 			Cc.remotingPassword = null;
 			

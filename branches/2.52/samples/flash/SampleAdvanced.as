@@ -47,9 +47,10 @@ package
 			Cc.commandLine = true; // enable command line
 			//Cc.memoryMonitor = true;
 			//Cc.fpsMonitor = true;
-			//Cc.displayRoller = true;
-			
+			// Cc.displayRoller = true;
+			Cc.config.objectHardReferenceTimer = 200;
 			Cc.config.commandLineAllowed = true;
+			Cc.config.rolloverToolTipStacks = 5;
 			Cc.width = 700;
 			Cc.height = 300;
 			Cc.remotingPassword = null; // Just so that remote don't ask for password

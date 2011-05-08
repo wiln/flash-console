@@ -166,7 +166,7 @@ package com.junkbyte.console.core
 					found = true;
 				}
 				if(found){
-					txt += "\n<p"+priority+"> @ "+lines[i]+"</p"+priority+">";
+					txt += (txt.length?"\n":"")+"<p"+priority+"> @ "+lines[i]+"</p"+priority+">";
 					if(priority>0) priority--;
 					depth--;
 					if(depth<=0){

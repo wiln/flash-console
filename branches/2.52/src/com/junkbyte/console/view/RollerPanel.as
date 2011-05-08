@@ -147,7 +147,7 @@ package com.junkbyte.console.view
 			}else if(txt == "capture"){
 				var key:KeyBind = console.rollerCaptureKey;
 				if(key){
-					txt = "Unassign key ::"+key.key;
+					txt = "Unassign key &&"+key.key;
 				}else{
 					txt = "Assign key";
 				}

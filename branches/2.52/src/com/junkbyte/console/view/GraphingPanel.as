@@ -260,7 +260,7 @@ package com.junkbyte.console.view {
 		protected function onMenuRollOver(e:TextEvent):void{
 			var txt:String = e.text?e.text.replace("event:",""):null;
 			if(txt == "gc"){
-				txt = "Garbage collect::Requires debugger version of flash player";
+				txt = "Garbage collect&&Requires debugger version of flash player";
 			}
 			console.panels.tooltip(txt, this);
 		}

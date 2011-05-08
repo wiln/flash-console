@@ -54,10 +54,10 @@ package com.junkbyte.console
 	 */
 	public class Console extends Sprite {
 
-		public static const VERSION:Number = 2.51;
-		public static const VERSION_STAGE:String = "";
-		public static const BUILD:int = 588;
-		public static const BUILD_DATE:String = "2011/05/06 00:09";
+		public static const VERSION:Number = 2.52;
+		public static const VERSION_STAGE:String = "rogue";
+		public static const BUILD:int = 589;
+		public static const BUILD_DATE:String = "2011/05/09 00:15";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -380,21 +380,13 @@ package com.junkbyte.console
 			
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
 			
-			 
-			//work in progress
-			var stack:String;
-			if(config.rolloverStackToolTip || stacks>0){
-				stack = _tools.getStack(stacks, priority);
-			}
 			if(!html && stacks>0){
-				txt += stack;
+				txt += "\n"+_tools.getStack(stacks, priority);
 			}
-			/*
-			if(!html && stacks>0){
-				txt += _tools.getStack(stacks, priority);
-			}*/
 			var l:Log = new Log(txt, MakeChannelName(channel), priority, isRepeating, html);
-			l.stack = stack?stack.substring(1):"";
+			if(config.rolloverToolTipStacks > 0){
+				l.stack = _tools.getStack(config.rolloverToolTipStacks, priority);
+			}
 			_logs.add(l);
 		}
 		//
