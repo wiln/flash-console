@@ -152,7 +152,7 @@ package com.junkbyte.console.core
 			return n+":"+explode(o[n], d-1, p-1);
 		}
 		
-		public function getStack(depth:int, priority:int):String{
+		public function getStack(depth:int, startingPriority:int):String{
 			var e:Error = new Error();
 			var str:String = e.hasOwnProperty("getStackTrace")?e.getStackTrace():null;
 			if(!str) return "";
@@ -166,8 +166,8 @@ package com.junkbyte.console.core
 					found = true;
 				}
 				if(found){
-					txt += (txt.length?"\n":"")+"<p"+priority+"> @ "+lines[i]+"</p"+priority+">";
-					if(priority>0) priority--;
+					txt += (txt.length?"\n":"")+"<p"+startingPriority+"> @ "+lines[i].replace(/[.*]/,"")+"</p"+startingPriority+">";
+					if(startingPriority>0) startingPriority--;
 					depth--;
 					if(depth<=0){
 						break;
