@@ -471,9 +471,11 @@ package com.junkbyte.console {
 		 * @param  callback	Function to call on trigger. pass null to remove previous
 		 * @param  description	Description of command. This shows up in /commands list
 		 * @param  alwaysAvailable	If set to false this command will NOT be avaviable when Cc.config.commandLineAllowed is false; default = true
+		 * @param  endOfArgsMarker	Marker string used to determine end of command argument so that remaining string can be parsed as next line. 
+		 * 							null = whole string always passed as argument. default = ";"
 		 */
-		public static function addSlashCommand(name:String, callback:Function, description:String = "", alwaysAvailable:Boolean = true):void{
-			if(_console ) _console.addSlashCommand(name, callback, description, alwaysAvailable);
+		public static function addSlashCommand(name:String, callback:Function, description:String = "", alwaysAvailable:Boolean = true, endOfArgsMarker:String = ";"):void{
+			if(_console ) _console.addSlashCommand(name, callback, description, alwaysAvailable, endOfArgsMarker);
 		}
 		//
 		// Memory management tools
@@ -636,10 +638,6 @@ package com.junkbyte.console {
 		}
 		/**
 		 * visibility of all console panels
-		 * <p>
-		 * If you have closed the main console by pressing the X button, setting true here will not turn it back on.
-		 * You will need to press the password key to turn that panel back on instead.
-		 * </p>
 		 */
 		public static function get visible():Boolean{
 			if(_console) return _console.visible;

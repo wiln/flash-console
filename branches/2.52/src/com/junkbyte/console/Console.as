@@ -55,9 +55,9 @@ package com.junkbyte.console
 	public class Console extends Sprite {
 
 		public static const VERSION:Number = 2.52;
-		public static const VERSION_STAGE:String = "rogue";
-		public static const BUILD:int = 589;
-		public static const BUILD_DATE:String = "2011/05/09 00:15";
+		public static const VERSION_STAGE:String = "";
+		public static const BUILD:int = 593;
+		public static const BUILD_DATE:String = "2011/06/15 00:27";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -315,6 +315,10 @@ package com.junkbyte.console
 		override public function get y():Number{
 			return _panels.mainPanel.y;
 		}
+		override public function set visible(v:Boolean):void{
+			super.visible = v;
+			if(v) _panels.mainPanel.visible = true;
+		}
 		//
 		//
 		//
@@ -398,8 +402,8 @@ package com.junkbyte.console
 		public function get commandLine ():Boolean{
 			return _panels.mainPanel.commandLine;
 		}
-		public function addSlashCommand(name:String, callback:Function, desc:String = "", allow:Boolean = true):void{
-			_cl.addSlashCommand(name, callback, desc, allow);
+		public function addSlashCommand(name:String, callback:Function, desc:String = "", alwaysAvailable:Boolean = true, endOfArgsMarker:String = ";"):void{
+			_cl.addSlashCommand(name, callback, desc, alwaysAvailable, endOfArgsMarker);
 		}
 		//
 		// LOGGING
