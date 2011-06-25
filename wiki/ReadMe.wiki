@@ -6,7 +6,7 @@
 
 ==Flash Console==
 
-  * Version 2.51 beta4 (April 2011)
+  * Version 2.52 (June 2011)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -32,7 +32,14 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.51 beta4 ===
+===2.52 ===
+  * Multi-line support with slash commands. E.g. "/base; /explode" will now work
+  * Added config.commandLineInputPassThrough which allows replacing command input execution
+  * Fixed bug: Issue 82, No output when selecting Unlimited 'maxLines'
+  * Fixed bug: Issue 84: Cc.visible doesn't work if user already closed console via X button
+  * Fix where slash command auto complete was adding blank argument
+  
+===2.51 ===
   * Major changes
    * HTML formatted logging support. see Cc.addHTML, Cc.addHTMLch
    * Socket remoting support
