@@ -177,11 +177,11 @@ package com.junkbyte.console.view
 			_scroller = new Sprite();
 			_scroller.name = "scrollbar";
 			_scroller.tabEnabled = false;
-			_scroller.y = 5;
+			_scroller.y = style.controlSize;
 			_scroller.graphics.beginFill(style.controlColor, 1);
-			_scroller.graphics.drawRect(-5, 0, 5, 30);
+			_scroller.graphics.drawRect(-style.controlSize, 0, style.controlSize, 30);
 			_scroller.graphics.beginFill(0, 0);
-			_scroller.graphics.drawRect(-10, 0, 10, 30);
+			_scroller.graphics.drawRect(-style.controlSize*2, 0, style.controlSize*2, 30);
 			_scroller.graphics.endFill();
 			_scroller.addEventListener(MouseEvent.MOUSE_DOWN, onScrollerDown, false, 0, true);
 			_scroll.addChild(_scroller);
@@ -360,17 +360,18 @@ package com.junkbyte.console.view
 			}
 		}
 		private function updateFull():void{
-			var str:String = "";
-			var line:Log = console.logs.last;
+			var text:String = "";
+			var line:Log = console.logs.first;
 			var showch:Boolean = _viewingChannels.length != 1;
+			var viewingAll:Boolean =  _priority == 0 && _viewingChannels.length == 0;
 			while(line){
-				if(lineShouldShow(line)){
-					str = makeLine(line, showch)+str;
+				if(viewingAll || lineShouldShow(line)){
+					text += makeLine(line, showch);
 				}
-				line = line.prev;
+				line = line.next;
 			}
 			_lockScrollUpdate = true;
-			_traceField.htmlText = str;
+			_traceField.htmlText = "<logs>"+text+"</logs>";;
 			_lockScrollUpdate = false;
 			updateScroller();
 		}
@@ -386,7 +387,7 @@ package com.junkbyte.console.view
 			updateMenu();
 		}
 		private function updateBottom():void{
-			var lines:Array = new Array();
+			var text:String = "";
 			var linesLeft:int = Math.round(_traceField.height/style.traceFontSize);
 			var maxchars:int = Math.round(_traceField.width*5/style.traceFontSize);
 			
@@ -396,11 +397,11 @@ package com.junkbyte.console.view
 				if(lineShouldShow(line)){
 					var numlines:int = Math.ceil(line.text.length/ maxchars);
 					if(line.html || linesLeft >= numlines ){
-						lines.push(makeLine(line, showch));
+						text = makeLine(line, showch)+text;
 					}else{
 						line = line.clone();
 						line.text = line.text.substring(Math.max(0,line.text.length-(maxchars*linesLeft)));
-						lines.push(makeLine(line, showch));
+						text = makeLine(line, showch)+text;
 						break;
 					}
 					linesLeft-=numlines;
@@ -411,19 +412,20 @@ package com.junkbyte.console.view
 				line = line.prev;
 			}
 			_lockScrollUpdate = true;
-			_traceField.htmlText = lines.reverse().join("");
+			_traceField.htmlText = "<logs>"+text+"</logs>";
 			_traceField.scrollV = _traceField.maxScrollV;
 			_lockScrollUpdate = false;
 			updateScroller();
 		}
 		private function lineShouldShow(line:Log):Boolean{
 			return (
+			 	( _priority == 0 || line.priority >= _priority) 
+			 	&&
 				(
 					chShouldShow(line.ch)
 			 		|| (_filterText && _viewingChannels.indexOf(Console.FILTER_CHANNEL) >= 0 && line.text.toLowerCase().indexOf(_filterText)>=0 )
 			 		|| (_filterRegExp && _viewingChannels.indexOf(Console.FILTER_CHANNEL)>=0 && line.text.search(_filterRegExp)>=0 )
 			 	) 
-			 	&& ( _priority == 0 || line.priority >= _priority)
 			);
 		}
 		private function chShouldShow(ch:String):Boolean{
@@ -500,23 +502,31 @@ package com.junkbyte.console.view
 			}
 		}
 		private function makeLine(line:Log, showch:Boolean):String{
-			var str:String = "";
-			var txt:String = line.text;
-			if(showch && line.ch != Console.DEFAULT_CHANNEL){
-				txt = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] "+txt;
+			var header:String = "<p>";
+			if (config.showLineNumber) {
+				header +=  line.lineStr;
 			}
-			var index:int;
+			if (showch) {
+				header += line.chStr;
+			}
+			if (config.showTimestamp) {
+				header += line.timeStr;
+			}
+			return header + addFilterText(line.text) + "</p>";
+		}
+		
+		private function addFilterText(txt:String):String{
 			if(_filterRegExp){
 				// need to look into every match to make sure there no half way HTML tags and not inside the HTML tags it self in the match.
 				_filterRegExp.lastIndex = 0;
 				var result:Object = _filterRegExp.exec(txt);
 				while (result != null) {
-					index = result.index;
+					var i:int = result.index;
 					var match:String = result[0];
 					if(match.search("<|>")>=0){
 						_filterRegExp.lastIndex -= match.length-match.search("<|>");
-					}else if(txt.lastIndexOf("<", index)<=txt.lastIndexOf(">", index)){
-						txt = txt.substring(0, index)+"<u>"+txt.substring(index, index+match.length)+"</u>"+txt.substring(index+match.length);
+					}else if(txt.lastIndexOf("<", i)<=txt.lastIndexOf(">", i)){
+						txt = txt.substring(0, i)+"<u>"+txt.substring(i, i+match.length)+"</u>"+txt.substring(i+match.length);
 						_filterRegExp.lastIndex+=7; // need to add to satisfy the fact that we added <u> and </u>
 					}
 					result = _filterRegExp.exec(txt);
@@ -524,15 +534,13 @@ package com.junkbyte.console.view
 			}else if(_filterText){
 				// could have been simple if txt.replace replaces every match.
 				var lowercase:String = txt.toLowerCase();
-				index = lowercase.lastIndexOf(_filterText);
-				while(index>=0){
-					txt = txt.substring(0, index)+"<u>"+txt.substring(index, index+_filterText.length)+"</u>"+txt.substring(index+_filterText.length);
-					index = lowercase.lastIndexOf(_filterText, index-2);
+				var j:int = lowercase.lastIndexOf(_filterText);
+				while(j>=0){
+					txt = txt.substring(0, j)+"<u>"+txt.substring(j, j+_filterText.length)+"</u>"+txt.substring(j+_filterText.length);
+					j = lowercase.lastIndexOf(_filterText, j-2);
 				}
 			}
-			var ptag:String = "p"+line.priority;
-			str += "<p><"+ptag+">" + txt + "</"+ptag+"></p>";
-			return str;
+			return txt;
 		}
 		//
 		// START OF SCROLL BAR STUFF
@@ -589,10 +597,10 @@ package com.junkbyte.console.view
 		//
 		//
 		private function get scrollPercent():Number{
-			return (_scroller.y-5)/(_scrollHeight-40);
+			return (_scroller.y-style.controlSize)/(_scrollHeight-30-style.controlSize*2);
 		}
 		private function set scrollPercent(per:Number):void{
-			_scroller.y = 5+((_scrollHeight-40)*per);
+			_scroller.y = style.controlSize+((_scrollHeight-30-style.controlSize*2)*per);
 		}
 		private function onScrollerDown(e:MouseEvent):void{
 			_scrolling = true;
@@ -603,8 +611,8 @@ package com.junkbyte.console.view
 				_updateTraces();
 				scrollPercent = p;
 			}
-			
-			_scroller.startDrag(false, new Rectangle(0,5, 0, (_scrollHeight-40)));
+
+			_scroller.startDrag(false, new Rectangle(0, style.controlSize, 0, (_scrollHeight - 30-style.controlSize*2)));
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onScrollerMove, false, 0, true);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onScrollerUp, false, 0, true);
 			e.stopPropagation();
@@ -662,17 +670,18 @@ package com.junkbyte.console.view
 			_bottomLine.y = _cmdField.visible?cmdy:n;
 			//
 			_scroll.y = mini?6:fsize+4;
-			_scrollHeight = (_bottomLine.y-(_cmdField.visible?0:10))-_scroll.y;
+			var ctrlSize:uint = style.controlSize;
+			_scrollHeight = (_bottomLine.y-(_cmdField.visible?0:ctrlSize*2))-_scroll.y;
 			_scroller.visible = _scrollHeight>40;
 			_scroll.graphics.clear();
 			if(_scrollHeight>=10){
 				_scroll.graphics.beginFill(style.controlColor, 0.7);
-				_scroll.graphics.drawRect(-5, 0, 5, 5);
-				_scroll.graphics.drawRect(-5, _scrollHeight-5, 5, 5);
+				_scroll.graphics.drawRect(-ctrlSize, 0, ctrlSize, ctrlSize);
+				_scroll.graphics.drawRect(-ctrlSize, _scrollHeight-ctrlSize, ctrlSize, ctrlSize);
 				_scroll.graphics.beginFill(style.controlColor, 0.25);
-				_scroll.graphics.drawRect(-5, 5, 5, _scrollHeight-10);
+				_scroll.graphics.drawRect(-ctrlSize, ctrlSize, ctrlSize, _scrollHeight-ctrlSize*2);
 				_scroll.graphics.beginFill(0, 0);
-				_scroll.graphics.drawRect(-10, 10, 10, _scrollHeight-10);
+				_scroll.graphics.drawRect(-ctrlSize*2, ctrlSize*2, ctrlSize*2, _scrollHeight-ctrlSize*2);
 				_scroll.graphics.endFill();
 			}
 			//
@@ -939,7 +948,7 @@ package com.junkbyte.console.view
 			_cmdsHistory = new Array();
 		}
 		private function commandKeyDown(e:KeyboardEvent):void{
-			e.stopPropagation();
+			//e.stopPropagation();
 			if(e.keyCode == Keyboard.TAB){
 				if(_hint) 
 				{
@@ -1010,7 +1019,7 @@ package com.junkbyte.console.view
 				setCLSelectionAtEnd();
 			}
 			else if(!_enteringLogin) updateCmdHint();
-			e.stopPropagation();
+			//e.stopPropagation();
 		}
 		private function setCLSelectionAtEnd():void{
 			_cmdField.setSelection(_cmdField.text.length, _cmdField.text.length);

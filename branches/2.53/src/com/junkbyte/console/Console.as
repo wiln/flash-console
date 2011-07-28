@@ -24,6 +24,7 @@
 */
 package com.junkbyte.console 
 {
+	import flash.utils.getTimer;
 	import flash.system.Capabilities;
 	import com.junkbyte.console.core.CommandLine;
 	import com.junkbyte.console.core.ConsoleTools;
@@ -55,9 +56,9 @@ package com.junkbyte.console
 	public class Console extends Sprite {
 
 		public static const VERSION:Number = 2.53;
-		public static const VERSION_STAGE:String = "";
-		public static const BUILD:int = 594;
-		public static const BUILD_DATE:String = "2011/07/13 00:07";
+		public static const VERSION_STAGE:String = "alpha";
+		public static const BUILD:int = 595;
+		public static const BUILD_DATE:String = "2011/07/28 01:19";
 		//
 		public static const LOG:uint = 1;
 		public static const INFO:uint = 3;
@@ -149,6 +150,7 @@ package com.junkbyte.console
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle);
 			stage.addEventListener(Event.MOUSE_LEAVE, onStageMouseLeave, false, 0, true);
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, _kb.keyDownHandler, false, 0, true);
+			stage.addEventListener(KeyboardEvent.KEY_UP, _kb.keyUpHandler, false, 0, true);
 		}
 		private function stageRemovedHandle(e:Event=null):void{
 			_cl.base = null;
@@ -156,6 +158,7 @@ package com.junkbyte.console
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle);
 			stage.removeEventListener(Event.MOUSE_LEAVE, onStageMouseLeave);
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, _kb.keyDownHandler);
+			stage.removeEventListener(KeyboardEvent.KEY_UP, _kb.keyUpHandler);
 		}
 		private function onStageMouseLeave(e:Event):void{
 			_panels.tooltip(null);
@@ -326,8 +329,9 @@ package com.junkbyte.console
 		//
 		//
 		private function _onEnterFrame(e:Event):void{
-			var hasNewLog:Boolean = _logs.update();
-			_refs.update();
+			var time:int = getTimer();
+			var hasNewLog:Boolean = _logs.update(time);
+			_refs.update(time);
 			_mm.update();
 			var graphsList:Array;
 			if(remoter.remoting != Remoting.RECIEVER)

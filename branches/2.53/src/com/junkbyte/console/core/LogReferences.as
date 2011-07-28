@@ -25,16 +25,15 @@
 
 package com.junkbyte.console.core 
 {
-	import flash.utils.getTimer;
-	import flash.events.Event;
-	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.WeakObject;
 
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
+	import flash.events.Event;
+	import flash.geom.Matrix;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import flash.utils.describeType;
@@ -68,9 +67,8 @@ package com.junkbyte.console.core
 			});
 			remoter.registerCallback("focus", handleFocused);
 		}
-		public function update():void{
+		public function update(time:uint):void{
 			if(_currentBank.length || _prevBank.length){
-				var time:int = getTimer();
 				if( time > _lastWithdraw+config.objectHardReferenceTimer*1000){
 					_prevBank = _currentBank;
 					_currentBank = new Array();

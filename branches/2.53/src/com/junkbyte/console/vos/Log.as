@@ -26,13 +26,18 @@ package com.junkbyte.console.vos {
 	import flash.utils.ByteArray;
 	
 	public class Log{
-		//public var line:uint;
+		public var line:uint;
 		public var text:String;
 		public var ch:String;
 		public var priority:int;
 		public var repeat:Boolean;
 		public var html:Boolean;
+		public var time:uint;
 		//public var stack:String;
+		
+		public var timeStr:String;
+		public var lineStr:String;
+		public var chStr:String;
 		//
 		public var next:Log;
 		public var prev:Log;
@@ -68,7 +73,8 @@ package com.junkbyte.console.vos {
 		
 		public function clone():Log{
 			var l:Log = new Log(text, ch, priority, repeat, html);
-			//l.line = line;
+			l.line = line;
+			l.time = time;
 			//l.stack = stack;
 			return l;
 		}

@@ -278,7 +278,7 @@ package com.junkbyte.console.core
 		}
 		
 		private function getInfo():String{
-			return "</p5>channel:<p5>"+config.remotingConnectionName+" ("+Security.sandboxType+")";
+			return "<p4>channel:"+config.remotingConnectionName+" ("+Security.sandboxType+")</p4>";
 		}
 		
 		private function printHowToGlobalSetting():void{

@@ -36,19 +36,20 @@ package com.junkbyte.console.core
 		private var _lastRepeat:Log;
 		private var _newRepeat:Log;
 		private var _hasNewLog:Boolean;
+		private var _timer:uint;
 		
-		private var first:Log;
+		public var first:Log;
 		public var last:Log;
 		
 		private var _length:uint;
-		//private var _lines:uint; // number of lines since start.
+		private var _lines:uint; // number of lines since start.
 		
 		public function Logs(console:Console){
 			super(console);
 			_channels = new Object();
 			remoter.addEventListener(Event.CONNECT, onRemoteConnection);
 			remoter.registerCallback("log", function(bytes:ByteArray):void{
-				add(Log.FromBytes(bytes));
+				registerLog(Log.FromBytes(bytes));
 			});
 		}
 		private function onRemoteConnection(e:Event):void{
@@ -65,7 +66,8 @@ package com.junkbyte.console.core
 				remoter.send("log", bytes);
 			}
 		}
-		public function update():Boolean{
+		public function update(time:uint):Boolean{
+			_timer = time;
 			if(_repeating > 0) _repeating--;
 			if(_newRepeat){
 				if(_lastRepeat) remove(_lastRepeat);
@@ -78,12 +80,26 @@ package com.junkbyte.console.core
 			return b;
 		}
 		public function add(line:Log):void{
+			_lines++;
+			line.line = _lines;
+			line.time = _timer;
+			
+			line.lineStr = line.line +" ";
+			line.chStr = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] ";
+			line.timeStr = config.timeStampFormatter(line.time) + " ";
+				
+			var ptag:String = "p"+line.priority;
+			line.text = "<"+ptag+">" + line.text + "</"+ptag+">";
+			
+			registerLog(line);
+		}
+		private function registerLog(line:Log):void{
 			_hasNewLog = true;
 			addChannel(line.ch);
 			send2Remote(line);
 			if (line.repeat) {
 				if(_repeating > 0 && _lastRepeat){
-					//line.line = _lastRepeat.line;
+					line.line = _lastRepeat.line;
 					_newRepeat = line;
 					return;
 				}else{
@@ -91,8 +107,6 @@ package com.junkbyte.console.core
 					_lastRepeat = line;
 				}
 			}
-			//_lines++;
-			//line.line = _lines;
 			//
 			push(line);
 			while(_length > config.maxLines && config.maxLines > 0){

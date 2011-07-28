@@ -133,7 +133,24 @@ package com.junkbyte.console {
 		public var traceCall:Function = function (ch:String, line:String, ...args):void{
 			trace("["+ch+"] "+line);
 		};
-
+		
+		
+		public var showTimestamp:Boolean = false;
+		
+		public var timeStampFormatter:Function = function(timer:uint):String
+		{
+			var s:uint = timer*0.001;
+			return makeTimeDigit(s/60)+":"+makeTimeDigit(s%60);
+		};
+		
+		private function makeTimeDigit(v:uint):String{
+			if(v < 10) return "0"+v;
+			return String(v);
+		}
+		
+		
+		public var showLineNumber:Boolean = false;
+		
 		// Work in progress
 		//public var rolloverStackToolTip:Boolean = false;
 		
