@@ -118,6 +118,9 @@ package com.junkbyte.console.view
 			addChild(_traceField);
 			//
 			txtField = makeTF("menuField");
+			txtField.wordWrap = true;
+			txtField.multiline = true;
+			txtField.autoSize = TextFieldAutoSize.RIGHT;
 			txtField.height = fsize+6;
 			txtField.y = -2;
 			registerTFRoller(txtField, onMenuRollOver);
@@ -503,11 +506,11 @@ package com.junkbyte.console.view
 		}
 		private function makeLine(line:Log, showch:Boolean):String{
 			var header:String = "<p>";
-			if (config.showLineNumber) {
-				header +=  line.lineStr;
-			}
 			if (showch) {
 				header += line.chStr;
+			}
+			if (config.showLineNumber) {
+				header +=  line.lineStr;
 			}
 			if (config.showTimestamp) {
 				header += line.timeStr;
@@ -660,6 +663,7 @@ package com.junkbyte.console.view
 			}
 			super.height = n;
 			var mini:Boolean = _mini || !style.topMenu;
+			updateTraceFHeight();
 			_traceField.y = mini?0:fsize;
 			_traceField.height = n-(_cmdField.visible?(fsize+4):0)-(mini?0:fsize);
 			var cmdy:Number = n-(fsize+6);
@@ -688,6 +692,11 @@ package com.junkbyte.console.view
 			_atBottom = true;
 			_needUpdateTrace = true;
 			_lockScrollUpdate = false;
+		}
+		private function updateTraceFHeight():void{
+			var mini:Boolean = _mini || !style.topMenu;
+			_traceField.y = mini?0:(txtField.y+txtField.height-6);
+			_traceField.height = height-(_cmdField.visible?(style.menuFontSize+4):0)-_traceField.y;
 		}
 		//
 		//
@@ -736,6 +745,7 @@ package com.junkbyte.console.view
 			str += " </b></menu></high></r>";
 			txtField.htmlText = str;
 			txtField.scrollH = txtField.maxScrollH;
+			updateTraceFHeight();
 		}
 		public function getChannelsLink(limited:Boolean = false):String{
 			var str:String = "<chs>";
