@@ -5,7 +5,7 @@
 
 ==Flash Console==
 
-  * Version 2.51 (May 2011)
+  * Version 2.53 (Aug 2011)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -31,6 +31,14 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
+===2.53 ALPHA ===
+  * Basic timestamp display support. Use Cc.config.showTimestamp = true;
+  * Line number display support. Use Cc.config.showLineNumber = true;
+  * Key binds allow for key down or key up state
+  * Multi line top menu
+  * Support for delete operation in commandLine
+  * Fixed Issue 90. UTF8 chars failing to send to remote
+  
 ===2.52 ===
   * Multi-line support with slash commands. E.g. "/base; /explode" will now work
   * Added config.commandLineInputPassThrough which allows replacing command input execution
