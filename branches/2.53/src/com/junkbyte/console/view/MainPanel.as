@@ -696,7 +696,7 @@ package com.junkbyte.console.view
 		private function updateTraceFHeight():void{
 			var mini:Boolean = _mini || !style.topMenu;
 			_traceField.y = mini?0:(txtField.y+txtField.height-6);
-			_traceField.height = height-(_cmdField.visible?(style.menuFontSize+4):0)-_traceField.y;
+			_traceField.height = Math.max(0, height-(_cmdField.visible?(style.menuFontSize+4):0)-_traceField.y);
 		}
 		//
 		//
