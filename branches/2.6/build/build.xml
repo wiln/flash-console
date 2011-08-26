@@ -23,7 +23,12 @@
 	</path>
 	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
 
-	<target name="BuildAll" description="Compile everything!" depends="incrementBuildNumber,updateVersion">
+	<target name="BuildAll" description="Build everything!" depends="incrementBuildNumber">
+		<antcall target="BuildSrc" />
+		<antcall target="compileASDoc" />
+	</target>
+
+	<target name="compileSrc" depends="updateVersion">
 		<antcall target="swf">
 			<param name="file" value="${samples.dir}/flash/Sample.as" />
 			<param name="output" value="${bin.dir}/sample.swf" />
@@ -46,9 +51,8 @@
 		</antcall>
 		<antcall target="packageAir" />
 		<antcall target="swc" />
-		<antcall target="compileASDoc" />
 	</target>
-
+	
 	<target name="incrementBuildNumber">
 		<propertyfile file="${build.dir}/project.properties">
 			<entry key="build.number" type="int" operation="+" value="1" />
