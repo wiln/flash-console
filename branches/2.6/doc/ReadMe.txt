@@ -5,7 +5,7 @@
 
 ==Flash Console==
 
-  * Version 2.53 (Aug 2011)
+  * Version 2.6 (Aug 2011)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -31,7 +31,7 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.53 ALPHA ===
+===2.6 ALPHA ===
   * Basic timestamp display support. Use Cc.config.showTimestamp = true;
   * Line number display support. Use Cc.config.showLineNumber = true;
   * Key binds allow for key down or key up state
