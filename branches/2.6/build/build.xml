@@ -50,13 +50,13 @@
 	</target>
 
 	<target name="incrementBuildNumber">
-		<propertyfile file="${build.dir}/build.properties">
+		<propertyfile file="${build.dir}/project.properties">
 			<entry key="build.number" type="int" operation="+" value="1" />
 			<entry key="build.date" type="date" value="now"/>
 		</propertyfile>
 	</target>
 	<target name="updateVersion">
-		<property file="${build.dir}/build.properties"/>
+		<property file="${build.dir}/project.properties"/>
 		<echo>"Version ${build.version}${build.stage}. build ${build.number} @ ${build.date}"</echo>
 		<replaceregexp file="${src.ver.file}" match="(VERSION:Number\s*=\s*).+;" replace="\1${build.version};" />
 		<replaceregexp file="${src.ver.file}" match="(VERSION_STAGE:String\s*=\s*).+;" replace='\1"${build.stage}";' />
@@ -82,7 +82,7 @@
 	<!-- Parameters: class, output -->
 	<target name="swc">
 		<echo message="Compiling SWC" />
-		<property file="${build.dir}/build.properties"/>
+		<property file="${build.dir}/project.properties"/>
 		<compc output="${bin.dir}/Console.swc" include-classes="${swc.classes}">
 			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
 			<compiler.source-path path-element="${src.dir}" />
@@ -111,7 +111,7 @@
 	</target>
 
 	<target name="zip" description="Package to ZIP">
-		<property file="${build.dir}/build.properties"/>
+		<property file="${build.dir}/project.properties"/>
 		<echo>"Packaging to Zip. Make sure you have commited new files to SVN as it will only package versioned files."</echo>
 		<delete dir="${temp.dir}" />
 		<svn>
@@ -143,7 +143,7 @@
 	<target name="compileASDoc">
 		<delete dir="${asdoc.dir}" failOnError="false" includeEmptyDirs="true" />
 		<mkdir dir="${asdoc.dir}" />
-		<property file="${build.dir}/build.properties"/>
+		<property file="${build.dir}/project.properties"/>
 		<exec executable="${FLEX_HOME}/bin/asdoc.exe" failonerror="true">
 			<arg line="-output '${asdoc.dir}'" />
 			<arg line="-source-path '${src.dir}'" />
