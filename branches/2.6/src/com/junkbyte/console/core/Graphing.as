@@ -54,7 +54,7 @@ package com.junkbyte.console.core {
 			});
 			remoter.registerCallback("removeGroup", function(bytes:ByteArray):void{
 				removeGroup(bytes.readUTF());
-			});;
+			});
 			remoter.registerCallback("graph", handleRemoteGraph, true);
 			
 		}

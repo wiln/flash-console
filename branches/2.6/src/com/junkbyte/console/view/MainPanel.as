@@ -515,7 +515,9 @@ package com.junkbyte.console.view
 			if (config.showTimestamp) {
 				header += line.timeStr;
 			}
-			return header + addFilterText(line.text) + "</p>";
+			
+			var ptag:String = "p"+line.priority;
+			return header + "<"+ptag+">"+ addFilterText( line.text ) + "</"+ptag+"></p>";
 		}
 		
 		private function addFilterText(txt:String):String{

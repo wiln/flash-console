@@ -52,6 +52,7 @@ package com.junkbyte.console.core
 				registerLog(Log.FromBytes(bytes));
 			});
 		}
+		
 		private function onRemoteConnection(e:Event):void{
 			var log:Log = first;
 			while(log){
@@ -59,6 +60,7 @@ package com.junkbyte.console.core
 				log = log.next;
 			}
 		}
+		
 		private function send2Remote(line:Log):void{
 			if(remoter.canSend) {
 				var bytes:ByteArray = new ByteArray();
@@ -66,6 +68,7 @@ package com.junkbyte.console.core
 				remoter.send("log", bytes);
 			}
 		}
+		
 		public function update(time:uint):Boolean{
 			_timer = time;
 			if(_repeating > 0) _repeating--;
@@ -79,23 +82,23 @@ package com.junkbyte.console.core
 			_hasNewLog = false;
 			return b;
 		}
+		
 		public function add(line:Log):void{
 			_lines++;
 			line.line = _lines;
 			line.time = _timer;
 			
-			line.lineStr = line.line +" ";
-			line.chStr = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] ";
-			line.timeStr = config.timeStampFormatter(line.time) + " ";
-				
-			var ptag:String = "p"+line.priority;
-			line.text = "<"+ptag+">" + line.text + "</"+ptag+">";
-			
 			registerLog(line);
 		}
+		
 		private function registerLog(line:Log):void{
 			_hasNewLog = true;
 			addChannel(line.ch);
+			
+			line.lineStr = line.line +" ";
+			line.chStr = "[<a href=\"event:channel_"+line.ch+"\">"+line.ch+"</a>] ";
+			line.timeStr = config.timeStampFormatter(line.time) + " ";
+			
 			send2Remote(line);
 			if (line.repeat) {
 				if(_repeating > 0 && _lastRepeat){
@@ -117,6 +120,7 @@ package com.junkbyte.console.core
 				config.traceCall(line.ch, line.plainText(), line.priority);
 			}
 		}
+		
 		public function clear(channel:String = null):void{
 			if(channel){
 				var line:Log = first;
@@ -134,6 +138,7 @@ package com.junkbyte.console.core
 				_channels = new Object();
 			}
 		}
+		
 		public function getLogsAsString(splitter:String, incChNames:Boolean = true, filter:Function = null):String{
 			var str:String = "";
 			var line:Log = first;
@@ -146,6 +151,7 @@ package com.junkbyte.console.core
 			}
 			return str;
 		}
+		
 		public function getChannels():Array{
 			var arr:Array = new Array(Console.GLOBAL_CHANNEL);
 			addIfexist(Console.DEFAULT_CHANNEL, arr);
@@ -158,9 +164,11 @@ package com.junkbyte.console.core
 			}
 			return arr.concat(others.sort(Array.CASEINSENSITIVE));
 		}
+		
 		private function addIfexist(n:String, arr:Array):void{
 			if(_channels.hasOwnProperty(n)) arr.push(n);
 		}
+		
 		public function cleanChannels():void{
 			_channels = new Object();
 			var line:Log = first;
@@ -169,6 +177,7 @@ package com.junkbyte.console.core
 				line = line.next;
 			}
 		}
+		
 		public function addChannel(n:String):void{
 			_channels[n] = null;
 		}
