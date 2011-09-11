@@ -31,7 +31,8 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.6 ALPHA ===
+===2.6 BETA ===
+  * Removed Cc.remotingPassword. use Cc.config.remotingPassword (should be set before starting remote)
   * Basic timestamp display support. Use Cc.config.showTimestamp = true;
   * Line number display support. Use Cc.config.showLineNumber = true;
   * Key binds allow for key down or key up state
