@@ -6,19 +6,24 @@ package com.junkbyte.console.addons.displaymap
 	
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
+	import flash.events.Event;
 	import flash.events.TextEvent;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
+	import flash.utils.Dictionary;
 	
 	public class DisplayMapPanel extends ConsolePanel
 	{
 		
 		public static const NAME:String = "displayMapPanel";
+		public static const UPDATE_N_FRAMES:uint = 30;
 		
 		private var rootDisplay:DisplayObject;
 		private var mapIndex:uint;
 		private var indexToDisplayMap:Object;
-		private var openings:Array;
+		private var openings:Dictionary;
+		
+		private var framesSinceUpdate:uint;
 		
 		public function DisplayMapPanel(m:Console)
 		{
@@ -36,8 +41,37 @@ package com.junkbyte.console.addons.displaymap
 		public function start(container:DisplayObject):void
 		{
 			rootDisplay = container;
-			openings = new Array(rootDisplay);
-			update();
+			openings = new Dictionary(true);
+			
+			if(rootDisplay == null)
+			{
+				return;
+			}
+			
+			rootDisplay.addEventListener(Event.ENTER_FRAME, onEnterFrame, false, 0, true);
+			
+			addToOpening(rootDisplay);
+		}
+		
+		public function stop():void
+		{
+			if(rootDisplay == null)
+			{
+				return;
+			}
+			
+			rootDisplay.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			rootDisplay = null;
+		}
+		
+		private function onEnterFrame(event:Event):void
+		{
+			framesSinceUpdate++;
+			if(framesSinceUpdate >= UPDATE_N_FRAMES)
+			{
+				framesSinceUpdate = 0;
+				update();
+			}
 		}
 		
 		private function update():void
@@ -58,7 +92,7 @@ package com.junkbyte.console.addons.displaymap
 				var rootParent:DisplayObjectContainer = rootDisplay.parent;
 				if(rootParent)
 				{
-					string += makeLink(rootParent, " ^ ", "focus")+makeName(rootParent)+"<br/>";
+					string += "<p5><b>"+makeLink(rootParent, " ^ ", "focus")+"</b>"+makeName(rootParent)+"</p5><br/>";
 					string += printChild(rootDisplay, 1);
 				}
 				else
@@ -75,18 +109,22 @@ package com.junkbyte.console.addons.displaymap
 		
 		private function printChild(display:DisplayObject, currentStep:uint):String
 		{
+			if(display == null)
+			{
+				return "";
+			}
 			if(display is DisplayObjectContainer)
 			{
 				var string:String;
 				var container:DisplayObjectContainer = display as DisplayObjectContainer;
-				if(openings.indexOf(display) >= 0)
+				if(openings[display] == true)
 				{
-					string = "<p5>"+generateSteps(display, currentStep)+makeLink(display, "-", "minimize")+makeName(display)+"</p5><br/>";
+					string = "<p5><b>"+generateSteps(display, currentStep)+makeLink(display, "-"+container.numChildren, "minimize")+"</b> "+makeName(display)+"</p5><br/>";
 					string += printChildren(container, currentStep + 1);
 				}
 				else
 				{
-					string = "<p4>"+generateSteps(display, currentStep)+makeLink(display, "+", "expand")+makeName(display)+"</p4><br/>";
+					string = "<p4><b>"+generateSteps(display, currentStep)+makeLink(display, "+"+container.numChildren, "expand")+"</b> "+makeName(display)+"</p4><br/>";
 				}
 				return string;
 			}
@@ -103,8 +141,7 @@ package com.junkbyte.console.addons.displaymap
 			}
 			return string;
 		}
-			
-		
+
 		private function generateSteps(display:Object, steps:uint):String
 		{
 			var str:String = "";
@@ -113,27 +150,32 @@ package com.junkbyte.console.addons.displaymap
 				{
 					if(display is DisplayObjectContainer)
 					{
-						str += makeLink(display, "<b> ∟ </b>", "focus");
+						str += makeLink(display, " &gt; ", "focus");
 					}
 					else
 					{
-						str += " ∟ ";
+						str += " &gt; ";
 					}
 				}
 				else
 				{
-					str += " - ";
+					str += " · ";
 				}
 			}
 			return str;
 		}
 		
-		private function onMenuRollOver(e:TextEvent):void{
+		private function onMenuRollOver(e:TextEvent):void
+		{
 			var txt:String = e.text?e.text.replace("event:",""):"";
 			if(txt == "close"){
 				txt = "Close";
-			}else if(txt == "cancel"){
-				txt = "Cancel assign key";
+			}else if(txt.indexOf("expand") == 0){
+				txt = "expand";
+			}else if(txt.indexOf("minimize") == 0){
+				txt = "minimize";
+			}else if(txt.indexOf("focus") == 0){
+				txt = "focus";
 			}else{
 				txt = null;
 			}
@@ -142,14 +184,14 @@ package com.junkbyte.console.addons.displaymap
 		
 		private function makeName(display:Object):String
 		{
-			return display.name+" ("+LogReferences.ShortClassName(display)+")";
+			return makeLink(display, display.name, "scope")+" {<menu>"+makeLink(display, LogReferences.ShortClassName(display), "inspect")+"</menu>}";
 		}
 		
 		private function makeLink(display:Object, text:String, event:String):String
 		{
 			mapIndex++;
 			indexToDisplayMap[mapIndex] = display;
-			return "<a href='event:"+event+"_"+mapIndex+"'>"+text+"</a> ";
+			return "<a href='event:"+event+"_"+mapIndex+"'>"+text+"</a>";
 		}
 		
 		private function getDisplay(string:String):DisplayObject
@@ -158,7 +200,8 @@ package com.junkbyte.console.addons.displaymap
 			return indexToDisplayMap[split[split.length-1]];
 		}
 		
-		protected function linkHandler(e:TextEvent):void{
+		protected function linkHandler(e:TextEvent):void
+		{
 			TextField(e.currentTarget).setSelection(0, 0);
 			console.panels.tooltip(null);
 			if(e.text == "close"){
@@ -169,6 +212,10 @@ package com.junkbyte.console.addons.displaymap
 				removeFromOpening(getDisplay(e.text));
 			}else if(e.text.indexOf("focus") == 0){
 				focus(getDisplay(e.text) as DisplayObjectContainer);
+			}else if(e.text.indexOf("scope") == 0){
+				scope(getDisplay(e.text));
+			}else if(e.text.indexOf("inspect") == 0){
+				inspect(getDisplay(e.text));
 			}
 			e.stopPropagation();
 		}
@@ -182,21 +229,36 @@ package com.junkbyte.console.addons.displaymap
 		
 		public function addToOpening(display:DisplayObject):void
 		{
-			if(openings.indexOf(display) < 0 )
+			if(openings[display] == undefined)
 			{
-				openings.push(display);
+				openings[display] = true;
 				update();
 			}
 		}
 		
 		public function removeFromOpening(display:DisplayObject):void
 		{
-			var index:int = openings.indexOf(display);
-			if(index >= 0)
+			if(openings[display] != undefined)
 			{
-				openings.splice(index, 1);
+				delete openings[display];
 				update();
 			}
+		}
+		
+		protected function scope(display:DisplayObject):void
+		{
+			console.cl.setReturned(display, true);
+		}
+		
+		protected function inspect(display:DisplayObject):void
+		{
+			console.refs.focus(display);
+		}
+		
+		override public function close():void
+		{
+			stop();
+			super.close();
 		}
 	}
 }

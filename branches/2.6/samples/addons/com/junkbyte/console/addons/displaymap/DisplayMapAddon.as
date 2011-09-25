@@ -23,5 +23,31 @@ package com.junkbyte.console.addons.displaymap
 			mapPanel.start(targetDisplay);
 			console.panels.addPanel(mapPanel);
 		}
+		
+		public static function registerCommand(commandName:String = "mapdisplay", console:Console = null):void
+		{
+			if(console == null)
+			{
+				console = Cc.instance;
+			}
+			if(console == null || commandName == null)
+			{
+				return;
+			}
+			
+			var callbackFunction:Function = function(...arguments:Array):void
+			{
+				var scope:* = console.cl.run("this");
+				if(scope is DisplayObject)
+				{
+					start(scope as DisplayObject, console);
+				}
+				else
+				{
+					console.error("Current scope", scope,"is not a DisplayObject.");
+				}
+			}
+			console.addSlashCommand(commandName, callbackFunction);
+		}
 	}
 }
