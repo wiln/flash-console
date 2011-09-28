@@ -24,14 +24,16 @@
 * REQUIRES JSON: com.adobe.serialization.json.JSON
 */
 package com.junkbyte.console.addons.htmlexport {
-	import com.junkbyte.console.ConsoleStyle;
-	import flash.text.StyleSheet;
-	import com.junkbyte.console.vos.Log;
 	import com.adobe.serialization.json.JSON;
-	import flash.net.FileReference;
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.Console;
+	import com.junkbyte.console.ConsoleConfig;
+	import com.junkbyte.console.ConsoleStyle;
+	import com.junkbyte.console.vos.Log;
+	
+	import flash.net.FileReference;
 	import flash.utils.ByteArray;
+	import flash.utils.describeType;
 	
 	/*
 	 * REQUIRES JSON: com.adobe.serialization.json.JSON
@@ -41,13 +43,7 @@ package com.junkbyte.console.addons.htmlexport {
 		[Embed(source="template.html", mimeType="application/octet-stream")]
 		private static var EmbeddedTemplate:Class;
 		
-		public static const REPLACE_BACKGROUND_COLOR:RegExp = /#BACKGROUND_COLOR/g;
-		public static const REPLACE_TEXT_COLOR:RegExp = /#TEXT_COLOR/g;
-		public static const REPLACE_VIWING_PRIORITY:String = "#VIWING_PRIORITY";
-		public static const REPLACE_VIEWING_CHANNELS:String = "#VIEWING_CHANNELS";
-		public static const REPLACE_IGNORED_CHANNELS:String = "#IGNORED_CHANNELS";
-		public static const REPLACE_STYLES:String = "#REPLACE_STYLES_FROM_FLASH{}";
-		public static const REPLACE_LOGS:String = "[{text:'REPLACE_LOGS_FROM_FLASH'}]";
+		public static const HTML_REPLACEMENT:String = "[{text:'HTML_REPLACEMENT'}]";
 		
 		public static function register(console:Console = null):void
 		{
@@ -62,38 +58,10 @@ package com.junkbyte.console.addons.htmlexport {
 			}
 		}
 		
-		public var preserveStyle:Boolean = true;
-		
-		//public var preserveViewingChannels:Boolean;
-		public var preserveViewingPriority:Boolean;
 		
 		public function export(console:Console):void
 		{
-			var html:String = String(new EmbeddedTemplate() as ByteArray);
-			
-			html = html.replace(REPLACE_VIWING_PRIORITY, preserveViewingPriority?console.panels.mainPanel.priority:0);
-			/*
-			// Can't support on current console build
-			if(preserveViewingChannels)
-			{
-				html = html.replace(REPLACE_VIEWING_CHANNELS, console.panels.mainPanel.viewingChannels.join(", "));
-				html = html.replace(REPLACE_IGNORED_CHANNELS, console.panels.mainPanel.ignoredChannels.join(", "));
-			}*/
-			html = html.replace(REPLACE_VIEWING_CHANNELS, "null");
-			html = html.replace(REPLACE_IGNORED_CHANNELS, "null");
-			
-			
-			var style:ConsoleStyle = console.config.style;
-			if(!preserveStyle)
-			{
-				style = new ConsoleStyle();
-				style.updateStyleSheet();
-			}
-			html = html.replace(REPLACE_BACKGROUND_COLOR, safeColorString(style.backgroundColor.toString(16)));
-			html = html.replace(REPLACE_TEXT_COLOR, safeColorString(style.menuColor.toString(16)));
-			html = html.replace(REPLACE_STYLES, getStylesReplacement(style.styleSheet));
-			
-			html = html.replace(REPLACE_LOGS, getLogsReplacement(console));
+			var html:String = exportHTMLString(console);
 			
 			var file:FileReference = new FileReference();
 			try
@@ -106,52 +74,88 @@ package com.junkbyte.console.addons.htmlexport {
 			}
 		}
 		
-		private function getLogsReplacement(console:Console):String
+		public function exportHTMLString(console:Console):String
+		{
+			var html:String = String(new EmbeddedTemplate() as ByteArray);
+			
+			html = html.replace(HTML_REPLACEMENT, exportJSON(console));
+			return html;
+		}
+		
+		public function exportJSON(console:Console):String
+		{
+			return JSON.encode(exportObject(console));
+		}
+		
+		public function exportObject(console:Console):Object
+		{
+			var data:Object = new Object();
+			
+			data.config = getConfigToEncode(console);
+			
+			data.logs = getLogsToEncode(console);
+			
+			return data;
+		}
+		
+		private function getConfigToEncode(console:Console):Object
+		{
+			var config:ConsoleConfig = console.config;
+			var object:Object = convertTypeToObject(config);
+			object.style = getStyleToEncode(console);
+			return object;
+		}
+		
+		private function getStyleToEncode(console:Console):Object
+		{
+			var style:ConsoleStyle = console.config.style;
+			/*if(!preserveStyle)
+			{
+				style = new ConsoleStyle();
+				style.updateStyleSheet();
+			}*/
+			
+			var object:Object = convertTypeToObject(style);
+			object.styleSheet = getStyleSheetToEncode(style);
+			
+			return object;
+		}
+		
+		private function getStyleSheetToEncode(style:ConsoleStyle):Object
+		{
+			var object:Object = new Object();
+			for each(var styleName:String in style.styleSheet.styleNames)
+			{
+				object[styleName] = style.styleSheet.getStyle(styleName);
+			}
+			return object;
+		}
+		
+		private function getLogsToEncode(console:Console):Object
 		{
 			var lines:Array = new Array();
 			var line:Log = console.logs.last;
 			while(line){
-				var obj:Object = {
-					text:line.text.replace(/<a(\s+)href=.*?>/g,"<a>"),
-					ch:line.ch,
-					priority:line.priority
-				};
+				var obj:Object = convertTypeToObject(line);
+				delete obj.next;
+				delete obj.prev;
 				lines.push(obj);
 				line = line.prev;
 			}
 			lines = lines.reverse();
-			return JSON.encode(lines);
+			return lines;
 		}
 		
-		private function getStylesReplacement(css:StyleSheet):String
+		private function convertTypeToObject(typedObject:Object):Object
 		{
-			var result:String = "";
-			for each(var styleName:String in css.styleNames)
+			var object:Object = new Object();
+			var desc:XML = describeType(typedObject);
+			for each(var varXML:XML in desc.variable)
 			{
-				var style:Object = css.getStyle(styleName);
-				var parts:String = "";
-				for (var key:String in style)
-				{
-					var value:String = style[key];
-					if(key == "color")
-					{
-						value = safeColorString(value.substring(1));
-					}
-					key = key.replace(/([A-Z])/g,"-$1").toLowerCase();
-					parts += key+":"+value+"; ";
-				}
-				result += styleName + " {" +parts+"}\r\n";
+				var key:String = varXML.@name;
+				object[key] = typedObject[key];
 			}
-			return result;
-		}
-		
-		private function safeColorString(col:String):String
-		{
-			while(col.length < 6)
-			{
-				col = "0"+col;
-			}
-			return "#"+col;
+			return object;
 		}
 	}
 }

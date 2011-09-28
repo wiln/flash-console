@@ -3,9 +3,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Console log</title>
-<style type="text/css">
+<style type="text/css" id="stylesheet">
 body {
-	background-color:#BACKGROUND_COLOR;
+	background-color:#000;
+	color:#CCC;
 	font-family: Verdana, Arial, sans-serif;
 	font-size: 12px;
 }
@@ -28,14 +29,14 @@ menu{
 	width:180px;
 	top:4px;
 	right:1px;
-	color:#TEXT_COLOR;
+	color:#FFF;
 }
 #searchField{
 	color:inherit;
 	width:140px;
 	border-width:1px;
-	border-color:#TEXT_COLOR;
-	background-color:#BACKGROUND_COLOR;
+	border-color:#FF8800;
+	background-color:#111;
 }
 #logsElement{
     position: fixed;
@@ -47,19 +48,90 @@ menu{
     word-wrap: break-word;
 	line-height:120%;
 }
-#REPLACE_STYLES_FROM_FLASH{}
 </style>
 <script type="text/javascript">
-	var logs = [{text:'REPLACE_LOGS_FROM_FLASH'}];
+	var data = [{text:'HTML_REPLACEMENT'}];
+	var config = data.config;
+	var style = config.style;
+	var logs = data.logs;
+</script>
+<script type="text/javascript">
+	function updateStyle()
+	{
+		setStylesFromObject(style.styleSheet);
+		
+		var body = getStyleByName("body");
+		body.color = safeColorString(style.lowColor);
+		body.backgroundColor = safeColorString(style.backgroundColor);
+		var searchElement = getStyleByName("#searchElement");
+		searchElement.color = safeColorString(style.menuColor);
+		var searchField = getStyleByName("#searchField");
+		searchField.backgroundColor = safeColorString(style.backgroundColor);
+		searchField.borderColor = safeColorString(style.menuColor);
+	}
+	
+	function getStyleByName(name)
+	{
+		var sheet = getStyleSheetElement().sheet;
+		var rules = new Array();
+		if (sheet.cssRules) rules = sheet.cssRules;
+		else if (sheet.rules) rules = sheet.rules;
+		
+		for (var X in rules)
+		{
+			if(rules[X].selectorText == name)
+			{
+				return rules[X].style;
+			}
+		}
+		return null;
+	}
+	function setStylesFromObject(object)
+	{
+		var result = "";
+		for (var styleName in object)
+		{
+			var style = object[styleName];
+			var parts = "";
+			for (var key in style)
+			{
+				var value = style[key];
+				if(key == "color")
+				{
+					value = safeColorString(value.substring(1));
+				}
+				key = key.replace(/([A-Z])/g,"-$1").toLowerCase();
+				parts += key+":"+value+"; ";
+			}
+			result += styleName + " {" +parts+"}\r\n";
+		}
+		
+		getStyleSheetElement().innerHTML += result;
+	}
+	
+	function getStyleSheetElement()
+	{
+		return document.getElementById('stylesheet');
+	}
+	
+	function safeColorString(col)
+	{
+		col = col.toString(16);
+		while(col.length < 6)
+		{
+			col = "0"+col;
+		}
+		return "#"+col;
+	}
 </script>
 <script type="text/javascript">
 	
 	var channels = new Object();
 	var priorities = new Object();
 	
-	var viewingPriority = #VIWING_PRIORITY;
-	var viewingChannels = #VIEWING_CHANNELS;
-	var ignoredChannels = #IGNORED_CHANNELS;
+	var viewingPriority = 0;
+	var viewingChannels = null;
+	var ignoredChannels = null;
 	var searchTerm = null;
 	var searchExp = false;
 	
@@ -87,13 +159,15 @@ menu{
 		for (var i = 0; i<len; i++)
 		{
 			var log = logs[i];
+			log.text = log.text.replace(/<a(\s+)href=.*?>/g,"<a>"); // todo
 			channels[log.ch] = true;
 			priorities[log.priority] = true;
 		}
-		
+		updateStyle();
 		updateMenu();
 		updateLogs();
 	}
+	
 	
 	function updateMenu()
 	{
@@ -282,8 +356,7 @@ menu{
 	{
 		var txt = "[" + makeJSLink(log.ch, "channelClicked(\""+log.ch+"\")" ) + "] " + log.text;
 		var ptag = "p"+log.priority;
-		txt = "<"+ptag+">" + txt + "</"+ptag+">";
-		return txt + "<br/>";
+		return "<"+ptag+">" + txt + "</"+ptag+"><br/>";
 	}
 	
 	function makeJSLink(text, linkFunction)
