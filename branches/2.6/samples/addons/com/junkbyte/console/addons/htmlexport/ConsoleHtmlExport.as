@@ -45,7 +45,11 @@ package com.junkbyte.console.addons.htmlexport {
 		
 		public static const HTML_REPLACEMENT:String = "[{text:'HTML_REPLACEMENT'}]";
 		
-		public static function register(console:Console = null):void
+		public var referencesDepth:uint = 1;
+		
+		protected var console:Console;
+		
+		public static function register(referencesDepth:uint = 1, console:Console = null):void
 		{
 			if(console == null)
 			{
@@ -53,20 +57,25 @@ package com.junkbyte.console.addons.htmlexport {
 			}
 			if (console) 
 			{
-				var exporter:ConsoleHtmlExport = new ConsoleHtmlExport();
-				console.addMenu("export", exporter.export, new Array(console), "Export logs to HTML");
+				var exporter:ConsoleHtmlExport = new ConsoleHtmlExport(console);
+				exporter.referencesDepth = referencesDepth;
+				console.addMenu("export", exporter.exportToFile, new Array(), "Export logs to HTML");
 			}
 		}
 		
-		
-		public function export(console:Console):void
+		public function ConsoleHtmlExport(console:Console):void
 		{
-			var html:String = exportHTMLString(console);
+			this.console = console;
+		}
+		
+		public function exportToFile(fileName:String = "logs.html"):void
+		{
+			var html:String = exportHTMLString();
 			
 			var file:FileReference = new FileReference();
 			try
 			{
-				file.save(html, "logs.html");
+				file.save(html, fileName);
 			}
 			catch(err:Error) 
 			{
@@ -74,39 +83,42 @@ package com.junkbyte.console.addons.htmlexport {
 			}
 		}
 		
-		public function exportHTMLString(console:Console):String
+		public function exportHTMLString():String
 		{
 			var html:String = String(new EmbeddedTemplate() as ByteArray);
-			
-			html = html.replace(HTML_REPLACEMENT, exportJSON(console));
+			html = html.replace(HTML_REPLACEMENT, exportJSON());
 			return html;
 		}
 		
-		public function exportJSON(console:Console):String
+		public function exportJSON():String
 		{
-			return JSON.encode(exportObject(console));
+			return JSON.encode(exportObject());
 		}
 		
-		public function exportObject(console:Console):Object
+		public function exportObject():Object
 		{
 			var data:Object = new Object();
 			
-			data.config = getConfigToEncode(console);
+			data.config = getConfigToEncode();
 			
-			data.logs = getLogsToEncode(console);
+			data.logs = getLogsToEncode();
+			
+			var refs:ConsoleHTMLRefsGen = new ConsoleHTMLRefsGen(console, referencesDepth);
+			refs.fillData(data);
 			
 			return data;
 		}
 		
-		private function getConfigToEncode(console:Console):Object
+		
+		private function getConfigToEncode():Object
 		{
 			var config:ConsoleConfig = console.config;
 			var object:Object = convertTypeToObject(config);
-			object.style = getStyleToEncode(console);
+			object.style = getStyleToEncode();
 			return object;
 		}
 		
-		private function getStyleToEncode(console:Console):Object
+		private function getStyleToEncode():Object
 		{
 			var style:ConsoleStyle = console.config.style;
 			/*if(!preserveStyle)
@@ -131,11 +143,12 @@ package com.junkbyte.console.addons.htmlexport {
 			return object;
 		}
 		
-		private function getLogsToEncode(console:Console):Object
+		private function getLogsToEncode():Object
 		{
 			var lines:Array = new Array();
 			var line:Log = console.logs.last;
-			while(line){
+			while(line)
+			{
 				var obj:Object = convertTypeToObject(line);
 				delete obj.next;
 				delete obj.prev;

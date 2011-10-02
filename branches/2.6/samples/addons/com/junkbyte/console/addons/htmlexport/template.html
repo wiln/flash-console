@@ -137,6 +137,7 @@ menu{
 	
 	var shiftKeyPressed = false;
 	var ctrlKeyPressed = false;
+	var focusHistory;
 	
 	var logsElement;
 	var menuElement;
@@ -155,11 +156,13 @@ menu{
 	{
 		logsElement = document.getElementById("logsElement");
 		menuElement = document.getElementById("menuElement");
+		
+		var refSearchExpression = /<a(\s+)href=\'event:ref_(\d+)\'>/g;
 		var len = logs.length;
 		for (var i = 0; i<len; i++)
 		{
 			var log = logs[i];
-			log.text = log.text.replace(/<a(\s+)href=.*?>/g,"<a>"); // todo
+			log.text = processLogText(log.text);
 			channels[log.ch] = true;
 			priorities[log.priority] = true;
 		}
@@ -168,6 +171,10 @@ menu{
 		updateLogs();
 	}
 	
+	function processLogText(string)
+	{
+		return string.replace(/<a(\s+)href=\'event:(.*?)\'>/g,"<a href=\"javascript:flashEvent('$2')\">");
+	}
 	
 	function updateMenu()
 	{
@@ -363,6 +370,106 @@ menu{
 	{
 		return "<a href='javascript:"+linkFunction+";'>"+text+"</a>";
 	}
+	
+	function flashEvent(event)
+	{
+		if(event.indexOf("ref_") == 0)
+		{
+			focusRef(event.substring(4));
+		}
+	}
+	
+	function focusRef(id)
+	{
+		var object = data.references[id];
+		if(object == null)
+		{
+			alert("Sorry. Reference not found.");
+			return;
+		}
+		
+		if(focusHistory == null)
+		{
+			focusHistory = new Array();
+		}
+		if(getCurrentFocus() != id)
+		{
+			focusHistory.push(id);
+		}
+		
+		var menuText = getInspectMenuText();
+		logsElement.innerHTML = menuText + "<br/><br/>" + getInspectText(object) + "<br/>" + menuText;
+		scrollToBottom();
+	}
+	
+	function exitFocus()
+	{
+		focusHistory = null;
+		updateLogs();
+	}
+	
+	function prevFocus()
+	{
+		if(focusHistory != null && focusHistory.length > 1)
+		{
+			focusHistory.pop();
+			focusRef(getCurrentFocus());
+		}
+	}
+	
+	function getCurrentFocus()
+	{
+		if(focusHistory != null && focusHistory.length > 0)
+		{
+			return focusHistory[focusHistory.length - 1];
+		}
+		return null;
+	}
+	
+	function getInspectText(object)
+	{
+		var text = "";
+		
+		text += "<b>"+object.name+"</b><br/>";
+		text += "<br/>";
+		
+		text += makeRefPart(object.constants, "Constants");
+		text += makeRefPart(object.accessors, "Accessors");
+		text += makeRefPart(object.staticAccessors, "Static Accessors");
+		text += makeRefPart(object.variables, "Variables");
+		text += makeRefPart(object.staticVariables, "Static Variables");
+		text += makeRefPart(object.dynamicVariables, "Dynamic Variables");
+		
+		return "<p4>"+text+"</p4>";
+	}
+	
+	function getInspectMenuText()
+	{
+		var text = "<menu><b>[<a href='javascript:exitFocus()'>exit</a>] ";
+		if(focusHistory != null&& focusHistory.length > 1)
+		{
+			text += " [<a href='javascript:prevFocus()'>previous</a>]";
+		}
+		text += "</b></menu>";
+		return text;
+	}
+	
+	function makeRefPart(object, name)
+	{
+		var result = "<b><p5>"+name+"</p5></b><br/>";
+		var haveChildren = false;
+		for (var X in object)
+		{
+			haveChildren = true;
+			result += "&nbsp;<p3> &nbsp;<p4>"+X+"</p4> = "+processLogText(object[X])+"</p3><br/>";
+		}
+		if(haveChildren)
+		{
+			return result + "<br/>";
+		}
+		return "";
+	}
+	
 </script>
 </head>
 <body onLoad="init()">
