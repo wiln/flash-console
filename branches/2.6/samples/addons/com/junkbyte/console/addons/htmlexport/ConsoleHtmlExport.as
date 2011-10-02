@@ -49,22 +49,27 @@ package com.junkbyte.console.addons.htmlexport {
 		
 		protected var console:Console;
 		
-		public static function register(referencesDepth:uint = 1, console:Console = null):void
+		public static function register(console:Console = null):ConsoleHtmlExport
 		{
 			if(console == null)
 			{
 				console = Cc.instance;
 			}
+			var exporter:ConsoleHtmlExport;
 			if (console) 
 			{
-				var exporter:ConsoleHtmlExport = new ConsoleHtmlExport(console);
-				exporter.referencesDepth = referencesDepth;
+				exporter = new ConsoleHtmlExport(console);
 				console.addMenu("export", exporter.exportToFile, new Array(), "Export logs to HTML");
 			}
+			return exporter;
 		}
 		
 		public function ConsoleHtmlExport(console:Console):void
 		{
+			if(console == null)
+			{
+				console = Cc.instance;
+			}
 			this.console = console;
 		}
 		
@@ -101,6 +106,8 @@ package com.junkbyte.console.addons.htmlexport {
 			
 			data.config = getConfigToEncode();
 			
+			data.ui = getUIDataToEncode();
+			
 			data.logs = getLogsToEncode();
 			
 			var refs:ConsoleHTMLRefsGen = new ConsoleHTMLRefsGen(console, referencesDepth);
@@ -109,8 +116,7 @@ package com.junkbyte.console.addons.htmlexport {
 			return data;
 		}
 		
-		
-		private function getConfigToEncode():Object
+		protected function getConfigToEncode():Object
 		{
 			var config:ConsoleConfig = console.config;
 			var object:Object = convertTypeToObject(config);
@@ -118,7 +124,7 @@ package com.junkbyte.console.addons.htmlexport {
 			return object;
 		}
 		
-		private function getStyleToEncode():Object
+		protected function getStyleToEncode():Object
 		{
 			var style:ConsoleStyle = console.config.style;
 			/*if(!preserveStyle)
@@ -133,7 +139,7 @@ package com.junkbyte.console.addons.htmlexport {
 			return object;
 		}
 		
-		private function getStyleSheetToEncode(style:ConsoleStyle):Object
+		protected function getStyleSheetToEncode(style:ConsoleStyle):Object
 		{
 			var object:Object = new Object();
 			for each(var styleName:String in style.styleSheet.styleNames)
@@ -143,7 +149,18 @@ package com.junkbyte.console.addons.htmlexport {
 			return object;
 		}
 		
-		private function getLogsToEncode():Object
+		protected function getUIDataToEncode():Object
+		{
+			var object:Object = new Object();
+			
+			object.viewingPriority = console.panels.mainPanel.priority;
+			object.viewingChannels = null; // TODO. console need to expose it
+			object.ignoredChannels = null; // TODO. console need to expose it
+			
+			return object;
+		}
+		
+		protected function getLogsToEncode():Object
 		{
 			var lines:Array = new Array();
 			var line:Log = console.logs.last;
@@ -159,7 +176,7 @@ package com.junkbyte.console.addons.htmlexport {
 			return lines;
 		}
 		
-		private function convertTypeToObject(typedObject:Object):Object
+		protected function convertTypeToObject(typedObject:Object):Object
 		{
 			var object:Object = new Object();
 			var desc:XML = describeType(typedObject);

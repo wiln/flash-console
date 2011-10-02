@@ -51,9 +51,15 @@ menu{
 </style>
 <script type="text/javascript">
 	var data = [{text:'HTML_REPLACEMENT'}];
+	
 	var config = data.config;
 	var style = config.style;
 	var logs = data.logs;
+	var uidata = data.ui;
+	
+	var viewingPriority = uidata.viewingPriority;
+	var viewingChannels = uidata.viewingChannels;
+	var ignoredChannels = uidata.ignoredChannels;
 </script>
 <script type="text/javascript">
 	function updateStyle()
@@ -129,15 +135,13 @@ menu{
 	var channels = new Object();
 	var priorities = new Object();
 	
-	var viewingPriority = 0;
-	var viewingChannels = null;
-	var ignoredChannels = null;
 	var searchTerm = null;
 	var searchExp = false;
 	
 	var shiftKeyPressed = false;
 	var ctrlKeyPressed = false;
 	var focusHistory;
+	var scrollBeforeFocus;
 	
 	var logsElement;
 	var menuElement;
@@ -390,6 +394,7 @@ menu{
 		
 		if(focusHistory == null)
 		{
+			scrollBeforeFocus = logsElement.scrollTop;
 			focusHistory = new Array();
 		}
 		if(getCurrentFocus() != id)
@@ -406,6 +411,7 @@ menu{
 	{
 		focusHistory = null;
 		updateLogs();
+		logsElement.scrollTop = scrollBeforeFocus;
 	}
 	
 	function prevFocus()
