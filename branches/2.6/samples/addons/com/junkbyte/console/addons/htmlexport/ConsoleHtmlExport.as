@@ -43,7 +43,7 @@ package com.junkbyte.console.addons.htmlexport {
 		[Embed(source="template.html", mimeType="application/octet-stream")]
 		private static var EmbeddedTemplate:Class;
 		
-		public static const HTML_REPLACEMENT:String = "[{text:'HTML_REPLACEMENT'}]";
+		public static const HTML_REPLACEMENT:String = "{text:'HTML_REPLACEMENT'}";
 		
 		public var referencesDepth:uint = 1;
 		
@@ -73,19 +73,32 @@ package com.junkbyte.console.addons.htmlexport {
 			this.console = console;
 		}
 		
-		public function exportToFile(fileName:String = "logs.html"):void
+		public function exportToFile(fileName:String = null):void
 		{
-			var html:String = exportHTMLString();
+			if(fileName == null)
+			{
+				fileName = generateFileName();
+			}
 			
 			var file:FileReference = new FileReference();
 			try
 			{
+				var html:String = exportHTMLString();
 				file.save(html, fileName);
 			}
 			catch(err:Error) 
 			{
 				console.report("Failed to save to file.", 8);
 			}
+		}
+		
+		protected function generateFileName():String
+		{
+			var date:Date = new Date();
+			var fileName:String = "log@"+date.getFullYear()+"."+(date.getMonth()+1)+"."+(date.getDate()+1);
+			fileName += "_"+date.hours+"."+date.minutes;
+			fileName += ".html";
+			return fileName;
 		}
 		
 		public function exportHTMLString():String

@@ -50,7 +50,7 @@ menu{
 }
 </style>
 <script type="text/javascript">
-	var data = [{text:'HTML_REPLACEMENT'}];
+	var data = {text:'HTML_REPLACEMENT'};	
 	
 	var config = data.config;
 	var style = config.style;
@@ -58,8 +58,28 @@ menu{
 	var uidata = data.ui;
 	
 	var viewingPriority = uidata.viewingPriority;
-	var viewingChannels = uidata.viewingChannels;
-	var ignoredChannels = uidata.ignoredChannels;
+	
+	var viewingChannels = null;
+	if(uidata.viewingChannels)
+	{
+		viewingChannels = convertChannelsListToMap(uidata.viewingChannels);
+	}
+	
+	var ignoredChannels = null;
+	if(uidata.ignoredChannels)
+	{
+		ignoredChannels = convertChannelsListToMap(uidata.ignoredChannels);
+	}
+	
+	function convertChannelsListToMap(channels)
+	{
+		var object = {};
+		for (var X in channels)
+		{
+			object[channels[X]] = true;
+		}
+		return object;
+	}
 </script>
 <script type="text/javascript">
 	function updateStyle()
