@@ -27,7 +27,8 @@ package
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleChannel;
-
+	import com.junkbyte.console.addons.displaymap.DisplayMapAddon;
+	
 	import flash.display.*;
 	import flash.events.*;
 	import flash.text.TextField;
@@ -43,9 +44,12 @@ package
 		private var _spamcount:int;
 		
 		public function Sample() {
+			
 			//
 			// SET UP - only required once
 			//
+			Cc.config.style.backgroundAlpha = 1;
+			
 			Cc.startOnStage(this, "`"); // "`" - change for password. This will start hidden
 			Cc.visible = true; // Show console, because having password hides console.
 			
@@ -61,6 +65,8 @@ package
 			// End of setup
 			//
 			
+			DisplayMapAddon.registerCommand();
+			DisplayMapAddon.addToMenu();
 			// show the demo logging stuff there...
 			demoBasics();
 			
