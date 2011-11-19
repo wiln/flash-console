@@ -63,7 +63,7 @@ package com.junkbyte.console.vos {
 			var c:String = bytes.readUTF();
 			var p:int = bytes.readInt();
 			var r:Boolean = bytes.readBoolean();
-			return new Log(t, c, p, r);
+			return new Log(t, c, p, r, true);
 		}
 		
 		public function plainText():String{
