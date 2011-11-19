@@ -61,9 +61,9 @@
 		public function getCurrentValue():Number{
 			return useExec?Executer.Exec(obj, _prop):obj[_prop];
 		}
-		public function setValue(val:Number, averaging:uint = 0):void{
+		public function setValue(val:Number, averaging:Number = NaN):void{
 			v = val;
-			if(averaging>0)
+			if(isNaN(averaging) == false)
 			{
 				if(isNaN(avg))
 				{
@@ -71,7 +71,7 @@
 				}
 				else
 				{
-					avg += ((v-avg)/averaging);
+					avg += (v - avg) * averaging / v;
 				}
 			}
 		}

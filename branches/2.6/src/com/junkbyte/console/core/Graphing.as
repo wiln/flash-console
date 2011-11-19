@@ -151,7 +151,7 @@ package com.junkbyte.console.core {
 					_fpsGroup = addSpecialGroup(GraphGroup.FPS);
 					_fpsGroup.low = 0;
 					_fpsGroup.fixed = true;
-					_fpsGroup.averaging = 30;
+					_fpsGroup.averaging = 3;
 				} else{
 					_previousTime = -1;
 					var index:int = _groups.indexOf(_fpsGroup);
@@ -211,7 +211,7 @@ package com.junkbyte.console.core {
 				}
 				if(ok){
 					var typ:uint = group.type;
-					var averaging:uint = group.averaging;
+					var averaging:Number = group.averaging;
 					var interests:Array = group.interests;
 					if(typ == GraphGroup.FPS){
 						group.hi = fps;

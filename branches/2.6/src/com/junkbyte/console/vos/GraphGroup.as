@@ -37,7 +37,7 @@ package com.junkbyte.console.vos {
 		public var low:Number;
 		public var hi:Number;
 		public var fixed:Boolean;
-		public var averaging:uint;
+		public var averaging:Number;
 		public var inv:Boolean;
 		public var interests:Array = [];
 		public var rect:Rectangle;
