@@ -91,7 +91,7 @@ package com.junkbyte.console.core
 			}
 			else
 			{
-				if(!isKeyUp) _passInd = 0;
+				if(isKeyUp) _passInd = 0;
 				var bind:KeyBind = new KeyBind(e.keyCode, e.shiftKey, e.ctrlKey, e.altKey, isKeyUp);
 				tryRunKey(bind.key);
 				if(char){
