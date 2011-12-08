@@ -36,6 +36,7 @@ package com.junkbyte.console {
 		/**
 		 * Set Password required to connect from remote.
 		 * <p>
+		 * Must be set before starting remote.
 		 * Set to null (deafult) to use keystrokePassword.
 		 * Set to "" (blank string), to disable remoting password.
 		 * </p>
