@@ -31,7 +31,8 @@ http://code.google.com/p/flash-console/issues/
 
 == Change Log ==
 
-===2.6 BETA ===
+===2.6 RC ===
+  * DisplayMap addon, Allows inspecting of display tree
   * Removed Cc.remotingPassword. use Cc.config.remotingPassword (should be set before starting remote)
   * Basic timestamp display support. Use Cc.config.showTimestamp = true;
   * Line number display support. Use Cc.config.showLineNumber = true;
