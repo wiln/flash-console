@@ -252,9 +252,6 @@ Cc.remoting = true; // turns on remoting
 
 ----
 
-==Addons==
-There are a few addons available for console. See [Addons]
-
 ==Custom Style==
 You *must* set them before starting console. Example:
 {{{
@@ -267,5 +264,8 @@ Cc.startOnStage(this); // finally start with these styles
 
 example: bin/sampleStyle.swf for demo. (src: `samples/flash/SampleStyle.as`).
 
+
+=Addons=
+There are a few addons available for console. See [Addons]
 
 Asdoc: http://console.junkbyte.com/2.5/asdoc/com/junkbyte/console/ConsoleStyle.html
