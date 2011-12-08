@@ -1,4 +1,6 @@
+#summary List of Console addons
 #labels Phase-Implementation
+
 Addons are located in samples/addons/com/junkbyte/console/addons
 These add functionality on top of base console.
 They are not compiled as part of SWC package at the moment as some may require additional libraries.
