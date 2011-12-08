@@ -66,8 +66,9 @@ package
 			//
 			
 			DisplayMapAddon.registerCommand();
-			DisplayMapAddon.addToMenu();
-			// show the demo logging stuff there...
+			DisplayMapAddon.addToMenu(); // click on DM button at top menu to start.
+			
+			
 			demoBasics();
 			
 			setupUI();

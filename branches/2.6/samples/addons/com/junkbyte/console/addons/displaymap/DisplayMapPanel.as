@@ -3,7 +3,7 @@ package com.junkbyte.console.addons.displaymap
     import com.junkbyte.console.Console;
     import com.junkbyte.console.core.LogReferences;
     import com.junkbyte.console.view.ConsolePanel;
-
+    
     import flash.display.DisplayObject;
     import flash.display.DisplayObjectContainer;
     import flash.events.Event;
@@ -17,7 +17,7 @@ package com.junkbyte.console.addons.displaymap
 
         public static const NAME:String = "displayMapPanel";
 
-        public static const UPDATE_N_FRAMES:uint = 30;
+        public static var numOfFramesToUpdate:uint = 10;
 
         private var rootDisplay:DisplayObject;
 
@@ -71,7 +71,7 @@ package com.junkbyte.console.addons.displaymap
         private function onEnterFrame(event:Event):void
         {
             framesSinceUpdate++;
-            if (framesSinceUpdate >= UPDATE_N_FRAMES)
+            if (framesSinceUpdate >= numOfFramesToUpdate)
             {
                 framesSinceUpdate = 0;
                 update();
