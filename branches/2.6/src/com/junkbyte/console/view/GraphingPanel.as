@@ -178,7 +178,7 @@ package com.junkbyte.console.view {
 						var frames:int = Math.floor(group.hi/_interest.v);
 						if(frames>30) frames = 30; // Don't add too many lagged frames
 						while(frames>0){
-							history.push(_interest.avg);
+							history.push(_interest.v);
 							frames--;
 						}
 					}else{
@@ -229,7 +229,7 @@ package com.junkbyte.console.view {
 				if(isNaN(_interest.v)){
 					str += "no input<menu>";
 				}else if(_type == FPS){
-					str += _interest.avg.toFixed(1)+" <menu><a href=\"event:reset\">R</a>";
+					str += _interest.v.toFixed(1)+" | "+_interest.avg.toFixed(1)+" <menu><a href=\"event:reset\">R</a>";
 				}else{
 					str += _interest.v.toFixed(2)+"mb <menu><a href=\"event:gc\">G</a> <a href=\"event:reset\">R</a>";
 				}
