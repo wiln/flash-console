@@ -29,7 +29,10 @@ package com.junkbyte.console.core
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.utils.getDefinitionByName;
-
+	
+	/**
+	 * @private
+	 */
 	public class Executer extends EventDispatcher{
 		
 		public static const RETURNED:String = "returned";

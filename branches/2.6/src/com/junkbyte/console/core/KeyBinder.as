@@ -32,6 +32,8 @@ package com.junkbyte.console.core
 	import flash.events.KeyboardEvent;
 
 	/**
+	 * @private
+	 * 
 	 * Suppse this could be 'view' ?
 	 */
 	public class KeyBinder extends ConsoleCore{

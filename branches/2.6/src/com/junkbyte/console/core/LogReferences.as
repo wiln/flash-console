@@ -39,7 +39,10 @@ package com.junkbyte.console.core
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-
+	
+	/**
+	 * @private
+	 */
 	public class LogReferences extends ConsoleCore
 	{
 		

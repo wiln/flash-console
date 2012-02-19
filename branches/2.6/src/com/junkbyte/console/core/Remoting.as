@@ -39,6 +39,9 @@ package com.junkbyte.console.core
 	import flash.utils.Dictionary;
 
 	[Event(name="CONNECT", type="flash.events.Event")]
+	/**
+	 * @private
+	 */
 	public class Remoting extends ConsoleCore{
 		
 		public static const NONE:uint = 0;

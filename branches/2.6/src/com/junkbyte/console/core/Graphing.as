@@ -32,7 +32,10 @@ package com.junkbyte.console.core {
 	import com.junkbyte.console.vos.GraphGroup;
 
 	import flash.geom.Rectangle;
-
+	
+	/**
+	 * @private
+	 */
 	public class Graphing extends ConsoleCore{
 		
 		private var _groups:Array = [];

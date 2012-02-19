@@ -31,7 +31,10 @@ package com.junkbyte.console.view {
 	import flash.display.Shape;
 	import flash.events.TextEvent;
 	import flash.text.TextField;		
-
+	
+	/**
+	 * @private
+	 */
 	public class GraphingPanel extends ConsolePanel {
 		//
 		public static const FPS:String = "fpsPanel";

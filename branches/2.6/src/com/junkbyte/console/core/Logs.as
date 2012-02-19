@@ -28,7 +28,10 @@ package com.junkbyte.console.core
 	import flash.events.Event;
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.vos.Log;
-
+	
+	/**
+	 * @private
+	 */
 	public class Logs extends ConsoleCore{
 		
 		private var _channels:Object;

@@ -144,15 +144,14 @@
 	</target>
 
 	<!-- http://livedocs.adobe.com/flex/3/html/help.html?content=asdoc_9.html#142061 -->
-	<target name="compileASDoc">
+	<target name="compileASDoc" description="Generate ASDOC">
 		<delete dir="${asdoc.dir}" failOnError="false" includeEmptyDirs="true" />
 		<mkdir dir="${asdoc.dir}" />
 		<property file="${build.dir}/project.properties"/>
 		<exec executable="${FLEX_HOME}/bin/asdoc.exe" failonerror="true">
 			<arg line="-output '${asdoc.dir}'" />
 			<arg line="-source-path '${src.dir}'" />
-			<arg line="-doc-classes com.junkbyte.console.Cc com.junkbyte.console.Console com.junkbyte.console.ConsoleConfig com.junkbyte.console.ConsoleStyle com.junkbyte.console.ConsoleChannel com.junkbyte.console.KeyBind" />
-			<arg line="-exclude-dependencies" />
+			<arg line="-doc-sources ${src.dir}/com/junkbyte/console/" />
 			<arg line="-main-title 'Flash-Console v${build.version}'" />
 			<arg line="-window-title 'Flash-Console v${build.version}'" />
 			<arg line="-footer 'Flash-Console v${build.version}'" />

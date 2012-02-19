@@ -25,6 +25,9 @@
 package com.junkbyte.console.vos {
 	import flash.utils.ByteArray;
 	
+	/**
+	 * @private
+	 */
 	public class Log{
 		public var line:uint;
 		public var text:String;
