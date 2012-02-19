@@ -28,7 +28,7 @@ package com.junkbyte.console.view
 	import com.junkbyte.console.core.LogReferences;
 	import com.junkbyte.console.core.Remoting;
 	import com.junkbyte.console.vos.Log;
-
+	
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -452,11 +452,20 @@ package com.junkbyte.console.view
 			_ignoredChannels.splice(0);
 			_viewingChannels.splice(0);
 			if(a.indexOf(Console.GLOBAL_CHANNEL) < 0 && a.indexOf(null) < 0){
-				for each(var ch:String in a) _viewingChannels.push(ch);
+				for each(var ch:String in a) 
+				{
+					if(ch) _viewingChannels.push(ch);
+				}
 			}
 			updateToBottom();
 			console.panels.updateMenu();
 		}
+		
+		public function get viewingChannels():Array
+		{
+			return _viewingChannels;
+		}
+		
 		public function setIgnoredChannels(...channels:Array):void{
 			var a:Array = new Array();
 			for each(var item:Object in channels) a.push(Console.MakeChannelName(item));
@@ -468,10 +477,18 @@ package com.junkbyte.console.view
 			_ignoredChannels.splice(0);
 			_viewingChannels.splice(0);
 			if(a.indexOf(Console.GLOBAL_CHANNEL) < 0 && a.indexOf(null) < 0){
-				for each(var ch:String in a) _ignoredChannels.push(ch);
+				for each(var ch:String in a) 
+				{
+					if(ch) _ignoredChannels.push(ch);
+				}
 			}
 			updateToBottom();
 			console.panels.updateMenu();
+		}
+		
+		public function get ignoredChannels():Array
+		{
+			return _ignoredChannels;
 		}
 		//
 		private function setFilterText(str:String = ""):void{

@@ -3,7 +3,7 @@ package com.junkbyte.console.addons.memoryRecorder
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.KeyBind;
 
-	public class MemoryRecorderConsole
+	public class MemoryRecorderAddon
 	{
 
 		public static function registerToConsole(console:Console, key:String = "r"):void

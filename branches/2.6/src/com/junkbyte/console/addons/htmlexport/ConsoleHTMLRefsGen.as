@@ -6,6 +6,9 @@ package com.junkbyte.console.addons.htmlexport
 	
 	import flash.utils.describeType;
 
+	/**
+	 * @private
+	 */
 	public class ConsoleHTMLRefsGen
 	{
 		private static const refSearchExpression:RegExp = /<a(\s+)href=\'event:ref_(\d+)\'>/g;

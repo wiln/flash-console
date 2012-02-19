@@ -29,6 +29,9 @@ package com.junkbyte.console.addons.displaymap
 
         private var framesSinceUpdate:uint;
 
+		/**
+		 * @private
+		 */
         public function DisplayMapPanel(m:Console)
         {
             super(m);
@@ -248,14 +251,14 @@ package com.junkbyte.console.addons.displaymap
             e.stopPropagation();
         }
 
-        public function focus(container:DisplayObjectContainer):void
+		private function focus(container:DisplayObjectContainer):void
         {
             rootDisplay = container;
             addToOpening(container);
             update();
         }
 
-        public function addToOpening(display:DisplayObject):void
+        private function addToOpening(display:DisplayObject):void
         {
             if (openings[display] == undefined)
             {
@@ -264,7 +267,7 @@ package com.junkbyte.console.addons.displaymap
             }
         }
 
-        public function removeFromOpening(display:DisplayObject):void
+		private function removeFromOpening(display:DisplayObject):void
         {
             if (openings[display] != undefined)
             {

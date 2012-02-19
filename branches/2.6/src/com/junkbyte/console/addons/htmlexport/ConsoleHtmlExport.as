@@ -21,7 +21,7 @@
 * misrepresented as being the original software.
 * 3. This notice may not be removed or altered from any source distribution.
 *
-* REQUIRES Flash Player 11.0 OR lib: com.adobe.serialization.json.JSON
+* REQUIRES Flash Player 11.0 OR com.adobe.serialization.json.JSON
 */
 package com.junkbyte.console.addons.htmlexport
 {
@@ -29,15 +29,16 @@ package com.junkbyte.console.addons.htmlexport
 	import com.junkbyte.console.Console;
 	import com.junkbyte.console.ConsoleConfig;
 	import com.junkbyte.console.ConsoleStyle;
+	import com.junkbyte.console.view.MainPanel;
 	import com.junkbyte.console.vos.Log;
-
+	
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 
 	/*
-	 * REQUIRES Flash Player 11.0 OR lib: com.adobe.serialization.json.JSON
+	 * REQUIRES Flash Player 11.0 OR com.adobe.serialization.json.JSON
 	 */
 	public class ConsoleHtmlExport
 	{
@@ -178,9 +179,10 @@ package com.junkbyte.console.addons.htmlexport
 		{
 			var object:Object = new Object();
 
-			object.viewingPriority = console.panels.mainPanel.priority;
-			object.viewingChannels = null; // TODO. console need to expose it
-			object.ignoredChannels = null; // TODO. console need to expose it
+			var mainPanel:MainPanel = console.panels.mainPanel;
+			object.viewingPriority = mainPanel.priority;
+			object.viewingChannels = mainPanel.viewingChannels;
+			object.ignoredChannels = mainPanel.ignoredChannels;
 
 			return object;
 		}
