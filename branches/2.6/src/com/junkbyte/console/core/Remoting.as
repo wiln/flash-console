@@ -97,47 +97,54 @@ package com.junkbyte.console.core
 				}
 			}
 			for (var id:String in _recBuffers){
-				if(!_senders[id]){
-					_senders[id] = true;
-					if(_lastReciever){
-						report("Remote switched to new sender ["+id+"] as primary.", -2);
-					}
-					_lastReciever = id;
-				}
-				
-				var buffer:ByteArray = _recBuffers[id];
-				try{
-					var pointer:uint = buffer.position = 0;
-					while(buffer.bytesAvailable){
-						var cmd:String = buffer.readUTF();
-						var arg:ByteArray = null;
-						if(buffer.bytesAvailable == 0) break;
-						if(buffer.readBoolean()){
-							if(buffer.bytesAvailable == 0) break;
-							var blen:uint = buffer.readUnsignedInt();
-							if(buffer.bytesAvailable < blen) break;
-							arg = new ByteArray();
-							buffer.readBytes(arg, 0, blen);
-						}
-						var callbackData:Object = _callbacks[cmd];
-						if(!callbackData.latest || id == _lastReciever){
-							if(arg) callbackData.fun(arg);
-							else callbackData.fun();
-						}
-						pointer = buffer.position;
-					}
-					if(pointer < buffer.length){
-						var recbuffer:ByteArray = new ByteArray();
-						recbuffer.writeBytes(buffer, pointer);
-						_recBuffers[id] = buffer = recbuffer;
-					}else{
-						delete _recBuffers[id];
-					}
-				}catch(err:Error){
-					report("Remoting sync error: "+err, 9);
-				}
+				processRecBuffer(id);
 			}
 		}
+
+		private function processRecBuffer(id:String):void
+		{
+			if(!_senders[id]){
+				_senders[id] = true;
+				if(_lastReciever){
+					report("Remote switched to new sender ["+id+"] as primary.", -2);
+				}
+				_lastReciever = id;
+			}
+		
+			var buffer:ByteArray = _recBuffers[id];
+			try{
+				var pointer:uint = buffer.position = 0;
+				while(buffer.bytesAvailable){
+					var cmd:String = buffer.readUTF();
+					var arg:ByteArray = null;
+					if(buffer.bytesAvailable == 0) break;
+					if(buffer.readBoolean()){
+						if(buffer.bytesAvailable == 0) break;
+						var blen:uint = buffer.readUnsignedInt();
+						if(buffer.bytesAvailable < blen) break;
+						arg = new ByteArray();
+						buffer.readBytes(arg, 0, blen);
+					}
+					var callbackData:Object = _callbacks[cmd];
+					if(!callbackData.latest || id == _lastReciever){
+						if(arg) callbackData.fun(arg);
+						else callbackData.fun();
+					}
+					pointer = buffer.position;
+				}
+				if(pointer < buffer.length){
+					var recbuffer:ByteArray = new ByteArray();
+					recbuffer.writeBytes(buffer, pointer);
+					_recBuffers[id] = buffer = recbuffer;
+				}else{
+					delete _recBuffers[id];
+				}
+			}catch(err:Error){
+				report("Remoting sync error: "+err, 9);
+			}
+		}
+
+
 		private function synchronize(id:String, obj:Object):void{
 			if(!(obj is ByteArray)){
 				report("Remoting sync error. Recieved non-ByteArray:"+obj, 9);

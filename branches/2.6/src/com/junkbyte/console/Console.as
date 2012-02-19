@@ -388,21 +388,9 @@ package com.junkbyte.console
 			
 			if(priority >= _config.autoStackPriority && stacks<0) stacks = _config.defaultStackDepth;
 			
-			/* 
-			//work in progress
-			var stack:String;
-			if(config.rolloverStackToolTip || stacks>0){
-				stack = _tools.getStack(stacks, priority);
-			}
-			if(!html && stacks>0){
-				txt += stack;
-			}
-			*/
 			if(!html && stacks>0){
 				txt += _tools.getStack(stacks, priority);
 			}
-			//var l:Log = new Log(txt, MakeChannelName(channel), priority, isRepeating, html);
-			//l.stack = stack;
 			_logs.add(new Log(txt, MakeChannelName(channel), priority, isRepeating, html));
 		}
 		//
