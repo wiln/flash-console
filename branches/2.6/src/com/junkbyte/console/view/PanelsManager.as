@@ -115,7 +115,7 @@ package com.junkbyte.console.view
 			}
 		}
 		public function updateGraphs(graphs:Array):void{
-			var usedMap:Object = {};
+			var usedMap:Object;
 			var fpsGroup:GraphGroup;
 			var memGroup:GraphGroup;
 			_graphPlaced = 0;
@@ -152,12 +152,17 @@ package com.junkbyte.console.view
 						_graphsMap[n] = panel;
 						addPanel(panel);
 					}
+					if(usedMap == null)
+					{
+						usedMap = {};
+					}
+					usedMap[n] = true;
 					panel.update(group, _canDraw);
 				}
-				usedMap[group.name] = true;
 			}
+			
 			for(var X:String in _graphsMap){
-				if(!usedMap[X]){
+				if(usedMap == null || !usedMap[X]){
 					_graphsMap[X].close();
 					delete _graphsMap[X];
 				}
