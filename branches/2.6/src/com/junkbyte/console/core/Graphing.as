@@ -177,7 +177,7 @@ package com.junkbyte.console.core {
 			}else if(b != memoryMonitor){
 				if(b) {
 					_memGroup = addSpecialGroup(GraphGroup.MEM);
-					_memGroup.freq = 10;
+					_memGroup.freq = 20;
 				} else{
 					var index:int = _groups.indexOf(_memGroup);
 					if(index>=0) _groups.splice(index, 1);
