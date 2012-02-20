@@ -13,7 +13,7 @@
 
 =Basics=
 
-For easy reference, please see `samples/flash/Sample.as` for working sample.
+For easy reference, please see `samples/flash/SampleBasic.as` for working sample.
 
 ==Start on stage==
 {{{
