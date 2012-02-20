@@ -106,7 +106,7 @@ Cc.bindKey(new KeyBind("h"), Cc.log, ["Hello!"]);
   * Command line appears at the bottom of main panel (press CL at top menu)
 
   * *Slash commands* run special functions on demand
-  * An example of build in slash command: '/filter log'
+  * An example of built-in slash command: '/filter log'
    * Typing this will filter to logs that match the string 'log'
    * You will also get underline under the exact match
    * When you are done, change the channel at top OR type '/filter'
@@ -118,14 +118,14 @@ Cc.addSlashCommand("test", function():void{ Cc.log("Do the test!");} );
 //When user type "/test" in commandLine, it will call function with no params.
 
 // Slash command example 2
-Cc.addSlashCommand("test2", function(param:String):void{Cc.log("Do the test2 with param string:", param);} );
+Cc.addSlashCommand("test2", function(param:String = ""):void{Cc.log("Do the test2 with param string:", param);} );
 //User type "/test2 abc 123" in commandLine to call Cc.log with one param: "abc 123".
 }}}
   * If you need multiple params, you will need to do the conversion inside your call back function.
 {{{
 // Slash command example 3 (multiple arguments trick)
-Cc.addSlashCommand("test3", function(param:String):void{ 
-		var args:Array = param.split(" ");
+Cc.addSlashCommand("test3", function(param:String = ""):void{ 
+		var args:Array = param.split(/\s+/);
 		Cc.log.apply(null, args); // This is where you call a function that accept multiple arguments
 	});
 //User type "/test3 abc 123" in commandLine to call Cc.log with param 1: "abc", param 2: "123"
@@ -147,7 +147,7 @@ Cc.store("mc", myMC); // assuming myMC is a MovieClip somewhere or could be anyt
   * You can go crazy with commandline. Example:
    * `stage.getChildByName("Console").filters = new Array(new flash.filters.GlowFilter());`
    * Adds glow filter on Console.
-  * For better understanding of commandLine, see CommandLineHelp
+  * CommandLine have limitations. For better understanding, see CommandLineHelp
  
 ==Display Roller==
   * Display roller shows the display tree of objects under your mouse
@@ -215,7 +215,7 @@ Cc.addGraph("mouse", this, "(Math.sin(flash.utils.getTimer()/1000)*300)+300", 0x
 }}}
 
 ==Extra menu links==
-  * You can add your own menu link at the top along with other console build in links.
+  * You can add your own menu link at the top along with other console built-in links.
 {{{
 Cc.addMenu("hi", Cc.log, ["Hello from top menu"], "Says hello!");
 }}}
@@ -240,7 +240,9 @@ aSprite = null;
   
 ==Remoting==
   * Remoting sends log data for a remote console to use
-  * The advantage is that you do not need to keep console open on your flash
+  * The advantages are:
+   * You dont need to keep console open in your working flash project
+   * Logs stays in remote afer closing your working flash project
   * You can use commandline, view FPS and memory from remote
   * SWF version of remote is in `bin/consoleRemote.swf`
   * AIR version of remote is in `bin/ConsoleRemote.air`
@@ -264,9 +266,7 @@ Cc.startOnStage(this); // finally start with these styles
 
 example: bin/sampleStyle.swf for demo. (src: `samples/flash/SampleStyle.as`).
 
+Asdoc: http://console.junkbyte.com/2.6/asdoc/com/junkbyte/console/ConsoleStyle.html
 
 =Addons=
 There are a few addons available for console. See [Addons]
-
-=Asdoc=
-see: http://console.junkbyte.com/2.5/asdoc/com/junkbyte/console/ConsoleStyle.html
