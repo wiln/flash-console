@@ -69,7 +69,7 @@ package com.junkbyte.console.view {
 			var lowStyle:Object = style.styleSheet.getStyle("low");
 			textFormat.font = lowStyle.fontFamily;
 			textFormat.size = lowStyle.fontSize;
-			textFormat.color = lowStyle.color;
+			textFormat.color = style.lowColor;
 			
 			lowTxt = new TextField();
 			lowTxt.name = "lowestField";
@@ -254,6 +254,7 @@ package com.junkbyte.console.view {
 			}
 			if(draw && (listchanged || _type)) updateKeyText();
 		}
+		
 		public function updateKeyText():void{
 			var str:String = "<r><low>";
 			if(_type){
