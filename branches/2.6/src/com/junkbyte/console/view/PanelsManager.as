@@ -100,11 +100,17 @@ package com.junkbyte.console.view
 				if(rect.height) panel.height = rect.height;
 			}
 		}
+		/**
+		 * @private
+		 */
 		public function updateMenu():void{
 			_mainPanel.updateMenu();
 			var chpanel:ChannelsPanel = getPanel(ChannelsPanel.NAME) as ChannelsPanel;
 			if(chpanel) chpanel.update();
 		}
+		/**
+		 * @private
+		 */
 		public function update(paused:Boolean, lineAdded:Boolean):void{
 			_canDraw = !paused;
 			_mainPanel.update(!paused && lineAdded);
@@ -114,6 +120,9 @@ package com.junkbyte.console.view
 				}
 			}
 		}
+		/**
+		 * @private
+		 */
 		public function updateGraphs(graphs:Array):void{
 			var usedMap:Object;
 			var fpsGroup:GraphGroup;
@@ -201,6 +210,9 @@ package com.junkbyte.console.view
 			}
 			_canDraw = false;
 		}
+		/**
+		 * @private
+		 */
 		public function removeGraph(group:GraphGroup):void
 		{
 			if(_fpsPanel && group == _fpsPanel.group){
@@ -220,6 +232,9 @@ package com.junkbyte.console.view
 		//
 		//
 		//
+		/**
+		 * @private
+		 */
 		public function get displayRoller():Boolean{
 			return (getPanel(RollerPanel.NAME) as RollerPanel)?true:false;
 		}
@@ -266,15 +281,24 @@ package com.junkbyte.console.view
 		//
 		//
 		//
+		/**
+		 * @private
+		 */
 		public function get memoryMonitor():Boolean{
 			return _memPanel!=null;
 		}
+		/**
+		 * @private
+		 */
 		public function get fpsMonitor():Boolean{
 			return _fpsPanel!=null;
 		}
 		//
 		//
 		//
+		/**
+		 * @private
+		 */
 		public function tooltip(str:String = null, panel:ConsolePanel = null):void{
 			if(str && !rulerActive){
 				var split:Array = str.split("::");

@@ -225,6 +225,10 @@ package com.junkbyte.console.view
 			addEventListener(Event.ADDED_TO_STAGE, stageAddedHandle, false, 0, true);
 			addEventListener(Event.REMOVED_FROM_STAGE, stageRemovedHandle, false, 0, true);
 		}
+		
+		/**
+		 * @private
+		 */
 		public function addMenu(key:String, f:Function, args:Array, rollover:String):void{
 			if(key){
 				key = key.replace(/[^\w]*/g, "");
@@ -297,6 +301,10 @@ package com.junkbyte.console.view
 			}
 		}
 		
+		
+		/**
+		 * @private
+		 */
 		public function requestLogin(on:Boolean = true):void{
 			var ct:ColorTransform = new ColorTransform();
 			if(on){
@@ -315,6 +323,10 @@ package com.junkbyte.console.view
 			_cmdField.displayAsPassword = on;
 			_enteringLogin = on;
 		}
+		
+		/**
+		 * @private
+		 */
 		public function update(changed:Boolean):void{
 			if(_bottomLine.alpha>0){
 				_bottomLine.alpha -= 0.25;
@@ -342,6 +354,10 @@ package com.junkbyte.console.view
 				_updateMenu();
 			}
 		}
+		
+		/**
+		 * @private
+		 */
 		public function updateToBottom():void{
 			_atBottom = true;
 			_needUpdateTrace = true;
@@ -378,6 +394,10 @@ package com.junkbyte.console.view
 			_lockScrollUpdate = false;
 			updateScroller();
 		}
+		
+		/**
+		 * @private
+		 */
 		public function setPaused(b:Boolean):void{
 			if(b && _atBottom){
 				_atBottom = false;
@@ -436,12 +456,20 @@ package com.junkbyte.console.view
 					&&
 					 (_ignoredChannels.length == 0 || _ignoredChannels.indexOf(ch)<0));
 		}
+		
+		/**
+		 * @private
+		 */
 		public function get reportChannel():String{
 			return _viewingChannels.length == 1?_viewingChannels[0]:Console.CONSOLE_CHANNEL;
 		}
 		/*public function get viewingChannels():Array{
 			return _viewingChannels;
 		}*/
+		
+		/**
+		 * @private
+		 */
 		public function setViewingChannels(...channels:Array):void{
 			var a:Array = new Array();
 			for each(var item:Object in channels) a.push(Console.MakeChannelName(item));
@@ -461,11 +489,19 @@ package com.junkbyte.console.view
 			console.panels.updateMenu();
 		}
 		
+		
+		/**
+		 * Get currently viewing channels.
+		 * Null if its viewing global.
+		 */
 		public function get viewingChannels():Array
 		{
 			return _viewingChannels;
 		}
 		
+		/**
+		 * @private
+		 */
 		public function setIgnoredChannels(...channels:Array):void{
 			var a:Array = new Array();
 			for each(var item:Object in channels) a.push(Console.MakeChannelName(item));
@@ -486,6 +522,10 @@ package com.junkbyte.console.view
 			console.panels.updateMenu();
 		}
 		
+		/**
+		 * Get currently ignoring channels.
+		 * Null if its viewing global.
+		 */
 		public function get ignoredChannels():Array
 		{
 			return _ignoredChannels;
@@ -654,6 +694,7 @@ package com.junkbyte.console.view
 		//
 		// END OF SCROLL BAR STUFF
 		//
+		
 		override public function set width(n:Number):void{
 			_lockScrollUpdate = true;
 			super.width = n;
@@ -673,6 +714,7 @@ package com.junkbyte.console.view
 			_needUpdateTrace = true;
 			_lockScrollUpdate = false;
 		}
+		
 		override public function set height(n:Number):void{
 			_lockScrollUpdate = true;
 			var fsize:int = style.menuFontSize;
@@ -720,6 +762,9 @@ package com.junkbyte.console.view
 		//
 		//
 		//
+		/**
+		 * @private
+		 */
 		public function updateMenu(instant:Boolean = false):void{
 			if(instant){
 				_updateMenu();
@@ -766,6 +811,9 @@ package com.junkbyte.console.view
 			txtField.scrollH = txtField.maxScrollH;
 			updateTraceFHeight();
 		}
+		/**
+		 * @private
+		 */
 		public function getChannelsLink(limited:Boolean = false):String{
 			var str:String = "<chs>";
 			var channels:Array = console.logs.getChannels();
@@ -787,6 +835,9 @@ package com.junkbyte.console.view
 			if(b) return "<menuHi>"+str+"</menuHi>";
 			return str;
 		}
+		/**
+		 * @private
+		 */
 		public function onMenuRollOver(e:TextEvent, src:ConsolePanel = null):void{
 			if(src==null) src = this;
 			var txt:String = e.text?e.text.replace("event:",""):"";
@@ -907,6 +958,10 @@ package com.junkbyte.console.view
 			txtField.setSelection(0, 0);
 			e.stopPropagation();
 		}
+		
+		/**
+		 * @private
+		 */
 		public function onChannelPressed(chn:String):void{
 			var current:Array;
 			if(_ctrl && chn != Console.GLOBAL_CHANNEL){
@@ -933,6 +988,11 @@ package com.junkbyte.console.view
 			}
 			return current;
 		}
+		
+		/**
+		 * Current console priority filter.
+		 * Default = 0.
+		 */
 		public function set priority(p:uint):void{
 			_priority = p;
 			console.so[PRIORITY_HISTORY] = _priority;
@@ -1094,6 +1154,10 @@ package com.junkbyte.console.view
 				_hint = null;
 			}
 		}
+		
+		/**
+		 * @private
+		 */
 		public function updateCLScope(str:String):void{
 			if(_enteringLogin) {
 				_enteringLogin = false;
@@ -1114,6 +1178,9 @@ package com.junkbyte.console.view
 			_cmdField.width = width-15-_cmdField.x;
 			_hintField.x = _cmdField.x;
 		}
+		/**
+		 * @private
+		 */
 		public function set commandLine(b:Boolean):void{
 			if(b){
 				_cmdField.visible = true;
@@ -1127,6 +1194,9 @@ package com.junkbyte.console.view
 			_needUpdateMenu = true;
 			this.height = height;
 		}
+		/**
+		 * @private
+		 */
 		public function get commandLine():Boolean{
 			return _cmdField.visible;
 		}

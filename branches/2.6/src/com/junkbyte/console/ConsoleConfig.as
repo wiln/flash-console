@@ -136,8 +136,21 @@ package com.junkbyte.console {
 		};
 		
 		
+		/**
+		 * Specifies whether to show timestamps in Console.
+		 */
 		public var showTimestamp:Boolean = false;
 		
+		
+		/**
+		 * Time stamp formatter.
+		 * <p>
+		 * Function must accept a single uint param and return a formatted string.
+		 * </p>
+		 * <p>
+		 * Default formatter returns as 'MM:SS' (10:20)
+		 * </p>
+		 */
 		public var timeStampFormatter:Function = function(timer:uint):String
 		{
 			var s:uint = timer*0.001;
@@ -149,7 +162,9 @@ package com.junkbyte.console {
 			return String(v);
 		}
 		
-		
+		/**
+		 * Specifies whether to show line numbers in console.
+		 */
 		public var showLineNumber:Boolean = false;
 		
 		// Work in progress
@@ -303,6 +318,9 @@ package com.junkbyte.console {
 		//                //
 		////////////////////
 		
+		/**
+		 * Get style configuration used.
+		 */
 		public function get style():ConsoleStyle{
 			return _style;
 		}

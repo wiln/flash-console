@@ -29,10 +29,25 @@ package com.junkbyte.console.addons.displaymap
     import com.junkbyte.console.view.ConsolePanel;
 
     import flash.display.DisplayObject;
-
+	
+	/**
+	 * Display tree mapping panel addon
+	 * 
+	 * <ul>
+	 * <li>Displays a panel mapping the display tree/map.</li>
+	 * <li>Start from code: DisplayMapAddon.start();</li>
+	 * <li>Add to menu: DisplayMapAddon.addToMenu();</li>
+	 * <li>Register to commandLine: DisplayMapAddon.registerCommand(); use /mapdisplay, starts mapping from current command scope.</li>
+	 * </ul>
+	 */
     public class DisplayMapAddon
     {
-
+		/**
+		 * Start DisplayMapAddon
+		 * 
+		 * @param targetDisplay Starting display object in mapping.
+		 * @param console Instance to Console. You do not need to pass this param if you use Cc.
+		 */
         public static function start(targetDisplay:DisplayObject, console:Console = null):void
         {
             if (console == null)
@@ -47,7 +62,13 @@ package com.junkbyte.console.addons.displaymap
             mapPanel.start(targetDisplay);
             console.panels.addPanel(mapPanel);
         }
-
+		
+		/**
+		 * Register DisplayMapAddon to console slash command.
+		 * 
+		 * @param commandName Command name to trigger. Default = 'mapdisplay'
+		 * @param console Instance to Console. You do not need to pass this param if you use Cc.
+		 */
         public static function registerCommand(commandName:String = "mapdisplay", console:Console = null):void
         {
             if (console == null)
@@ -73,7 +94,14 @@ package com.junkbyte.console.addons.displaymap
             }
             console.addSlashCommand(commandName, callbackFunction);
         }
-
+		
+		
+		/**
+		 * Add DisplayMapAddon to console top menu.
+		 * 
+		 * @param menuName Name of menu. Default = 'DM'
+		 * @param console Instance to Console. You do not need to pass this param if you use Cc.
+		 */
         public static function addToMenu(menuName:String = "DM", console:Console = null):void
         {
             if (console == null)

@@ -39,6 +39,9 @@ package com.junkbyte.console.view {
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 
+	/**
+	 * @private
+	 */
 	public class ConsolePanel extends Sprite {
 		
 		public static const DRAGGING:String = "DRAGGING";

@@ -26,6 +26,14 @@ package com.junkbyte.console.addons.commandprompt {
 	import com.junkbyte.console.Cc;
 	import com.junkbyte.console.Console;
 	
+	/**
+	 * Command prompt addon.
+	 * <ul>
+	 * <li>Simulates 'command prompt' style user input.</li>
+	 * <li>Ask to choose from a selection of input, user enter into command line to choose a selection.</li>
+	 * <li>Could be useful for 'utility' sort of app where there is no GUI to represent user options.</li>
+	 * </ul>
+	 */
 	public class CommandPrompt {
 		
 		public var ch : String = Console.CONSOLE_CHANNEL;

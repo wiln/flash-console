@@ -35,7 +35,10 @@ package com.junkbyte.console.addons.displaymap
     import flash.text.TextField;
     import flash.text.TextFieldAutoSize;
     import flash.utils.Dictionary;
-
+	
+	/**
+	 * @private
+	 */
     public class DisplayMapPanel extends ConsolePanel
     {
 
@@ -53,9 +56,6 @@ package com.junkbyte.console.addons.displaymap
 
         private var framesSinceUpdate:uint;
 
-		/**
-		 * @private
-		 */
         public function DisplayMapPanel(m:Console)
         {
             super(m);

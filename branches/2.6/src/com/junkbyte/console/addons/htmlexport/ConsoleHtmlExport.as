@@ -37,8 +37,16 @@ package com.junkbyte.console.addons.htmlexport
 	import flash.utils.describeType;
 	import flash.utils.getDefinitionByName;
 
-	/*
-	 * REQUIRES Flash Player 11.0 OR com.adobe.serialization.json.JSON
+	/**
+	 * This addon allows you to export logs from flash console to a HTML file.
+	 * 
+	 * <ul>
+	 * <li>Preserves channels and priorities.</li>
+	 * <li>It also have all those filtering features in HTML page.</li>
+	 * <li>Add to Console menu by calling ConsoleHtmlExport.register();</li>
+	 * </ul>
+	 * 
+	 * REQUIRES Flash Player 11.0 OR com.adobe.serialization.json.JSON library.
 	 */
 	public class ConsoleHtmlExport
 	{
@@ -50,7 +58,14 @@ package com.junkbyte.console.addons.htmlexport
 		public var referencesDepth:uint = 1;
 
 		protected var console:Console;
-
+		
+		/**
+		 * Regiter to Console by adding 'export' menu item at the top menu.
+		 * 
+		 * @param console Instance to Console. You do not need to pass this param if you use Cc.
+		 * 
+		 * @return New ConsoleHTMLExport instance created by this method.
+		 */
 		public static function register(console:Console = null):ConsoleHtmlExport
 		{
 			if (console == null)
@@ -75,6 +90,11 @@ package com.junkbyte.console.addons.htmlexport
 			this.console = console;
 		}
 
+		/**
+		 * Trigger 'save to file' dialogue to save console logs in HTML file.
+		 * 
+		 * @param fileName Initial file name to use in save dialogue.
+		 */
 		public function exportToFile(fileName:String = null):void
 		{
 			if (fileName == null)
@@ -86,7 +106,7 @@ package com.junkbyte.console.addons.htmlexport
 			try
 			{
 				var html:String = exportHTMLString();
-				file.save(html, fileName);
+				file['save'](html, fileName); // flash player 10+ 
 			}
 			catch (err:Error)
 			{
@@ -102,7 +122,11 @@ package com.junkbyte.console.addons.htmlexport
 			fileName += ".html";
 			return fileName;
 		}
-
+		
+		
+		/**
+		 * Generate HTML String of Console logs.
+		 */
 		public function exportHTMLString():String
 		{
 			var html:String = String(new EmbeddedTemplate() as ByteArray);
@@ -110,7 +134,7 @@ package com.junkbyte.console.addons.htmlexport
 			return html;
 		}
 
-		public function exportJSON():String
+		protected function exportJSON():String
 		{
 			var object:Object = exportObject();
 			try
@@ -120,13 +144,13 @@ package com.junkbyte.console.addons.htmlexport
 			}
 			catch (error:Error)
 			{
-				// native json not found, pre flash player 11.
+				// native json not found. pre flash player 11.
 			}
 			var libJSON:Class = getDefinitionByName("com.adobe.serialization.json.JSON") as Class;
 			return libJSON["encode"](object);
 		}
 
-		public function exportObject():Object
+		protected function exportObject():Object
 		{
 			var data:Object = new Object();
 
