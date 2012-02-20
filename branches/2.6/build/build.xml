@@ -21,8 +21,11 @@
 			<include name="*.jar" />
 		</fileset>
 	</path>
-	<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
 
+	<target name="initAnt">
+		<typedef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="svnant.classpath" />
+	</target>
+	
 	<target name="BuildAll" description="Build everything!" depends="incrementBuildNumber">
 		<antcall target="compileSrc" />
 		<antcall target="compileASDoc" />
@@ -113,7 +116,7 @@
 		</exec>
 	</target>
 
-	<target name="zip" description="Package to ZIP">
+	<target name="zip" description="Package to ZIP" depends="initAnt">
 		<property file="${build.dir}/project.properties"/>
 		<echo>"Packaging to Zip. Make sure you have commited new files to SVN as it will only package versioned files."</echo>
 		<delete dir="${temp.dir}" />
@@ -147,7 +150,15 @@
 		<delete dir="${asdoc.dir}" failOnError="false" includeEmptyDirs="true" />
 		<mkdir dir="${asdoc.dir}" />
 		<property file="${build.dir}/project.properties"/>
-		<exec executable="${FLEX_HOME}/bin/asdoc.exe" failonerror="true">
+		<exec executable="${FLEX_HOME}/bin/asdoc.exe" failonerror="true" osfamily="windows">
+			<arg line="-output '${asdoc.dir}'" />
+			<arg line="-source-path '${src.dir}'" />
+			<arg line="-doc-sources ${src.dir}/com/junkbyte/console/" />
+			<arg line="-main-title 'Flash-Console v${build.version}'" />
+			<arg line="-window-title 'Flash-Console v${build.version}'" />
+			<arg line="-footer 'Flash-Console v${build.version}'" />
+		</exec>
+		<exec executable="${FLEX_HOME}/bin/asdoc" failonerror="true" osfamily="mac">
 			<arg line="-output '${asdoc.dir}'" />
 			<arg line="-source-path '${src.dir}'" />
 			<arg line="-doc-sources ${src.dir}/com/junkbyte/console/" />
