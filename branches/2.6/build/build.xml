@@ -76,7 +76,7 @@
 	<target name="swf">
 		<echo message="Compiling SWF: ${file} to ${output}" />
 		<mxmlc file="${file}" output="${output}" keep-generated-actionscript="false" 
-			static-link-runtime-shared-libraries="true" >
+			static-link-runtime-shared-libraries="true" debug="false">
 			<load-config filename="${FLEX_HOME}/frameworks/${config}-config.xml" />
 			<source-path path-element="${FLEX_HOME}/frameworks" />
 			<compiler.source-path path-element="${src.dir}" />
