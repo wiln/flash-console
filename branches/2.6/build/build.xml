@@ -30,8 +30,8 @@
 
 	<target name="compileSrc" depends="updateVersion">
 		<antcall target="swf">
-			<param name="file" value="${samples.dir}/flash/Sample.as" />
-			<param name="output" value="${bin.dir}/sample.swf" />
+			<param name="file" value="${samples.dir}/flash/SampleBasic.as" />
+			<param name="output" value="${bin.dir}/SampleBasic.swf" />
 			<param name="config" value="flex" />
 		</antcall>
 		<antcall target="swf">
@@ -78,7 +78,6 @@
 			<source-path path-element="${FLEX_HOME}/frameworks" />
 			<compiler.source-path path-element="${src.dir}" />
 			<compiler.source-path path-element="${samples.dir}/flash"/>
-			<compiler.source-path path-element="${samples.dir}/addons"/>
 			<default-size width="640" height="480" />
 		</mxmlc>
 	</target>
