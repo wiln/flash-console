@@ -6,7 +6,7 @@
 
 ==Flash Console==
 
-  * Version 2.6 RC (Dec 2011)
+  * Version 2.6 (Feb 2012)
   * Project home page: http://code.google.com/p/flash-console/
   * Author: Lu Aye Oo, http://www.junkbyte.com
   * Required: `ActionScript 3.0`, Flash player 9 or above
@@ -27,12 +27,13 @@ http://code.google.com/p/flash-console/issues/
 
 == Credits ==
   * Created by Lu Aye Oo
-  * Logo by Nick Holliday
+  * Icon by Nick Holliday
 
 
 == Change Log ==
 
-===2.6 RC ===
+===2.6 ===
+  * Addons are now included in Console.swc
   * DisplayMap addon, Allows inspecting of display tree
   * Removed Cc.remotingPassword. use Cc.config.remotingPassword (should be set before starting remote)
   * Basic timestamp display support. Use Cc.config.showTimestamp = true;
