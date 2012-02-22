@@ -17,8 +17,9 @@ They are not compiled as part of SWC package at the moment as some may require a
   * Export console logs to a HTML file. preserves channels and priorities.
   * It also have all those filtering features in HTML page.
   * Add to menu: `ConsoleHtmlExportAddon.addToMenu();`
+  * sample: http://console.junkbyte.com/addons/htmlexport/export.html
   * blog: http://junkbyte.com/wp/as3/console/console-logs-to-html-export-addon/
-  * Requires com.adobe.serialization.json.JSON. (May replace in your own code with flash player 11's native JSON)
+  * Requires flash player 11 OR com.adobe.serialization.json.JSON.
 
 
 ==Command Prompt==
