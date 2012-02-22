@@ -26,7 +26,9 @@ They are not compiled as part of SWC package at the moment as some may require a
   * Simulates 'command prompt' style user input. 
   * Ask to choose from a selection of input, user enter into command line to choose a selection.
   * Could be useful for 'utility' sort of app where there is no GUI to represent user options.
-  * Currently undocumented. see source code of `CommandPrompt.as`.
+  * Demo: http://console.junkbyte.com/addons/commandprompt/
+  * Blog with demo source: http://junkbyte.com/wp/as3/console/console-command-prompt-addon-demo/
+
   
   
 ==`CommandLine` Auto focus==
