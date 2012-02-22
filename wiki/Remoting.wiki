@@ -3,8 +3,16 @@
 
 = Introduction =
 
+  * Remoting sends log data for a remote console to use
+  * The advantages are:
+   * You dont need to keep console open in your working flash project
+   * Logs stays in remote afer closing your working flash project
+  * You can use commandline, view FPS and memory from remote
+  * AIR version of remote is in `bin/ConsoleRemote.air`
+  * EXE and APP version can be published using `samples/flash/ConsoleRemote.as`
+  * NOTE: There can be confusion with FPS and memory monitor if you have more than one flash client sending to remote
+
 Remote (receiver) receives logs from client (sender).
-Best remote option is the ConsoleRemote.air - AIR app.
 
 If you set:
 {{{
