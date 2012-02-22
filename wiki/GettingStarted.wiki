@@ -251,6 +251,7 @@ aSprite = null;
 {{{
 Cc.remoting = true; // turns on remoting
 }}}
+For more information see: [Remoting]
 
 ----
 
