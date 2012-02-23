@@ -8,7 +8,7 @@
    * You dont need to keep console open in your working flash project
    * Logs stays in remote afer closing your working flash project
    * You can use commandline, view FPS and memory from remote
-  * AIR version of remote is in `bin/ConsoleRemote.air`
+  * AIR version of remote is in [http://flash-console.googlecode.com/svn/trunk/bin/ConsoleRemote.air bin/ConsoleRemote.air]
   * EXE and APP version can be published using `samples/remote_air/ConsoleRemoteAIR.as`
 
 ==DEMO==
