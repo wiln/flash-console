@@ -9,7 +9,7 @@
    * Logs stays in remote afer closing your working flash project
   * You can use commandline, view FPS and memory from remote
   * AIR version of remote is in `bin/ConsoleRemote.air`
-  * EXE and APP version can be published using `samples/flash/ConsoleRemote.as`
+  * EXE and APP version can be published using `samples/remote_air/ConsoleRemoteAIR.as`
   * NOTE: There can be confusion with FPS and memory monitor if you have more than one flash client sending to remote
 
 Remote (receiver) receives logs from client (sender).
