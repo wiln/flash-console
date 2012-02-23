@@ -7,29 +7,23 @@
   * The advantages are:
    * You dont need to keep console open in your working flash project
    * Logs stays in remote afer closing your working flash project
-  * You can use commandline, view FPS and memory from remote
+   * You can use commandline, view FPS and memory from remote
   * AIR version of remote is in `bin/ConsoleRemote.air`
   * EXE and APP version can be published using `samples/remote_air/ConsoleRemoteAIR.as`
-  * NOTE: There can be confusion with FPS and memory monitor if you have more than one flash client sending to remote
 
-Remote (receiver) receives logs from client (sender).
-
-If you set:
-{{{
-Cc.remoting = true;
-}}}
-On your client app, you should see logs on your remote app as soon as you launch it.
+==DEMO==
+  * Client (sender): http://console.junkbyte.com/sample.html
+  * Remote (receiver): http://console.junkbyte.com/remote.html
 
 Remote may prompt for password if you have password set up on client.
-You may disable this by setting `Cc.config.remotingPassword = "";`. This *must be set before* starting remoting.
 
+You may disable this by setting `Cc.config.remotingPassword = "";`. - *Must be set before* starting remoting.
 
-There are two communication options.
-  * Local Connection
-  * Socket
+There can be confusion with FPS and memory monitor if you have more than one flash client sending to remote
 
+=Communication options=
 
-=Local Connection=
+==Local Connection==
 Default option. 
 It can connects to another flash instance on the same machine.
 
@@ -40,7 +34,7 @@ Start from client code:
 Start from commandLine:
 `$C.remoting = true`
 
-=Socket=
+==Socket==
 Can connect using Socket connection to another FlashConsole on another computer.
 
 Data is in simple binaries, so you can even write your own remote on any platform.
