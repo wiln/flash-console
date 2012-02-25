@@ -20,6 +20,7 @@ They are not compiled as part of SWC package at the moment as some may require a
   * sample: http://console.junkbyte.com/addons/htmlexport/export.html
   * blog: http://junkbyte.com/wp/as3/console/console-logs-to-html-export-addon/
   * Requires flash player 11 OR com.adobe.serialization.json.JSON.
+   * If you are using com.adobe.serialization.json.JSON, make sure you reference the class somewhere so that it get compiled.
 
 
 ==Command Prompt==
